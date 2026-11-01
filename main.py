@@ -158,7 +158,10 @@ def main():
 
     parser.add_argument("--spread", type=float)
     parser.add_argument("--total", type=float)
-
+    parser.add_argument("--home-odds", type=int)
+    parser.add_argument("--away-odds", type=int)
+    parser.add_argument("--over-odds", type=int)
+    parser.add_argument("--under-odds", type=int)
     parser.add_argument("--trials", type=int, default=100000)
 
     args = parser.parse_args()
