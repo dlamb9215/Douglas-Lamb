@@ -249,6 +249,10 @@ def main():
     if args.total is not None:
         print(f"Sportsbook total: {args.total:.1f}")
         print(f"Total difference: {model_total - args.total:+.1f}")
+        if abs(model_total - args.total) >= 3:
+            print("Total edge: MODEL LEAN")
+        else:
+            print("Total edge: NO CLEAR EDGE")
     else:
         print("Sportsbook total: Not provided")
     total_line = args.total if args.total is not None else model_total
