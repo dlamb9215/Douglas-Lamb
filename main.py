@@ -330,7 +330,7 @@ def main():
 
         print(f"Over edge: {result['over'] - over_fair:+.2f} percentage points")
         print(f"Under edge: {result['under'] - under_fair:+.2f} percentage points")
-    )
+    
     first_half = simulate_game(
         home_mean / 2,
         away_mean / 2,
