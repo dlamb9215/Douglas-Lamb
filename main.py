@@ -235,11 +235,12 @@ def main():
     print(f"Model projected spread: {model_spread:.1f}")
     print(f"Model projected total: {model_total:.1f}")
 
-    if args.spread is not None:
-        print(f"Sportsbook spread: {args.spread:+.1f}")
-        print(f"Spread difference: {model_spread - args.spread:+.1f}")
-    if abs(model_spread - args.spread) >= 3:
-        print("Spread edge: MODEL LEAN")
+        if args.spread is not None:
+            print(f"Sportsbook spread: {args.spread:+.1f}")
+            print(f"Spread difference: {model_spread - args.spread:+.1f}")
+
+            if abs(model_spread - args.spread) >= 3:
+            print("Spread edge: MODEL LEAN")
         else:
             print("Spread edge: NO CLEAR EDGE")
     else:
