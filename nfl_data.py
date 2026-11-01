@@ -265,7 +265,40 @@ def compare_team_stats(database, team_a, team_b):
 
     return report
 
+def project_team_yardage(database, offense_team, defense_team):
+    """Project a team's passing, rushing, and total yards."""
 
+    offense = get_team_stats(database, offense_team)["offense"]
+    defense = get_team_stats(database, defense_team)["defense"]
+
+    passing = (
+        offense["passing"]["yards_per_game"]
+        + defense["passing"]["yards_per_game"]
+    ) / 2
+
+    rushing = (
+        offense["rushing"]["yards_per_game"]
+        + defense["rushing"]["yards_per_game"]
+    ) / 2
+
+    return {
+        "passing_yards": round(passing, 1),
+        "rushing_yards": round(rushing, 1),
+        "total_yards": round(passing + rushing, 1),
+    }
+
+
+def project_matchup_yardage(database, home_team, away_team):
+    """Project yardage for both teams in a matchup."""
+
+    return {
+        home_team: project_team_yardage(
+            database, home_team, away_team
+        ),
+        away_team: project_team_yardage(
+            database, away_team, home_team
+        ),
+    }
 if __name__ == "__main__":
     database = load_team_stats()
 
