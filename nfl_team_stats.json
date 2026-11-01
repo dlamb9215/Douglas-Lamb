@@ -1,6 +1,9 @@
 [
   {
     "team": "ARI",
+    "games_played": 7,
+    "points_for_per_game": 20.29,
+    "points_allowed_per_game": 29.71,
     "offense": {
       "passing": {
         "yards_per_game": 229.57,
@@ -57,6 +60,9 @@
   },
   {
     "team": "ATL",
+    "games_played": 7,
+    "points_for_per_game": 24.43,
+    "points_allowed_per_game": 24.71,
     "offense": {
       "passing": {
         "yards_per_game": 211.29,
@@ -113,6 +119,9 @@
   },
   {
     "team": "BAL",
+    "games_played": 7,
+    "points_for_per_game": 24.14,
+    "points_allowed_per_game": 23.86,
     "offense": {
       "passing": {
         "yards_per_game": 242.0,
@@ -169,6 +178,9 @@
   },
   {
     "team": "BUF",
+    "games_played": 6,
+    "points_for_per_game": 32.83,
+    "points_allowed_per_game": 28.5,
     "offense": {
       "passing": {
         "yards_per_game": 250.67,
@@ -225,6 +237,9 @@
   },
   {
     "team": "CAR",
+    "games_played": 7,
+    "points_for_per_game": 25.43,
+    "points_allowed_per_game": 27.57,
     "offense": {
       "passing": {
         "yards_per_game": 281.14,
@@ -281,6 +296,9 @@
   },
   {
     "team": "CHI",
+    "games_played": 7,
+    "points_for_per_game": 25.71,
+    "points_allowed_per_game": 20.43,
     "offense": {
       "passing": {
         "yards_per_game": 254.86,
@@ -337,6 +355,9 @@
   },
   {
     "team": "CIN",
+    "games_played": 6,
+    "points_for_per_game": 27.17,
+    "points_allowed_per_game": 20.33,
     "offense": {
       "passing": {
         "yards_per_game": 275.5,
@@ -393,6 +414,9 @@
   },
   {
     "team": "CLE",
+    "games_played": 7,
+    "points_for_per_game": 19.0,
+    "points_allowed_per_game": 20.86,
     "offense": {
       "passing": {
         "yards_per_game": 211.71,
@@ -449,6 +473,9 @@
   },
   {
     "team": "DAL",
+    "games_played": 7,
+    "points_for_per_game": 27.0,
+    "points_allowed_per_game": 25.71,
     "offense": {
       "passing": {
         "yards_per_game": 264.43,
@@ -505,6 +532,9 @@
   },
   {
     "team": "DEN",
+    "games_played": 7,
+    "points_for_per_game": 20.57,
+    "points_allowed_per_game": 20.14,
     "offense": {
       "passing": {
         "yards_per_game": 181.57,
@@ -561,6 +591,9 @@
   },
   {
     "team": "DET",
+    "games_played": 6,
+    "points_for_per_game": 30.67,
+    "points_allowed_per_game": 27.5,
     "offense": {
       "passing": {
         "yards_per_game": 298.0,
@@ -617,6 +650,9 @@
   },
   {
     "team": "GB",
+    "games_played": 8,
+    "points_for_per_game": 21.38,
+    "points_allowed_per_game": 20.5,
     "offense": {
       "passing": {
         "yards_per_game": 280.75,
@@ -673,6 +709,9 @@
   },
   {
     "team": "HOU",
+    "games_played": 7,
+    "points_for_per_game": 23.57,
+    "points_allowed_per_game": 24.29,
     "offense": {
       "passing": {
         "yards_per_game": 266.71,
@@ -729,6 +768,9 @@
   },
   {
     "team": "IND",
+    "games_played": 7,
+    "points_for_per_game": 22.0,
+    "points_allowed_per_game": 25.71,
     "offense": {
       "passing": {
         "yards_per_game": 199.71,
@@ -785,6 +827,9 @@
   },
   {
     "team": "JAX",
+    "games_played": 6,
+    "points_for_per_game": 25.67,
+    "points_allowed_per_game": 17.33,
     "offense": {
       "passing": {
         "yards_per_game": 246.67,
@@ -841,6 +886,9 @@
   },
   {
     "team": "KC",
+    "games_played": 6,
+    "points_for_per_game": 23.83,
+    "points_allowed_per_game": 17.17,
     "offense": {
       "passing": {
         "yards_per_game": 245.67,
@@ -897,6 +945,9 @@
   },
   {
     "team": "LAC",
+    "games_played": 6,
+    "points_for_per_game": 15.0,
+    "points_allowed_per_game": 25.17,
     "offense": {
       "passing": {
         "yards_per_game": 190.17,
@@ -953,6 +1004,9 @@
   },
   {
     "team": "LAR",
+    "games_played": 7,
+    "points_for_per_game": 24.29,
+    "points_allowed_per_game": 22.71,
     "offense": {
       "passing": {
         "yards_per_game": 286.0,
@@ -1009,6 +1063,9 @@
   },
   {
     "team": "LV",
+    "games_played": 7,
+    "points_for_per_game": 26.14,
+    "points_allowed_per_game": 28.14,
     "offense": {
       "passing": {
         "yards_per_game": 276.86,
@@ -1065,6 +1122,9 @@
   },
   {
     "team": "MIA",
+    "games_played": 6,
+    "points_for_per_game": 16.33,
+    "points_allowed_per_game": 26.17,
     "offense": {
       "passing": {
         "yards_per_game": 176.17,
@@ -1121,6 +1181,9 @@
   },
   {
     "team": "MIN",
+    "games_played": 6,
+    "points_for_per_game": 20.83,
+    "points_allowed_per_game": 12.33,
     "offense": {
       "passing": {
         "yards_per_game": 181.33,
@@ -1177,6 +1240,9 @@
   },
   {
     "team": "NE",
+    "games_played": 7,
+    "points_for_per_game": 22.86,
+    "points_allowed_per_game": 20.43,
     "offense": {
       "passing": {
         "yards_per_game": 261.43,
@@ -1233,6 +1299,9 @@
   },
   {
     "team": "NO",
+    "games_played": 7,
+    "points_for_per_game": 23.14,
+    "points_allowed_per_game": 27.71,
     "offense": {
       "passing": {
         "yards_per_game": 245.86,
@@ -1289,6 +1358,9 @@
   },
   {
     "team": "NYG",
+    "games_played": 7,
+    "points_for_per_game": 23.29,
+    "points_allowed_per_game": 23.0,
     "offense": {
       "passing": {
         "yards_per_game": 243.14,
@@ -1345,6 +1417,9 @@
   },
   {
     "team": "NYJ",
+    "games_played": 7,
+    "points_for_per_game": 19.57,
+    "points_allowed_per_game": 21.43,
     "offense": {
       "passing": {
         "yards_per_game": 231.86,
@@ -1401,6 +1476,9 @@
   },
   {
     "team": "PHI",
+    "games_played": 7,
+    "points_for_per_game": 18.14,
+    "points_allowed_per_game": 25.0,
     "offense": {
       "passing": {
         "yards_per_game": 194.14,
@@ -1457,6 +1535,9 @@
   },
   {
     "team": "PIT",
+    "games_played": 7,
+    "points_for_per_game": 21.86,
+    "points_allowed_per_game": 19.71,
     "offense": {
       "passing": {
         "yards_per_game": 242.71,
@@ -1513,6 +1594,9 @@
   },
   {
     "team": "SEA",
+    "games_played": 7,
+    "points_for_per_game": 24.0,
+    "points_allowed_per_game": 17.86,
     "offense": {
       "passing": {
         "yards_per_game": 246.57,
@@ -1569,6 +1653,9 @@
   },
   {
     "team": "SF",
+    "games_played": 7,
+    "points_for_per_game": 28.14,
+    "points_allowed_per_game": 19.86,
     "offense": {
       "passing": {
         "yards_per_game": 249.71,
@@ -1625,6 +1712,9 @@
   },
   {
     "team": "TB",
+    "games_played": 7,
+    "points_for_per_game": 23.14,
+    "points_allowed_per_game": 21.57,
     "offense": {
       "passing": {
         "yards_per_game": 168.57,
@@ -1681,6 +1771,9 @@
   },
   {
     "team": "TEN",
+    "games_played": 7,
+    "points_for_per_game": 15.43,
+    "points_allowed_per_game": 22.29,
     "offense": {
       "passing": {
         "yards_per_game": 168.43,
@@ -1737,6 +1830,9 @@
   },
   {
     "team": "WAS",
+    "games_played": 6,
+    "points_for_per_game": 22.0,
+    "points_allowed_per_game": 28.67,
     "offense": {
       "passing": {
         "yards_per_game": 214.17,
