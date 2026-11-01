@@ -10,7 +10,8 @@ API_URL = (
     "https://api.github.com/repos/"
     "nflverse/nflverse-data/releases/tags/stats_team"
 )
-OUTPUT = Path("nfl_team_stats.json")TEAM_ALIASES = {"LA": "LAR"}
+OUTPUT = Path("nfl_team_stats.json")
+TEAM_ALIASES = {"LA": "LAR"}
 
 
 def normalize_team(value):
