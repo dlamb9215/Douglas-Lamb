@@ -241,7 +241,26 @@ def main():
         total_line,
         args.trials,
     )
+        first_half = simulate_game(
+        home_mean / 2,
+        away_mean / 2,
+        args.home_sd / (2 ** 0.5),
+        args.away_sd / (2 ** 0.5),
+        spread_line / 2,
+        total_line / 2,
+        args.trials,
+    )
 
+    print("\nFIRST-HALF SIMULATION")
+    print("=====================")
+    print(f"Home win: {first_half['home_win']:.2f}%")
+    print(f"Away win: {first_half['away_win']:.2f}%")
+    print(f"Home cover: {first_half['home_cover']:.2f}%")
+    print(f"Away cover: {first_half['away_cover']:.2f}%")
+    print(f"Over: {first_half['over']:.2f}%")
+    print(f"Under: {first_half['under']:.2f}%")
+    print(f"Projected home points: {first_half['home_avg']:.1f}")
+    print(f"Projected away points: {first_half['away_avg']:.1f}")
     print(f"\nSIMULATION RESULTS: {args.trials:,} TRIALS")
 
     print("\nWIN PROBABILITIES")
