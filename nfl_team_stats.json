@@ -1,0 +1,20 @@
+[
+  {
+    "team": "ARI",
+    "offense": {
+      "passing": {},
+      "rushing": {},
+      "total": {}
+    },
+    "defense": {
+      "passing": {},
+      "rushing": {},
+      "total": {}
+    },
+    "turnovers": {
+      "takeaways": null,
+      "giveaways": null,
+      "differential": null
+    }
+  }
+]
