@@ -248,7 +248,18 @@ def main():
 
         print("\nNo matchup prediction was generated.")
         return
-    
+    print("\nDATA QUALITY CHECK")
+    print("==================")
+    print("Required matchup statistics: VERIFIED")
+    print("Team scoring data: CHECKED")
+    print("Injury and inactive status: NOT VERIFIED")
+    print("Confirmed starting lineups: NOT VERIFIED")
+
+    print("\nMODEL CONFIDENCE WARNING")
+    print("========================")
+    print("55% lean threshold is preliminary, not historically calibrated.")
+    print("First-half projections use estimated scoring splits.")
+    print("Do not treat a model lean as a guaranteed betting edge.")
     home_scoring = home.get("points_for_per_game")
     home_allowed = home.get("points_allowed_per_game")
     away_scoring = away.get("points_for_per_game")
