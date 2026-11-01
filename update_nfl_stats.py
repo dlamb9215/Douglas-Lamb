@@ -70,7 +70,7 @@ def main():
         if row.get("season_type") != "REG":
             continue
 
-        team = row.get("team", "").upper()
+        team = normalize_team(row.get("team"))
         games = num(row, "games")
         if not team or games <= 0:
             continue
@@ -161,7 +161,7 @@ def main():
             continue
 
         opponent = normalize_team(row.get("opponent_team"))
-        team = row.get("team", "").upper()
+        team = normalize_team(row.get("team"))
 
         if opponent not in teams or team not in teams:
             continue
