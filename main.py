@@ -165,7 +165,7 @@ def main():
     parser.add_argument("--trials", type=int, default=100000)
 
     args = parser.parse_args()
-        def implied_probability(odds):
+    def implied_probability(odds):
         if odds is None:
             return None
         if odds > 0:
