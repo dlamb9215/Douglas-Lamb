@@ -304,8 +304,7 @@ def main():
     print(f"Under: {result['under']:.2f}%")
     print(f"Push: {result['total_push']:.2f}%")
 
-    print("\nPROJECTED SCORE")
-        print("\nPROBABILITY-BASED MODEL LEANS")
+    print("\nPROBABILITY-BASED MODEL LEANS")
     print("=============================")
 
     if result["home_win"] >= 55:
@@ -328,13 +327,10 @@ def main():
         print(f"TOTAL LEAN: UNDER ({result['under']:.1f}%)")
     else:
         print("TOTAL: PASS")
+
+    print("\nPROJECTED SCORE")
     print(f"{home['name']}: {result['home_avg']:.1f}")
     print(f"{away['name']}: {result['away_avg']:.1f}")
-
-    print(
-        "\nNOTE: Scoring averages are supplied inputs, "
-        "not automatically calculated projections."
-    )
 
 
 if __name__ == "__main__":
