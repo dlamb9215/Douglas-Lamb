@@ -11,6 +11,7 @@ from nfl_data import (
     get_team_stats,
     compare_team_stats,
     check_matchup_data,
+    project_matchup_yardage,
 )
 
 
@@ -178,6 +179,18 @@ def main():
     print(f"{away['name']} AT {home['name']}")
 
     print_matchup_report(database, home_code, away_code)
+        yardage = project_matchup_yardage(
+        database, home_code, away_code
+    )
+
+    print("\nAUTOMATIC YARDAGE PROJECTIONS")
+    print("=============================")
+
+    for team, projection in yardage.items():
+        print(f"\n{team}")
+        print(f"Passing yards: {projection['passing_yards']}")
+        print(f"Rushing yards: {projection['rushing_yards']}")
+        print(f"Total yards: {projection['total_yards']}")
 
     data_check = check_matchup_data(
         database, home_code, away_code
