@@ -79,6 +79,19 @@ class TestTeamStats(unittest.TestCase):
             rushing["team_b_advantage"], 5
         )
 
+    def test_compare_stat_advantage(self):
+        result = compare_stat_advantage(
+            self.team_a,
+            self.team_b
+        )
 
+        self.assertEqual(
+            result,
+            {
+                "passing": None,
+                "rushing": None,
+                "total": None
+            }
+        )
 if __name__ == "__main__":
     unittest.main()
