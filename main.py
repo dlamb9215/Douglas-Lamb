@@ -216,14 +216,14 @@ def main():
     away_allowed = away.get("points_allowed_per_game")
 
     if None in (home_scoring, home_allowed, away_scoring, away_allowed):
-    print("SIMULATION BLOCKED: Missing scoring data.")
-    return
+        print("SIMULATION BLOCKED: Missing scoring data.")
+        return
 
     home_mean = args.home_mean if args.home_mean is not None else (
-    home_scoring + away_allowed) / 2
+        home_scoring + away_allowed) / 2
 
     away_mean = args.away_mean if args.away_mean is not None else (
-    away_scoring + home_allowed) / 2
+        away_scoring + home_allowed) / 2
 
     if args.spread is None or args.total is None:
         print("SIMULATION NOT RUN: Enter the sportsbook spread and total.")
