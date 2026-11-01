@@ -6,7 +6,11 @@ NFL 100,000 Trial Simulation Engine
 
 import random
 import argparse
-
+from player_projections import (
+    project_quarterback,
+    project_running_back,
+    project_receiver
+)
 
 def simulate_game(
     home_mean,
