@@ -248,7 +248,7 @@ def main():
 
         print("\nNo matchup prediction was generated.")
         return
-
+    
     home_scoring = home.get("points_for_per_game")
     home_allowed = home.get("points_allowed_per_game")
     away_scoring = away.get("points_for_per_game")
