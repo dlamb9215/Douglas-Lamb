@@ -10,7 +10,12 @@ API_URL = (
     "https://api.github.com/repos/"
     "nflverse/nflverse-data/releases/tags/stats_team"
 )
-OUTPUT = Path("nfl_team_stats.json")
+OUTPUT = Path("nfl_team_stats.json")TEAM_ALIASES = {"LA": "LAR"}
+
+
+def normalize_team(value):
+    team = (value or "").upper()
+    return TEAM_ALIASES.get(team, team)
 
 
 def download_csv(filename):
@@ -154,7 +159,7 @@ def main():
         if row.get("season_type") != "REG":
             continue
 
-        opponent = row.get("opponent_team", "").upper()
+        opponent = normalize_team(row.get("opponent_team"))
         team = row.get("team", "").upper()
 
         if opponent not in teams or team not in teams:
@@ -177,7 +182,7 @@ def main():
     for row in weekly:
         if row.get("season_type") != "REG":
             continue
-        team = row.get("team", "").upper()
+        team = normalize_team(row.get("team"))
         if team in allowed:
             allowed[team]["def_interceptions"] += num(
                 row, "def_interceptions"
