@@ -56,7 +56,6 @@ def download_schedule():
         return list(csv.DictReader(
             response.read().decode("utf-8-sig").splitlines()
         ))
-        
 def num(row, field):
     try:
         value = row.get(field, "")
