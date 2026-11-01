@@ -4,7 +4,8 @@ import unittest
 from team_stats import (
     validate_team,
     compare_teams,
-    rank_advantage
+    rank_advantage,
+    compare_stat_advantage
 )
 
 
