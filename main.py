@@ -179,7 +179,7 @@ def main():
     print(f"{away['name']} AT {home['name']}")
 
     print_matchup_report(database, home_code, away_code)
-        yardage = project_matchup_yardage(
+    yardage = project_matchup_yardage(
         database, home_code, away_code
     )
 
