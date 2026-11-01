@@ -1,0 +1,44 @@
+name: Run Doug's Elite Game Simulator
+
+on:
+  workflow_dispatch:
+    inputs:
+      home:
+        description: Home team
+        required: true
+        default: BUF
+        type: string
+      away:
+        description: Away team
+        required: true
+        default: BAL
+        type: string
+      trials:
+        description: Simulation trials
+        required: true
+        default: "100000"
+        type: string
+
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run tests
+        run: python -m unittest -v
+
+      - name: Run matchup
+        run: python main.py --home "${{ inputs.home }}" --away "${{ inputs.away }}" --trials "${{ inputs.trials }}" | tee simulation-results.txt
+
+      - name: Save results
+        uses: actions/upload-artifact@v4
+        with:
+          name: matchup-simulation-results
+          path: simulation-results.txt
