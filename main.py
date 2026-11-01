@@ -238,6 +238,10 @@ def main():
     if args.spread is not None:
         print(f"Sportsbook spread: {args.spread:+.1f}")
         print(f"Spread difference: {model_spread - args.spread:+.1f}")
+    if abs(model_spread - args.spread) >= 3:
+        print("Spread edge: MODEL LEAN")
+        else:
+            print("Spread edge: NO CLEAR EDGE")
     else:
         print("Sportsbook spread: Not provided")
 
