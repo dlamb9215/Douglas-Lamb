@@ -176,7 +176,23 @@ def main():
 
     print("\nSPORTSBOOK IMPLIED PROBABILITIES")
     print("================================")
+    if args.home_odds is not None and args.away_odds is not None:
+        home_raw = implied_probability(args.home_odds)
+        away_raw = implied_probability(args.away_odds)
+        market_total = home_raw + away_raw
 
+        print("\nVIG-FREE MONEYLINE PROBABILITIES")
+        print(f"Home: {home_raw / market_total * 100:.2f}%")
+        print(f"Away: {away_raw / market_total * 100:.2f}%")
+
+    if args.over_odds is not None and args.under_odds is not None:
+        over_raw = implied_probability(args.over_odds)
+        under_raw = implied_probability(args.under_odds)
+        market_total = over_raw + under_raw
+
+        print("\nVIG-FREE TOTAL PROBABILITIES")
+        print(f"Over: {over_raw / market_total * 100:.2f}%")
+        print(f"Under: {under_raw / market_total * 100:.2f}%")
     for label, odds in [
         ("Home ML", args.home_odds),
         ("Away ML", args.away_odds),
