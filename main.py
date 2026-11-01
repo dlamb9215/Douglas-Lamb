@@ -241,7 +241,7 @@ def main():
         total_line,
         args.trials,
     )
-        first_half = simulate_game(
+    first_half = simulate_game(
         home_mean / 2,
         away_mean / 2,
         args.home_sd / (2 ** 0.5),
