@@ -211,40 +211,24 @@ def main():
         return
 
     home_scoring = home.get("points_for_per_game")
-home_allowed = home.get("points_allowed_per_game")
-away_scoring = away.get("points_for_per_game")
-away_allowed = away.get("points_allowed_per_game")
+    home_allowed = home.get("points_allowed_per_game")
+    away_scoring = away.get("points_for_per_game")
+    away_allowed = away.get("points_allowed_per_game")
 
-if None in (home_scoring, home_allowed, away_scoring, away_allowed):
+    if None in (home_scoring, home_allowed, away_scoring, away_allowed):
     print("SIMULATION BLOCKED: Missing scoring data.")
     return
 
-home_mean = args.home_mean if args.home_mean is not None else (
-    home_scoring + away_allowed
-) / 2
+    home_mean = args.home_mean if args.home_mean is not None else (
+    home_scoring + away_allowed) / 2
 
-away_mean = args.away_mean if args.away_mean is not None else (
-    away_scoring + home_allowed
-) / 2
+    away_mean = args.away_mean if args.away_mean is not None else (
+    away_scoring + home_allowed) / 2
 
-if args.spread is None or args.total is None:
-    print("SIMULATION NOT RUN: Enter the sportsbook spread and total.")
-    return
-        "home scoring average": args.home_mean,
-        "away scoring average": args.away_mean,
-        "spread": args.spread,
-        "game total": args.total,
-    }
-
-    missing_lines = [
-        name for name, value in required_lines.items()
-        if value is None
-    ]
-
-    if missing_lines:
-        print("\nSIMULATION NOT RUN")
-        print("Missing inputs:", ", ".join(missing_lines))
+    if args.spread is None or args.total is None:
+        print("SIMULATION NOT RUN: Enter the sportsbook spread and total.")
         return
+        
 
     result = simulate_game(
         home_mean,
