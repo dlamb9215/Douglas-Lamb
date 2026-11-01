@@ -305,6 +305,31 @@ def main():
         spread_line,
         total_line,
         args.trials,
+        )
+    print("\nMODEL EDGE VS FAIR MARKET")
+    print("=========================")
+
+    if args.home_odds is not None and args.away_odds is not None:
+        home_fair = implied_probability(args.home_odds)
+        away_fair = implied_probability(args.away_odds)
+        fair_total = home_fair + away_fair
+
+        home_fair = home_fair / fair_total * 100
+        away_fair = away_fair / fair_total * 100
+
+        print(f"Home ML edge: {result['home_win'] - home_fair:+.2f} percentage points")
+        print(f"Away ML edge: {result['away_win'] - away_fair:+.2f} percentage points")
+
+    if args.over_odds is not None and args.under_odds is not None:
+        over_fair = implied_probability(args.over_odds)
+        under_fair = implied_probability(args.under_odds)
+        fair_total = over_fair + under_fair
+
+        over_fair = over_fair / fair_total * 100
+        under_fair = under_fair / fair_total * 100
+
+        print(f"Over edge: {result['over'] - over_fair:+.2f} percentage points")
+        print(f"Under edge: {result['under'] - under_fair:+.2f} percentage points")
     )
     first_half = simulate_game(
         home_mean / 2,
