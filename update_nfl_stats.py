@@ -1,154 +1,125 @@
 import csv
 import json
 import urllib.request
+from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
 SEASON = 2026
-REPO_API = (
+API_URL = (
     "https://api.github.com/repos/"
     "nflverse/nflverse-data/releases/tags/stats_team"
 )
+OUTPUT = Path("nfl_team_stats.json")
 
-OUTPUT_FILE = Path("nfl_team_stats.json")
 
-def download_csv():
+def download_csv(filename):
     request = urllib.request.Request(
-        REPO_API,
+        API_URL,
         headers={"User-Agent": "Doug-Elite-Game-Simulator"}
     )
-
     with urllib.request.urlopen(request, timeout=30) as response:
         release = json.loads(response.read().decode("utf-8"))
 
-    filename = f"stats_team_reg_{SEASON}.csv"
-
     asset = next(
-        (item for item in release["assets"]
-         if item["name"] == filename),
+        (a for a in release["assets"] if a["name"] == filename),
         None
     )
-
     if asset is None:
-        raise RuntimeError(f"Could not find {filename} in the data release.")
+        raise RuntimeError(f"Missing data file: {filename}")
 
     request = urllib.request.Request(
         asset["browser_download_url"],
         headers={"User-Agent": "Doug-Elite-Game-Simulator"}
     )
+    with urllib.request.urlopen(request, timeout=90) as response:
+        return list(csv.DictReader(
+            response.read().decode("utf-8-sig").splitlines()
+        ))
 
-    with urllib.request.urlopen(request, timeout=60) as response:
-        return response.read().decode("utf-8-sig")
 
-
-def number(row, field):
-    value = row.get(field, "")
-    if value in ("", None):
-        return None
+def num(row, field):
     try:
-        return float(value)
+        value = row.get(field, "")
+        return float(value) if value not in ("", None) else 0.0
     except (TypeError, ValueError):
-        return None
+        return 0.0
 
 
-def per_game(value, games):
-    if value is None or not games:
-        return None
-    return round(value / games, 2)
+def rate(a, b):
+    return round(a / b, 3) if b else None
 
 
-def safe_rate(numerator, denominator):
-    if numerator is None or denominator in (None, 0):
-        return None
-    return round(numerator / denominator, 3)
+def average(a, games):
+    return round(a / games, 2) if games else None
 
 
 def main():
-    csv_text = download_csv()
-    rows = list(csv.DictReader(csv_text.splitlines()))
+    regular = download_csv(f"stats_team_reg_{SEASON}.csv")
+    weekly = download_csv(f"stats_team_week_{SEASON}.csv")
 
     teams = {}
 
-    for row in rows:
-        if row.get("season_type", "REG") != "REG":
+    for row in regular:
+        if row.get("season_type") != "REG":
             continue
 
         team = row.get("team", "").upper()
-        games = number(row, "games")
-
-        if not team or not games or games <= 0:
+        games = num(row, "games")
+        if not team or games <= 0:
             continue
 
-        pass_yards = number(row, "passing_yards")
-        pass_attempts = number(row, "attempts")
-        completions = number(row, "completions")
-        pass_tds = number(row, "passing_tds")
-        interceptions = number(row, "passing_interceptions")
-        pass_first = number(row, "passing_first_downs")
+        py = num(row, "passing_yards")
+        pa = num(row, "attempts")
+        comp = num(row, "completions")
+        ptd = num(row, "passing_tds")
+        interceptions = num(row, "passing_interceptions")
+        pfirst = num(row, "passing_first_downs")
 
-        rush_yards = number(row, "rushing_yards")
-        carries = number(row, "carries")
-        rush_tds = number(row, "rushing_tds")
-        rush_first = number(row, "rushing_first_downs")
+        ry = num(row, "rushing_yards")
+        carries = num(row, "carries")
+        rtd = num(row, "rushing_tds")
+        rfirst = num(row, "rushing_first_downs")
 
-        sacks = number(row, "sacks_suffered") or 0
-        plays = (
-            (pass_attempts or 0)
-            + (carries or 0)
-            + sacks
-        )
-
-        total_yards = (
-            (pass_yards or 0)
-            + (rush_yards or 0)
-        )
+        sacks = num(row, "sacks_suffered")
+        plays = pa + carries + sacks
+        total_yards = py + ry
 
         takeaways = (
-            (number(row, "def_interceptions") or 0)
-            + (number(row, "fumble_recovery_opp") or 0)
+            num(row, "def_interceptions")
+            + num(row, "fumble_recovery_opp")
         )
-
-        fumbles_lost = sum(
-            number(row, field) or 0
-            for field in (
-                "sack_fumbles_lost",
-                "rushing_fumbles_lost",
-                "receiving_fumbles_lost",
-            )
+        giveaways = (
+            interceptions
+            + num(row, "sack_fumbles_lost")
+            + num(row, "rushing_fumbles_lost")
+            + num(row, "receiving_fumbles_lost")
         )
-
-        giveaways = (interceptions or 0) + fumbles_lost
 
         teams[team] = {
             "team": team,
             "offense": {
                 "passing": {
-                    "yards_per_game": per_game(pass_yards, games),
-                    "attempts_per_game": per_game(pass_attempts, games),
-                    "completions_per_game": per_game(completions, games),
-                    "completion_pct": (
-                        round(completions / pass_attempts * 100, 2)
-                        if completions is not None
-                        and pass_attempts else None
-                    ),
-                    "yards_per_attempt": safe_rate(
-                        pass_yards, pass_attempts
-                    ),
-                    "touchdowns": per_game(pass_tds, games),
-                    "interceptions": per_game(interceptions, games),
-                    "first_downs_per_game": per_game(pass_first, games),
+                    "yards_per_game": average(py, games),
+                    "attempts_per_game": average(pa, games),
+                    "completions_per_game": average(comp, games),
+                    "completion_pct": round(comp / pa * 100, 2) if pa else None,
+                    "yards_per_attempt": rate(py, pa),
+                    "touchdowns": average(ptd, games),
+                    "interceptions": average(interceptions, games),
+                    "first_downs_per_game": average(pfirst, games),
                 },
                 "rushing": {
-                    "yards_per_game": per_game(rush_yards, games),
-                    "attempts_per_game": per_game(carries, games),
-                    "yards_per_carry": safe_rate(rush_yards, carries),
-                    "touchdowns": per_game(rush_tds, games),
-                    "first_downs_per_game": per_game(rush_first, games),
+                    "yards_per_game": average(ry, games),
+                    "attempts_per_game": average(carries, games),
+                    "yards_per_carry": rate(ry, carries),
+                    "touchdowns": average(rtd, games),
+                    "first_downs_per_game": average(rfirst, games),
                 },
                 "total": {
-                    "yards_per_game": per_game(total_yards, games),
-                    "plays_per_game": per_game(plays, games),
-                    "yards_per_play": safe_rate(total_yards, plays),
+                    "yards_per_game": average(total_yards, games),
+                    "plays_per_game": average(plays, games),
+                    "yards_per_play": rate(total_yards, plays),
                 },
             },
             "defense": {
@@ -157,19 +128,115 @@ def main():
                 "total": {},
             },
             "turnovers": {
-                "takeaways": round(takeaways, 2),
-                "giveaways": round(giveaways, 2),
-                "differential": round(takeaways - giveaways, 2),
+                "takeaways": takeaways,
+                "giveaways": giveaways,
+                "differential": takeaways - giveaways,
+            },
+        }
+
+    # Build defensive totals from the offenses each team faced.
+    allowed = defaultdict(lambda: {
+        "games": 0,
+        "pass_yards": 0,
+        "pass_attempts": 0,
+        "completions": 0,
+        "pass_tds": 0,
+        "pass_first": 0,
+        "rush_yards": 0,
+        "carries": 0,
+        "rush_tds": 0,
+        "rush_first": 0,
+        "sacks": 0,
+        "def_interceptions": 0,
+    })
+
+    for row in weekly:
+        if row.get("season_type") != "REG":
+            continue
+
+        opponent = row.get("opponent_team", "").upper()
+        team = row.get("team", "").upper()
+
+        if opponent not in teams or team not in teams:
+            continue
+
+        d = allowed[opponent]
+        d["games"] += 1
+        d["pass_yards"] += num(row, "passing_yards")
+        d["pass_attempts"] += num(row, "attempts")
+        d["completions"] += num(row, "completions")
+        d["pass_tds"] += num(row, "passing_tds")
+        d["pass_first"] += num(row, "passing_first_downs")
+        d["rush_yards"] += num(row, "rushing_yards")
+        d["carries"] += num(row, "carries")
+        d["rush_tds"] += num(row, "rushing_tds")
+        d["rush_first"] += num(row, "rushing_first_downs")
+        d["sacks"] += num(row, "sacks_suffered")
+
+    # Defensive interceptions are credited to the defending team.
+    for row in weekly:
+        if row.get("season_type") != "REG":
+            continue
+        team = row.get("team", "").upper()
+        if team in allowed:
+            allowed[team]["def_interceptions"] += num(
+                row, "def_interceptions"
+            )
+
+    for team, record in teams.items():
+        d = allowed[team]
+        games = d["games"]
+
+        if games == 0:
+            continue
+
+        py = d["pass_yards"]
+        pa = d["pass_attempts"]
+        comp = d["completions"]
+        ry = d["rush_yards"]
+        carries = d["carries"]
+        total_yards = py + ry
+        plays = pa + carries + d["sacks"]
+
+        record["defense"] = {
+            "passing": {
+                "yards_per_game": average(py, games),
+                "attempts_per_game": average(pa, games),
+                "completions_per_game": average(comp, games),
+                "completion_pct": round(comp / pa * 100, 2) if pa else None,
+                "yards_per_attempt": rate(py, pa),
+                "touchdowns": average(d["pass_tds"], games),
+                "interceptions": average(d["def_interceptions"], games),
+                "first_downs_per_game": average(d["pass_first"], games),
+            },
+            "rushing": {
+                "yards_per_game": average(ry, games),
+                "attempts_per_game": average(carries, games),
+                "yards_per_carry": rate(ry, carries),
+                "touchdowns": average(d["rush_tds"], games),
+                "first_downs_per_game": average(d["rush_first"], games),
+            },
+            "total": {
+                "yards_per_game": average(total_yards, games),
+                "plays_per_game": average(plays, games),
+                "yards_per_play": rate(total_yards, plays),
             },
         }
 
     if len(teams) != 32:
         raise RuntimeError(
-            f"Expected 32 NFL teams, but imported {len(teams)}. "
-            "The existing data file was not changed."
+            f"Expected 32 teams, imported {len(teams)}. "
+            "Existing file was not changed."
         )
 
-    OUTPUT_FILE.write_text(
+    for team, record in teams.items():
+        for category in ("passing", "rushing", "total"):
+            if not record["defense"][category]:
+                raise RuntimeError(
+                    f"Missing defensive data for {team}."
+                )
+
+    OUTPUT.write_text(
         json.dumps(
             [teams[key] for key in sorted(teams)],
             indent=2
@@ -177,13 +244,13 @@ def main():
         encoding="utf-8"
     )
 
-    print(f"Imported offensive stats for {len(teams)} teams.")
+    print("NFL statistics successfully imported.")
     print(f"Season: {SEASON}")
-    print("Defensive fields remain blank until verified data is added.")
-    print(
-        "Source update checked at: "
-        + datetime.now(timezone.utc).isoformat()
-    )
+    print("Teams: 32")
+    print("Offense: populated")
+    print("Defense: populated from opponent game statistics")
+    print("Source: nflverse")
+    print(datetime.now(timezone.utc).isoformat())
 
 
 if __name__ == "__main__":
