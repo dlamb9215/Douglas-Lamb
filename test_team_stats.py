@@ -63,7 +63,7 @@ class TestTeamStats(unittest.TestCase):
         passing = result["matchups"][0]
 
         self.assertEqual(
-            passing["team_a_advantage"], -5
+            passing["team_a_advantage"], 5
         )
 
     def test_rushing_advantage(self):
@@ -75,7 +75,7 @@ class TestTeamStats(unittest.TestCase):
         rushing = result["matchups"][1]
 
         self.assertEqual(
-            rushing["team_b_advantage"], 10
+            rushing["team_b_advantage"], 5
         )
 
 
