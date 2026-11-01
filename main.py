@@ -225,9 +225,11 @@ def main():
     away_mean = args.away_mean if args.away_mean is not None else (
         away_scoring + home_allowed) / 2
 
-    if args.spread is None or args.total is None:
-        print("SIMULATION NOT RUN: Enter the sportsbook spread and total.")
-        return
+        model_spread = away_mean - home_mean
+    model_total = home_mean + away_mean
+
+    spread_line = args.spread if args.spread is not None else model_spread
+    total_line = args.total if args.total is not None else model_total
         
 
     result = simulate_game(
@@ -235,8 +237,8 @@ def main():
         away_mean,
         args.home_sd,
         args.away_sd,
-        args.spread,
-        args.total,
+        spread_line,
+        total_line,
         args.trials,
     )
 
