@@ -95,7 +95,7 @@ def main():
         home_score = game.get("home_score")
         away_score = game.get("away_score")
 
-        if not home_score or not away_score:
+        if home_score in ("", None) or away_score in ("", None):
             continue
 
         home_score = int(float(home_score))
