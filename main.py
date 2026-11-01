@@ -241,9 +241,9 @@ def main():
 
             if abs(model_spread - args.spread) >= 3:
             print("Spread edge: MODEL LEAN")
-        else:
+            else:
             print("Spread edge: NO CLEAR EDGE")
-    else:
+         else:
         print("Sportsbook spread: Not provided")
 
     if args.total is not None:
