@@ -1,13 +1,13 @@
-
 """
 DOUG'S ELITE GAME SIMULATOR
 NFL TEAM STATISTICS DATA ENGINE
 
-Loads verified NFL statistics, validates team data,
-and calculates offensive and defensive rankings.
+Validates NFL data, calculates rankings,
+and checks whether matchup projections are safe.
 """
 
 import json
+import math
 from pathlib import Path
 
 from nfl_teams import NFL_TEAMS
@@ -41,8 +41,17 @@ REQUIRED_STATS = {
 }
 
 
+def is_valid_number(value):
+    """Accept real finite numbers, but reject booleans."""
+    return (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and math.isfinite(value)
+    )
+
+
 def validate_source_data(records):
-    """Validate incoming statistics."""
+    """Check team coverage and the structure of incoming data."""
 
     if not isinstance(records, list):
         raise ValueError("Statistics must be a list.")
@@ -50,6 +59,9 @@ def validate_source_data(records):
     seen = set()
 
     for record in records:
+        if not isinstance(record, dict):
+            raise ValueError("Every team record must be an object.")
+
         team = record.get("team")
 
         if team not in NFL_TEAMS:
@@ -61,53 +73,74 @@ def validate_source_data(records):
         seen.add(team)
 
         for section in ("offense", "defense"):
-            if section not in record:
-                raise ValueError(
-                    f"{team} missing {section}"
-                )
+            section_data = record.get(section)
+
+            if not isinstance(section_data, dict):
+                raise ValueError(f"{team} missing {section} data.")
 
             for category in CATEGORIES:
-                if category not in record[section]:
+                category_data = section_data.get(category)
+
+                if not isinstance(category_data, dict):
                     raise ValueError(
-                        f"{team} missing {section} {category}"
+                        f"{team} missing {section} {category} data."
                     )
+
+                for field, value in category_data.items():
+                    if value is not None and not is_valid_number(value):
+                        raise ValueError(
+                            f"{team} has invalid {section} "
+                            f"{category} value for {field}."
+                        )
+
+        turnovers = record.get("turnovers", {})
+
+        if not isinstance(turnovers, dict):
+            raise ValueError(f"{team} has invalid turnover data.")
+
+        for field in ("takeaways", "giveaways", "differential"):
+            value = turnovers.get(field)
+
+            if value is not None and not is_valid_number(value):
+                raise ValueError(
+                    f"{team} has invalid turnover value for {field}."
+                )
+
+    missing = set(NFL_TEAMS) - seen
+
+    if missing:
+        raise ValueError(
+            "Missing NFL teams: " + ", ".join(sorted(missing))
+        )
 
     return True
 
 
 def calculate_rankings(database):
-    """Rank all teams in each statistical category."""
+    """Rank teams using only available statistics."""
 
     for section in ("offense", "defense"):
-
         for category in CATEGORIES:
-
-            field = "yards_per_game"
-
             ranked = []
 
             for abbreviation, team in database.items():
-
                 stats = team[section][category]
+                value = stats.get("yards_per_game")
 
-                value = stats.get(field)
-
-                if value is not None:
+                if is_valid_number(value):
                     ranked.append((abbreviation, value))
 
-            # Offense: higher yards rank better.
-            # Defense: lower yards allowed rank better.
+                stats.pop("rank", None)
+
             ranked.sort(
                 key=lambda item: item[1],
                 reverse=(section == "offense")
             )
 
-            for rank, (abbreviation, value) in enumerate(
+            for rank, (abbreviation, _) in enumerate(
                 ranked, start=1
             ):
-                database[abbreviation][section][category][
-                    "rank"
-                ] = rank
+                database[abbreviation][section][category]["rank"] = rank
 
     return database
 
@@ -120,39 +153,32 @@ def build_team_database(records):
     database = {}
 
     for record in records:
-
         abbreviation = record["team"]
 
         database[abbreviation] = {
             "name": NFL_TEAMS[abbreviation],
-
             "offense": record["offense"],
-
             "defense": record["defense"],
-
             "turnovers": record.get(
                 "turnovers",
                 {
                     "takeaways": None,
                     "giveaways": None,
-                    "differential": None
+                    "differential": None,
                 }
-            )
+            ),
         }
 
     return calculate_rankings(database)
 
 
 def load_team_stats(filename="nfl_team_stats.json"):
-    """Load verified statistics from a JSON file."""
+    """Load and validate the NFL statistics file."""
 
     path = Path(filename)
 
     if not path.exists():
-        raise FileNotFoundError(
-            f"{filename} not found. "
-            "Add verified NFL statistics first."
-        )
+        raise FileNotFoundError(f"{filename} not found.")
 
     with path.open("r", encoding="utf-8") as file:
         records = json.load(file)
@@ -164,15 +190,61 @@ def get_team_stats(database, abbreviation):
     """Retrieve one team's statistics."""
 
     if abbreviation not in database:
-        raise ValueError(
-            f"Unknown NFL team: {abbreviation}"
-        )
+        raise ValueError(f"Unknown NFL team: {abbreviation}")
 
     return database[abbreviation]
 
 
+def get_missing_stats(team, section):
+    """List required statistics that are not yet available."""
+
+    missing = []
+
+    for category, fields in REQUIRED_STATS.items():
+        stats = team[section][category]
+
+        for field in fields:
+            if not is_valid_number(stats.get(field)):
+                missing.append(f"{category}.{field}")
+
+    return missing
+
+
+def check_matchup_data(database, team_a, team_b):
+    """Check whether both teams have complete required data."""
+
+    first = get_team_stats(database, team_a)
+    second = get_team_stats(database, team_b)
+
+    missing = {}
+
+    for abbreviation, team in (
+        (team_a, first),
+        (team_b, second),
+    ):
+        team_missing = []
+
+        for section in ("offense", "defense"):
+            for field in get_missing_stats(team, section):
+                team_missing.append(f"{section}.{field}")
+
+        turnovers = team["turnovers"]
+
+        for field in ("takeaways", "giveaways", "differential"):
+            if not is_valid_number(turnovers.get(field)):
+                team_missing.append(f"turnovers.{field}")
+
+        if team_missing:
+            missing[abbreviation] = team_missing
+
+    return {
+        "ready": not missing,
+        "missing": missing,
+    }
+
+
 def compare_team_stats(database, team_a, team_b):
-    """Compare both teams' offensive and defensive rankings."""
+    """Compare both teams' offense against the opponent's defense."""
 
     first = get_team_stats(database, team_a)
     second = get_team_stats(database, team_b)
@@ -180,23 +252,34 @@ def compare_team_stats(database, team_a, team_b):
     report = {}
 
     for category in CATEGORIES:
-
         report[category] = {
             "team_a_offense": first["offense"][category],
             "team_b_defense": second["defense"][category],
-
             "team_b_offense": second["offense"][category],
             "team_a_defense": first["defense"][category],
         }
+
+    report["data_check"] = check_matchup_data(
+        database, team_a, team_b
+    )
 
     return report
 
 
 if __name__ == "__main__":
+    database = load_team_stats()
 
     print("DOUG'S ELITE GAME SIMULATOR")
     print("NFL STATISTICS ENGINE")
     print("=========================")
-    print("32 NFL teams recognized.")
-    print("Statistics loader ready.")
-    print("Waiting for verified NFL data.")
+    print(f"Teams loaded: {len(database)}")
+    print("Statistics structure validated.")
+
+    ready_teams = sum(
+        1 for team in database.values()
+        if not get_missing_stats(team, "offense")
+        and not get_missing_stats(team, "defense")
+    )
+
+    print(f"Teams with complete offense and defense: {ready_teams}/32")
+    print("Missing statistics remain unavailable, not zero.")
