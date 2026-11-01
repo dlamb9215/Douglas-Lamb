@@ -165,7 +165,27 @@ def main():
     parser.add_argument("--trials", type=int, default=100000)
 
     args = parser.parse_args()
+        def implied_probability(odds):
+        if odds is None:
+            return None
+        if odds > 0:
+            return 100 * 100 / (odds + 100)
+        if odds < 0:
+            return 100 * abs(odds) / (abs(odds) + 100)
+        raise ValueError("Odds cannot be zero.")
 
+    print("\nSPORTSBOOK IMPLIED PROBABILITIES")
+    print("================================")
+
+    for label, odds in [
+        ("Home ML", args.home_odds),
+        ("Away ML", args.away_odds),
+        ("Over", args.over_odds),
+        ("Under", args.under_odds),
+    ]:
+        probability = implied_probability(odds)
+        if probability is not None:
+            print(f"{label}: {probability:.2f}%")
     database = load_team_stats()
 
     home_code = args.home.upper()
