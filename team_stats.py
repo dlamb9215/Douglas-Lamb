@@ -164,7 +164,26 @@ def compare_turnovers(team_a, team_b):
         for key, value in team["turnovers"].items():
             print(f"{key}: {value}")
 
+def compare_stat_advantage(team_a, team_b):
+    """Compare actual offensive production against opposing defense."""
 
+    results = {}
+
+    for category in ("passing", "rushing", "total"):
+        offense = team_a["offense"][category]
+        defense = team_b["defense"][category]
+
+        offense_yards = offense.get("yards_per_game")
+        defense_allowed = defense.get("yards_allowed_per_game")
+
+        if offense_yards is None or defense_allowed is None:
+            results[category] = None
+        else:
+            results[category] = round(
+                offense_yards - defense_allowed, 2
+            )
+
+    return results
 if __name__ == "__main__":
 
     print("Doug's Elite Game Simulator")
