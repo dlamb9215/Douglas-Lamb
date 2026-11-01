@@ -43,7 +43,20 @@ def download_csv(filename):
             response.read().decode("utf-8-sig").splitlines()
         ))
 
-
+def download_schedule():
+    url = (
+        "https://github.com/nflverse/nflverse-data/"
+        "releases/download/schedules/games.csv"
+    )
+    request = urllib.request.Request(
+        url,
+        headers={"User-Agent": "Doug-Elite-Game-Simulator"}
+    )
+    with urllib.request.urlopen(request, timeout=90) as response:
+        return list(csv.DictReader(
+            response.read().decode("utf-8-sig").splitlines()
+        ))
+        
 def num(row, field):
     try:
         value = row.get(field, "")
@@ -62,10 +75,40 @@ def average(a, games):
 
 def main():
     regular = download_csv(f"stats_team_reg_{SEASON}.csv")
+    schedule = download_schedule()
     weekly = download_csv(f"stats_team_week_{SEASON}.csv")
 
     teams = {}
+    scoring = defaultdict(lambda: {
+        "games": 0,
+        "points_for": 0,
+        "points_against": 0,
+    })
 
+    for game in schedule:
+        if game.get("season") != str(SEASON):
+            continue
+        if game.get("game_type") != "REG":
+            continue
+
+        home = normalize_team(game.get("home_team"))
+        away = normalize_team(game.get("away_team"))
+        home_score = game.get("home_score")
+        away_score = game.get("away_score")
+
+        if not home_score or not away_score:
+            continue
+
+        home_score = int(float(home_score))
+        away_score = int(float(away_score))
+
+        scoring[home]["games"] += 1
+        scoring[home]["points_for"] += home_score
+        scoring[home]["points_against"] += away_score
+
+        scoring[away]["games"] += 1
+        scoring[away]["points_for"] += away_score
+        scoring[away]["points_against"] += home_score
     for row in regular:
         if row.get("season_type") != "REG":
             continue
@@ -104,6 +147,15 @@ def main():
 
         teams[team] = {
             "team": team,
+            "games_played": int(games),
+            "points_for_per_game": average(
+    scoring[team]["points_for"],
+    scoring[team]["games"]
+),
+"points_allowed_per_game": average(
+    scoring[team]["points_against"],
+    scoring[team]["games"]
+),
             "offense": {
                 "passing": {
                     "yards_per_game": average(py, games),
@@ -143,6 +195,7 @@ def main():
     # Build defensive totals from the offenses each team faced.
     allowed = defaultdict(lambda: {
         "games": 0,
+        "points_allowed": 0,
         "pass_yards": 0,
         "pass_attempts": 0,
         "completions": 0,
