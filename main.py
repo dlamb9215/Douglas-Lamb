@@ -229,7 +229,7 @@ def main():
     model_total = home_mean + away_mean
 
     spread_line = args.spread if args.spread is not None else model_spread
-        print("\nMODEL VS SPORTSBOOK")
+    print("\nMODEL VS SPORTSBOOK")
     print("====================")
 
     print(f"Model projected spread: {model_spread:.1f}")
