@@ -1,20 +1,34 @@
 [
-  {
-    "team": "ARI",
-    "offense": {
-      "passing": {},
-      "rushing": {},
-      "total": {}
-    },
-    "defense": {
-      "passing": {},
-      "rushing": {},
-      "total": {}
-    },
-    "turnovers": {
-      "takeaways": null,
-      "giveaways": null,
-      "differential": null
-    }
-  }
+{"team":"ARI","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"ATL","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"BAL","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"BUF","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"CAR","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"CHI","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"CIN","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"CLE","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"DAL","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"DEN","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"DET","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"GB","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"HOU","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"IND","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"JAX","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"KC","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"LV","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"LAC","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"LAR","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"MIA","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"MIN","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"NE","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"NO","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"NYG","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"NYJ","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"PHI","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"PIT","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"SF","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"SEA","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"TB","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"TEN","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}},
+{"team":"WAS","offense":{"passing":{},"rushing":{},"total":{}},"defense":{"passing":{},"rushing":{},"total":{}},"turnovers":{"takeaways":null,"giveaways":null,"differential":null}}
 ]
