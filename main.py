@@ -305,6 +305,29 @@ def main():
     print(f"Push: {result['total_push']:.2f}%")
 
     print("\nPROJECTED SCORE")
+        print("\nPROBABILITY-BASED MODEL LEANS")
+    print("=============================")
+
+    if result["home_win"] >= 55:
+        print(f"MONEYLINE LEAN: {home['name']} ({result['home_win']:.1f}%)")
+    elif result["away_win"] >= 55:
+        print(f"MONEYLINE LEAN: {away['name']} ({result['away_win']:.1f}%)")
+    else:
+        print("MONEYLINE: PASS")
+
+    if result["home_cover"] >= 55:
+        print(f"SPREAD LEAN: {home['name']} ({result['home_cover']:.1f}%)")
+    elif result["away_cover"] >= 55:
+        print(f"SPREAD LEAN: {away['name']} ({result['away_cover']:.1f}%)")
+    else:
+        print("SPREAD: PASS")
+
+    if result["over"] >= 55:
+        print(f"TOTAL LEAN: OVER ({result['over']:.1f}%)")
+    elif result["under"] >= 55:
+        print(f"TOTAL LEAN: UNDER ({result['under']:.1f}%)")
+    else:
+        print("TOTAL: PASS")
     print(f"{home['name']}: {result['home_avg']:.1f}")
     print(f"{away['name']}: {result['away_avg']:.1f}")
 
