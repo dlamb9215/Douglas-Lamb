@@ -896,62 +896,6 @@
     }
   },
   {
-    "team": "LA",
-    "offense": {
-      "passing": {
-        "yards_per_game": 286.0,
-        "attempts_per_game": 40.14,
-        "completions_per_game": 27.0,
-        "completion_pct": 67.26,
-        "yards_per_attempt": 7.125,
-        "touchdowns": 2.0,
-        "interceptions": 1.0,
-        "first_downs_per_game": 14.29
-      },
-      "rushing": {
-        "yards_per_game": 125.0,
-        "attempts_per_game": 26.57,
-        "yards_per_carry": 4.704,
-        "touchdowns": 1.14,
-        "first_downs_per_game": 7.57
-      },
-      "total": {
-        "yards_per_game": 411.0,
-        "plays_per_game": 68.29,
-        "yards_per_play": 6.019
-      }
-    },
-    "defense": {
-      "passing": {
-        "yards_per_game": 193.0,
-        "attempts_per_game": 32.29,
-        "completions_per_game": 18.71,
-        "completion_pct": 57.96,
-        "yards_per_attempt": 5.978,
-        "touchdowns": 1.43,
-        "interceptions": 0.71,
-        "first_downs_per_game": 9.86
-      },
-      "rushing": {
-        "yards_per_game": 115.71,
-        "attempts_per_game": 27.43,
-        "yards_per_carry": 4.219,
-        "touchdowns": 0.57,
-        "first_downs_per_game": 6.43
-      },
-      "total": {
-        "yards_per_game": 308.71,
-        "plays_per_game": 61.14,
-        "yards_per_play": 5.049
-      }
-    },
-    "turnovers": {
-      "takeaways": 6.0,
-      "giveaways": 11.0,
-      "differential": -5.0
-    }
-  },
-  {
     "team": "LAC",
     "offense": {
       "passing": {
@@ -1005,6 +949,62 @@
       "takeaways": 10.0,
       "giveaways": 14.0,
       "differential": -4.0
+    }
+  },
+  {
+    "team": "LAR",
+    "offense": {
+      "passing": {
+        "yards_per_game": 286.0,
+        "attempts_per_game": 40.14,
+        "completions_per_game": 27.0,
+        "completion_pct": 67.26,
+        "yards_per_attempt": 7.125,
+        "touchdowns": 2.0,
+        "interceptions": 1.0,
+        "first_downs_per_game": 14.29
+      },
+      "rushing": {
+        "yards_per_game": 125.0,
+        "attempts_per_game": 26.57,
+        "yards_per_carry": 4.704,
+        "touchdowns": 1.14,
+        "first_downs_per_game": 7.57
+      },
+      "total": {
+        "yards_per_game": 411.0,
+        "plays_per_game": 68.29,
+        "yards_per_play": 6.019
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 193.0,
+        "attempts_per_game": 32.29,
+        "completions_per_game": 18.71,
+        "completion_pct": 57.96,
+        "yards_per_attempt": 5.978,
+        "touchdowns": 1.43,
+        "interceptions": 0.71,
+        "first_downs_per_game": 9.86
+      },
+      "rushing": {
+        "yards_per_game": 115.71,
+        "attempts_per_game": 27.43,
+        "yards_per_carry": 4.219,
+        "touchdowns": 0.57,
+        "first_downs_per_game": 6.43
+      },
+      "total": {
+        "yards_per_game": 308.71,
+        "plays_per_game": 61.14,
+        "yards_per_play": 5.049
+      }
+    },
+    "turnovers": {
+      "takeaways": 6.0,
+      "giveaways": 11.0,
+      "differential": -5.0
     }
   },
   {
