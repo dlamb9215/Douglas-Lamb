@@ -162,6 +162,80 @@ def get_player_status_report(players, team):
     }
 
 
+def adjust_injury_workload(
+    player,
+    projected_snaps,
+    practice_status="full",
+    snap_limit=None,
+    backup_snap_bonus=0,
+):
+    """
+    Adjust projected workload for injury-related limitations.
+    Only confirmed active starters receive projections.
+    """
+
+    validate_player(player)
+
+    if player["status"] != "active" or player.get("starter") is not True:
+        raise ValueError(
+            "Injury workload adjustment requires an active starter."
+        )
+
+    if practice_status not in {"full", "limited", "dnp"}:
+        raise ValueError("Invalid practice status.")
+
+    values = {
+        "projected_snaps": projected_snaps,
+        "backup_snap_bonus": backup_snap_bonus,
+    }
+
+    for field, value in values.items():
+        if (
+            not isinstance(value, (int, float))
+            or isinstance(value, bool)
+            or value < 0
+        ):
+            raise ValueError(f"Invalid value for {field}.")
+
+    if projected_snaps > 100 or backup_snap_bonus > 100:
+        raise ValueError("Snap projections cannot exceed 100.")
+
+    if snap_limit is not None:
+        if (
+            not isinstance(snap_limit, (int, float))
+            or isinstance(snap_limit, bool)
+            or not 0 <= snap_limit <= 100
+        ):
+            raise ValueError("Snap limit must be between 0 and 100.")
+
+    practice_multipliers = {
+        "full": 1.00,
+        "limited": 0.85,
+        "dnp": 0.70,
+    }
+
+    adjusted_snaps = (
+        projected_snaps * practice_multipliers[practice_status]
+    )
+
+    if snap_limit is not None:
+        adjusted_snaps = min(adjusted_snaps, snap_limit)
+
+    adjusted_snaps = min(
+        100,
+        adjusted_snaps + backup_snap_bonus
+    )
+
+    return {
+        "player": player["name"],
+        "team": player["team"],
+        "practice_status": practice_status,
+        "original_snaps": projected_snaps,
+        "adjusted_snaps": round(adjusted_snaps, 2),
+        "snap_limit": snap_limit,
+        "backup_snap_bonus": backup_snap_bonus,
+    }
+
 if __name__ == "__main__":
     print("DOUG'S ELITE GAME SIMULATOR")
     print("PLAYER AVAILABILITY ENGINE READY")
