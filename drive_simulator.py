@@ -177,4 +177,4 @@ def simulate_drive_game(
     results["home_avg"] = home_score_sum / trials
     results["away_avg"] = away_score_sum / trials
 
-            return results
+    return results
