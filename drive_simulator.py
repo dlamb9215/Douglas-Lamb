@@ -104,7 +104,24 @@ def simulate_drive_game(
     if trials < 1:
         raise ValueError("Trials must be greater than zero.")
     rng = random.Random(seed)
- 
+    rng = random.Random(seed)
+
+keys = (
+    "home_win",
+    "away_win",
+    "tie",
+    "home_cover",
+    "away_cover",
+    "spread_push",
+    "over",
+    "under",
+    "total_push",
+)
+
+counts = dict.fromkeys(keys, 0)
+
+home_score_sum = 0
+away_score_sum = 0
     home_score_sum = 0
     away_score_sum = 0
 
