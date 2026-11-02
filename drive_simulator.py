@@ -1,40 +1,39 @@
 
-"""Drive-based scoring engine for Doug's Elite Game Simulator.
+"""Drive-based NFL scoring simulation for Doug's Elite Game Simulator.
 
-This is a first-stage possession model, not a full play-by-play simulator.
+A simplified possession model, not a play-by-play engine.
+The spread argument is the home team's handicap.
 """
 import random
 
 
-def _drive_probabilities(points_per_game, drives):
-    ppp = max(0.05, min(4.5, points_per_game / drives))
+def _clip(value, low, high):
+    return max(low, min(high, value))
 
-    touchdown = min(0.34, max(0.08, ppp * 0.115))
-    field_goal = max(
-        0.0,
-        min(0.45, (ppp - 7.0 * touchdown) / 3.0)
+
+def _drive_outcomes(points_per_game, drives, efficiency=1.0):
+    points_per_drive = max(
+        0.0, points_per_game * efficiency / max(1, drives)
     )
 
-    if touchdown * 7.0 + field_goal * 3.0 < ppp:
-        touchdown = min(
-            0.48,
-            touchdown + (
-                ppp - touchdown * 7.0 - field_goal * 3.0
-            ) / 7.0
-        )
+    # Allocate expected scoring between touchdowns and field goals.
+    td_probability = points_per_drive * 0.62 / 7.0
+    fg_probability = points_per_drive * 0.38 / 3.0
 
-    if touchdown + field_goal > 0.92:
-        scale = 0.92 / (touchdown + field_goal)
-        touchdown *= scale
-        field_goal *= scale
+    td_probability = _clip(td_probability, 0.0, 0.65)
+    fg_probability = _clip(fg_probability, 0.0, 0.65)
 
-    empty = max(0.0, 1.0 - touchdown - field_goal)
-    return empty, field_goal, touchdown
+    if td_probability + fg_probability > 0.90:
+        scale = 0.90 / (td_probability + fg_probability)
+        td_probability *= scale
+        fg_probability *= scale
+
+    return td_probability, fg_probability
 
 
-def _score_team(rng, expected_points, drives):
-    _, field_goal_probability, touchdown_probability = (
-        _drive_probabilities(expected_points, drives)
+def _score_team(rng, expected_points, drives, efficiency):
+    td_probability, fg_probability = _drive_outcomes(
+        expected_points, drives, efficiency
     )
 
     score = 0
@@ -42,9 +41,9 @@ def _score_team(rng, expected_points, drives):
     for _ in range(drives):
         draw = rng.random()
 
-        if draw < touchdown_probability:
+        if draw < td_probability:
             score += 7
-        elif draw < touchdown_probability + field_goal_probability:
+        elif draw < td_probability + fg_probability:
             score += 3
 
     return score
@@ -56,9 +55,10 @@ def simulate_drive_game(
     spread,
     total,
     trials=100000,
-    seed=42
+    seed=42,
+    first_half=False,
 ):
-    """Simulate discrete scoring drives and calculate probabilities."""
+    """Return simulated win, spread, total and score probabilities."""
 
     if trials < 1:
         raise ValueError("Trials must be greater than zero.")
@@ -71,32 +71,50 @@ def simulate_drive_game(
     keys = (
         "home_win", "away_win", "tie",
         "home_cover", "away_cover", "spread_push",
-        "over", "under", "total_push"
+        "over", "under", "total_push",
     )
-
     counts = dict.fromkeys(keys, 0)
-    home_points = 0
-    away_points = 0
+
+    home_score_sum = 0
+    away_score_sum = 0
 
     for _ in range(trials):
-        # Shared game pace connects both teams' drive volume.
-        pace = max(8, min(14, round(rng.gauss(11.0, 1.15))))
+        if first_half:
+            pace = _clip(round(rng.gauss(5.3, 0.8)), 3, 8)
+            min_drives, max_drives = 3, 8
+            home_target = home_mean / 2
+            away_target = away_mean / 2
+        else:
+            pace = _clip(round(rng.gauss(10.6, 1.2)), 7, 15)
+            min_drives, max_drives = 7, 15
+            home_target = home_mean
+            away_target = away_mean
 
-        home_drives = max(
-            7, min(15, pace + rng.choice((-1, 0, 0, 1)))
-        )
-        away_drives = max(
-            7, min(15, pace + rng.choice((-1, 0, 0, 1)))
-        )
+        home_drives = int(_clip(
+            pace + rng.choice((-1, 0, 0, 1)),
+            min_drives, max_drives
+        ))
+        away_drives = int(_clip(
+            pace + rng.choice((-1, 0, 0, 1)),
+            min_drives, max_drives
+        ))
 
-        home = _score_team(rng, home_mean, home_drives)
-        away = _score_team(rng, away_mean, away_drives)
+        # Small game-level efficiency variation.
+        home_efficiency = _clip(rng.gauss(1.0, 0.10), 0.70, 1.30)
+        away_efficiency = _clip(rng.gauss(1.0, 0.10), 0.70, 1.30)
+
+        home = _score_team(
+            rng, home_target, home_drives, home_efficiency
+        )
+        away = _score_team(
+            rng, away_target, away_drives, away_efficiency
+        )
 
         margin = home - away
         game_total = home + away
 
-        home_points += home
-        away_points += away
+        home_score_sum += home
+        away_score_sum += away
 
         if margin > 0:
             counts["home_win"] += 1
@@ -126,7 +144,7 @@ def simulate_drive_game(
         for key, value in counts.items()
     }
 
-    results["home_avg"] = home_points / trials
-    results["away_avg"] = away_points / trials
+    results["home_avg"] = home_score_sum / trials
+    results["away_avg"] = away_score_sum / trials
 
     return results
