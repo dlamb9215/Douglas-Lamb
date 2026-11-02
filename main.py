@@ -5,7 +5,7 @@ NFL MATCHUP AND 100,000 TRIAL ENGINE
 
 import random
 import argparse
-
+from drive_simulator import simulate_drive_game
 from nfl_data import (
     load_team_stats,
     get_team_stats,
@@ -15,6 +15,7 @@ from nfl_data import (
 )
 
 
+
 def simulate_game(
     home_mean,
     away_mean,
@@ -22,80 +23,23 @@ def simulate_game(
     away_sd,
     spread,
     total,
-    trials=100000
+    trials=100000,
+    first_half=False,
 ):
-    """Run a reproducible scoring simulation."""
+    """Run the drive-based scoring simulation."""
 
-    if trials < 1:
-        raise ValueError("Trials must be greater than zero.")
+    return simulate_drive_game(
+        home_mean=home_mean,
+        away_mean=away_mean,
+        spread=spread,
+        total=total,
+        trials=trials,
+        seed=42,
+        first_half=first_half,
+    )
 
-    if home_sd < 0 or away_sd < 0:
-        raise ValueError("Standard deviations cannot be negative.")
 
-    rng = random.Random(42)
 
-    home_wins = 0
-    away_wins = 0
-    ties = 0
-
-    home_covers = 0
-    away_covers = 0
-    spread_pushes = 0
-
-    overs = 0
-    unders = 0
-    total_pushes = 0
-
-    home_score_sum = 0
-    away_score_sum = 0
-
-    for _ in range(trials):
-
-        home = max(0, round(rng.gauss(home_mean, home_sd)))
-        away = max(0, round(rng.gauss(away_mean, away_sd)))
-
-        margin = home - away
-        game_total = home + away
-
-        home_score_sum += home
-        away_score_sum += away
-
-        if margin > 0:
-            home_wins += 1
-        elif margin < 0:
-            away_wins += 1
-        else:
-            ties += 1
-
-        spread_result = margin + spread
-
-        if spread_result > 0:
-            home_covers += 1
-        elif spread_result < 0:
-            away_covers += 1
-        else:
-            spread_pushes += 1
-
-        if game_total > total:
-            overs += 1
-        elif game_total < total:
-            unders += 1
-        else:
-            total_pushes += 1
-
-    return {
-        "home_win": home_wins / trials * 100,
-        "away_win": away_wins / trials * 100,
-        "tie": ties / trials * 100,
-        "home_cover": home_covers / trials * 100,
-        "away_cover": away_covers / trials * 100,
-        "spread_push": spread_pushes / trials * 100,
-        "over": overs / trials * 100,
-        "under": unders / trials * 100,
-        "total_push": total_pushes / trials * 100,
-        "home_avg": home_score_sum / trials,
-        "away_avg": away_score_sum / trials,
-    }
 
 
 def print_matchup_report(database, home_code, away_code):
@@ -342,15 +286,18 @@ def main():
         print(f"Over edge: {result['over'] - over_fair:+.2f} percentage points")
         print(f"Under edge: {result['under'] - under_fair:+.2f} percentage points")
     
+
     first_half = simulate_game(
-        home_mean / 2,
-        away_mean / 2,
-        args.home_sd / (2 ** 0.5),
-        args.away_sd / (2 ** 0.5),
+        home_mean,
+        away_mean,
+        args.home_sd,
+        args.away_sd,
         spread_line / 2,
         total_line / 2,
         args.trials,
+        first_half=True,
     )
+
 
     print("\nFIRST-HALF SIMULATION")
     print("=====================")
