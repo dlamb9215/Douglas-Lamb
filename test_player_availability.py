@@ -1,4 +1,4 @@
-
+from player_availability import adjust_injury_workload
 import unittest
 
 from player_projections import (
@@ -83,6 +83,38 @@ class TestPlayerProjections(unittest.TestCase):
                 self.questionable_rb,
                 projected_snaps=50,
                 projected_carries=15,
+            )
+
+    def test_full_practice_workload(self):
+        result = adjust_injury_workload(
+            self.active_qb,
+            projected_snaps=70,
+            practice_status="full",
+        )
+        self.assertEqual(result["adjusted_snaps"], 70)
+
+    def test_limited_practice_adjustment(self):
+        result = adjust_injury_workload(
+            self.active_qb,
+            projected_snaps=70,
+            practice_status="limited",
+        )
+        self.assertEqual(result["adjusted_snaps"], 59.5)
+
+    def test_snap_limit_enforced(self):
+        result = adjust_injury_workload(
+            self.active_qb,
+            projected_snaps=80,
+            practice_status="full",
+            snap_limit=50,
+        )
+        self.assertEqual(result["adjusted_snaps"], 50)
+
+    def test_inactive_player_blocked(self):
+        with self.assertRaises(ValueError):
+            adjust_injury_workload(
+                self.out_receiver,
+                projected_snaps=50,
             )
 
 if __name__ == "__main__":
