@@ -104,50 +104,7 @@ def simulate_drive_game(
     if trials < 1:
         raise ValueError("Trials must be greater than zero.")
 
-home = 0
-away = 0
-
-for drive_index in range(max(home_drives, away_drives)):
-
-    # Simulate home team's next drive.
-    if drive_index < home_drives:
-        home_margin = home - away
-
-        home_multiplier = _game_script_multiplier(
-            home_margin
-        )
-
-        home += _score_one_drive(
-            rng,
-            home_target,
-            home_drives,
-            home_efficiency,
-            home_multiplier,
-        )
-
-    # Simulate away team's next drive.
-    if drive_index < away_drives:
-        away_margin = away - home
-
-        away_multiplier = _game_script_multiplier(
-            away_margin
-        )
-
-        away += _score_one_drive(
-            rng,
-            away_target,
-            away_drives,
-            away_efficiency,
-            away_multiplier,
-        )
-
-    keys = (
-        "home_win", "away_win", "tie",
-        "home_cover", "away_cover", "spread_push",
-        "over", "under", "total_push",
-    )
-    counts = dict.fromkeys(keys, 0)
-
+ 
     home_score_sum = 0
     away_score_sum = 0
 
@@ -220,4 +177,4 @@ for drive_index in range(max(home_drives, away_drives)):
     results["home_avg"] = home_score_sum / trials
     results["away_avg"] = away_score_sum / trials
 
-    return results
+            return results
