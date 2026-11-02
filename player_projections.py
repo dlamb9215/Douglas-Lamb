@@ -89,3 +89,53 @@ def project_receiver(
 if __name__ == "__main__":
     print("DOUG'S ELITE GAME SIMULATOR")
     print("AVAILABILITY-VERIFIED PROJECTIONS READY")
+
+
+
+def project_player_workload(
+    player,
+    projected_snaps,
+    projected_routes=0,
+    projected_targets=0,
+    projected_carries=0,
+    red_zone_opportunities=0,
+):
+    """Project player workload for Doug's Elite Game Simulator."""
+
+    validate_projection_player(player)
+
+    workload = {
+        "projected_snaps": projected_snaps,
+        "projected_routes": projected_routes,
+        "projected_targets": projected_targets,
+        "projected_carries": projected_carries,
+        "red_zone_opportunities": red_zone_opportunities,
+    }
+
+    limits = {
+        "projected_snaps": 100,
+        "projected_routes": 100,
+        "projected_targets": 30,
+        "projected_carries": 40,
+        "red_zone_opportunities": 20,
+    }
+
+    for stat, value in workload.items():
+        if not isinstance(value, (int, float)) or isinstance(value, bool):
+            raise ValueError(f"{stat} must be numeric")
+
+        if value < 0 or value > limits[stat]:
+            raise ValueError(f"Invalid workload value: {stat}")
+
+    if projected_routes > projected_snaps:
+        raise ValueError("Routes cannot exceed projected snaps")
+
+    if projected_targets > projected_routes:
+        raise ValueError("Targets cannot exceed projected routes")
+
+    return {
+        "player": player["name"],
+        "team": player["team"],
+        "position": player["position"],
+        **workload,
+    }
