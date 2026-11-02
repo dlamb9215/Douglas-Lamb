@@ -49,6 +49,47 @@ def _score_team(rng, expected_points, drives, efficiency):
     return score
 
 
+def _game_script_multiplier(score_margin):
+    """Adjust scoring efficiency based on the current score."""
+
+    if score_margin >= 14:
+        return 0.88
+    elif score_margin >= 7:
+        return 0.94
+    elif score_margin <= -14:
+        return 1.10
+    elif score_margin <= -7:
+        return 1.05
+
+    return 1.00
+
+
+def _score_one_drive(
+    rng,
+    expected_points,
+    drives,
+    efficiency,
+    script_multiplier,
+):
+    """Simulate one scoring drive with a game-script adjustment."""
+
+    adjusted_points = expected_points * script_multiplier
+
+    td_probability, fg_probability = _drive_outcomes(
+        adjusted_points,
+        drives,
+        efficiency,
+    )
+
+    draw = rng.random()
+
+    if draw < td_probability:
+        return 7
+    elif draw < td_probability + fg_probability:
+        return 3
+
+    return 0
+
 def simulate_drive_game(
     home_mean,
     away_mean,
@@ -63,10 +104,42 @@ def simulate_drive_game(
     if trials < 1:
         raise ValueError("Trials must be greater than zero.")
 
-    if home_mean < 0 or away_mean < 0:
-        raise ValueError("Expected scores cannot be negative.")
+home = 0
+away = 0
 
-    rng = random.Random(seed)
+for drive_index in range(max(home_drives, away_drives)):
+
+    # Simulate home team's next drive.
+    if drive_index < home_drives:
+        home_margin = home - away
+
+        home_multiplier = _game_script_multiplier(
+            home_margin
+        )
+
+        home += _score_one_drive(
+            rng,
+            home_target,
+            home_drives,
+            home_efficiency,
+            home_multiplier,
+        )
+
+    # Simulate away team's next drive.
+    if drive_index < away_drives:
+        away_margin = away - home
+
+        away_multiplier = _game_script_multiplier(
+            away_margin
+        )
+
+        away += _score_one_drive(
+            rng,
+            away_target,
+            away_drives,
+            away_efficiency,
+            away_multiplier,
+        )
 
     keys = (
         "home_win", "away_win", "tie",
