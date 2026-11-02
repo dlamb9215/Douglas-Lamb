@@ -103,7 +103,7 @@ def simulate_drive_game(
 
     if trials < 1:
         raise ValueError("Trials must be greater than zero.")
-
+    rng = random.Random(seed)
  
     home_score_sum = 0
     away_score_sum = 0
