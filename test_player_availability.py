@@ -1,61 +1,58 @@
+
 import unittest
 
-from player_availability import (
-    validate_player,
-    validate_roster,
-    get_active_players,
-    get_confirmed_starters,
+from player_projections import (
+    project_quarterback,
+    project_running_back,
+    project_receiver,
 )
 
 
-class TestPlayerAvailability(unittest.TestCase):
+class TestPlayerProjections(unittest.TestCase):
 
     def setUp(self):
-        self.players = [
-            {
-                "name": "Player One",
-                "team": "BUF",
-                "position": "QB",
-                "status": "active",
-                "starter": True,
-            },
-            {
-                "name": "Player Two",
-                "team": "BUF",
-                "position": "RB",
-                "status": "questionable",
-                "starter": False,
-            },
-            {
-                "name": "Player Three",
-                "team": "BUF",
-                "position": "WR",
-                "status": "out",
-                "starter": False,
-            },
-        ]
+        self.active_qb = {
+            "name": "Test QB",
+            "team": "BUF",
+            "position": "QB",
+            "status": "active",
+            "starter": True,
+        }
 
-    def test_valid_roster(self):
-        self.assertTrue(validate_roster(self.players))
+        self.questionable_rb = {
+            "name": "Test RB",
+            "team": "BUF",
+            "position": "RB",
+            "status": "questionable",
+            "starter": True,
+        }
 
-    def test_active_players(self):
-        active = get_active_players(self.players, "BUF")
-        self.assertEqual(len(active), 1)
+        self.out_receiver = {
+            "name": "Test WR",
+            "team": "BUF",
+            "position": "WR",
+            "status": "out",
+            "starter": False,
+        }
 
-    def test_confirmed_starters(self):
-        starters = get_confirmed_starters(self.players, "BUF")
-        self.assertEqual(len(starters), 1)
-        self.assertEqual(starters[0]["position"], "QB")
+    def test_active_qb_projection(self):
+        result = project_quarterback(
+            self.active_qb, 24, 11.5
+        )
 
-    def test_questionable_player_excluded(self):
-        active = get_active_players(self.players)
-        names = [p["name"] for p in active]
-        self.assertNotIn("Player Two", names)
+        self.assertEqual(result["passing_yards"], 276.0)
 
-    def test_out_player_excluded(self):
-        active = get_active_players(self.players)
-        names = [p["name"] for p in active]
-        self.assertNotIn("Player Three", names)
+    def test_questionable_player_blocked(self):
+        with self.assertRaises(ValueError):
+            project_running_back(
+                self.questionable_rb, 15, 4.5
+            )
+
+    def test_out_player_blocked(self):
+        with self.assertRaises(ValueError):
+            project_receiver(
+                self.out_receiver, 8, 0.65, 12
+            )
 
 
 if __name__ == "__main__":
