@@ -135,8 +135,15 @@ def simulate_drive_game(
         # If the score remains tied, the game is recorded as a tie.
         if not first_half and home == away:
             counts["overtime"] += 1
-            home += _score_one_drive(rng, home_target, 1, home_eff, 1.0, home_to)
-            away += _score_one_drive(rng, away_target, 1, away_eff, 1.0, away_to)
+            # Overtime is one possession each, so retain the regulation
+            # expected-points-per-drive rate instead of treating the full
+            # game scoring mean as the value of a single overtime drive.
+            home += _score_one_drive(
+                rng, home_target, home_drives, home_eff, 1.0, home_to
+            )
+            away += _score_one_drive(
+                rng, away_target, away_drives, away_eff, 1.0, away_to
+            )
 
         margin = home - away
         game_total = home + away
