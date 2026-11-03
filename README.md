@@ -41,6 +41,8 @@ The workflow runs tests before the simulation and saves the text report as an ar
 - Team statistics are refreshed by the scheduled **Update NFL Statistics** workflow (Tuesday 12:00 UTC) and can also be run manually from Actions.
 - The simulator blocks a matchup when required team statistics are missing.
 - Current team-stat inputs are through the most recently completed refresh; verify the data timestamp and injury/news reports before betting.
-- The scoring model uses team scoring averages and opponent points allowed, with drive-level Monte Carlo variation. It is a model estimate, not a guarantee or a historically proven edge.
+- The scoring model uses team scoring averages and opponent points allowed, with drive-level Monte Carlo variation and team giveaway rates converted to estimated per-drive turnover probabilities.
+- Tied regulation outcomes receive a simplified overtime approximation with one possession per team; a tie can remain. This is not a full NFL rules/play-by-play overtime engine.
+- The model is an estimate, not a guarantee or a historically proven edge.
 - First-half probabilities are approximate splits of full-game scoring.
 - The simulator does not currently verify official inactives, starting quarterbacks, weather, or sportsbook line movement automatically. Check those before final picks.
