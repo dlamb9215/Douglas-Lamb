@@ -1,0 +1,48 @@
+name: Refresh NFL Player Data
+
+on:
+  schedule:
+    - cron: "30 13 * * *"
+  workflow_dispatch:
+    inputs:
+      season:
+        description: NFL season (blank uses current year)
+        required: false
+        type: string
+      weeks:
+        description: Recent weeks to aggregate
+        required: true
+        default: "5"
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Refresh player data from nflverse
+        run: |
+          if [ -n "${{ inputs.season }}" ]; then
+            python refresh_player_data.py --season "${{ inputs.season }}" --weeks "${{ inputs.weeks }}" --output player_pool.json
+          else
+            python refresh_player_data.py --weeks "${{ inputs.weeks || '5' }}" --output player_pool.json
+          fi
+      - name: Commit refreshed player pool
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add player_pool.json
+          if git diff --cached --quiet; then
+            echo "Player data unchanged."
+          else
+            git commit -m "Refresh NFL player data"
+            git push
+          fi
