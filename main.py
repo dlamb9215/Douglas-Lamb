@@ -207,6 +207,8 @@ def main():
     print("==================")
     print("Required matchup statistics: VERIFIED")
     print("Team scoring data: CHECKED")
+    print("Turnover rates: INCLUDED IN DRIVE SIMULATION")
+    print("Overtime: SIMPLIFIED TWO-POSSESSION APPROXIMATION")
     print("Injury and inactive status: NOT VERIFIED")
     print("Confirmed starting lineups: NOT VERIFIED")
 
