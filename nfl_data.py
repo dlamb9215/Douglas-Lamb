@@ -157,6 +157,7 @@ def build_team_database(records):
 
         database[abbreviation] = {
             "name": NFL_TEAMS[abbreviation],
+            "games_played": record.get("games_played", 0),
             "points_for_per_game": record.get("points_for_per_game"),
             "points_allowed_per_game": record.get("points_allowed_per_game"),
             "offense": record["offense"],
