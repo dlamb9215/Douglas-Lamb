@@ -1,5 +1,6 @@
 import csv
 import json
+import os
 import urllib.request
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -20,10 +21,11 @@ def normalize_team(value):
 
 
 def download_csv(filename):
-    request = urllib.request.Request(
-        API_URL,
-        headers={"User-Agent": "Doug-Elite-Game-Simulator"}
-    )
+    headers = {"User-Agent": "Doug-Elite-Game-Simulator"}
+    token = os.environ.get("GITHUB_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    request = urllib.request.Request(API_URL, headers=headers)
     with urllib.request.urlopen(request, timeout=30) as response:
         release = json.loads(response.read().decode("utf-8"))
 
@@ -36,7 +38,7 @@ def download_csv(filename):
 
     request = urllib.request.Request(
         asset["browser_download_url"],
-        headers={"User-Agent": "Doug-Elite-Game-Simulator"}
+        headers=headers
     )
     with urllib.request.urlopen(request, timeout=90) as response:
         return list(csv.DictReader(
