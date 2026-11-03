@@ -146,7 +146,7 @@ def _aggregate_stats(stat_rows, season, last_n_weeks):
 
 
 def build_player_pool(stat_rows, roster_rows, depth_rows, injury_rows,
-                      season, last_n_weeks=5):
+                      season, last_n_weeks=5, snap_rows=None):
     """Join recent player production to roster/depth/injury status.
 
     Players are marked eligible only when roster status is active, they are
@@ -154,6 +154,21 @@ def build_player_pool(stat_rows, roster_rows, depth_rows, injury_rows,
     designation is present. This is not a substitute for final inactives.
     """
     stats = _aggregate_stats(stat_rows, season, last_n_weeks)
+    snap_rows = snap_rows or []
+    snap_totals = {}
+    for snap in snap_rows:
+        try:
+            snap_season = int(_first(snap, "season") or 0)
+            snap_week = int(_first(snap, "week") or 0)
+        except (TypeError, ValueError):
+            continue
+        if snap_season != season:
+            continue
+        snap_name = _norm(_first(snap, "player", "player_name", "full_name"))
+        snap_team = str(_first(snap, "team", "recent_team") or "").upper()
+        if not snap_name:
+            continue
+        snap_totals.setdefault((snap_name, snap_team), []).append(snap)
     roster_by_id = {
         str(_first(r, "gsis_id", "player_id")): r for r in roster_rows
         if _first(r, "gsis_id", "player_id")
@@ -185,7 +200,16 @@ def build_player_pool(stat_rows, roster_rows, depth_rows, injury_rows,
         roster_active = roster_status in {"act", "active", "1"}
         listed_first = depth_order == 1 and depth_position in POSITIONS
         eligible = roster_active and listed_first and injury_status == "active"
+        player_snaps = snap_totals.get((_norm(player["name"]), str(player["team"] or "").upper()), [])
+        recent_weeks = set(player.get("weeks_in_sample", []))
+        player_snaps = [r for r in player_snaps if int(_first(r, "week") or 0) in recent_weeks]
+        offense_snaps = sum(_float(r, "offense_snaps", "off_snap") for r in player_snaps)
+        offense_pct_values = [_float(r, "offense_pct", "off_pct") for r in player_snaps if _first(r, "offense_pct", "off_pct") not in (None, "")]
         player.update({
+            "offense_snaps_total": round(offense_snaps, 2),
+            "offense_snaps_per_game": round(offense_snaps / max(1, len(player_snaps)), 2),
+            "offense_snap_pct_avg": round(sum(offense_pct_values) / max(1, len(offense_pct_values)), 2) if offense_pct_values else None,
+            "snap_games": len(player_snaps),
             "roster_status": roster_status or "not_found",
             "depth_order": depth_order,
             "depth_position": depth_position,
@@ -214,6 +238,7 @@ def fetch_player_pool(season=None, last_n_weeks=5):
         "rosters": f"{BASE}/rosters/roster_{season}.csv",
         "depth_charts": f"{BASE}/depth_charts/depth_charts_{season}.csv",
         "injuries": f"{BASE}/injuries/injuries_{season}.csv",
+        "snap_counts": f"{BASE}/snap_counts/snap_counts_{season}.csv",
     }
     downloaded = {}
     for label, url in urls.items():
@@ -228,7 +253,7 @@ def fetch_player_pool(season=None, last_n_weeks=5):
     pool = build_player_pool(
         downloaded["player_stats"], downloaded["rosters"],
         downloaded["depth_charts"], downloaded["injuries"],
-        season, last_n_weeks,
+        season, last_n_weeks, downloaded["snap_counts"],
     )
     return {
         "season": season,
