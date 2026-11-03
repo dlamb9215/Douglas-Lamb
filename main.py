@@ -25,6 +25,7 @@ def simulate_game(
     total,
     trials=100000,
     first_half=False,
+    seed=42,
 ):
     """Run the drive-based scoring simulation."""
 
@@ -34,7 +35,7 @@ def simulate_game(
         spread=spread,
         total=total,
         trials=trials,
-        seed=42,
+        seed=seed,
         first_half=first_half,
     )
 
@@ -107,8 +108,12 @@ def main():
     parser.add_argument("--over-odds", type=int)
     parser.add_argument("--under-odds", type=int)
     parser.add_argument("--trials", type=int, default=100000)
+    parser.add_argument("--seed", type=int, default=42,
+                        help="Random seed for reproducible simulations")
 
     args = parser.parse_args()
+    if args.trials < 1:
+        parser.error("--trials must be greater than zero")
     def implied_probability(odds):
         if odds is None:
             return None
@@ -260,6 +265,7 @@ def main():
         spread_line,
         total_line,
         args.trials,
+        seed=args.seed,
         )
     print("\nMODEL EDGE VS FAIR MARKET")
     print("=========================")
@@ -296,6 +302,7 @@ def main():
         total_line / 2,
         args.trials,
         first_half=True,
+        seed=args.seed + 1,
     )
 
 
@@ -310,6 +317,7 @@ def main():
     print(f"Projected home points: {first_half['home_avg']:.1f}")
     print(f"Projected away points: {first_half['away_avg']:.1f}")
     print(f"\nSIMULATION RESULTS: {args.trials:,} TRIALS")
+    print(f"Random seed: {args.seed} (first-half seed: {args.seed + 1})")
 
     print("\nWIN PROBABILITIES")
     print(f"{home['name']}: {result['home_win']:.2f}%")
