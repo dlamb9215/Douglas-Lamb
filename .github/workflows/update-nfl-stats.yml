@@ -2,6 +2,10 @@ name: Update NFL Statistics
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/update-nfl-stats.yml"
   schedule:
     - cron: "0 12 * * 2"
 
@@ -23,6 +27,9 @@ jobs:
 
       - name: Import NFL statistics
         run: python update_nfl_stats.py
+
+      - name: Validate team statistics
+        run: python nfl_data.py
 
       - name: Save updated statistics
         run: |
