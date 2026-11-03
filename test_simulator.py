@@ -120,6 +120,8 @@ class TestDougSimulator(unittest.TestCase):
         self.assertLessEqual(result["overtime"], 100)
         self.assertGreaterEqual(result["tie"], 0)
         self.assertLessEqual(result["tie"], result["overtime"])
+        self.assertLess(result["home_avg"], 30)
+        self.assertLess(result["away_avg"], 30)
 
 if __name__ == "__main__":
     unittest.main()
