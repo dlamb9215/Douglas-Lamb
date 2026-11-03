@@ -88,18 +88,29 @@ class TestDougSimulator(unittest.TestCase):
         self.assertNotEqual(low_variance, high_variance)
 
 
-    def test_turnover_rates_change_simulation_results(self):
+    def test_turnover_rates_do_not_double_count_scoring_loss(self):
         low = simulate_drive_game(
-            24, 21, -3, 45, trials=12000, seed=77,
+            24, 21, -3, 45, trials=50000, seed=77,
             home_turnover_rate=0.02, away_turnover_rate=0.02
         )
         high = simulate_drive_game(
-            24, 21, -3, 45, trials=12000, seed=77,
+            24, 21, -3, 45, trials=50000, seed=77,
             home_turnover_rate=0.25, away_turnover_rate=0.25
         )
         self.assertNotEqual(low, high)
-        self.assertGreater(low["home_avg"] + low["away_avg"],
-                           high["home_avg"] + high["away_avg"])
+        # Turnovers alter game variance and win/cover distribution, but the
+        # supplied scoring means already include historical turnover losses.
+        # The mean score should therefore remain close, not collapse.
+        low_total = low["home_avg"] + low["away_avg"]
+        high_total = high["home_avg"] + high["away_avg"]
+        self.assertLess(abs(low_total - high_total), 2.0)
+
+    def test_turnover_rate_is_validated(self):
+        with self.assertRaises(ValueError):
+            simulate_drive_game(
+                24, 21, -3, 45, trials=1000,
+                home_turnover_rate=0.31
+            )
 
     def test_overtime_is_counted_and_final_outcomes_are_valid(self):
         result = simulate_drive_game(

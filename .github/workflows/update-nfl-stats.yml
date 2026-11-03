@@ -31,10 +31,13 @@ jobs:
       - name: Validate team statistics
         run: python nfl_data.py
 
+      - name: Archive immutable weekly statistics snapshot
+        run: python snapshot_nfl_stats.py
+
       - name: Save updated statistics
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add nfl_team_stats.json
+          git add nfl_team_stats.json data_snapshots/
           git diff --cached --quiet || git commit -m "Update NFL team statistics"
           git push
