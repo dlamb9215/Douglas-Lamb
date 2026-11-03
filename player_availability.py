@@ -7,6 +7,10 @@ Only confirmed active players and confirmed starters
 are eligible for final player projections.
 """
 
+import math
+
+from nfl_teams import NFL_TEAMS
+
 VALID_STATUSES = {
     "active",
     "inactive",
@@ -30,8 +34,11 @@ def validate_player(player):
         if field not in player:
             raise ValueError(f"Player missing required field: {field}")
 
-    if not player["name"].strip():
+    if not isinstance(player["name"], str) or not player["name"].strip():
         raise ValueError("Player name cannot be empty.")
+
+    if not isinstance(player["team"], str) or player["team"] not in NFL_TEAMS:
+        raise ValueError("Player team must be a valid NFL abbreviation.")
 
     if player["status"] not in VALID_STATUSES:
         raise ValueError(
@@ -193,6 +200,7 @@ def adjust_injury_workload(
         if (
             not isinstance(value, (int, float))
             or isinstance(value, bool)
+            or not math.isfinite(value)
             or value < 0
         ):
             raise ValueError(f"Invalid value for {field}.")
@@ -204,6 +212,7 @@ def adjust_injury_workload(
         if (
             not isinstance(snap_limit, (int, float))
             or isinstance(snap_limit, bool)
+            or not math.isfinite(snap_limit)
             or not 0 <= snap_limit <= 100
         ):
             raise ValueError("Snap limit must be between 0 and 100.")
