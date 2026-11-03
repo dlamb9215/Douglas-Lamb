@@ -5,6 +5,7 @@ Spread is the home team's handicap (e.g. -3 means home -3).
 Each tied regulation game receives a simplified overtime: one possession
 for each team, with a regular-season tie retained if still level.
 """
+import math
 import random
 
 
@@ -161,5 +162,3 @@ def simulate_drive_game(
     results["away_avg"] = away_score_sum / trials
     return results
 
-
-import math
