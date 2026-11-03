@@ -1,7 +1,9 @@
-"""Drive-based NFL scoring simulation for Doug's Elite Game Simulator.
+"""Drive-based NFL scoring simulation with turnover and overtime handling.
 
 This is a possession-level approximation, not a play-by-play model.
-The spread argument is the home team's handicap (e.g. -3 means home -3).
+Spread is the home team's handicap (e.g. -3 means home -3).
+Each tied regulation game receives a simplified overtime: one possession
+for each team, with a regular-season tie retained if still level.
 """
 import random
 
@@ -11,21 +13,17 @@ def _clip(value, low, high):
 
 
 def _drive_outcomes(points_per_game, drives, efficiency=1.0):
-    """Convert a scoring mean into mutually exclusive TD/FG/empty drives."""
     points_per_drive = max(0.0, points_per_game * efficiency / max(1, drives))
     td_probability = _clip(points_per_drive * 0.62 / 7.0, 0.0, 0.65)
     fg_probability = _clip(points_per_drive * 0.38 / 3.0, 0.0, 0.65)
-
     if td_probability + fg_probability > 0.90:
         scale = 0.90 / (td_probability + fg_probability)
         td_probability *= scale
         fg_probability *= scale
-
     return td_probability, fg_probability
 
 
 def _game_script_multiplier(score_margin):
-    """Simple trailing/leading adjustment; bounded to avoid runaway feedback."""
     if score_margin >= 14:
         return 0.88
     if score_margin >= 7:
@@ -37,7 +35,11 @@ def _game_script_multiplier(score_margin):
     return 1.00
 
 
-def _score_one_drive(rng, expected_points, drives, efficiency, script_multiplier):
+def _score_one_drive(rng, expected_points, drives, efficiency,
+                     script_multiplier, turnover_rate=0.0):
+    # Turnovers end the possession before a scoring result is generated.
+    if rng.random() < _clip(turnover_rate, 0.0, 0.30):
+        return 0
     adjusted_points = max(0.0, expected_points * script_multiplier)
     td_probability, fg_probability = _drive_outcomes(
         adjusted_points, drives, efficiency
@@ -50,38 +52,40 @@ def _score_one_drive(rng, expected_points, drives, efficiency, script_multiplier
     return 0
 
 
-def _validate_inputs(home_mean, away_mean, spread, total, trials, home_sd, away_sd):
+def _validate_inputs(home_mean, away_mean, spread, total, trials,
+                     home_sd, away_sd, home_turnover_rate,
+                     away_turnover_rate):
     for label, value in (
         ("home_mean", home_mean), ("away_mean", away_mean),
         ("spread", spread), ("total", total),
         ("home_sd", home_sd), ("away_sd", away_sd),
+        ("home_turnover_rate", home_turnover_rate),
+        ("away_turnover_rate", away_turnover_rate),
     ):
         if not isinstance(value, (int, float)) or isinstance(value, bool):
             raise ValueError(f"{label} must be numeric.")
+        if not math.isfinite(value):
+            raise ValueError(f"{label} must be finite.")
     if home_mean < 0 or away_mean < 0 or home_sd < 0 or away_sd < 0:
         raise ValueError("Scoring means and standard deviations cannot be negative.")
+    if not 0 <= home_turnover_rate <= 0.30 or not 0 <= away_turnover_rate <= 0.30:
+        raise ValueError("Turnover rates must be between 0 and 0.30 per drive.")
     if trials < 1:
         raise ValueError("Trials must be greater than zero.")
 
 
 def simulate_drive_game(
-    home_mean,
-    away_mean,
-    spread,
-    total,
-    trials=100000,
-    seed=42,
-    first_half=False,
-    home_sd=10.0,
-    away_sd=10.0,
+    home_mean, away_mean, spread, total, trials=100000, seed=42,
+    first_half=False, home_sd=10.0, away_sd=10.0,
+    home_turnover_rate=0.10, away_turnover_rate=0.10,
 ):
     """Return simulated win, cover, total and average-score probabilities."""
-    _validate_inputs(home_mean, away_mean, spread, total, trials, home_sd, away_sd)
+    _validate_inputs(home_mean, away_mean, spread, total, trials,
+                     home_sd, away_sd, home_turnover_rate, away_turnover_rate)
     rng = random.Random(seed)
-
     keys = (
         "home_win", "away_win", "tie", "home_cover", "away_cover",
-        "spread_push", "over", "under", "total_push",
+        "spread_push", "over", "under", "total_push", "overtime",
     )
     counts = dict.fromkeys(keys, 0)
     home_score_sum = 0
@@ -92,42 +96,44 @@ def simulate_drive_game(
             pace = int(_clip(round(rng.gauss(5.3, 0.8)), 3, 8))
             min_drives, max_drives = 3, 8
             home_target, away_target = home_mean / 2, away_mean / 2
+            home_to, away_to = home_turnover_rate, away_turnover_rate
         else:
             pace = int(_clip(round(rng.gauss(10.6, 1.2)), 7, 15))
             min_drives, max_drives = 7, 15
             home_target, away_target = home_mean, away_mean
+            home_to, away_to = home_turnover_rate, away_turnover_rate
 
         home_drives = int(_clip(pace + rng.choice((-1, 0, 0, 1)), min_drives, max_drives))
         away_drives = int(_clip(pace + rng.choice((-1, 0, 0, 1)), min_drives, max_drives))
-
-        # Team-level game variance: standard deviations now affect outcomes.
         home_cv = _clip(home_sd / max(home_target, 10.0) * 0.35, 0.03, 0.30)
         away_cv = _clip(away_sd / max(away_target, 10.0) * 0.35, 0.03, 0.30)
-        home_efficiency = _clip(rng.lognormvariate(-0.5 * home_cv**2, home_cv), 0.65, 1.40)
-        away_efficiency = _clip(rng.lognormvariate(-0.5 * away_cv**2, away_cv), 0.65, 1.40)
+        home_eff = _clip(rng.lognormvariate(-0.5 * home_cv**2, home_cv), 0.65, 1.40)
+        away_eff = _clip(rng.lognormvariate(-0.5 * away_cv**2, away_cv), 0.65, 1.40)
 
-        home = 0
-        away = 0
-        # Alternate possessions so score-state effects can influence later drives.
+        home = away = 0
         for drive_index in range(max(home_drives, away_drives)):
             if drive_index < home_drives:
-                margin = home - away
                 home += _score_one_drive(
-                    rng, home_target, home_drives, home_efficiency,
-                    _game_script_multiplier(margin),
+                    rng, home_target, home_drives, home_eff,
+                    _game_script_multiplier(home - away), home_to
                 )
             if drive_index < away_drives:
-                margin = away - home
                 away += _score_one_drive(
-                    rng, away_target, away_drives, away_efficiency,
-                    _game_script_multiplier(margin),
+                    rng, away_target, away_drives, away_eff,
+                    _game_script_multiplier(away - home), away_to
                 )
+
+        # Simplified regular-season overtime: each team gets one possession.
+        # If the score remains tied, the game is recorded as a tie.
+        if not first_half and home == away:
+            counts["overtime"] += 1
+            home += _score_one_drive(rng, home_target, 1, home_eff, 1.0, home_to)
+            away += _score_one_drive(rng, away_target, 1, away_eff, 1.0, away_to)
 
         margin = home - away
         game_total = home + away
         home_score_sum += home
         away_score_sum += away
-
         if margin > 0:
             counts["home_win"] += 1
         elif margin < 0:
@@ -154,3 +160,6 @@ def simulate_drive_game(
     results["home_avg"] = home_score_sum / trials
     results["away_avg"] = away_score_sum / trials
     return results
+
+
+import math
