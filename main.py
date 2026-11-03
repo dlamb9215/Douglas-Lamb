@@ -334,7 +334,8 @@ def main():
     print("\nWIN PROBABILITIES")
     print(f"{home['name']}: {result['home_win']:.2f}%")
     print(f"{away['name']}: {result['away_win']:.2f}%")
-    print(f"Tie: {result['tie']:.2f}%")
+    print(f"Regulation ties sent to overtime: {result['overtime']:.2f}%")
+    print(f"Final tie probability: {result['tie']:.2f}%")
 
     print("\nSPREAD PROBABILITIES")
     print(f"{home['name']}: {result['home_cover']:.2f}%")
