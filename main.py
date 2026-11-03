@@ -26,6 +26,8 @@ def simulate_game(
     trials=100000,
     first_half=False,
     seed=42,
+    home_turnover_rate=0.10,
+    away_turnover_rate=0.10,
 ):
     """Run the drive-based scoring simulation."""
 
@@ -39,6 +41,8 @@ def simulate_game(
         first_half=first_half,
         home_sd=home_sd,
         away_sd=away_sd,
+        home_turnover_rate=home_turnover_rate,
+        away_turnover_rate=away_turnover_rate,
     )
 
 
@@ -268,6 +272,8 @@ def main():
         total_line,
         args.trials,
         seed=args.seed,
+        home_turnover_rate=home['turnovers']['giveaways'] / max(home.get('games_played', 1), 1) / 10.6,
+        away_turnover_rate=away['turnovers']['giveaways'] / max(away.get('games_played', 1), 1) / 10.6,
         )
     print("\nMODEL EDGE VS FAIR MARKET")
     print("=========================")
@@ -305,6 +311,8 @@ def main():
         args.trials,
         first_half=True,
         seed=args.seed + 1,
+        home_turnover_rate=home['turnovers']['giveaways'] / max(home.get('games_played', 1), 1) / 10.6,
+        away_turnover_rate=away['turnovers']['giveaways'] / max(away.get('games_played', 1), 1) / 10.6,
     )
 
 
