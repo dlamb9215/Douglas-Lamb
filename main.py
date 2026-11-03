@@ -37,6 +37,8 @@ def simulate_game(
         trials=trials,
         seed=seed,
         first_half=first_half,
+        home_sd=home_sd,
+        away_sd=away_sd,
     )
 
 
