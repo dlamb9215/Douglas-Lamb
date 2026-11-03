@@ -8,6 +8,8 @@ import argparse
 import json
 from datetime import datetime, timezone
 
+from game_day_confirmations import validate_confirmation_file, confirmed_player_copy
+
 from player_prop_simulator import (
     project_from_recent_player_data,
     simulate_player_prop,
@@ -34,13 +36,14 @@ def load_player_pool(path="player_pool.json"):
 
 
 def analyze_matchup(home, away, player_pool, prop_lines=None,
-                    trials=100000, seed=42, allow_depth_chart_first=False):
+                    trials=100000, seed=42, confirmations=None):
     home, away = home.upper(), away.upper()
     if home == away:
         raise ValueError("Home and away teams must be different.")
     if trials < 1:
         raise ValueError("trials must be positive.")
     prop_lines = prop_lines or {}
+    confirmations = confirmations or {}
     eligible = []
     blocked = []
     for player in player_pool["players"]:
@@ -48,23 +51,15 @@ def analyze_matchup(home, away, player_pool, prop_lines=None,
             continue
         if player.get("position") not in SUPPORTED_STATS:
             continue
-        if not player.get("starter"):
+        confirmed = confirmed_player_copy(player, confirmations)
+        if confirmed is None:
             blocked.append({
                 "player": player.get("name"),
                 "team": player.get("team"),
-                "reason": player.get("eligibility_note", "Not eligible in player feed."),
+                "reason": "No fresh official game-day confirmation of active status and starting role.",
             })
             continue
-        # This feed's starter flag means first-listed depth chart, not confirmed
-        # game-day active starter. Require explicit opt-in to use as provisional.
-        if not allow_depth_chart_first:
-            blocked.append({
-                "player": player.get("name"),
-                "team": player.get("team"),
-                "reason": "Depth-chart first-listed only; official game-day starter/inactive confirmation required.",
-            })
-            continue
-        eligible.append(player)
+        eligible.append(confirmed)
 
     reports = []
     for index, player in enumerate(eligible):
@@ -106,8 +101,8 @@ def analyze_matchup(home, away, player_pool, prop_lines=None,
         "blocked_players": blocked,
         "players": reports,
         "warnings": [
-            "Depth-chart first-listed is not official game-day starter confirmation.",
-            "Official NFL/team inactives must be checked before final props.",
+            "Only players explicitly confirmed active starters in the fresh game-day confirmation file are projected.",
+            "The confirmation file must be sourced from official NFL/team game-day inactive and starter information.",
             "Recent per-game production is a baseline, not opponent-adjusted.",
             "A prop probability is only produced when a sportsbook line is supplied.",
             "Normal-approximation dispersion remains provisional pending historical calibration.",
@@ -123,8 +118,8 @@ def main():
     parser.add_argument("--lines", help="JSON file mapping TEAM:Player:stat to line")
     parser.add_argument("--trials", type=int, default=100000)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--allow-depth-chart-first", action="store_true",
-                        help="Allow depth-chart first-listed players as provisional, not game-day-confirmed")
+    parser.add_argument("--confirmations", required=True,
+                        help="Fresh JSON file with official game-day active/starter confirmations")
     parser.add_argument("--output", default="matchup-player-report.json")
     args = parser.parse_args()
     pool = load_player_pool(args.pool)
@@ -132,9 +127,12 @@ def main():
     if args.lines:
         with open(args.lines, "r", encoding="utf-8") as handle:
             lines = json.load(handle)
+    with open(args.confirmations, "r", encoding="utf-8") as handle:
+        confirmation_data = json.load(handle)
+    confirmations = validate_confirmation_file(confirmation_data)
     report = analyze_matchup(
         args.home, args.away, pool, lines, args.trials, args.seed,
-        args.allow_depth_chart_first,
+        confirmations,
     )
     with open(args.output, "w", encoding="utf-8") as handle:
         json.dump(report, handle, indent=2)
