@@ -152,3 +152,57 @@ def simulate_player_prop(projection, stat, line, trials=100000, seed=42,
         "p95": round(samples[int((trials - 1) * 0.95)], 2),
         "method_note": "Normal approximation; dispersion is provisional, not historically calibrated.",
     }
+
+
+def project_from_recent_player_data(player):
+    """Create a prop-simulation input from a live nflverse player-pool row.
+
+    Uses recent per-game production as the baseline. It does not claim a
+    matchup-adjusted forecast; callers should adjust volume/rates for opponent,
+    role changes and expected game script before treating it as a projection.
+    """
+    from player_projections import validate_projection_player
+
+    validate_projection_player(player)
+    games = int(player.get("games", 0))
+    if games < 1:
+        raise ValueError("At least one recent game is required.")
+
+    position = player["position"]
+    stat_map = {
+        "QB": ("passing_yards_per_game", "completions_per_game",
+               "passing_attempts_per_game", "passing_tds_per_game",
+               "interceptions_per_game", "rushing_yards_per_game",
+               "carries_per_game"),
+        "RB": ("carries_per_game", "rushing_yards_per_game",
+               "targets_per_game", "receptions_per_game",
+               "receiving_yards_per_game", "rushing_tds_per_game"),
+        "WR": ("targets_per_game", "receptions_per_game",
+               "receiving_yards_per_game", "receiving_tds_per_game"),
+        "TE": ("targets_per_game", "receptions_per_game",
+               "receiving_yards_per_game", "receiving_tds_per_game"),
+    }
+    if position not in stat_map:
+        raise ValueError(f"Unsupported player position: {position}")
+
+    stats = {}
+    for key in stat_map[position]:
+        stats[key.replace("_per_game", "")] = round(
+            float(player.get(key, 0) or 0), 2
+        )
+    stats["games_in_sample"] = games
+    stats["offense_snaps_per_game"] = player.get("offense_snaps_per_game")
+    stats["offense_snap_pct_avg"] = player.get("offense_snap_pct_avg")
+    stats["targets_per_game"] = round(float(player.get("targets_per_game", 0) or 0), 2)
+    stats["carries_per_game"] = round(float(player.get("carries_per_game", 0) or 0), 2)
+
+    return {
+        "player": player["name"],
+        "team": player["team"],
+        "position": position,
+        "projected_stats": stats,
+        "data_note": (
+            "Recent nflverse per-game baseline; not yet opponent-adjusted, "
+            "not a confirmed game-day starter, and not a calibrated forecast."
+        ),
+    }
