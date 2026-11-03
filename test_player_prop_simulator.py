@@ -1,5 +1,5 @@
 import unittest
-from player_prop_simulator import project_player_stats, simulate_player_prop
+from player_prop_simulator import project_player_stats, simulate_player_prop, project_from_recent_player_data
 
 class TestPlayerPropSimulator(unittest.TestCase):
     def setUp(self):
@@ -22,6 +22,19 @@ class TestPlayerPropSimulator(unittest.TestCase):
         b=simulate_player_prop(p,'receiving_yards',70.5,trials=5000,seed=71)
         self.assertEqual(a,b)
         self.assertAlmostEqual(a['over_probability']+a['under_probability']+a['push_probability'],100.0,places=2)
+
+
+    def test_recent_usage_row_creates_prop_projection(self):
+        row = {
+            "name":"Test Receiver","team":"BUF","position":"WR",
+            "status":"active","starter":True,"games":4,
+            "targets_per_game":8.5,"receptions_per_game":6.0,
+            "receiving_yards_per_game":74.0,"receiving_tds_per_game":0.5,
+            "offense_snaps_per_game":52.0,"offense_snap_pct_avg":78.0,
+        }
+        result = project_from_recent_player_data(row)
+        self.assertEqual(result["projected_stats"]["receiving_yards"],74.0)
+        self.assertEqual(result["projected_stats"]["targets"],8.5)
 
 if __name__ == '__main__':
     unittest.main()
