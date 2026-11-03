@@ -41,7 +41,14 @@ def _score_one_drive(rng, expected_points, drives, efficiency,
     # Turnovers end the possession before a scoring result is generated.
     if rng.random() < _clip(turnover_rate, 0.0, 0.30):
         return 0
-    adjusted_points = max(0.0, expected_points * script_multiplier)
+    # The scoring mean is already observed production, including turnovers.
+    # Conditional scoring on a non-turnover drive must be scaled up so that
+    # applying the turnover probability does not count those lost points twice.
+    survival_probability = 1.0 - _clip(turnover_rate, 0.0, 0.30)
+    adjusted_points = max(
+        0.0,
+        expected_points * script_multiplier / survival_probability
+    )
     td_probability, fg_probability = _drive_outcomes(
         adjusted_points, drives, efficiency
     )
