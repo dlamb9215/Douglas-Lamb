@@ -40,5 +40,15 @@ class TestDougSimulator(unittest.TestCase):
         self.assertGreater(result["away_avg"], 0)
 
 
+    def test_seed_reproduces_same_results(self):
+        first = simulate_game(24, 21, 10, 10, -3, 45, 5000, seed=123)
+        second = simulate_game(24, 21, 10, 10, -3, 45, 5000, seed=123)
+        self.assertEqual(first, second)
+
+    def test_different_seeds_can_change_results(self):
+        first = simulate_game(24, 21, 10, 10, -3, 45, 5000, seed=123)
+        second = simulate_game(24, 21, 10, 10, -3, 45, 5000, seed=456)
+        self.assertNotEqual(first, second)
+
 if __name__ == "__main__":
     unittest.main()
