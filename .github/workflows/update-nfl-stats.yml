@@ -26,6 +26,8 @@ jobs:
           python-version: "3.12"
 
       - name: Import NFL statistics
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: python update_nfl_stats.py
 
       - name: Validate team statistics
