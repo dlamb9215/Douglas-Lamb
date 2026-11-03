@@ -18,7 +18,7 @@ def main():
     if destination.exists():
         raise FileExistsError(f"Refusing to overwrite snapshot: {destination}")
     destination.write_text(
-        json.dumps(records, indent=2) + "\\n",
+        json.dumps(records, indent=2) + "\n",
         encoding="utf-8",
     )
     print(f"Archived {len(records)} teams to {destination}")
