@@ -87,5 +87,28 @@ class TestDougSimulator(unittest.TestCase):
         )
         self.assertNotEqual(low_variance, high_variance)
 
+
+    def test_turnover_rates_change_simulation_results(self):
+        low = simulate_drive_game(
+            24, 21, -3, 45, trials=12000, seed=77,
+            home_turnover_rate=0.02, away_turnover_rate=0.02
+        )
+        high = simulate_drive_game(
+            24, 21, -3, 45, trials=12000, seed=77,
+            home_turnover_rate=0.25, away_turnover_rate=0.25
+        )
+        self.assertNotEqual(low, high)
+        self.assertGreater(low["home_avg"] + low["away_avg"],
+                           high["home_avg"] + high["away_avg"])
+
+    def test_overtime_is_counted_and_final_outcomes_are_valid(self):
+        result = simulate_drive_game(
+            20, 20, 0, 40, trials=20000, seed=88
+        )
+        self.assertGreaterEqual(result["overtime"], 0)
+        self.assertLessEqual(result["overtime"], 100)
+        self.assertGreaterEqual(result["tie"], 0)
+        self.assertLessEqual(result["tie"], result["overtime"])
+
 if __name__ == "__main__":
     unittest.main()
