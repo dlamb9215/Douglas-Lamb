@@ -1,0 +1,32 @@
+name: Update NBA Statistics
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 10 * * *"
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Refresh NBA team statistics
+        env:
+          NBA_SEASON: "2026-27"
+          NBA_PRIOR_SEASON: "2025-26"
+        run: python nba/update_stats.py
+      - name: Validate data and engine
+        run: |
+          python -m unittest -v nba.test_simulator
+          python -c "import json; d=json.load(open('nba/team_stats.json')); assert len(d['teams']) == 30"
+      - name: Commit refreshed stats
+        run: |
+          if git diff --quiet -- nba/team_stats.json; then echo "No changes"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add nba/team_stats.json
+          git commit -m "Update NBA team statistics"
+          git push
