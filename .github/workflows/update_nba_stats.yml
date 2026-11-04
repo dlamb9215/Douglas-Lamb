@@ -20,7 +20,7 @@ jobs:
         run: python nba/update_stats.py
       - name: Validate data and engine
         run: |
-          python -m unittest -v nba.test_simulator
+          python -m unittest -v nba.test_simulator nba.test_backtest
           python -c "import json; d=json.load(open('nba/team_stats.json')); assert len(d['teams']) == 30"
       - name: Commit refreshed stats
         run: |
