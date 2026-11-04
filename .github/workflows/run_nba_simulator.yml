@@ -73,9 +73,11 @@ jobs:
       - name: Install dependencies
         run: python -m pip install --upgrade pip numpy
       - name: Run NBA tests
-        run: python -m unittest -v nba.test_simulator
+        run: python -m unittest -v nba.test_simulator nba.test_backtest
       - name: Require refreshed NBA data
-        run: test -s nba/team_stats.json
+        run: |
+          test -s nba/team_stats.json
+          python -c "import json; d=json.load(open('nba/team_stats.json')); assert len(d.get('teams', {})) == 30, 'Expected exactly 30 NBA teams'"
       - name: Run matchup
         env:
           HOME_TEAM: ${{ inputs.home }}
