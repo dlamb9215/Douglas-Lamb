@@ -79,11 +79,17 @@ def load_team_stats(path="nba/team_stats.json"):
     return {k.upper():TeamStats.from_dict(k,v) for k,v in raw.items()},data
 
 def _shot_profile_adjustment(t,o):
-    # Small correction for opponent three-point accuracy allowed; eFG already
-    # captures much of the team's own shot-making, so avoid double-counting it.
-    if t.three_pa_rate is None or o.opp_fg3_pct is None: return 0.0
-    share=min(.60,max(.20,t.three_pa_rate))
-    return max(-1.25,min(1.25,(o.opp_fg3_pct-.36)*300*share*.25))
+    # Small, capped correction for the offense's 3P accuracy and the defense's
+    # 3P accuracy/attempt profile allowed. eFG already captures much of this,
+    # so the adjustment is deliberately conservative to limit double-counting.
+    offense_pct=t.fg3_pct if t.fg3_pct is not None else .36
+    defense_pct=o.opp_fg3_pct if o.opp_fg3_pct is not None else .36
+    own_rate=t.three_pa_rate if t.three_pa_rate is not None else .39
+    allowed_rate=o.opp_three_pa_rate if o.opp_three_pa_rate is not None else .39
+    share=min(.60,max(.20,(own_rate+allowed_rate)/2))
+    accuracy=(.5*(offense_pct+defense_pct)-.36)*300*share*.20
+    volume=(allowed_rate-.39)*2.0
+    return max(-1.5,min(1.5,accuracy+volume))
 
 def _factor_adjustment(t,o):
     own=38*(t.efg_pct-LEAGUE["efg_pct"])-24*(t.tov_pct-LEAGUE["tov_pct"])+15*(t.orb_pct-LEAGUE["orb_pct"])+10*(t.ft_rate-LEAGUE["ft_rate"])
