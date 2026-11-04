@@ -90,16 +90,20 @@ def main():
     # Prior-year baseline.
     prior_adv=fetch(prior_season,"Advanced"); time.sleep(1.2)
     prior_ff=fetch(prior_season,"Four Factors"); time.sleep(1.2)
+    prior_base=fetch(prior_season,"Base"); time.sleep(1.2)
+    prior_opp=fetch(prior_season,"Opponent"); time.sleep(1.2)
     # Current full-season, recent form and venue splits.
     cur_adv=fetch(season,"Advanced"); time.sleep(1.2)
     cur_ff=fetch(season,"Four Factors"); time.sleep(1.2)
+    cur_base=fetch(season,"Base"); time.sleep(1.2)
+    cur_opp=fetch(season,"Opponent"); time.sleep(1.2)
     recent_adv=fetch(season,"Advanced",last_n=10); time.sleep(1.2)
     home_adv=fetch(season,"Advanced",location="Home"); time.sleep(1.2)
     road_adv=fetch(season,"Advanced",location="Road"); time.sleep(1.2)
     current_score_sd=fetch_score_sd(season); time.sleep(1.2)
     prior_score_sd=fetch_score_sd(prior_season)
     team_codes=set(cur_adv)
-    if any(set(x)!=team_codes for x in (cur_ff,prior_adv,prior_ff,recent_adv,home_adv,road_adv,current_score_sd,prior_score_sd)):
+    if any(set(x)!=team_codes for x in (cur_ff,prior_adv,prior_ff,cur_base,cur_opp,prior_base,prior_opp,recent_adv,home_adv,road_adv,current_score_sd,prior_score_sd)):
         raise RuntimeError("Team sets differ between NBA Stats queries; preserving previous data.")
     teams={}
     for code in sorted(team_codes):
@@ -111,6 +115,25 @@ def main():
         gp=max(0,now["games_played"])
         # Eight-game prior-season weight prevents early-season overreaction.
         row=dict(now)
+        def ratio(source,numerator,denominator):
+            n=val(source,numerator); d=val(source,denominator)
+            return n/d if n is not None and d else None
+        shot_values={
+            "three_pa_rate":ratio(cur_base[code],"FG3A","FGA"),
+            "fg3_pct":val(cur_base[code],"FG3_PCT"),
+            "opp_three_pa_rate":ratio(cur_opp[code],"OPP_FG3A","OPP_FGA"),
+            "opp_fg3_pct":val(cur_opp[code],"OPP_FG3_PCT")}
+        prior_shot_values={
+            "three_pa_rate":ratio(prior_base[code],"FG3A","FGA"),
+            "fg3_pct":val(prior_base[code],"FG3_PCT"),
+            "opp_three_pa_rate":ratio(prior_opp[code],"OPP_FG3A","OPP_FGA"),
+            "opp_fg3_pct":val(prior_opp[code],"OPP_FG3_PCT")}
+        for key,value in shot_values.items():
+            prior_value=prior_shot_values[key]
+            if value is not None and prior_value is not None:
+                row[key]=(value*gp+prior_value*8)/(gp+8)
+            elif value is not None: row[key]=value
+            elif prior_value is not None: row[key]=prior_value
         for key in ("pace","off_rating","def_rating","efg_pct","tov_pct","orb_pct","ft_rate",
                     "opp_efg_pct","opp_tov_pct","opp_orb_pct","opp_ft_rate"):
             row[key]=(now[key]*gp+prior[key]*8)/(gp+8)
