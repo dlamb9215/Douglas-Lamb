@@ -5,22 +5,22 @@ on:
       home:
         description: Home team abbreviation
         required: true
-        default: "NY"
+        default: "MEM"
         type: string
       away:
         description: Away team abbreviation
         required: true
-        default: "CHI"
+        default: "IND"
         type: string
       spread:
         description: Home spread, e.g. -3.5; blank to skip
         required: false
-        default: "-12.5"
+        default: "-6.5"
         type: string
       total:
         description: Game total; blank to skip
         required: false
-        default: "233.5"
+        default: "228.5"
         type: string
       trials:
         description: Baseline Monte Carlo trials
@@ -50,12 +50,12 @@ on:
       home_injury_points:
         description: Manual home team points adjustment for unavailable players
         required: true
-        default: "-0.9"
+        default: "-1.5"
         type: string
       away_injury_points:
         description: Manual away team points adjustment for unavailable players
         required: true
-        default: "-1.0"
+        default: "-7.5"
         type: string
       seed:
         description: Reproducible random seed
