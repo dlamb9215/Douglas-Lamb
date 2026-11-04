@@ -37,6 +37,10 @@ class TeamStats:
     road_off_rating:float|None=None
     road_def_rating:float|None=None
     score_sd:float=11.5
+    three_pa_rate:float|None=None
+    fg3_pct:float|None=None
+    opp_three_pa_rate:float|None=None
+    opp_fg3_pct:float|None=None
 
     @classmethod
     def from_dict(cls,code:str,raw:dict[str,Any]):
@@ -55,10 +59,13 @@ class TeamStats:
                 raise ValueError(f"{code} {k} must be 0-1 or 0-100")
         optional={}
         for k in ("recent_pace","recent_off_rating","recent_def_rating","home_off_rating",
-                  "home_def_rating","road_off_rating","road_def_rating","score_sd"):
+                  "home_def_rating","road_off_rating","road_def_rating","score_sd","three_pa_rate","fg3_pct","opp_three_pa_rate","opp_fg3_pct"):
             value=raw.get(k)
             optional[k]=float(value) if value is not None else None
         if optional["score_sd"] is None: optional["score_sd"]=11.5
+        for k in ("three_pa_rate","fg3_pct","opp_three_pa_rate","opp_fg3_pct"):
+            if optional[k] is not None and optional[k]>1: optional[k]/=100
+            if optional[k] is not None and not 0<=optional[k]<=1: raise ValueError(f"{code} {k} must be 0-1 or 0-100")
         if not 7<=optional["score_sd"]<=18: raise ValueError(f"{code} score_sd outside supported range")
         gp=int(raw.get("games_played",raw.get("gp",0)))
         if gp<0: raise ValueError("games_played cannot be negative")
@@ -70,6 +77,13 @@ def load_team_stats(path="nba/team_stats.json"):
     data=json.loads(p.read_text(encoding="utf-8")); raw=data.get("teams",{})
     if not isinstance(raw,dict) or len(raw)<30: raise ValueError("NBA data must contain all 30 teams")
     return {k.upper():TeamStats.from_dict(k,v) for k,v in raw.items()},data
+
+def _shot_profile_adjustment(t,o):
+    # Small correction for opponent three-point accuracy allowed; eFG already
+    # captures much of the team's own shot-making, so avoid double-counting it.
+    if t.three_pa_rate is None or o.opp_fg3_pct is None: return 0.0
+    share=min(.60,max(.20,t.three_pa_rate))
+    return max(-1.25,min(1.25,(o.opp_fg3_pct-.36)*300*share*.25))
 
 def _factor_adjustment(t,o):
     own=38*(t.efg_pct-LEAGUE["efg_pct"])-24*(t.tov_pct-LEAGUE["tov_pct"])+15*(t.orb_pct-LEAGUE["orb_pct"])+10*(t.ft_rate-LEAGUE["ft_rate"])
@@ -88,8 +102,8 @@ def matchup_projection(home,away,home_rest=2,away_rest=2,home_travel=0,away_trav
     a_off=.85*a_off+.15*away.recent_off_rating if away.recent_off_rating is not None else a_off
     h_def=.85*h_def+.15*home.recent_def_rating if home.recent_def_rating is not None else h_def
     a_def=.85*a_def+.15*away.recent_def_rating if away.recent_def_rating is not None else a_def
-    he=(h_off+a_def)/2+_factor_adjustment(home,away)+1.35
-    ae=(a_off+h_def)/2+_factor_adjustment(away,home)
+    he=(h_off+a_def)/2+_factor_adjustment(home,away)+_shot_profile_adjustment(home,away)+1.35
+    ae=(a_off+h_def)/2+_factor_adjustment(away,home)+_shot_profile_adjustment(away,home)
     # Small transparent schedule effects; capped to avoid exaggerated travel/rest adjustments.
     h_rest=max(0,min(3,home_rest-1))*0.35
     a_rest=max(0,min(3,away_rest-1))*0.35
@@ -202,7 +216,7 @@ def main():
         r=simulate(h,w,a.max_trials,a.seed,a.spread,a.total,**kwargs)
     print("\nDOUG'S ELITE NBA SIMULATOR\n========================="); print(f"{w.name} at {h.name}")
     for t in (h,w):
-        print(f"{t.name}: GP {t.games_played} | Pace {t.pace:.1f} | ORtg {t.off_rating:.1f} | DRtg {t.def_rating:.1f} | eFG {t.efg_pct:.3f} | TOV {t.tov_pct:.3f} | ORB {t.orb_pct:.3f} | FT rate {t.ft_rate:.3f}")
+        print(f"{t.name}: GP {t.games_played} | Pace {t.pace:.1f} | ORtg {t.off_rating:.1f} | DRtg {t.def_rating:.1f} | eFG {t.efg_pct:.3f} | TOV {t.tov_pct:.3f} | ORB {t.orb_pct:.3f} | FT rate {t.ft_rate:.3f} | 3PA rate {t.three_pa_rate if t.three_pa_rate is not None else float('nan'):.3f}")
     print(f"Projected pace {r['pace']:.1f} | Score {h.name} {r['home_points']:.1f} - {w.name} {r['away_points']:.1f}")
     print(f"Projected total {r['total_points']:.1f} | Home margin {r['home_margin']:+.1f}")
     print(f"Trials {r['trials']:,} | Seed {r['seed']} | Margin SD {r['margin_sd']:.1f}")
