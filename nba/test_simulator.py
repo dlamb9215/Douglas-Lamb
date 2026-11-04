@@ -49,7 +49,14 @@ class TestNBAEngine(unittest.TestCase):
         changed=matchup_projection(h,w,home_rest=0,away_rest=3,home_travel=2000,home_injury_points=-4)
         self.assertLess(changed["home_points"],base["home_points"])
         self.assertGreater(changed["away_points"],base["away_points"])
-    def test_recent_pace_uses_season_baseline_when_one_team_has_no_recent_sample(self):\n        h=team("BOS",recent_pace=105)\n        w=team("NYK",recent_pace=None)\n        result=matchup_projection(h,w)\n        expected=.8*99+.2*((105+99)/2)\n        self.assertAlmostEqual(result["pace"],expected)\n\n    def test_recent_form_and_venue_features_are_supported(self):
+    def test_recent_pace_uses_season_baseline_when_one_team_has_no_recent_sample(self):
+        h=team("BOS",recent_pace=105)
+        w=team("NYK",recent_pace=None)
+        result=matchup_projection(h,w)
+        expected=.8*99+.2*((105+99)/2)
+        self.assertAlmostEqual(result["pace"],expected)
+
+    def test_recent_form_and_venue_features_are_supported(self):
         h=team("BOS",recent_off_rating=120,home_off_rating=119)
         w=team("NYK",recent_off_rating=110,road_def_rating=115)
         r=matchup_projection(h,w)
