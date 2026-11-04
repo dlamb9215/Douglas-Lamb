@@ -5,22 +5,22 @@ on:
       home:
         description: Home team abbreviation
         required: true
-        default: "HOU"
+        default: "DEN"
         type: string
       away:
         description: Away team abbreviation
         required: true
-        default: "MIN"
+        default: "TOR"
         type: string
       spread:
         description: Home spread, e.g. -3.5; blank to skip
         required: false
-        default: "-7.5"
+        default: "-4.5"
         type: string
       total:
         description: Game total; blank to skip
         required: false
-        default: "220.5"
+        default: "231.5"
         type: string
       trials:
         description: Baseline Monte Carlo trials
