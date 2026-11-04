@@ -1,4 +1,8 @@
-"""Refresh NBA team metrics from NBA.com Stats; preserve last good data on failure."""
+"""Refresh NBA team metrics from NBA.com Stats.
+
+All requests are validated before the previous data file is replaced. Current-season
+recent and home/road splits are blended with season-level and prior-season baselines.
+"""
 import json, os, time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -10,64 +14,112 @@ HEADERS={"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome
 "Referer":"https://www.nba.com/","Origin":"https://www.nba.com","x-nba-stats-origin":"stats",
 "x-nba-stats-token":"true","Accept":"application/json, text/plain, */*"}
 
-def fetch(season,measure):
-    p={"LeagueID":"00","Season":season,"SeasonType":"Regular Season","PerMode":"PerGame",
-       "MeasureType":measure,"PlusMinus":"N","PaceAdjust":"N","Rank":"N","LastNGames":"0",
-       "Month":"0","OpponentTeamID":"0","Period":"0","TeamID":"0","DateFrom":"","DateTo":"",
-       "Location":"","Outcome":"","SeasonSegment":"","VsConference":"","VsDivision":""}
-    req=Request(URL+"?"+urlencode(p),headers=HEADERS)
-    with urlopen(req,timeout=45) as response: data=json.loads(response.read().decode())
-    sets=data.get("resultSets") or data.get("resultSet")
-    if not sets: raise RuntimeError(f"No result set for {season}/{measure}")
-    rows={}
-    for row in sets[0]["rowSet"]:
-        item=dict(zip(sets[0]["headers"],row))
-        code=str(item.get("TEAM_ABBREVIATION","")).upper()
-        if code: rows[code]=item
-    if len(rows)!=30: raise RuntimeError(f"Incomplete {season}/{measure}: got {len(rows)} teams")
-    return rows
+def fetch(season,measure,last_n=0,location=""):
+    params={"LeagueID":"00","Season":season,"SeasonType":"Regular Season","PerMode":"PerGame",
+      "MeasureType":measure,"PlusMinus":"N","PaceAdjust":"N","Rank":"N","LastNGames":str(last_n),
+      "Month":"0","OpponentTeamID":"0","Period":"0","TeamID":"0","DateFrom":"","DateTo":"",
+      "Location":location,"Outcome":"","SeasonSegment":"","VsConference":"","VsDivision":""}
+    req=Request(URL+"?"+urlencode(params),headers=HEADERS)
+    last_error=None
+    for attempt in range(3):
+        try:
+            with urlopen(req,timeout=45) as response: data=json.loads(response.read().decode())
+            sets=data.get("resultSets") or data.get("resultSet")
+            if not sets: raise RuntimeError(f"No result set for {season}/{measure}")
+            rows={}
+            for row in sets[0]["rowSet"]:
+                item=dict(zip(sets[0]["headers"],row))
+                code=str(item.get("TEAM_ABBREVIATION","")).upper()
+                if code: rows[code]=item
+            if len(rows)!=30: raise RuntimeError(f"Incomplete {season}/{measure}/{location}/{last_n}: {len(rows)} teams")
+            return rows
+        except Exception as exc:
+            last_error=exc
+            if attempt<2: time.sleep(3*(attempt+1))
+    raise RuntimeError(f"NBA Stats request failed after retries: {last_error}")
 
 def val(row,*keys):
     for k in keys:
         if row.get(k) is not None: return float(row[k])
     return None
 
-def normalize(season):
-    adv=fetch(season,"Advanced"); time.sleep(1.5); ff=fetch(season,"Four Factors")
-    out={}
-    for code,a in adv.items():
-        f=ff[code]
-        out[code]={"name":a.get("TEAM_NAME",code),"games_played":int(a.get("GP") or 0),
-        "pace":val(a,"PACE"),"off_rating":val(a,"OFF_RATING","E_OFF_RATING"),
-        "def_rating":val(a,"DEF_RATING","E_DEF_RATING"),"efg_pct":val(f,"EFG_PCT"),
-        "tov_pct":val(f,"TM_TOV_PCT","TOV_PCT"),"orb_pct":val(f,"OREB_PCT","ORB_PCT"),
-        "ft_rate":val(f,"FTA_RATE","FT_RATE"),"opp_efg_pct":val(f,"OPP_EFG_PCT"),
-        "opp_tov_pct":val(f,"OPP_TOV_PCT"),"opp_orb_pct":val(f,"OPP_OREB_PCT","OPP_ORB_PCT"),
-        "opp_ft_rate":val(f,"OPP_FTA_RATE","OPP_FT_RATE")}
-        missing=[k for k,v in out[code].items() if v is None and k!="name"]
-        if missing: raise RuntimeError(f"{code} missing metrics: {missing}")
-    return out
+def metric_row(advanced,factors=None):
+    row={"name":advanced.get("TEAM_NAME"),"games_played":int(advanced.get("GP") or 0),
+         "pace":val(advanced,"PACE","E_PACE"),
+         "off_rating":val(advanced,"OFF_RATING","E_OFF_RATING"),
+         "def_rating":val(advanced,"DEF_RATING","E_DEF_RATING")}
+    if factors is not None:
+        row.update({"efg_pct":val(factors,"EFG_PCT"),
+          "tov_pct":val(factors,"TM_TOV_PCT","TOV_PCT"),
+          "orb_pct":val(factors,"OREB_PCT","ORB_PCT"),
+          "ft_rate":val(factors,"FTA_RATE","FT_RATE"),
+          "opp_efg_pct":val(factors,"OPP_EFG_PCT"),
+          "opp_tov_pct":val(factors,"OPP_TOV_PCT"),
+          "opp_orb_pct":val(factors,"OPP_OREB_PCT","OPP_ORB_PCT"),
+          "opp_ft_rate":val(factors,"OPP_FTA_RATE","OPP_FT_RATE")})
+    return row
 
 def main():
-    season=os.getenv("NBA_SEASON","2026-27"); prior_season=os.getenv("NBA_PRIOR_SEASON","2025-26")
+    season=os.getenv("NBA_SEASON","2026-27")
+    prior_season=os.getenv("NBA_PRIOR_SEASON","2025-26")
     path=Path(os.getenv("NBA_DATA_PATH","nba/team_stats.json"))
-    current=normalize(season); prior=normalize(prior_season)
-    if set(current)!=set(prior): raise RuntimeError("Current and prior season team sets differ")
-    keys=("pace","off_rating","def_rating","efg_pct","tov_pct","orb_pct","ft_rate","opp_efg_pct","opp_tov_pct","opp_orb_pct","opp_ft_rate")
+    # Prior-year baseline.
+    prior_adv=fetch(prior_season,"Advanced"); time.sleep(1.2)
+    prior_ff=fetch(prior_season,"Four Factors"); time.sleep(1.2)
+    # Current full-season, recent form and venue splits.
+    cur_adv=fetch(season,"Advanced"); time.sleep(1.2)
+    cur_ff=fetch(season,"Four Factors"); time.sleep(1.2)
+    recent_adv=fetch(season,"Advanced",last_n=10); time.sleep(1.2)
+    home_adv=fetch(season,"Advanced",location="Home"); time.sleep(1.2)
+    road_adv=fetch(season,"Advanced",location="Road")
+    team_codes=set(cur_adv)
+    if any(set(x)!=team_codes for x in (cur_ff,prior_adv,prior_ff,recent_adv,home_adv,road_adv)):
+        raise RuntimeError("Team sets differ between NBA Stats queries; preserving previous data.")
     teams={}
-    for code,row in current.items():
-        gp=max(0,row["games_played"]); blended=dict(row)
-        for k in keys: blended[k]=(row[k]*gp+prior[code][k]*8)/(gp+8)
-        blended["prior_season_weight_games"]=8
-        teams[code]=blended
+    for code in sorted(team_codes):
+        now=metric_row(cur_adv[code],cur_ff[code])
+        prior=metric_row(prior_adv[code],prior_ff[code])
+        recent=metric_row(recent_adv[code])
+        home=metric_row(home_adv[code])
+        road=metric_row(road_adv[code])
+        gp=max(0,now["games_played"])
+        # Eight-game prior-season weight prevents early-season overreaction.
+        row=dict(now)
+        for key in ("pace","off_rating","def_rating","efg_pct","tov_pct","orb_pct","ft_rate",
+                    "opp_efg_pct","opp_tov_pct","opp_orb_pct","opp_ft_rate"):
+            row[key]=(now[key]*gp+prior[key]*8)/(gp+8)
+        # Recent ten-game trend is shrunk 30% toward the full-season estimate.
+        for key in ("pace","off_rating","def_rating"):
+            if recent[key] is not None:
+                row["recent_"+key]=.70*recent[key]+.30*row[key]
+        # Venue splits are used only after at least 3 games at that venue.
+        for prefix,venue in (("home",home),("road",road)):
+            if venue["games_played"]>=3:
+                for key in ("off_rating","def_rating"):
+                    row[prefix+"_"+key]=(venue[key]*venue["games_played"]+row[key]*5)/(venue["games_played"]+5)
+            else:
+                row[prefix+"_off_rating"]=row["off_rating"]
+                row[prefix+"_def_rating"]=row["def_rating"]
+        row["prior_season_weight_games"]=8
+        row["recent_form_shrinkage"]=.30
+        teams[code]=row
+    if len(teams)!=30: raise RuntimeError(f"Expected 30 teams, received {len(teams)}")
     payload={"league":"NBA","season":season,"prior_season":prior_season,
       "updated_at":datetime.now(timezone.utc).isoformat(),
-      "source":"NBA.com Stats Advanced + Four Factors dashboards",
-      "early_sample_method":"Current season blended with prior season using an eight-game prior weight.",
+      "source":"NBA.com Stats LeagueDashTeamStats Advanced and Four Factors",
+      "methods":{"prior_season_weight_games":8,"recent_form_weight":.70,
+                 "recent_form_prior_weight":.30,"venue_split_prior_games":5,
+                 "venue_split_min_games":3},
       "teams":teams}
-    if len(teams)!=30: raise RuntimeError("Refusing to write incomplete team data")
-    path.parent.mkdir(parents=True,exist_ok=True); tmp=path.with_suffix(".json.tmp")
+    path.parent.mkdir(parents=True,exist_ok=True)
+    tmp=path.with_suffix(".json.tmp")
     tmp.write_text(json.dumps(payload,indent=2)+"\n",encoding="utf-8")
-    json.loads(tmp.read_text(encoding="utf-8")); tmp.replace(path)
-    print(f"Updated {path}: {len(teams)} teams, season {season}")
+    parsed=json.loads(tmp.read_text(encoding="utf-8"))
+    if len(parsed["teams"])!=30: raise RuntimeError("Output validation failed")
+    for code,row in parsed["teams"].items():
+        required=("pace","off_rating","def_rating","efg_pct","tov_pct","orb_pct","ft_rate",
+                  "opp_efg_pct","opp_tov_pct","opp_orb_pct","opp_ft_rate")
+        if any(row.get(k) is None for k in required): raise RuntimeError(f"{code} incomplete output")
+    tmp.replace(path)
+    print(f"Updated {path}: {len(teams)} teams, season {season}, prior {prior_season}")
 if __name__=="__main__": main()
