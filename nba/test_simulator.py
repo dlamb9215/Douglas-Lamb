@@ -33,6 +33,10 @@ class TestNBAEngine(unittest.TestCase):
         self.assertGreater(r["first_half"]["home_avg"],0)
         self.assertIn("home_cover",r["first_half"])
         self.assertIn("over",r["first_half"])
+        self.assertAlmostEqual(r["first_half"]["home_cover"]+r["first_half"]["away_cover"]+r["first_half"]["spread_push"],100,places=6)
+        self.assertAlmostEqual(r["first_half"]["over"]+r["first_half"]["under"]+r["first_half"]["total_push"],100,places=6)
+        self.assertEqual(len(r["home_cover_ci"]),2)
+        self.assertLess(r["home_cover_ci"][0],r["home_cover_ci"][1])
     def test_odds_conversion(self):
         self.assertAlmostEqual(implied_probability(-110),110/210)
         self.assertAlmostEqual(implied_probability(150),.4)
