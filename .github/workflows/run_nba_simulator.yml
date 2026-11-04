@@ -1,0 +1,65 @@
+name: Run Doug's Elite NBA Simulator
+on:
+  workflow_dispatch:
+    inputs:
+      home:
+        description: Home team abbreviation
+        required: true
+        default: BOS
+        type: string
+      away:
+        description: Away team abbreviation
+        required: true
+        default: NYK
+        type: string
+      spread:
+        description: Home spread, e.g. -3.5; blank to skip
+        required: false
+        default: ""
+        type: string
+      total:
+        description: Game total; blank to skip
+        required: false
+        default: ""
+        type: string
+      trials:
+        description: Baseline Monte Carlo trials
+        required: true
+        default: "1000000"
+        type: string
+      seed:
+        description: Reproducible random seed
+        required: true
+        default: "42"
+        type: string
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip numpy
+      - name: Run NBA tests
+        run: python -m unittest -v nba.test_simulator
+      - name: Require refreshed NBA data
+        run: test -s nba/team_stats.json
+      - name: Run matchup
+        env:
+          HOME_TEAM: ${{ inputs.home }}
+          AWAY_TEAM: ${{ inputs.away }}
+          SPREAD: ${{ inputs.spread }}
+          TOTAL: ${{ inputs.total }}
+          TRIALS: ${{ inputs.trials }}
+          SEED: ${{ inputs.seed }}
+        run: |
+          args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --seed "$SEED")
+          if [ -n "$SPREAD" ]; then args+=(--spread "$SPREAD"); fi
+          if [ -n "$TOTAL" ]; then args+=(--total "$TOTAL"); fi
+          python -m nba.simulator "${args[@]}" | tee nba-simulation-results.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nba-matchup-results
+          path: nba-simulation-results.txt
