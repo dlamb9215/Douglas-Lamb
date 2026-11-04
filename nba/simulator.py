@@ -84,10 +84,12 @@ def matchup_projection(home,away,home_rest=2,away_rest=2,home_travel=0,away_trav
     h_def=home.home_def_rating or home.def_rating
     a_off=away.road_off_rating or away.off_rating
     a_def=away.road_def_rating or away.def_rating
+    h_off=.85*h_off+.15*home.recent_off_rating if home.recent_off_rating is not None else h_off
+    a_off=.85*a_off+.15*away.recent_off_rating if away.recent_off_rating is not None else a_off
+    h_def=.85*h_def+.15*home.recent_def_rating if home.recent_def_rating is not None else h_def
+    a_def=.85*a_def+.15*away.recent_def_rating if away.recent_def_rating is not None else a_def
     he=(h_off+a_def)/2+_factor_adjustment(home,away)+1.35
     ae=(a_off+h_def)/2+_factor_adjustment(away,home)
-    if home.recent_off_rating is not None: he=.85*he+.15*home.recent_off_rating
-    if away.recent_off_rating is not None: ae=.85*ae+.15*away.recent_off_rating
     # Small transparent schedule effects; capped to avoid exaggerated travel/rest adjustments.
     h_rest=max(0,min(3,home_rest-1))*0.35
     a_rest=max(0,min(3,away_rest-1))*0.35
