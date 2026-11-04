@@ -93,8 +93,8 @@ def matchup_projection(home,away,home_rest=2,away_rest=2,home_travel=0,away_trav
     # Small transparent schedule effects; capped to avoid exaggerated travel/rest adjustments.
     h_rest=max(0,min(3,home_rest-1))*0.35
     a_rest=max(0,min(3,away_rest-1))*0.35
-    h_b2b=1.0 if home_rest<=1 else 0.0
-    a_b2b=1.0 if away_rest<=1 else 0.0
+    h_b2b=1.0 if home_rest<=0 else 0.0
+    a_b2b=1.0 if away_rest<=0 else 0.0
     h_travel=min(max(home_travel,0)/1000,2)*0.35
     a_travel=min(max(away_travel,0)/1000,2)*0.35
     he += (h_rest-h_b2b-h_travel) * 100/pace
