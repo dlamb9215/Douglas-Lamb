@@ -6,12 +6,12 @@ on:
       home:
         description: Home team
         required: true
-        default: MIA
+        default: WAS
         type: string
       away:
         description: Away team
         required: true
-        default: DET
+        default: LAR
         type: string
       trials:
         description: Simulation trials
