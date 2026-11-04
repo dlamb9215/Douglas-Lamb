@@ -5,17 +5,17 @@ on:
       home:
         description: Home team abbreviation
         required: true
-        default: "PHX"
+        default: "SA"
         type: string
       away:
         description: Away team abbreviation
         required: true
-        default: "POR"
+        default: "DAL"
         type: string
       spread:
         description: Home spread, e.g. -3.5; blank to skip
         required: false
-        default: "2.5"
+        default: "-11.5"
         type: string
       total:
         description: Game total; blank to skip
