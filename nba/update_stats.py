@@ -21,9 +21,9 @@ def fetch(season,measure,last_n=0,location=""):
       "Location":location,"Outcome":"","SeasonSegment":"","VsConference":"","VsDivision":""}
     req=Request(URL+"?"+urlencode(params),headers=HEADERS)
     last_error=None
-    for attempt in range(3):
+    for attempt in range(5):
         try:
-            with urlopen(req,timeout=45) as response: data=json.loads(response.read().decode())
+            with urlopen(req,timeout=120) as response: data=json.loads(response.read().decode())
             sets=data.get("resultSets") or data.get("resultSet")
             if not sets: raise RuntimeError(f"No result set for {season}/{measure}")
             rows={}
@@ -35,7 +35,7 @@ def fetch(season,measure,last_n=0,location=""):
             return rows
         except Exception as exc:
             last_error=exc
-            if attempt<2: time.sleep(3*(attempt+1))
+            if attempt<4: time.sleep(5*(attempt+1))
     raise RuntimeError(f"NBA Stats request failed after retries: {last_error}")
 
 def val(row,*keys):
@@ -64,9 +64,9 @@ def fetch_score_sd(season):
     params={"PlayerOrTeam":"T","Season":season,"SeasonType":"Regular Season","LeagueID":"00","TeamID":"0"}
     req=Request("https://stats.nba.com/stats/leaguegamefinder?"+urlencode(params),headers=HEADERS)
     last_error=None
-    for attempt in range(3):
+    for attempt in range(5):
         try:
-            with urlopen(req,timeout=45) as response: data=json.loads(response.read().decode())
+            with urlopen(req,timeout=120) as response: data=json.loads(response.read().decode())
             sets=data.get("resultSets") or data.get("resultSet")
             if not sets: raise RuntimeError("LeagueGameFinder returned no result set")
             headers=sets[0]["headers"]; rows=sets[0]["rowSet"]
@@ -80,7 +80,7 @@ def fetch_score_sd(season):
             return {code:float(__import__("statistics").pstdev(scores)) for code,scores in points.items() if len(scores)>=2}
         except Exception as exc:
             last_error=exc
-            if attempt<2: time.sleep(3*(attempt+1))
+            if attempt<4: time.sleep(5*(attempt+1))
     raise RuntimeError(f"LeagueGameFinder failed for {season}: {last_error}")
 
 def main():
