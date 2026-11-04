@@ -172,7 +172,7 @@ def main():
     ap.add_argument("--home-injury-points",type=float,default=0,help="Manual estimated team points lost to unavailable players")
     ap.add_argument("--away-injury-points",type=float,default=0)
     ap.add_argument("--trials",type=int,default=1_000_000); ap.add_argument("--max-trials",type=int,default=5_000_000)
-    ap.add_argument("--seed",type=int,default=42); ap.add_argument("--no-auto-refine",action="store_true")
+    ap.add_argument("--seed",type=int,default=42); ap.add_argument("--no-auto-refine",action="store_true"); ap.add_argument("--json-output",default="")
     a=ap.parse_args()
     if a.trials<1 or a.max_trials<a.trials: ap.error("Invalid trial counts")
     if a.home.upper()==a.away.upper(): ap.error("Home and away teams must differ")
@@ -211,4 +211,7 @@ def main():
     print(f"\nDATA: {meta.get('season','unknown')} | updated {meta.get('updated_at','unknown')}")
     print("Injury adjustment is manual unless an independently verified report is supplied.")
     print("Model status: estimates require out-of-sample backtesting before being treated as betting edges.")
+    if a.json_output:
+        payload={"home_team":h.abbreviation,"away_team":w.abbreviation,"season":meta.get("season"),"data_updated_at":meta.get("updated_at"),"spread_line":a.spread,"total_line":a.total,"home_rest":a.home_rest,"away_rest":a.away_rest,"home_travel_miles":a.home_travel,"away_travel_miles":a.away_travel,"home_injury_points":a.home_injury_points,"away_injury_points":a.away_injury_points,"result":r}
+        Path(a.json_output).write_text(json.dumps(payload,indent=2)+"\\n",encoding="utf-8")
 if __name__=="__main__": main()
