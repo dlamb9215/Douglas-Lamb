@@ -99,7 +99,7 @@ def _factor_adjustment(t,o):
 def matchup_projection(home,away,home_rest=2,away_rest=2,home_travel=0,away_travel=0,
                        home_injury_points=0,away_injury_points=0):
     pace=(home.pace+away.pace)/2
-    if home.recent_pace is not None: pace=.8*pace+.2*(home.recent_pace+away.recent_pace if away.recent_pace is not None else home.recent_pace)/2
+    if home.recent_pace is not None or away.recent_pace is not None:\n        recent_home=home.recent_pace if home.recent_pace is not None else home.pace\n        recent_away=away.recent_pace if away.recent_pace is not None else away.pace\n        pace=.8*pace+.2*(recent_home+recent_away)/2
     h_off=home.home_off_rating or home.off_rating
     h_def=home.home_def_rating or home.def_rating
     a_off=away.road_off_rating or away.off_rating
