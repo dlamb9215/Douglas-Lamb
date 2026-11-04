@@ -59,6 +59,30 @@ def metric_row(advanced,factors=None):
           "opp_ft_rate":val(factors,"OPP_FTA_RATE","OPP_FT_RATE")})
     return row
 
+
+def fetch_score_sd(season):
+    params={"PlayerOrTeam":"T","Season":season,"SeasonType":"Regular Season","LeagueID":"00","TeamID":"0"}
+    req=Request("https://stats.nba.com/stats/leaguegamefinder?"+urlencode(params),headers=HEADERS)
+    last_error=None
+    for attempt in range(3):
+        try:
+            with urlopen(req,timeout=45) as response: data=json.loads(response.read().decode())
+            sets=data.get("resultSets") or data.get("resultSet")
+            if not sets: raise RuntimeError("LeagueGameFinder returned no result set")
+            headers=sets[0]["headers"]; rows=sets[0]["rowSet"]
+            points={}
+            for values in rows:
+                item=dict(zip(headers,values))
+                code=str(item.get("TEAM_ABBREVIATION","")).upper()
+                score=item.get("PTS")
+                if code and score is not None: points.setdefault(code,[]).append(float(score))
+            if len(points)<30: raise RuntimeError(f"Game log contains only {len(points)} teams")
+            return {code:float(__import__("statistics").pstdev(scores)) for code,scores in points.items() if len(scores)>=2}
+        except Exception as exc:
+            last_error=exc
+            if attempt<2: time.sleep(3*(attempt+1))
+    raise RuntimeError(f"LeagueGameFinder failed for {season}: {last_error}")
+
 def main():
     season=os.getenv("NBA_SEASON","2026-27")
     prior_season=os.getenv("NBA_PRIOR_SEASON","2025-26")
@@ -71,9 +95,11 @@ def main():
     cur_ff=fetch(season,"Four Factors"); time.sleep(1.2)
     recent_adv=fetch(season,"Advanced",last_n=10); time.sleep(1.2)
     home_adv=fetch(season,"Advanced",location="Home"); time.sleep(1.2)
-    road_adv=fetch(season,"Advanced",location="Road")
+    road_adv=fetch(season,"Advanced",location="Road"); time.sleep(1.2)
+    current_score_sd=fetch_score_sd(season); time.sleep(1.2)
+    prior_score_sd=fetch_score_sd(prior_season)
     team_codes=set(cur_adv)
-    if any(set(x)!=team_codes for x in (cur_ff,prior_adv,prior_ff,recent_adv,home_adv,road_adv)):
+    if any(set(x)!=team_codes for x in (cur_ff,prior_adv,prior_ff,recent_adv,home_adv,road_adv,current_score_sd,prior_score_sd)):
         raise RuntimeError("Team sets differ between NBA Stats queries; preserving previous data.")
     teams={}
     for code in sorted(team_codes):
@@ -100,6 +126,7 @@ def main():
             else:
                 row[prefix+"_off_rating"]=row["off_rating"]
                 row[prefix+"_def_rating"]=row["def_rating"]
+        row["score_sd"]=((current_score_sd[code]**2*gp+prior_score_sd[code]**2*8)/(gp+8))**.5
         row["prior_season_weight_games"]=8
         row["recent_form_shrinkage"]=.30
         teams[code]=row
