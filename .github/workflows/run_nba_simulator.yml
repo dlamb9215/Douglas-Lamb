@@ -5,22 +5,22 @@ on:
       home:
         description: Home team abbreviation
         required: true
-        default: BOS
+        default: BKN
         type: string
       away:
         description: Away team abbreviation
         required: true
-        default: MIL
+        default: CHA
         type: string
       spread:
         description: Home spread, e.g. -3.5; blank to skip
         required: false
-        default: "-11.5"
+        default: "3.5"
         type: string
       total:
         description: Game total; blank to skip
         required: false
-        default: "223.5"
+        default: "214.5"
         type: string
       trials:
         description: Baseline Monte Carlo trials
@@ -40,7 +40,7 @@ on:
       home_travel:
         description: Home team travel miles since previous game (0 if unknown)
         required: true
-        default: "0"
+        default: "-1.3"
         type: string
       away_travel:
         description: Away team travel miles since previous game (0 if unknown)
@@ -50,7 +50,7 @@ on:
       home_injury_points:
         description: Manual home team points adjustment for unavailable players
         required: true
-        default: "-3.5"
+        default: "-1.0"
         type: string
       away_injury_points:
         description: Manual away team points adjustment for unavailable players
