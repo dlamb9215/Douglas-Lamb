@@ -1,7 +1,7 @@
 {
   "season": 2026,
   "last_n_weeks": 5,
-  "retrieved_at_utc": "2026-11-03T19:30:42.725591+00:00",
+  "retrieved_at_utc": "2026-11-04T14:29:26.881989+00:00",
   "source": "nflverse",
   "source_urls": {
     "player_stats": "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2026.csv",
@@ -2674,8 +2674,8 @@
       "roster_status": "act",
       "depth_order": 99,
       "depth_position": "WR",
-      "injury_status": "questionable",
-      "status": "questionable",
+      "injury_status": "active",
+      "status": "unknown",
       "starter": false,
       "eligibility_note": "Blocked: roster/depth chart/injury data does not establish an eligible starter."
     },
