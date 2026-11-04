@@ -54,6 +54,13 @@ class TestNBAEngine(unittest.TestCase):
         w=team("NYK",recent_off_rating=110,road_def_rating=115)
         r=matchup_projection(h,w)
         self.assertGreater(r["home_points"],0)
+    def test_three_point_shot_profile_is_used_conservatively(self):
+        h=team("BOS",three_pa_rate=.50,fg3_pct=.40)
+        w=team("NYK",opp_three_pa_rate=.44,opp_fg3_pct=.39)
+        baseline=matchup_projection(team("BOS"),team("NYK"))
+        adjusted=matchup_projection(h,w)
+        self.assertGreater(adjusted["home_points"],baseline["home_points"])
+        self.assertLess(adjusted["home_points"]-baseline["home_points"],2.0)
     def test_decision_requires_probability_and_line_edge(self):
         self.assertEqual(_decision(58,2),"LEAN")
         self.assertEqual(_decision(54,4),"PASS")
