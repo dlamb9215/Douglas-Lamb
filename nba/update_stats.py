@@ -7,23 +7,32 @@ import json, os, time
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlencode
-from urllib.request import Request, urlopen
+from curl_cffi import requests as cffi_requests
 
 URL="https://stats.nba.com/stats/leaguedashteamstats"
+# NBA Stats increasingly filters generic Python TLS fingerprints. Use a browser-like
+# TLS handshake and warm up the official stats site to obtain its session cookies.
+SESSION=cffi_requests.Session(impersonate="chrome120")
+try:
+    SESSION.get("https://www.nba.com/stats/",timeout=25)
+except Exception:
+    pass
 HEADERS={"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/125.0 Safari/537.36",
 "Referer":"https://www.nba.com/","Origin":"https://www.nba.com","x-nba-stats-origin":"stats",
-"x-nba-stats-token":"true","Accept":"application/json, text/plain, */*"}
+"x-nba-stats-token":"true","Accept":"application/json, text/plain, */*","Accept-Language":"en-US,en;q=0.9","Connection":"keep-alive"}
 
 def fetch(season,measure,last_n=0,location=""):
     params={"LeagueID":"00","Season":season,"SeasonType":"Regular Season","PerMode":"PerGame",
       "MeasureType":measure,"PlusMinus":"N","PaceAdjust":"N","Rank":"N","LastNGames":str(last_n),
       "Month":"0","OpponentTeamID":"0","Period":"0","TeamID":"0","DateFrom":"","DateTo":"",
       "Location":location,"Outcome":"","SeasonSegment":"","VsConference":"","VsDivision":""}
-    req=Request(URL+"?"+urlencode(params),headers=HEADERS)
+    request_url=URL+"?"+urlencode(params)
     last_error=None
     for attempt in range(5):
         try:
-            with urlopen(req,timeout=120) as response: data=json.loads(response.read().decode())
+            response=SESSION.get(request_url,headers=HEADERS,timeout=120)
+            response.raise_for_status()
+            data=response.json()
             sets=data.get("resultSets") or data.get("resultSet")
             if not sets: raise RuntimeError(f"No result set for {season}/{measure}")
             rows={}
@@ -62,11 +71,13 @@ def metric_row(advanced,factors=None):
 
 def fetch_score_sd(season):
     params={"PlayerOrTeam":"T","Season":season,"SeasonType":"Regular Season","LeagueID":"00","TeamID":"0"}
-    req=Request("https://stats.nba.com/stats/leaguegamefinder?"+urlencode(params),headers=HEADERS)
+    request_url="https://stats.nba.com/stats/leaguegamefinder?"+urlencode(params)
     last_error=None
     for attempt in range(5):
         try:
-            with urlopen(req,timeout=120) as response: data=json.loads(response.read().decode())
+            response=SESSION.get(request_url,headers=HEADERS,timeout=120)
+            response.raise_for_status()
+            data=response.json()
             sets=data.get("resultSets") or data.get("resultSet")
             if not sets: raise RuntimeError("LeagueGameFinder returned no result set")
             headers=sets[0]["headers"]; rows=sets[0]["rowSet"]
