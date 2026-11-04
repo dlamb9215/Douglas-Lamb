@@ -27,9 +27,9 @@ jobs:
           python -c "import json; d=json.load(open('nba/team_stats.json')); assert len(d['teams']) == 30"
       - name: Commit refreshed stats
         run: |
-          if git diff --quiet -- nba/team_stats.json; then echo "No changes"; exit 0; fi
+          git add -f nba/team_stats.json
+          if git diff --cached --quiet -- nba/team_stats.json; then echo "No changes"; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add nba/team_stats.json
           git commit -m "Update NBA team statistics"
           git push
