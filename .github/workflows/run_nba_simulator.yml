@@ -27,6 +27,36 @@ on:
         required: true
         default: "1000000"
         type: string
+      home_rest:
+        description: Home team days of rest before this game
+        required: true
+        default: "2"
+        type: string
+      away_rest:
+        description: Away team days of rest before this game
+        required: true
+        default: "2"
+        type: string
+      home_travel:
+        description: Home team travel miles since previous game (0 if unknown)
+        required: true
+        default: "0"
+        type: string
+      away_travel:
+        description: Away team travel miles since previous game (0 if unknown)
+        required: true
+        default: "0"
+        type: string
+      home_injury_points:
+        description: Manual home team points adjustment for unavailable players
+        required: true
+        default: "0"
+        type: string
+      away_injury_points:
+        description: Manual away team points adjustment for unavailable players
+        required: true
+        default: "0"
+        type: string
       seed:
         description: Reproducible random seed
         required: true
@@ -54,12 +84,20 @@ jobs:
           TOTAL: ${{ inputs.total }}
           TRIALS: ${{ inputs.trials }}
           SEED: ${{ inputs.seed }}
+          HOME_REST: ${{ inputs.home_rest }}
+          AWAY_REST: ${{ inputs.away_rest }}
+          HOME_TRAVEL: ${{ inputs.home_travel }}
+          AWAY_TRAVEL: ${{ inputs.away_travel }}
+          HOME_INJURY: ${{ inputs.home_injury_points }}
+          AWAY_INJURY: ${{ inputs.away_injury_points }}
         run: |
-          args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --seed "$SEED")
+          args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --seed "$SEED" --home-rest "$HOME_REST" --away-rest "$AWAY_REST" --home-travel "$HOME_TRAVEL" --away-travel "$AWAY_TRAVEL" --home-injury-points "$HOME_INJURY" --away-injury-points "$AWAY_INJURY" --json-output nba-simulation-results.json)
           if [ -n "$SPREAD" ]; then args+=(--spread "$SPREAD"); fi
           if [ -n "$TOTAL" ]; then args+=(--total "$TOTAL"); fi
           python -m nba.simulator "${args[@]}" | tee nba-simulation-results.txt
       - uses: actions/upload-artifact@v4
         with:
           name: nba-matchup-results
-          path: nba-simulation-results.txt
+          path: |
+            nba-simulation-results.txt
+            nba-simulation-results.json
