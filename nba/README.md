@@ -8,6 +8,7 @@ A team-level NBA forecasting and betting-analysis engine. It is separate from th
 - Full-season statistics blended with the prior season using an eight-game prior weight.
 - Recent 10-game offensive/defensive rating and pace, shrunk 30% toward the season baseline.
 - Home/road offensive and defensive ratings, shrunk toward the full-season baseline when venue samples are small.
+- Historical team scoring variance estimated from team game logs and blended with prior-season variance.
 - Schedule adjustments for rest, back-to-backs and travel distance.
 - Team-level injury/availability point adjustments supplied as explicit inputs; the simulator does not pretend to verify injuries automatically.
 - Correlated full-game and first-half Monte Carlo score distributions.
@@ -21,7 +22,7 @@ A team-level NBA forecasting and betting-analysis engine. It is separate from th
 This is team-level only: no player-prop projections, player-prop data pipeline or moneyline recommendations. Betting outputs are spreads and game totals, full game and first half. No alternate spreads are created.
 
 ## Refresh data
-Run the **Update NBA Statistics** workflow. It requests NBA.com Stats Advanced and Four Factors data for the current and prior seasons, plus current-season last-10 and home/road splits. The updater validates all 30 teams and writes only after every request and data check succeeds. It retries temporary request failures and preserves the last good file if a refresh fails.
+Run the **Update NBA Statistics** workflow. It requests NBA.com Stats Advanced and Four Factors data for the current and prior seasons, plus current-season last-10 and home/road splits, plus historical team game logs for score-variance estimates. The updater validates all 30 teams and writes only after every request and data check succeeds. It retries temporary request failures and preserves the last good file if a refresh fails.
 
 The scheduled updater uses the 2026-27 season and 2025-26 as the prior baseline. Confirm the season settings when a new season begins. NBA Stats can rate-limit hosted runners; a failed refresh is not silently treated as current data.
 
