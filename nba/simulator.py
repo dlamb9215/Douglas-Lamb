@@ -106,6 +106,13 @@ def matchup_projection(home,away,home_rest=2,away_rest=2,home_travel=0,away_trav
             "total_points":hp+ap,"home_rest_adjustment":h_rest-h_b2b-h_travel,
             "away_rest_adjustment":a_rest-a_b2b-a_travel}
 
+def _wilson_interval(probability,trials,z=1.96):
+    p=min(1.0,max(0.0,probability))
+    denom=1+z*z/trials
+    center=(p+z*z/(2*trials))/denom
+    radius=z*((p*(1-p)/trials+z*z/(4*trials*trials))**.5)/denom
+    return [max(0.0,(center-radius)*100),min(100.0,(center+radius)*100)]
+
 def _simulate_period(hmean,amean,pace,hsd,asd,trials,seed):
     rng=np.random.default_rng(seed)
     # A shared pace/game-environment shock induces realistic positive scoring correlation.
@@ -134,11 +141,15 @@ def simulate(home,away,trials=1_000_000,seed=42,spread=None,total=None,
         adj=margin+spread
         r.update({"spread":spread,"home_cover":float(np.mean(adj>0)*100),
                   "away_cover":float(np.mean(adj<0)*100),"spread_push":float(np.mean(adj==0)*100),
-                  "spread_edge_points":float(p["home_margin"]+spread)})
+                  "spread_edge_points":float(p["home_margin"]+spread),
+                  "home_cover_ci":_wilson_interval(float(np.mean(adj>0)),trials),
+                  "away_cover_ci":_wilson_interval(float(np.mean(adj<0)),trials)})
     if total is not None:
         r.update({"total":total,"over":float(np.mean(combined>total)*100),
                   "under":float(np.mean(combined<total)*100),"total_push":float(np.mean(combined==total)*100),
-                  "total_edge_points":float(p["total_points"]-total)})
+                  "total_edge_points":float(p["total_points"]-total),
+                  "over_ci":_wilson_interval(float(np.mean(combined>total)),trials),
+                  "under_ci":_wilson_interval(float(np.mean(combined<total)),trials)})
     hh,ha=_simulate_period(p["home_points"]/2,p["away_points"]/2,p["pace"]/2,
                            hsd/np.sqrt(2),asd/np.sqrt(2),trials,seed+1)
     hm=hh-ha; ht=hh+ha
@@ -148,10 +159,10 @@ def simulate(home,away,trials=1_000_000,seed=42,spread=None,total=None,
     if spread is not None:
         first_line=spread/2; fm=hm+first_line
         r["first_half"].update({"home_cover":float(np.mean(fm>0)*100),
-                                "away_cover":float(np.mean(fm<0)*100)})
+                                "away_cover":float(np.mean(fm<0)*100),"spread_push":float(np.mean(fm==0)*100)})
     if total is not None:
         r["first_half"].update({"over":float(np.mean(ht>total/2)*100),
-                                "under":float(np.mean(ht<total/2)*100)})
+                                "under":float(np.mean(ht<total/2)*100),"total_push":float(np.mean(ht==total/2)*100)})
     return r
 
 def implied_probability(odds):
