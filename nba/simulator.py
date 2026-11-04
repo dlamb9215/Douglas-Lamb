@@ -13,6 +13,9 @@ import numpy as np
 LEAGUE={"efg_pct":.540,"tov_pct":.135,"orb_pct":.265,"ft_rate":.250,
         "opp_efg_pct":.540,"opp_tov_pct":.135,"opp_orb_pct":.265,"opp_ft_rate":.250}
 
+# DunkAPI uses several legacy NBA abbreviations. Accept standard sportsbook/team codes too.
+TEAM_CODE_ALIASES={"GSW":"GS","NOP":"NO","NYK":"NY","SAS":"SA","UTA":"UTAH","WAS":"WSH"}
+
 @dataclass(frozen=True)
 class TeamStats:
     abbreviation:str
@@ -76,7 +79,17 @@ def load_team_stats(path="nba/team_stats.json"):
     if not p.exists(): raise FileNotFoundError(f"{p} missing. Run Update NBA Statistics first.")
     data=json.loads(p.read_text(encoding="utf-8")); raw=data.get("teams",{})
     if not isinstance(raw,dict) or len(raw)<30: raise ValueError("NBA data must contain all 30 teams")
-    return {k.upper():TeamStats.from_dict(k,v) for k,v in raw.items()},data
+    teams={k.upper():TeamStats.from_dict(k,v) for k,v in raw.items()}
+    for standard,provider in TEAM_CODE_ALIASES.items():
+        if provider in teams:
+            source=teams[provider]
+            teams[standard]=TeamStats(standard,source.name,source.games_played,source.pace,
+                source.off_rating,source.def_rating,source.efg_pct,source.tov_pct,source.orb_pct,
+                source.ft_rate,source.opp_efg_pct,source.opp_tov_pct,source.opp_orb_pct,
+                source.opp_ft_rate,source.recent_pace,source.recent_off_rating,source.recent_def_rating,
+                source.home_off_rating,source.home_def_rating,source.road_off_rating,source.road_def_rating,
+                source.score_sd,source.three_pa_rate,source.fg3_pct,source.opp_three_pa_rate,source.opp_fg3_pct)
+    return teams,data
 
 def _shot_profile_adjustment(t,o):
     # Small, capped correction for the offense's 3P accuracy and the defense's
