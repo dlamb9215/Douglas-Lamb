@@ -274,6 +274,10 @@ def build_player_pool(stat_rows, roster_rows, depth_rows, injury_rows,
             "depth_order": depth_order,
             "depth_position": depth_position,
             "injury_status": injury_status,
+            "injury_week": int(_first(injury, "week") or 0) if injury else None,
+            "injury_report_modified": _first(injury, "date_modified") if injury else None,
+            "practice_status": _first(injury, "practice_status") if injury else None,
+            "reported_injury": _first(injury, "report_primary_injury", "practice_primary_injury") if injury else None,
             "status": "active" if eligible else (
                 injury_status if injury_status != "active" else "unknown"
             ),
