@@ -99,7 +99,7 @@ def main():
     with open(args.input, encoding="utf-8") as handle:
         pool = json.load(handle)
     report = build_pregame_report(pool, args.home, args.away, args.max_age_hours)
-    Path(args.output).write_text(json.dumps(report, indent=2) + "\\n", encoding="utf-8")
+    Path(args.output).write_text(json.dumps(report, indent=2) + chr(10), encoding="utf-8")
     print("PREGAME CONTEXT CHECK PASSED")
     print(f"Matchup: {report['away']} at {report['home']}")
     print(f"Season: {report['season']}; retrieved: {report['retrieved_at_utc']}")
