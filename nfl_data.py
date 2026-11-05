@@ -117,30 +117,58 @@ def validate_source_data(records):
 
 
 def calculate_rankings(database):
-    """Rank teams using only available statistics."""
+    """Rank every available team metric, with direction matched to value.
 
+    Offense: higher is better except interceptions thrown.
+    Defense: lower is better except interceptions recorded.
+    Turnovers: more takeaways and a better differential are better;
+    fewer giveaways are better.
+    """
     for section in ("offense", "defense"):
         for category in CATEGORIES:
-            ranked = []
+            fields = set()
+            for team in database.values():
+                fields.update(team[section][category].keys())
 
-            for abbreviation, team in database.items():
-                stats = team[section][category]
-                value = stats.get("yards_per_game")
+            for field in fields:
+                ranked = []
+                for abbreviation, team in database.items():
+                    stats = team[section][category]
+                    value = stats.get(field)
+                    rank_key = "rank" if field == "yards_per_game" else f"{field}_rank"
+                    stats.pop(rank_key, None)
+                    if is_valid_number(value):
+                        ranked.append((abbreviation, value))
 
-                if is_valid_number(value):
-                    ranked.append((abbreviation, value))
+                if not ranked:
+                    continue
 
-                stats.pop("rank", None)
+                higher_is_better = (
+                    (section == "offense" and field != "interceptions")
+                    or (section == "defense" and field == "interceptions")
+                )
+                ranked.sort(key=lambda item: item[1], reverse=higher_is_better)
 
-            ranked.sort(
-                key=lambda item: item[1],
-                reverse=(section == "offense")
-            )
+                for rank, (abbreviation, _) in enumerate(ranked, start=1):
+                    stats = database[abbreviation][section][category]
+                    rank_key = "rank" if field == "yards_per_game" else f"{field}_rank"
+                    stats[rank_key] = rank
 
-            for rank, (abbreviation, _) in enumerate(
-                ranked, start=1
-            ):
-                database[abbreviation][section][category]["rank"] = rank
+    turnover_fields = ("takeaways", "giveaways", "differential")
+    for field in turnover_fields:
+        ranked = []
+        for abbreviation, team in database.items():
+            value = team["turnovers"].get(field)
+            team["turnovers"].pop(f"{field}_rank", None)
+            if is_valid_number(value):
+                ranked.append((abbreviation, value))
+
+        ranked.sort(
+            key=lambda item: item[1],
+            reverse=(field != "giveaways"),
+        )
+        for rank, (abbreviation, _) in enumerate(ranked, start=1):
+            database[abbreviation]["turnovers"][f"{field}_rank"] = rank
 
     return database
 
