@@ -227,6 +227,14 @@ def build_player_pool(stat_rows, roster_rows, depth_rows, injury_rows,
         ):
             injury_by_id[str(pid)] = row
 
+    def depth_rank(row):
+        try:
+            return int(float(_first(
+                row, "pos_rank", "depth_order", "depth_team", "order"
+            ) or 99))
+        except (TypeError, ValueError):
+            return 99
+
     pool = []
     for player in stats:
         pid = str(player["player_id"] or "")
@@ -238,13 +246,7 @@ def build_player_pool(stat_rows, roster_rows, depth_rows, injury_rows,
             == str(player["position"]).upper()
         ]
         depth_candidates = matching_depth or depth_candidates
-        depth = min(
-            depth_candidates,
-            key=lambda row: int(float(_first(
-                row, "pos_rank", "depth_order", "depth_team", "order"
-            ) or 99)),
-            default={},
-        )
+        depth = min(depth_candidates, key=depth_rank, default={})
         injury = injury_by_id.get(pid, {})
         roster_status = _norm(_first(roster, "status", "roster_status"))
         depth_position = _first(depth, "pos_abb", "depth_position", "position") or player["position"]
