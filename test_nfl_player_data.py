@@ -14,7 +14,7 @@ class TestNFLPlayerData(unittest.TestCase):
         ]
         self.rosters = [{"gsis_id":"P1","status":"ACT"}]
         self.depth = [{"gsis_id":"P1","depth_position":"WR","depth_order":"1"}]
-        self.injuries = [{"gsis_id":"P1","report_status":""}]
+        self.injuries = [{"gsis_id":"P1","team":"BUF","season":"2026","week":"8","report_status":""}]
         self.snaps = [
             {"player":"Test Receiver","team":"BUF","season":"2026","week":"8",
              "offense_snaps":"55","offense_pct":"82.0"},
@@ -33,6 +33,28 @@ class TestNFLPlayerData(unittest.TestCase):
         self.assertEqual(player["receiving_yards_per_game"],78.0)
         self.assertEqual(player["offense_snaps_total"],105.0)
         self.assertEqual(player["offense_snap_pct_avg"],78.5)
+
+    def test_2025_plus_depth_chart_schema_is_read_correctly(self):
+        self.depth = [{
+            "gsis_id": "P1", "team": "BUF",
+            "dt": "2026-11-05T12:00:00Z",
+            "pos_abb": "WR", "pos_rank": "1",
+        }]
+        player = build_player_pool(
+            self.stats,self.rosters,self.depth,self.injuries,2026,5,self.snaps
+        )[0]
+        self.assertTrue(player["starter"])
+        self.assertEqual(player["depth_order"], 1)
+
+    def test_latest_team_injury_week_overrides_old_out_designation(self):
+        self.injuries = [
+            {"gsis_id":"P1","team":"BUF","season":"2026","week":"7","report_status":"Out"},
+            {"gsis_id":"P1","team":"BUF","season":"2026","week":"8","report_status":"Questionable"},
+        ]
+        player = build_player_pool(
+            self.stats,self.rosters,self.depth,self.injuries,2026,5,self.snaps
+        )[0]
+        self.assertEqual(player["status"], "questionable")
 
     def test_questionable_player_is_blocked(self):
         self.injuries[0]["report_status"] = "Questionable"
