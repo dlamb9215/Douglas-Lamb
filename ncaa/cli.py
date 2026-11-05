@@ -41,6 +41,12 @@ def main() -> None:
     print(f"Home win: {result['home_win_probability']:.1%} | "
           f"Away win: {result['away_win_probability']:.1%}")
     print(f"Projected total: {result['projected_total']:.1f}")
+    h1 = result["projected_first_half_score"]
+    print(f"Projected first half: {args.home} {h1[args.home]:.1f} - {args.away} {h1[args.away]:.1f}")
+    print(f"First-half home lead probability: {result['first_half_win_probability_home']:.1%}")
+    print("Projected score ranges (10th percentile / median / 90th percentile):")
+    for team, band in result["score_ranges"].items():
+        print(f"  {team}: {band['p10']} / {band['median']} / {band['p90']}")
     if result["market"]:
         print("Market probabilities:")
         for key, value in result["market"].items():
