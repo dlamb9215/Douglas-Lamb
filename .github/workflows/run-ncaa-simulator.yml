@@ -1,0 +1,65 @@
+name: Doug's Elite NCAA Football Simulator
+
+on:
+  workflow_dispatch:
+    inputs:
+      home:
+        description: Home college team
+        required: true
+        default: Georgia
+        type: string
+      away:
+        description: Away college team
+        required: true
+        default: Alabama
+        type: string
+      trials:
+        description: Monte Carlo trials (default 100000)
+        required: true
+        default: "100000"
+        type: string
+      home_spread:
+        description: Home-team sportsbook handicap (leave blank if unknown)
+        required: false
+        default: ""
+        type: string
+      total:
+        description: Sportsbook game total (leave blank if unknown)
+        required: false
+        default: ""
+        type: string
+      neutral_site:
+        description: Neutral-site game
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run NCAA simulator tests
+        run: python -m unittest discover -s ncaa/tests -v
+      - name: Run NCAA matchup
+        shell: bash
+        run: |
+          args=(--home "${{ inputs.home }}" --away "${{ inputs.away }}" --trials "${{ inputs.trials }}" --season 2026)
+          if [[ -n "${{ inputs.home_spread }}" ]]; then args+=(--home-spread "${{ inputs.home_spread }}"); fi
+          if [[ -n "${{ inputs.total }}" ]]; then args+=(--total "${{ inputs.total }}"); fi
+          if [[ "${{ inputs.neutral_site }}" == "true" ]]; then args+=(--neutral-site); fi
+          python -m ncaa.cli "${args[@]}" --output ncaa-results.json | tee ncaa-simulation-results.txt
+      - name: Upload simulation results
+        uses: actions/upload-artifact@v4
+        with:
+          name: dougs-elite-ncaa-results
+          path: |
+            ncaa-results.json
+            ncaa-simulation-results.txt
+            ncaa/data/team_rankings.json
+            ncaa/data/team_profiles.csv

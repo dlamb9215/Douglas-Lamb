@@ -23,3 +23,5 @@ jobs:
         run: python -m unittest -v test_simulator
       - name: Run NBA simulator and backtest tests
         run: python -m unittest -v nba.test_simulator nba.test_backtest
+      - name: Run NCAA simulator and data pipeline tests
+        run: python -m unittest discover -s ncaa/tests -v
