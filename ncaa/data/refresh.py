@@ -133,7 +133,7 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
                 continue
             row = team_totals.setdefault(name, {
                 "games": 0, "points_for": 0.0, "points_against": 0.0,
-                "yards_for": 0.0, "yards_allowed": 0.0, "plays": 0.0,
+                "yards_for": 0.0, "yards_allowed": 0.0, "plays": 0.0, "plays_allowed": 0.0,
                 "turnovers": 0.0, "takeaways": 0.0, "pass_yards": 0.0,
                 "rush_yards": 0.0, "pass_attempts": 0.0, "completions": 0.0,
                 "rush_attempts": 0.0, "first_downs": 0.0, "sacks": 0.0,
@@ -177,6 +177,10 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
             if other_yards is None:
                 other_yards = (pick(other_stats, "netPassingYards", "passingYards", "passYards") or 0.0) + (pick(other_stats, "rushingYards", "rushYards") or 0.0)
             row["yards_allowed"] += other_yards
+            other_plays = pick(other_stats, "totalPlays", "plays")
+            if other_plays is None:
+                other_plays = (pick(other_stats, "passAttempts", "passingAttempts") or 0.0) + (pick(other_stats, "rushAttempts", "rushingAttempts") or 0.0) + (pick(other_stats, "sacks") or 0.0)
+            row["plays_allowed"] += other_plays
             own_stats = extract_stats(own)
             own_takeaways = pick(own_stats, "interceptions", "defensiveInterceptions") or 0.0
             own_takeaways += pick(own_stats, "fumblesRecovered", "fumblesRecoveredByDefense") or 0.0
@@ -200,7 +204,7 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
         yards_pg = raw["yards_for"] / games_n
         allowed_pg = raw["yards_allowed"] / games_n
         ypp = raw["yards_for"] / raw["plays"] if raw["plays"] else 5.8
-        ypp_allowed = raw["yards_allowed"] / raw["plays"] if raw["plays"] else 5.8
+        ypp_allowed = raw["yards_allowed"] / raw["plays_allowed"] if raw["plays_allowed"] else 5.8
         adv = advanced.get(team.casefold(), {})
         off_adv, def_adv = adv.get("offense", {}), adv.get("defense", {})
         success = number(off_adv.get("successRate"))
@@ -218,6 +222,7 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
             "points_per_drive": "",
             "turnovers_per_game": round(raw["turnovers"] / games_n, 3),
             "takeaways_per_game": round(raw["takeaways"] / games_n, 3),
+            "turnover_margin_per_game": round((raw["takeaways"] - raw["turnovers"]) / games_n, 3),
             "explosive_play_rate": round(explosive, 5) if explosive is not None else 0.12,
             "success_rate": round(success, 5) if success is not None else 0.42,
             "strength_rating": round(strength, 4),
@@ -261,7 +266,7 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
         "total_defense_rank": ("total_yards_allowed_per_game", False),
         "yards_per_play_rank": ("yards_per_play", True),
         "yards_allowed_per_play_rank": ("yards_allowed_per_play", False),
-        "turnover_margin_rank": ("takeaways_per_game", True),
+        "turnover_margin_rank": ("turnover_margin_per_game", True),
     }
     for metric, value in rankings.items():
         for rank_name, (field, descending) in rank_specs.items():
