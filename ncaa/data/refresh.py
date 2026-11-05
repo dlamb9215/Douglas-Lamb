@@ -98,6 +98,16 @@ def parse_advanced(rows: list) -> dict:
 
 
 def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict, dict]:
+    fbs_rows = api_get("/teams/fbs", {"year": year}, api_key)
+    if not isinstance(fbs_rows, list) or not fbs_rows:
+        raise RuntimeError("CFBD did not return the FBS team directory; refusing to publish unfiltered data.")
+    fbs_names = {
+        str(row.get("school") or row.get("name") or "").casefold()
+        for row in fbs_rows
+        if row.get("school") or row.get("name")
+    }
+    if len(fbs_names) < 100:
+        raise RuntimeError(f"CFBD returned only {len(fbs_names)} FBS teams; refusing to publish an incomplete directory.")
     games = api_get("/games", {
         "year": year, "seasonType": season_type, "classification": "fbs"
     }, api_key)
@@ -135,6 +145,8 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
         g for g in games
         if g.get("homePoints") is not None and g.get("awayPoints") is not None
         and g.get("homeTeam") and g.get("awayTeam")
+        and str(g.get("homeTeam")).casefold() in fbs_names
+        and str(g.get("awayTeam")).casefold() in fbs_names
     ]
     if not completed:
         raise RuntimeError(
@@ -142,6 +154,13 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
             "refusing to overwrite team data with an empty dataset."
         )
 
+    # Keep only completed FBS-vs-FBS games. The CFBD box-score endpoint can
+    # return FCS opponents even when classification=fbs is supplied.
+    completed_ids = {g.get("id") for g in completed}
+    team_games = [
+        game for game in team_games
+        if game.get("id") in completed_ids
+    ]
     team_totals = {}
     for game in team_games:
         game_id = game.get("id")
@@ -149,7 +168,7 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
             continue
         for team in game.get("teams", []) or []:
             name = team.get("team")
-            if not name:
+            if not name or str(name).casefold() not in fbs_names:
                 continue
             row = team_totals.setdefault(name, {
                 "games": 0, "points_for": 0.0, "points_against": 0.0,
@@ -228,7 +247,11 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
         adv = advanced.get(team.casefold(), {})
         off_adv, def_adv = adv.get("offense", {}), adv.get("defense", {})
         success = number(off_adv.get("successRate"))
-        explosive = number(off_adv.get("explosiveness"))
+        # CFBD's advanced "explosiveness" is an efficiency index, not a
+        # probability/rate. The simulator expects a 0..1 explosive-play rate,
+        # so retain the documented conservative prior until a true play-count
+        # numerator/denominator is calculated from play-by-play data.
+        explosive = number(off_adv.get("explosivePlayRate"))
         elo_rating = elo.get(team.casefold(), 0.0)
         # Keep ratings on a comparable centered scale; Elo is informational, not a raw model rating.
         strength = (elo_rating - 1500.0) / 25.0 if elo_rating else 0.0
