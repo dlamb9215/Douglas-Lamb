@@ -8,6 +8,10 @@ on:
       - "nfl_data.py"
       - "drive_simulator.py"
       - "update_nfl_stats.py"
+      - "nfl_player_data.py"
+      - "refresh_player_data.py"
+      - "pregame_context.py"
+      - "test_pregame_context.py"
       - "test_simulator.py"
       - ".github/workflows/run-simulator.yml"
   workflow_dispatch:
@@ -26,6 +30,30 @@ on:
         description: Simulation trials
         required: true
         default: "100000"
+        type: string
+      spread:
+        description: Sportsbook spread (home-team perspective, optional)
+        required: false
+        type: string
+      total:
+        description: Sportsbook game total (optional)
+        required: false
+        type: string
+      home_odds:
+        description: Home moneyline American odds (optional)
+        required: false
+        type: string
+      away_odds:
+        description: Away moneyline American odds (optional)
+        required: false
+        type: string
+      over_odds:
+        description: Over American odds (optional)
+        required: false
+        type: string
+      under_odds:
+        description: Under American odds (optional)
+        required: false
         type: string
 
 permissions:
@@ -54,14 +82,31 @@ jobs:
       - name: Validate refreshed 32-team statistics
         run: python nfl_data.py
 
+      - name: Refresh current-season player, injury, roster and depth-chart data
+        run: python refresh_player_data.py --weeks 5 --output player_pool.json
+
+      - name: Validate fresh pregame context
+        run: python pregame_context.py --home "${{ inputs.home || 'BAL' }}" --away "${{ inputs.away || 'JAX' }}" --input player_pool.json --output pregame-context.json
+
       - name: Run tests
         run: python -m unittest -v
 
       - name: Run matchup
-        run: python main.py --home "${{ inputs.home || 'BAL' }}" --away "${{ inputs.away || 'JAX' }}" --trials "${{ inputs.trials || '100000' }}" | tee simulation-results.txt
+        shell: bash
+        run: |
+          ARGS=(--home "${{ inputs.home || 'BAL' }}" --away "${{ inputs.away || 'JAX' }}" --trials "${{ inputs.trials || '100000' }}" --pregame-report pregame-context.json)
+          if [[ -n "${{ inputs.spread }}" ]]; then ARGS+=(--spread "${{ inputs.spread }}"); fi
+          if [[ -n "${{ inputs.total }}" ]]; then ARGS+=(--total "${{ inputs.total }}"); fi
+          if [[ -n "${{ inputs.home_odds }}" ]]; then ARGS+=(--home-odds "${{ inputs.home_odds }}"); fi
+          if [[ -n "${{ inputs.away_odds }}" ]]; then ARGS+=(--away-odds "${{ inputs.away_odds }}"); fi
+          if [[ -n "${{ inputs.over_odds }}" ]]; then ARGS+=(--over-odds "${{ inputs.over_odds }}"); fi
+          if [[ -n "${{ inputs.under_odds }}" ]]; then ARGS+=(--under-odds "${{ inputs.under_odds }}"); fi
+          python main.py "${ARGS[@]}" | tee simulation-results.txt
 
       - name: Save results
         uses: actions/upload-artifact@v4
         with:
           name: matchup-simulation-results
-          path: simulation-results.txt
+          path: |
+            simulation-results.txt
+            pregame-context.json
