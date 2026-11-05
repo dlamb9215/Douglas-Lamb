@@ -1,7 +1,7 @@
 """Doug's Elite NBA Simulator.
 
-Team-level Monte Carlo engine. Betting outputs are spreads and totals only.
-No player-prop projections or moneyline recommendations.
+Team-level Monte Carlo engine. Outputs include moneyline, spread, and total picks.
+No player-prop projections.
 """
 from __future__ import annotations
 import argparse, json
@@ -169,7 +169,7 @@ def simulate(home,away,trials=1_000_000,seed=42,spread=None,total=None,
     hsd=max(8.0,home.score_sd); asd=max(8.0,away.score_sd)
     hs,aws=_simulate_period(p["home_points"],p["away_points"],p["pace"],hsd,asd,trials,seed)
     margin=hs-aws; combined=hs+aws
-    r={**p,"trials":trials,"seed":seed,"home_avg":float(np.mean(hs)),
+    r={**p,"trials":trials,"seed":seed,"home_win":float(np.mean(margin>0)*100),"away_win":float(np.mean(margin<0)*100),"win_tie":float(np.mean(margin==0)*100),"home_avg":float(np.mean(hs)),
        "away_avg":float(np.mean(aws)),"total_avg":float(np.mean(combined)),
        "margin_sd":float(np.std(margin,ddof=1))}
     if spread is not None:
@@ -243,6 +243,9 @@ def main():
     print(f"Projected total {r['total_points']:.1f} | Home margin {r['home_margin']:+.1f}")
     print(f"Trials {r['trials']:,} | Seed {r['seed']} | Margin SD {r['margin_sd']:.1f}")
     print(f"Schedule adjustments: home {r['home_rest_adjustment']:+.2f} pts | away {r['away_rest_adjustment']:+.2f} pts")
+    ml_pick=h.name if r["home_win"]>=55 else (w.name if r["away_win"]>=55 else "PASS — no 55% win-probability edge")
+    print(f"\nMONEYLINE: {h.name} win {r['home_win']:.2f}% | {w.name} win {r['away_win']:.2f}% | tie {r['win_tie']:.2f}%")
+    print(f"Moneyline pick: {ml_pick}")
     if a.spread is not None:
         hp=_decision(r["home_cover"],r["spread_edge_points"])
         apick=_decision(r["away_cover"],-r["spread_edge_points"])
@@ -263,6 +266,6 @@ def main():
     print("Injury adjustment is manual unless an independently verified report is supplied.")
     print("Model status: estimates require out-of-sample backtesting before being treated as betting edges.")
     if a.json_output:
-        payload={"home_team":h.abbreviation,"away_team":w.abbreviation,"season":meta.get("season"),"data_updated_at":meta.get("updated_at"),"spread_line":a.spread,"total_line":a.total,"home_rest":a.home_rest,"away_rest":a.away_rest,"home_travel_miles":a.home_travel,"away_travel_miles":a.away_travel,"home_injury_points":a.home_injury_points,"away_injury_points":a.away_injury_points,"result":r}
+        payload={"home_team":h.abbreviation,"away_team":w.abbreviation,"season":meta.get("season"),"data_updated_at":meta.get("updated_at"),"spread_line":a.spread,"total_line":a.total,"home_rest":a.home_rest,"away_rest":a.away_rest,"home_travel_miles":a.home_travel,"away_travel_miles":a.away_travel,"home_injury_points":a.home_injury_points,"away_injury_points":a.away_injury_points,"moneyline_pick":ml_pick,"result":r}
         Path(a.json_output).write_text(json.dumps(payload,indent=2)+"\\n",encoding="utf-8")
 if __name__=="__main__": main()
