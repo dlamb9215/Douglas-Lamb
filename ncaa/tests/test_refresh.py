@@ -30,7 +30,7 @@ class RefreshTests(unittest.TestCase):
                 "team": "Example U", "points_for": 30, "points_against": 20,
                 "yards_per_play": 6.0, "yards_per_play_allowed": 5.0,
                 "plays_per_game": 70, "points_per_drive": "",
-                "turnovers_per_game": 1.0, "takeaways_per_game": 1.5,
+                "turnovers_per_game": 1.0, "takeaways_per_game": 1.5,\n                "turnover_margin_per_game": 0.5,
                 "explosive_play_rate": .12, "success_rate": .42,
                 "strength_rating": 0, "games_sampled": 4,
                 "source": "test", "as_of": "2026-11-04",
