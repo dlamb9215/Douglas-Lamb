@@ -185,7 +185,7 @@ def simulate_matchup(
             away_wins += 1
         if hg - ag > puck_line:
             home_covers += 1
-        if ag - hg > puck_line:
+        if ag - hg > -puck_line:
             away_covers += 1
         game_total = hg + ag
         if game_total > total_line:
