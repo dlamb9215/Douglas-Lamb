@@ -204,7 +204,7 @@ def main():
     print_matchup_report(database, home_code, away_code)
 
     if pregame_report:
-        print("\\nLIVE PREGAME PLAYER CONTEXT")
+        print("\nLIVE PREGAME PLAYER CONTEXT")
         print("===========================")
         print(f"Source: {pregame_report.get('source')}")
         print(f"Retrieved: {pregame_report.get('retrieved_at_utc')}")
