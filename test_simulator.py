@@ -9,8 +9,9 @@ class TestDougSimulator(unittest.TestCase):
 
     def test_matchup_scoring_projection_uses_home_field_advantage(self):
         from nfl_data import load_team_stats, project_matchup_scoring
+        from main import project_matchup_scoring as main_projection
         database = load_team_stats()
-        with_home = project_matchup_scoring(database, "BAL", "JAX")
+        with_home = main_projection(database, "BAL", "JAX")
         neutral = project_matchup_scoring(
             database, "BAL", "JAX", home_field_points=0
         )
