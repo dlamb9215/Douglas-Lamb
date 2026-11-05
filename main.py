@@ -226,11 +226,24 @@ def main():
         print("SIMULATION BLOCKED: Missing scoring data.")
         return
 
-    home_mean = args.home_mean if args.home_mean is not None else (
-        home_scoring + away_allowed) / 2
+    scoring_projection = project_matchup_scoring(
+        database, home_code, away_code
+    )
 
-    away_mean = args.away_mean if args.away_mean is not None else (
-        away_scoring + home_allowed) / 2
+    home_mean = (
+        args.home_mean if args.home_mean is not None
+        else scoring_projection[home_code]
+    )
+    away_mean = (
+        args.away_mean if args.away_mean is not None
+        else scoring_projection[away_code]
+    )
+
+    print("\\nMATCHUP-ADJUSTED SCORING PROJECTIONS")
+    print("===================================")
+    print(f"{home['name']}: {home_mean:.2f} points")
+    print(f"{away['name']}: {away_mean:.2f} points")
+    print("Includes a 1.5-point home-field adjustment and a shrunk yardage matchup adjustment.")
 
     model_spread = away_mean - home_mean
     model_total = home_mean + away_mean
