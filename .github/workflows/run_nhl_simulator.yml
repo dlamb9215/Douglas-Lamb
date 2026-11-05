@@ -1,0 +1,54 @@
+name: Run Doug's Elite NHL Simulator
+
+on:
+  workflow_dispatch:
+    inputs:
+      home:
+        description: Home NHL team abbreviation
+        required: true
+        default: BOS
+        type: choice
+        options: [ANA, BOS, BUF, CGY, CAR, CHI, COL, CBJ, DAL, DET, EDM, FLA, LAK, MIN, MTL, NSH, NJD, NYI, NYR, OTT, PHI, PIT, SJS, SEA, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
+      away:
+        description: Away NHL team abbreviation
+        required: true
+        default: NYR
+        type: choice
+        options: [ANA, BOS, BUF, CGY, CAR, CHI, COL, CBJ, DAL, DET, EDM, FLA, LAK, MIN, MTL, NSH, NJD, NYI, NYR, OTT, PHI, PIT, SJS, SEA, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
+      trials:
+        description: Monte Carlo trials
+        required: true
+        default: "100000"
+        type: choice
+        options: ["10000", "100000", "500000", "1000000"]
+      seed:
+        description: Reproducible random seed
+        required: true
+        default: "20261105"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run NHL model tests
+        run: python -m unittest -v test_nhl_simulator.py
+      - name: Run matchup simulation
+        run: |
+          python nhl_simulator.py --home "${{ inputs.home }}" --away "${{ inputs.away }}" --trials "${{ inputs.trials }}" --seed "${{ inputs.seed }}" | tee nhl-simulation-results.txt
+      - name: Save simulation results
+        uses: actions/upload-artifact@v4
+        with:
+          name: dougs-elite-nhl-simulation-results
+          path: |
+            nhl-simulation-results.txt
+            nhl-simulation-results.json
