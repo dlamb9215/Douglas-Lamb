@@ -12,6 +12,7 @@ from nfl_data import (
     compare_team_stats,
     check_matchup_data,
     project_matchup_yardage,
+    project_matchup_scoring,
 )
 
 
@@ -239,7 +240,7 @@ def main():
         else scoring_projection[away_code]
     )
 
-    print("\\nMATCHUP-ADJUSTED SCORING PROJECTIONS")
+    print("\nMATCHUP-ADJUSTED SCORING PROJECTIONS")
     print("===================================")
     print(f"{home['name']}: {home_mean:.2f} points")
     print(f"{away['name']}: {away_mean:.2f} points")
