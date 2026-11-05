@@ -251,7 +251,7 @@ def main():
         print("\nNo matchup prediction was generated.")
         return
     if pregame_report and not pregame_report.get("team_simulation_ready", False):
-        print("\\nSIMULATION BLOCKED")
+        print("\nSIMULATION BLOCKED")
         print("==================")
         print("Latest pregame data does not show an available QB1 for both teams.")
         for blocker in pregame_report.get("team_simulation_blockers", []):
