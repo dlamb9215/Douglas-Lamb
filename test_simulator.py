@@ -7,6 +7,17 @@ from drive_simulator import simulate_drive_game, _game_script_multiplier
 
 class TestDougSimulator(unittest.TestCase):
 
+    def test_full_team_metric_rankings_are_available(self):
+        from nfl_data import load_team_stats
+        database = load_team_stats()
+        self.assertIn("attempts_per_game_rank", database["BAL"]["offense"]["passing"])
+        self.assertIn("yards_per_carry_rank", database["BAL"]["defense"]["rushing"])
+        self.assertIn("takeaways_rank", database["BAL"]["turnovers"])
+        self.assertIn("giveaways_rank", database["BAL"]["turnovers"])
+        self.assertIn("differential_rank", database["BAL"]["turnovers"])
+        self.assertGreaterEqual(database["BAL"]["turnovers"]["differential_rank"], 1)
+        self.assertLessEqual(database["BAL"]["turnovers"]["differential_rank"], 32)
+
     def test_matchup_scoring_projection_uses_home_field_advantage(self):
         from nfl_data import load_team_stats, project_matchup_scoring
         from main import project_matchup_scoring as main_projection
