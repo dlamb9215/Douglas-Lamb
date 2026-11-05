@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from ncaa.data.refresh import extract_stats, parse_advanced, write_outputs
+from ncaa.data.refresh import extract_stats, parse_advanced, parse_season_stats, write_outputs
 
 
 class RefreshTests(unittest.TestCase):
@@ -16,7 +16,7 @@ class RefreshTests(unittest.TestCase):
         self.assertEqual(result["passingyards"], 312.0)
         self.assertEqual(result["totalyards"], 450.0)
 
-    def test_advanced_rows_accept_nested_metrics(self):
+    def test_season_stats_are_grouped_and_normalized(self):\n        result = parse_season_stats([\n            {"team": "Example U", "statName": "passAttempts", "statValue": "280"},\n            {"team": "Example U", "statName": "totalYards", "statValue": "4100"},\n        ])\n        self.assertEqual(result["example u"]["passattempts"], 280.0)\n        self.assertEqual(result["example u"]["totalyards"], 4100.0)\n\n    def test_advanced_rows_accept_nested_metrics(self):
         result = parse_advanced([{
             "team": "Example U",
             "offense": {"successRate": 0.47},
