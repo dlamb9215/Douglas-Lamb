@@ -210,7 +210,7 @@ def main():
         print(f"Retrieved: {pregame_report.get('retrieved_at_utc')}")
         for team_code in (home_code, away_code):
             details = pregame_report["teams"][team_code]
-            print(f"\\n{team_code} quarterback depth chart (not confirmed starters):")
+            print(f"\n{team_code} quarterback depth chart (not confirmed starters):")
             for qb in details.get("quarterback_depth_chart", []):
                 print(f"  #{qb.get('depth_order')} {qb.get('name')} | roster: {qb.get('roster_status')} | injury: {qb.get('injury_status')}")
             print(f"Reported injuries: {details.get('reported_injuries', [])}")
@@ -250,14 +250,23 @@ def main():
 
         print("\nNo matchup prediction was generated.")
         return
+    if pregame_report and not pregame_report.get("team_simulation_ready", False):
+        print("\\nSIMULATION BLOCKED")
+        print("==================")
+        print("Latest pregame data does not show an available QB1 for both teams.")
+        for blocker in pregame_report.get("team_simulation_blockers", []):
+            print("-", blocker)
+        print("No win, spread or total probabilities were generated.")
+        return
+
     print("\nDATA QUALITY CHECK")
     print("==================")
     print("Required matchup statistics: VERIFIED")
     print("Team scoring data: CHECKED")
     print("Turnover rates: INCLUDED IN DRIVE SIMULATION")
     print("Overtime: SIMPLIFIED TWO-POSSESSION APPROXIMATION")
-    print("Injury and inactive status: NOT VERIFIED")
-    print("Confirmed starting lineups: NOT VERIFIED")
+    print("Current weekly injury/depth context: LOADED")
+    print("Final inactives and official starting lineups: NOT CONFIRMED")
 
     print("\nMODEL CONFIDENCE WARNING")
     print("========================")
