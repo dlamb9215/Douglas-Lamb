@@ -12,6 +12,7 @@ on:
       - "refresh_player_data.py"
       - "pregame_context.py"
       - "test_pregame_context.py"
+      - "test_nfl_player_data.py"
       - "test_simulator.py"
       - ".github/workflows/run-simulator.yml"
   workflow_dispatch:
