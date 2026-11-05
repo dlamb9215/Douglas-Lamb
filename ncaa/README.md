@@ -55,3 +55,15 @@ Open Actions → **Doug's Elite NCAA Football Simulator** → Run workflow. Ente
 ## Model limitations
 
 This engine is a transparent drive-outcome Monte Carlo model, not a play-by-play NCAA rules simulator. First-half estimates split simulated drives approximately in half; they are not a separate clock-accurate half-game engine. It does not yet model player availability, play-calling, fourth-down decisions, overtime rules, weather, injuries, transfer portal changes, or conference-specific calibration. Its probabilities require a complete, current and consistently sourced profile file and subsequent backtesting before they should be used for wagering.
+
+## Forecast backtesting and calibration
+
+Save each simulator forecast before kickoff, then append the final outcomes to a CSV. Required columns are `home_win_probability,home_win`; optional paired columns are `home_cover_probability,home_cover` and `over_probability,over`. Probabilities are decimals from 0 to 1 and outcomes are 1 for yes / 0 for no.
+
+Run:
+
+```bash
+python -m ncaa.backtest --input ncaa-predictions.csv --output ncaa-backtest-results.json
+```
+
+The report includes sample size, Brier score, log loss, accuracy, and reliability bins for each market with available data. Only forecasts recorded before kickoff should be included. This is an evaluation framework; it does not claim calibrated performance until a meaningful historical prediction ledger has been accumulated.
