@@ -266,6 +266,10 @@ def main():
     print("Turnover rates: INCLUDED IN DRIVE SIMULATION")
     print("Overtime: SIMPLIFIED TWO-POSSESSION APPROXIMATION")
     print("Current weekly injury/depth context: LOADED")
+    print("BETTING READINESS: NOT READY")
+    if pregame_report:
+        for blocker in pregame_report.get("betting_readiness_blockers", []):
+            print("-", blocker)
     print("Final inactives and official starting lineups: NOT CONFIRMED")
 
     print("\nMODEL CONFIDENCE WARNING")
