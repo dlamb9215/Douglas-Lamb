@@ -1,0 +1,55 @@
+name: Refresh NCAA FBS Statistics
+
+on:
+  workflow_dispatch:
+    inputs:
+      year:
+        description: Season year
+        required: true
+        default: "2026"
+        type: string
+      season_type:
+        description: Season segment
+        required: true
+        default: regular
+        type: choice
+        options:
+          - regular
+          - postseason
+          - both
+  schedule:
+    - cron: "20 10 * * 2,3,4,5,6,0"
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Refresh verified FBS data
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+        run: |
+          YEAR="${{ inputs.year }}"
+          TYPE="${{ inputs.season_type }}"
+          if [[ -z "$YEAR" ]]; then YEAR="$(date -u +%Y)"; fi
+          if [[ -z "$TYPE" ]]; then TYPE="regular"; fi
+          python -m ncaa.data.refresh --year "$YEAR" --season-type "$TYPE"
+      - name: Commit refreshed data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ncaa/data/team_profiles.csv ncaa/data/team_rankings.json
+          if git diff --cached --quiet; then
+            echo "No data changes to commit."
+          else
+            git commit -m "Refresh NCAA FBS team statistics"
+            git push
+          fi
