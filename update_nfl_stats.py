@@ -6,7 +6,7 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
-SEASON = 2026
+SEASON = int(os.environ.get("NFL_SEASON", datetime.now(timezone.utc).year))
 API_URL = (
     "https://api.github.com/repos/"
     "nflverse/nflverse-data/releases/tags/stats_team"
@@ -148,6 +148,8 @@ def main():
 
         teams[team] = {
             "team": team,
+            "data_updated_at": datetime.now(timezone.utc).isoformat(),
+            "season": SEASON,
             "games_played": int(games),
             "points_for_per_game": average(
     scoring[team]["points_for"],
