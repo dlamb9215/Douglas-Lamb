@@ -26,9 +26,20 @@ class PregameContextTests(unittest.TestCase):
 
     def test_report_keeps_depth_chart_distinct_from_final_starters(self):
         report = build_pregame_report(self.pool, "BAL", "JAX", now=self.now)
-        self.assertFalse(report["player_props_ready"])
+        self.assertTrue(report["team_simulation_ready"])\n        self.assertFalse(report["player_props_ready"])
         self.assertFalse(report["teams"]["BAL"]["official_starting_quarterback_confirmed"])
         self.assertEqual(report["teams"]["BAL"]["reported_injuries"][0]["status"], "questionable")
+
+    def test_missing_active_qb1_blocks_team_simulation(self):
+        self.pool["players"][0]["depth_order"] = 99
+        report = build_pregame_report(self.pool, "BAL", "JAX", now=self.now)
+        self.assertFalse(report["team_simulation_ready"])
+        self.assertTrue(report["team_simulation_blockers"])
+
+    def test_out_qb1_blocks_team_simulation(self):
+        self.pool["players"][0]["injury_status"] = "out"
+        report = build_pregame_report(self.pool, "BAL", "JAX", now=self.now)
+        self.assertFalse(report["team_simulation_ready"])
 
     def test_stale_player_data_is_rejected(self):
         self.pool["retrieved_at_utc"] = (self.now - timedelta(hours=40)).isoformat()
