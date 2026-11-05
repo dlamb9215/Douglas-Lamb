@@ -121,18 +121,28 @@ def simulate_game(
 
     home_scores: list[int] = []
     away_scores: list[int] = []
-    home_wins = ties = home_covers = overs = 0
-    margin_sum = total_sum = 0.0
+    home_first_scores: list[int] = []
+    away_first_scores: list[int] = []
+    home_wins = ties = home_covers = home_cover_pushes = overs = total_pushes = 0
+    margin_sum = total_sum = first_home_sum = first_away_sum = 0.0
 
     for _ in range(trials):
         # Small shared game-environment shock creates correlated pace/scoring variance.
         game_shock = rng.gauss(0.0, 0.12)
         h_count = max(6, round(rng.gauss(home_drives, 0.85)))
         a_count = max(6, round(rng.gauss(away_drives, 0.85)))
-        hs = sum(_drive_points(_clamp(home_ppd + game_shock, 0.65, 5.2),
-                               home.turnovers_per_game, rng) for _ in range(h_count))
-        as_ = sum(_drive_points(_clamp(away_ppd + game_shock, 0.65, 5.2),
-                                away.turnovers_per_game, rng) for _ in range(a_count))
+        h_first_count = max(1, round(h_count / 2))
+        a_first_count = max(1, round(a_count / 2))
+        h_outcomes = [_drive_points(_clamp(home_ppd + game_shock, 0.65, 5.2),
+                                    home.turnovers_per_game, rng) for _ in range(h_count)]
+        a_outcomes = [_drive_points(_clamp(away_ppd + game_shock, 0.65, 5.2),
+                                    away.turnovers_per_game, rng) for _ in range(a_count)]
+        h1, a1 = sum(h_outcomes[:h_first_count]), sum(a_outcomes[:a_first_count])
+        hs, as_ = sum(h_outcomes), sum(a_outcomes)
+        home_first_scores.append(h1)
+        away_first_scores.append(a1)
+        first_home_sum += h1
+        first_away_sum += a1
         # Overtime is represented as a modest one-possession resolution, not a full OT ruleset.
         if hs == as_:
             if rng.random() < 0.5:
@@ -148,9 +158,12 @@ def simulate_game(
         home_wins += margin > 0
         ties += margin == 0
         if lines.spread_home is not None:
-            home_covers += margin + lines.spread_home > 0
+            adjusted_margin = margin + lines.spread_home
+            home_covers += adjusted_margin > 0
+            home_cover_pushes += adjusted_margin == 0
         if lines.total is not None:
             overs += total > lines.total
+            total_pushes += total == lines.total
 
     mean_home = sum(home_scores) / trials
     mean_away = sum(away_scores) / trials
@@ -164,6 +177,16 @@ def simulate_game(
         "projected_score": {home.name: round(mean_home, 2), away.name: round(mean_away, 2)},
         "projected_margin_home": round(margin_sum / trials, 2),
         "projected_total": round(total_sum / trials, 2),
+        "projected_first_half_score": {
+            home.name: round(first_home_sum / trials, 2),
+            away.name: round(first_away_sum / trials, 2),
+        },
+        "projected_first_half_total": round((first_home_sum + first_away_sum) / trials, 2),
+        "score_ranges": {
+            home.name: {"p10": _percentile(home_scores, 0.10), "median": _percentile(home_scores, 0.50), "p90": _percentile(home_scores, 0.90)},
+            away.name: {"p10": _percentile(away_scores, 0.10), "median": _percentile(away_scores, 0.50), "p90": _percentile(away_scores, 0.90)},
+        },
+        "first_half_win_probability_home": round(sum(h > a for h, a in zip(home_first_scores, away_first_scores)) / trials, 4),
         "home_win_probability": round(home_wins / trials, 4),
         "away_win_probability": round((trials - home_wins) / trials, 4),
         "expected_points_per_drive": {home.name: round(home_ppd, 3), away.name: round(away_ppd, 3)},
@@ -181,12 +204,20 @@ def simulate_game(
     if lines.spread_home is not None:
         result["market"]["home_spread"] = lines.spread_home
         result["market"]["home_cover_probability"] = round(home_covers / trials, 4)
-        result["market"]["away_cover_probability"] = round(1 - home_covers / trials, 4)
+        result["market"]["away_cover_probability"] = round((trials - home_covers - home_cover_pushes) / trials, 4)
+        result["market"]["spread_push_probability"] = round(home_cover_pushes / trials, 4)
     if lines.total is not None:
         result["market"]["total_line"] = lines.total
         result["market"]["over_probability"] = round(overs / trials, 4)
-        result["market"]["under_probability"] = round(1 - overs / trials, 4)
+        result["market"]["under_probability"] = round((trials - overs - total_pushes) / trials, 4)
+        result["market"]["total_push_probability"] = round(total_pushes / trials, 4)
     return result
+
+
+def _percentile(values: list[int], quantile: float) -> int:
+    ordered = sorted(values)
+    index = min(len(ordered) - 1, max(0, round((len(ordered) - 1) * quantile)))
+    return ordered[index]
 
 
 def _warnings(home: TeamProfile, away: TeamProfile) -> list[str]:
