@@ -61,3 +61,5 @@ jobs:
           path: |
             ncaa-results.json
             ncaa-simulation-results.txt
+            ncaa/data/team_rankings.json
+            ncaa/data/team_profiles.csv
