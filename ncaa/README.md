@@ -21,9 +21,24 @@ python -m unittest discover -s ncaa/tests -v
 python -m ncaa.cli --home Georgia --away Alabama --trials 100000 --home-spread -3.5 --total 52.5
 ```
 
-## Team data
+## Automatic FBS data pipeline
 
-Populate `ncaa/data/team_profiles.csv` with verified current-season team data. One row per school. Rates are decimals (for example, 0.45 = 45%). `strength_rating` is a relative rating on a consistent scale; use the same scale for every team. `points_per_drive` is optional; if blank it is estimated from points per game and expected drives.
+The refresh job uses the CollegeFootballData API for FBS schedules/results, game team box scores, advanced team-season metrics, and Elo ratings. It creates:
+
+- `ncaa/data/team_profiles.csv`: the simulator's normalized inputs
+- `ncaa/data/team_rankings.json`: national comparison metrics, ranks, source and retrieval metadata
+
+The pipeline only counts completed games and refuses to replace the dataset if the provider returns no completed games or fewer than 50 team profiles. Current-season ranks are provisional and change as games are played. Some advanced fields may be unavailable early in the season and are clearly represented by neutral fallback values in the profile.
+
+### One-time API setup
+
+1. Create a free CollegeFootballData account and request an API key at https://collegefootballdata.com/
+2. In GitHub, open **Settings → Secrets and variables → Actions → New repository secret**.
+3. Name the secret exactly `CFBD_API_KEY` and paste the API key as its value. Never put the key in a file or commit it.
+4. Open **Actions → Refresh NCAA FBS Statistics → Run workflow**, select the season year and season segment, then run it.
+
+The refresh workflow also runs on its scheduled cadence. It commits updated CSV/JSON data to the repository only after successful validation. The API key is read only from the GitHub Actions secret. CFBD access limits and endpoint entitlements depend on the provider's current plan.
+
 
 Required columns:
 
@@ -31,7 +46,7 @@ Required columns:
 
 Optional: `points_per_drive`.
 
-**Important:** the starter dataset is intentionally empty. If a team is missing, the engine uses a league-average prior and clearly flags it. Do not treat prior-only output as a betting recommendation. A reliable live data ingestion pipeline and calibration against historical NCAA results are the next upgrade phase; no current-season stats are fabricated or silently assumed.
+**Important:** until the CFBD API secret is configured and a successful refresh completes, the starter dataset remains an empty template. Missing teams use a league-average prior and are explicitly flagged. Do not treat prior-only output as a betting recommendation. The current collector is a first verified-data pipeline, not yet a fully calibrated betting model; backtesting and model calibration remain required.
 
 ## GitHub Actions
 
