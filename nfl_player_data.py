@@ -174,27 +174,84 @@ def build_player_pool(stat_rows, roster_rows, depth_rows, injury_rows,
         str(_first(r, "gsis_id", "player_id")): r for r in roster_rows
         if _first(r, "gsis_id", "player_id")
     }
+    # 2025+ nflverse depth charts use dt/team/pos_abb/pos_rank.
+    # Keep only the latest chart snapshot for each team, then match the
+    # player's actual position instead of overwriting multi-position rows.
+    latest_depth_dt_by_team = {}
+    for row in depth_rows:
+        team_code = str(_first(row, "team", "club_code") or "").upper()
+        dt = str(_first(row, "dt") or "")
+        if team_code and dt > latest_depth_dt_by_team.get(team_code, ""):
+            latest_depth_dt_by_team[team_code] = dt
+
     depth_by_id = {}
     for row in depth_rows:
         pid = _first(row, "gsis_id", "player_id")
-        if pid:
-            depth_by_id[str(pid)] = row
+        team_code = str(_first(row, "team", "club_code") or "").upper()
+        dt = str(_first(row, "dt") or "")
+        if not pid:
+            continue
+        latest_dt = latest_depth_dt_by_team.get(team_code)
+        if latest_dt and dt and dt != latest_dt:
+            continue
+        depth_by_id.setdefault(str(pid), []).append(row)
+
+    # Injury reports are weekly. Use the latest published week for each
+    # team so a prior week's OUT designation cannot leak into this week's pool.
+    latest_injury_week_by_team = {}
+    for row in injury_rows:
+        team_code = str(_first(row, "team") or "").upper()
+        try:
+            row_season = int(_first(row, "season") or season)
+            week = int(_first(row, "week") or 0)
+        except (TypeError, ValueError):
+            continue
+        if row_season == season and team_code and week:
+            latest_injury_week_by_team[team_code] = max(
+                week, latest_injury_week_by_team.get(team_code, 0)
+            )
+
     injury_by_id = {}
     for row in injury_rows:
         pid = _first(row, "gsis_id", "player_id")
-        if pid:
+        team_code = str(_first(row, "team") or "").upper()
+        try:
+            row_season = int(_first(row, "season") or season)
+            week = int(_first(row, "week") or 0)
+        except (TypeError, ValueError):
+            continue
+        if (
+            pid
+            and row_season == season
+            and week == latest_injury_week_by_team.get(team_code)
+        ):
             injury_by_id[str(pid)] = row
 
     pool = []
     for player in stats:
         pid = str(player["player_id"] or "")
         roster = roster_by_id.get(pid, {})
-        depth = depth_by_id.get(pid, {})
+        depth_candidates = depth_by_id.get(pid, [])
+        matching_depth = [
+            row for row in depth_candidates
+            if str(_first(row, "pos_abb", "depth_position", "position") or "").upper()
+            == str(player["position"]).upper()
+        ]
+        depth_candidates = matching_depth or depth_candidates
+        depth = min(
+            depth_candidates,
+            key=lambda row: int(float(_first(
+                row, "pos_rank", "depth_order", "depth_team", "order"
+            ) or 99)),
+            default={},
+        )
         injury = injury_by_id.get(pid, {})
         roster_status = _norm(_first(roster, "status", "roster_status"))
-        depth_position = _first(depth, "depth_position", "position") or player["position"]
+        depth_position = _first(depth, "pos_abb", "depth_position", "position") or player["position"]
         try:
-            depth_order = int(float(_first(depth, "depth_order", "order") or 99))
+            depth_order = int(float(_first(
+                depth, "pos_rank", "depth_order", "depth_team", "order"
+            ) or 99))
         except (TypeError, ValueError):
             depth_order = 99
         injury_status = _status_from_injury(injury) if injury else "active"
