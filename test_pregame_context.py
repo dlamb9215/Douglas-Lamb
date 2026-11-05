@@ -26,7 +26,8 @@ class PregameContextTests(unittest.TestCase):
 
     def test_report_keeps_depth_chart_distinct_from_final_starters(self):
         report = build_pregame_report(self.pool, "BAL", "JAX", now=self.now)
-        self.assertTrue(report["team_simulation_ready"])\n        self.assertFalse(report["player_props_ready"])
+        self.assertTrue(report["team_simulation_ready"])
+        self.assertFalse(report["player_props_ready"])
         self.assertFalse(report["teams"]["BAL"]["official_starting_quarterback_confirmed"])
         self.assertEqual(report["teams"]["BAL"]["reported_injuries"][0]["status"], "questionable")
 
