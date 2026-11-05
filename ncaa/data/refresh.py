@@ -104,10 +104,23 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
     team_games = api_get("/games/teams", {
         "year": year, "seasonType": season_type, "classification": "fbs"
     }, api_key)
-    advanced_rows = api_get("/stats/season/advanced", {
-        "year": year, "excludeGarbageTime": "true"
-    }, api_key)
-    elo_rows = api_get("/ratings/elo", {"year": year}, api_key)
+    provider_warnings = []
+    try:
+        advanced_rows = api_get("/stats/season/advanced", {
+            "year": year, "excludeGarbageTime": "true"
+        }, api_key)
+    except RuntimeError as exc:
+        if "403" not in str(exc) and "404" not in str(exc):
+            raise
+        advanced_rows = []
+        provider_warnings.append(f"Advanced team metrics unavailable: {exc}")
+    try:
+        elo_rows = api_get("/ratings/elo", {"year": year}, api_key)
+    except RuntimeError as exc:
+        if "403" not in str(exc) and "404" not in str(exc):
+            raise
+        elo_rows = []
+        provider_warnings.append(f"Elo ratings unavailable: {exc}")
 
     if not isinstance(games, list) or not isinstance(team_games, list):
         raise RuntimeError("CFBD games endpoints did not return arrays.")
@@ -285,6 +298,7 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
         "teams_with_box_scores": len(profiles),
         "retrieved_at": datetime.now(timezone.utc).isoformat(),
         "note": "Ranks are among teams returned with usable game box scores; incomplete-season ranks change weekly.",
+        "provider_warnings": provider_warnings,
     }
     return profiles, rankings, metadata
 
