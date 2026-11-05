@@ -8,7 +8,7 @@ An independent college-football simulation module inside `dlamb9215/Douglas-Lamb
 - College-specific pace estimate from plays per game and expected plays per drive.
 - Offense-versus-defense blend using points per game/drive, yards per play, success rate, explosive-play rate, turnover rates and team strength rating.
 - Home-field adjustment, with neutral-site option.
-- Moneyline, spread-cover and total over/under probabilities when sportsbook lines are supplied.
+- Moneyline, spread-cover and total over/under probabilities when sportsbook lines are supplied, including push probabilities.\n- First-half score and home-lead projections, plus team scoring 10th/50th/90th percentile ranges.
 - Data-quality warnings for missing or small samples.
 - JSON output containing projections, inputs, probabilities and warnings.
 
@@ -42,7 +42,7 @@ The refresh workflow also runs on its scheduled cadence. It commits updated CSV/
 
 Required columns:
 
-`team,points_for,points_against,yards_per_play,yards_per_play_allowed,plays_per_game,turnovers_per_game,takeaways_per_game,explosive_play_rate,success_rate,strength_rating,games_sampled,source,as_of`
+`team,points_for,points_against,yards_per_play,yards_per_play_allowed,plays_per_game,points_per_drive,turnovers_per_game,takeaways_per_game,turnover_margin_per_game,explosive_play_rate,success_rate,strength_rating,games_sampled,source,as_of`
 
 Optional: `points_per_drive`.
 
@@ -54,4 +54,4 @@ Open Actions → **Doug's Elite NCAA Football Simulator** → Run workflow. Ente
 
 ## Model limitations
 
-This first engine is a transparent drive-outcome Monte Carlo model, not a play-by-play NCAA rules simulator. It does not yet model player availability, play-calling, fourth-down decisions, overtime rules, weather, injuries, transfer portal changes, or conference-specific calibration. Its probabilities require a complete, current and consistently sourced profile file and subsequent backtesting before they should be used for wagering.
+This engine is a transparent drive-outcome Monte Carlo model, not a play-by-play NCAA rules simulator. First-half estimates split simulated drives approximately in half; they are not a separate clock-accurate half-game engine. It does not yet model player availability, play-calling, fourth-down decisions, overtime rules, weather, injuries, transfer portal changes, or conference-specific calibration. Its probabilities require a complete, current and consistently sourced profile file and subsequent backtesting before they should be used for wagering.
