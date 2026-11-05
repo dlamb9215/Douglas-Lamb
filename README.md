@@ -5,7 +5,8 @@ Team-level NFL matchup simulator. Player-prop projections are not part of the ac
 ## What it produces
 
 - Two-team passing, rushing, and total offense-versus-defense comparison
-- Team yardage and scoring projections
+- Team yardage and matchup-adjusted scoring projections
+- Data season, refresh timestamp, and 32-team validation
 - Turnover comparison
 - Full-game and first-half moneyline, spread, and total probabilities
 - Vig-free sportsbook comparison when odds and lines are supplied
@@ -40,7 +41,9 @@ The workflow runs tests before the simulation and saves the text report as an ar
 
 - Team statistics are refreshed by the scheduled **Update NFL Statistics** workflow (Tuesday 12:00 UTC) and can also be run manually from Actions.
 - The simulator blocks a matchup when required team statistics are missing.
-- Current team-stat inputs are through the most recently completed refresh; verify the data timestamp and injury/news reports before betting.
+- Current team-stat inputs are through the most recently completed refresh; the report displays the season and refresh timestamp. Validation rejects invalid team coverage, games played, and scoring averages. Verify injury/news reports before betting.
+- Scoring projections blend team points scored with opponent points allowed, then apply a shrunk offense-versus-defense yardage adjustment and a 1.5-point home-field assumption. This adjustment is transparent but not yet empirically calibrated.
+- Rankings are calculated for each available passing, rushing, total-offense, total-defense, and turnover metric. Higher is better for offensive production and takeaways; lower is better for defensive allowances and giveaways.
 - The scoring model uses team scoring averages and opponent points allowed, with drive-level Monte Carlo variation. Turnover probabilities are applied to drives, while non-turnover drive scoring is normalized so the observed team scoring averages are not reduced a second time by the same historical turnovers.
 - The weekly statistics workflow archives immutable timestamped copies in `data_snapshots/`. These snapshots establish an auditable pregame data history for future out-of-sample backtesting; they do not retroactively create missing historical snapshots.
 - Tied regulation outcomes receive a simplified overtime approximation with one possession per team; a tie can remain. This is not a full NFL rules/play-by-play overtime engine.
