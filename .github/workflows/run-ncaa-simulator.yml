@@ -6,27 +6,27 @@ on:
       home:
         description: Home college team
         required: true
-        default: Georgia
+        default: Florida Atlantic
         type: string
       away:
         description: Away college team
         required: true
-        default: Alabama
+        default: UTSA
         type: string
       trials:
-        description: Monte Carlo trials (default 100000)
+        description: Monte Carlo trials
         required: true
-        default: "100000"
+        default: "500000"
         type: string
       home_spread:
-        description: Home-team sportsbook handicap (leave blank if unknown)
+        description: Home-team sportsbook handicap
         required: false
-        default: ""
+        default: "7"
         type: string
       total:
-        description: Sportsbook game total (leave blank if unknown)
+        description: Sportsbook game total
         required: false
-        default: ""
+        default: "72.5"
         type: string
       neutral_site:
         description: Neutral-site game
