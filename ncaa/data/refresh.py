@@ -82,6 +82,19 @@ def pick(stats: dict, *keys):
     return None
 
 
+
+def parse_season_stats(rows: list) -> dict:
+    """Group CFBD /stats/season rows by team and normalized stat name."""
+    result = {}
+    for row in rows or []:
+        team = row.get("team")
+        key = norm(row.get("statName", ""))
+        value = number(row.get("statValue"))
+        if team and key and value is not None:
+            result.setdefault(str(team).casefold(), {})[key] = value
+    return result
+
+
 def parse_advanced(rows: list) -> dict:
     result = {}
     for row in rows:
@@ -225,7 +238,7 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
             own_takeaways += pick(own_stats, "fumblesRecovered", "fumblesRecoveredByDefense") or 0.0
             row["takeaways"] += own_takeaways
 
-    advanced = parse_advanced(advanced_rows if isinstance(advanced_rows, list) else [])
+    season_stat_rows = api_get("/stats/season", {"year": year, "classification": "fbs"}, api_key)\n    if not isinstance(season_stat_rows, list) or not season_stat_rows:\n        raise RuntimeError("CFBD returned no FBS season-stat rows; refusing to publish incomplete team profiles.")\n    season_stats = parse_season_stats(season_stat_rows)\n    advanced = parse_advanced(advanced_rows if isinstance(advanced_rows, list) else [])
     elo = {}
     if isinstance(elo_rows, list):
         for row in elo_rows:
