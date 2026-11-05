@@ -46,6 +46,25 @@ class SimulatorTests(unittest.TestCase):
                            result["projected_score"]["Away U"])
         self.assertGreater(result["home_win_probability"], .5)
 
+    def test_first_half_and_score_ranges_present(self):
+        result = simulate_game(self.home, self.away, 2500, seed=17)
+        self.assertIn("projected_first_half_score", result)
+        self.assertIn("score_ranges", result)
+        self.assertIn("first_half_win_probability_home", result)
+        self.assertGreaterEqual(result["first_half_win_probability_home"], 0)
+        self.assertLessEqual(result["first_half_win_probability_home"], 1)
+
+    def test_push_probabilities_account_for_pushes(self):
+        result = simulate_game(self.home, self.away, 2000,
+                               MarketLines(0, 0), seed=19)
+        market = result["market"]
+        self.assertAlmostEqual(
+            market["home_cover_probability"] + market["away_cover_probability"] +
+            market["spread_push_probability"], 1.0)
+        self.assertAlmostEqual(
+            market["over_probability"] + market["under_probability"] +
+            market["total_push_probability"], 1.0)
+
     def test_invalid_trial_count_rejected(self):
         with self.assertRaises(ValueError):
             simulate_game(self.home, self.away, 0)
