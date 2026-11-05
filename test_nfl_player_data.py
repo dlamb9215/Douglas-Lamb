@@ -42,6 +42,14 @@ class TestNFLPlayerData(unittest.TestCase):
         self.assertFalse(player["starter"])
         self.assertEqual(player["status"],"questionable")
 
+    def test_doubtful_is_not_mislabeled_as_out(self):
+        self.injuries[0]["report_status"] = "Doubtful"
+        player = build_player_pool(
+            self.stats,self.rosters,self.depth,self.injuries,2026,5,self.snaps
+        )[0]
+        self.assertFalse(player["starter"])
+        self.assertEqual(player["status"], "doubtful")
+
     def test_not_first_depth_chart_player_is_blocked(self):
         self.depth[0]["depth_order"] = "2"
         player = build_player_pool(
