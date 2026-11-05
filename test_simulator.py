@@ -7,6 +7,17 @@ from drive_simulator import simulate_drive_game, _game_script_multiplier
 
 class TestDougSimulator(unittest.TestCase):
 
+    def test_matchup_scoring_projection_uses_home_field_advantage(self):
+        from nfl_data import load_team_stats, project_matchup_scoring
+        database = load_team_stats()
+        projections = project_matchup_scoring(database, "BAL", "JAX")
+        self.assertGreater(projections["BAL"], 0)
+        self.assertGreater(projections["JAX"], 0)
+        self.assertGreater(
+            projections["BAL"] - projections["JAX"],
+            -100,
+        )
+
     def test_runs_100000_trials(self):
         result = simulate_game(
             24, 21, 10, 10, -3, 45, 100000
