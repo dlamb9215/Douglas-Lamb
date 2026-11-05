@@ -101,9 +101,16 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
     games = api_get("/games", {
         "year": year, "seasonType": season_type, "classification": "fbs"
     }, api_key)
-    team_games = api_get("/games/teams", {
-        "year": year, "seasonType": season_type, "classification": "fbs"
-    }, api_key)
+    # CFBD requires one of week, team, or conference when querying
+    # game-level team box scores by season. Fetch each FBS week separately.
+    team_games = []
+    for week in range(1, 18):
+        week_rows = api_get("/games/teams", {
+            "year": year, "week": week, "seasonType": season_type,
+            "classification": "fbs"
+        }, api_key)
+        if isinstance(week_rows, list):
+            team_games.extend(week_rows)
     provider_warnings = []
     try:
         advanced_rows = api_get("/stats/season/advanced", {
