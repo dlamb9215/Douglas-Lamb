@@ -50,6 +50,9 @@ def build_pregame_report(pool, home, away, max_age_hours=36, now=None):
                 "position": p.get("position"),
                 "status": p.get("injury_status", "unknown"),
                 "practice_status": p.get("practice_status"),
+                "reported_injury": p.get("reported_injury"),
+                "injury_week": p.get("injury_week"),
+                "injury_report_modified": p.get("injury_report_modified"),
                 "depth_order": p.get("depth_order"),
             }
             for p in rows
@@ -70,6 +73,10 @@ def build_pregame_report(pool, home, away, max_age_hours=36, now=None):
                     "roster_status": p.get("roster_status"),
                     "injury_status": p.get("injury_status"),
                     "injury_week": p.get("injury_week"),
+                    "games": p.get("games"),
+                    "passing_yards_per_game": p.get("passing_yards_per_game"),
+                    "passing_tds_per_game": p.get("passing_tds_per_game"),
+                    "passing_attempts_per_game": p.get("passing_attempts_per_game"),
                 }
                 for p in qbs[:3]
             ],
@@ -102,7 +109,7 @@ def build_pregame_report(pool, home, away, max_age_hours=36, now=None):
         "team_simulation_context": "Current player injury/depth context loaded; this team-score engine does not yet quantify player-specific injury impact.",
         "team_simulation_ready": team_simulation_ready,
         "team_simulation_blockers": blockers,
-        "player_props_ready": False,
+        "betting_ready": False,\n        "betting_readiness_blockers": [\n            "Player-specific injury impact is not modeled in team scoring.",\n            "Final game-day inactives and official starting lineups are not confirmed.",\n            "Weather is not integrated.",\n            "Sportsbook prices must be entered manually.",\n            "Win-probability thresholds have not been historically calibrated.",\n        ],\n        "player_props_ready": False,
         "blocking_note": "Do not issue player props until official game-day active/inactive and starting-lineup confirmations are supplied.",
         "weather_status": "NOT_INTEGRATED",
         "sportsbook_status": "MANUAL_LINES_REQUIRED",
