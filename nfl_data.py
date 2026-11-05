@@ -291,6 +291,43 @@ def project_team_yardage(database, offense_team, defense_team):
     }
 
 
+def project_matchup_scoring(database, home_team, away_team, home_field_points=1.5):
+    """Estimate team points using scoring baseline and matchup yardage efficiency.
+
+    This is a transparent team-level adjustment, not a calibrated scoring model.
+    """
+    yardage = project_matchup_yardage(database, home_team, away_team)
+    projections = {}
+
+    for offense_team, defense_team in (
+        (home_team, away_team),
+        (away_team, home_team),
+    ):
+        offense = get_team_stats(database, offense_team)
+        defense = get_team_stats(database, defense_team)
+        baseline = (
+            offense["points_for_per_game"]
+            + defense["points_allowed_per_game"]
+        ) / 2
+
+        offensive_yards = offense["offense"]["total"]["yards_per_game"]
+        projected_yards = yardage[offense_team]["total_yards"]
+        if not is_valid_number(offensive_yards) or offensive_yards <= 0:
+            raise ValueError(f"Invalid offensive yardage baseline for {offense_team}.")
+
+        # Shrink the raw yardage matchup adjustment to avoid overreacting
+        # to a small sample or a single strong/weak opponent.
+        yardage_ratio = projected_yards / offensive_yards
+        adjusted_points = baseline * (0.70 + 0.30 * yardage_ratio)
+
+        if offense_team == home_team:
+            adjusted_points += home_field_points
+
+        projections[offense_team] = round(max(0.0, adjusted_points), 2)
+
+    return projections
+
+
 def project_matchup_yardage(database, home_team, away_team):
     """Project yardage for both teams in a matchup."""
 
