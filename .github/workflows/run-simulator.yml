@@ -1,6 +1,15 @@
 name: Run Doug's Elite Game Simulator
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "main.py"
+      - "nfl_data.py"
+      - "drive_simulator.py"
+      - "update_nfl_stats.py"
+      - "test_simulator.py"
+      - ".github/workflows/run-simulator.yml"
   workflow_dispatch:
     inputs:
       home:
