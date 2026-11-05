@@ -55,6 +55,12 @@ def build_pregame_report(pool, home, away, max_age_hours=36, now=None):
             for p in rows
             if p.get("injury_status", "unknown") in {"out", "doubtful", "questionable"}
         ]
+        qb1 = next((p for p in qbs if p.get("depth_order") == 1), None)
+        qb1_ready = bool(
+            qb1
+            and str(qb1.get("roster_status", "")).lower() in {"act", "active", "1"}
+            and qb1.get("injury_status") == "active"
+        )
         teams[team] = {
             "player_records": len(rows),
             "quarterback_depth_chart": [
@@ -63,13 +69,26 @@ def build_pregame_report(pool, home, away, max_age_hours=36, now=None):
                     "depth_order": p.get("depth_order"),
                     "roster_status": p.get("roster_status"),
                     "injury_status": p.get("injury_status"),
+                    "injury_week": p.get("injury_week"),
                 }
                 for p in qbs[:3]
             ],
+            "projected_qb1": qb1.get("name") if qb1 else None,
+            "projected_qb1_available_in_feed": qb1_ready,
             "reported_injuries": injury_rows,
             "official_game_day_inactives_confirmed": False,
             "official_starting_quarterback_confirmed": False,
         }
+
+    team_simulation_ready = all(
+        teams[team]["projected_qb1_available_in_feed"]
+        for team in (home, away)
+    )
+    blockers = [
+        f"{team}: no active QB1 in the latest depth chart/injury feed"
+        for team in (home, away)
+        if not teams[team]["projected_qb1_available_in_feed"]
+    ]
 
     return {
         "season": pool.get("season"),
@@ -81,6 +100,8 @@ def build_pregame_report(pool, home, away, max_age_hours=36, now=None):
         "away": away,
         "teams": teams,
         "team_simulation_context": "Current player injury/depth context loaded; this team-score engine does not yet quantify player-specific injury impact.",
+        "team_simulation_ready": team_simulation_ready,
+        "team_simulation_blockers": blockers,
         "player_props_ready": False,
         "blocking_note": "Do not issue player props until official game-day active/inactive and starting-lineup confirmations are supplied.",
         "weather_status": "NOT_INTEGRATED",
@@ -106,6 +127,9 @@ def main():
     for team, details in report["teams"].items():
         print(f"{team}: {details['player_records']} player records; {len(details['reported_injuries'])} reported injury designations")
         print(f"  QB depth chart: {details['quarterback_depth_chart']}")
+    print(f"Team simulation ready: {report['team_simulation_ready']}")
+    for blocker in report["team_simulation_blockers"]:
+        print(f"BLOCKER: {blocker}")
     print("Final inactives/starters: NOT CONFIRMED")
     print("Player props: BLOCKED")
     print("Weather: NOT INTEGRATED")
