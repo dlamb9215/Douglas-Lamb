@@ -5,6 +5,7 @@ NFL MATCHUP AND 100,000 TRIAL ENGINE
 
 import random
 import argparse
+import json
 from drive_simulator import simulate_drive_game
 from nfl_data import (
     load_team_stats,
@@ -115,6 +116,7 @@ def main():
     parser.add_argument("--over-odds", type=int)
     parser.add_argument("--under-odds", type=int)
     parser.add_argument("--trials", type=int, default=100000)
+    parser.add_argument("--pregame-report", help="Fresh pregame context JSON")
     parser.add_argument("--seed", type=int, default=42,
                         help="Random seed for reproducible simulations")
 
@@ -182,6 +184,16 @@ def main():
     if home_code == away_code:
         parser.error("Home and away teams must be different.")
 
+    pregame_report = None
+    if args.pregame_report:
+        try:
+            with open(args.pregame_report, encoding="utf-8") as handle:
+                pregame_report = json.load(handle)
+        except (OSError, json.JSONDecodeError) as exc:
+            parser.error(f"Could not read pregame report: {exc}")
+        if pregame_report.get("home") != home_code or pregame_report.get("away") != away_code:
+            parser.error("Pregame report teams do not match requested matchup.")
+
     home = get_team_stats(database, home_code)
     away = get_team_stats(database, away_code)
 
@@ -190,6 +202,24 @@ def main():
     print(f"{away['name']} AT {home['name']}")
 
     print_matchup_report(database, home_code, away_code)
+
+    if pregame_report:
+        print("\\nLIVE PREGAME PLAYER CONTEXT")
+        print("===========================")
+        print(f"Source: {pregame_report.get('source')}")
+        print(f"Retrieved: {pregame_report.get('retrieved_at_utc')}")
+        for team_code in (home_code, away_code):
+            details = pregame_report["teams"][team_code]
+            print(f"\\n{team_code} quarterback depth chart (not confirmed starters):")
+            for qb in details.get("quarterback_depth_chart", []):
+                print(f"  #{qb.get('depth_order')} {qb.get('name')} | roster: {qb.get('roster_status')} | injury: {qb.get('injury_status')}")
+            print(f"Reported injuries: {details.get('reported_injuries', [])}")
+        print("Final game-day inactives and starting QBs: NOT CONFIRMED")
+        print("Player props: BLOCKED")
+        print("Team scoring injury adjustment: NOT MODELED")
+    else:
+        print("\\nPREGAME PLAYER CONTEXT: NOT PROVIDED")
+
     yardage = project_matchup_yardage(
         database, home_code, away_code
     )
