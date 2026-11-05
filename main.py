@@ -160,6 +160,22 @@ def main():
             print(f"{label}: {probability:.2f}%")
     database = load_team_stats()
 
+    timestamps = sorted({
+        team.get("data_updated_at")
+        for team in database.values()
+        if team.get("data_updated_at")
+    })
+    seasons = sorted({
+        team.get("season")
+        for team in database.values()
+        if team.get("season") is not None
+    })
+    print("\nDATA FRESHNESS")
+    print("==============")
+    print(f"Season: {seasons[-1] if seasons else 'Not recorded'}")
+    print(f"Data refreshed: {timestamps[-1] if timestamps else 'Timestamp unavailable'}")
+    print(f"Teams loaded: {len(database)}")
+
     home_code = args.home.upper()
     away_code = args.away.upper()
 
