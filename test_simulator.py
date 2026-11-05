@@ -10,13 +10,14 @@ class TestDougSimulator(unittest.TestCase):
     def test_matchup_scoring_projection_uses_home_field_advantage(self):
         from nfl_data import load_team_stats, project_matchup_scoring
         database = load_team_stats()
-        projections = project_matchup_scoring(database, "BAL", "JAX")
-        self.assertGreater(projections["BAL"], 0)
-        self.assertGreater(projections["JAX"], 0)
-        self.assertGreater(
-            projections["BAL"] - projections["JAX"],
-            -100,
+        with_home = project_matchup_scoring(database, "BAL", "JAX")
+        neutral = project_matchup_scoring(
+            database, "BAL", "JAX", home_field_points=0
         )
+        self.assertGreater(with_home["BAL"], 0)
+        self.assertGreater(with_home["JAX"], 0)
+        self.assertAlmostEqual(with_home["BAL"] - neutral["BAL"], 1.5)
+        self.assertAlmostEqual(with_home["JAX"], neutral["JAX"])
 
     def test_runs_100000_trials(self):
         result = simulate_game(
