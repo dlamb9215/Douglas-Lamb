@@ -49,7 +49,8 @@ def _norm(value):
 
 def _status_from_injury(row):
     status = _norm(_first(row, "report_status", "game_status", "status"))
-    if any(term in status for term in INACTIVE_TERMS):
+    # Keep official designations distinct; doubtful is not the same as out.
+    if any(term in status for term in ("out", "inactive", "injured reserve", "suspended", "ir")):
         return "out"
     if "doubtful" in status:
         return "doubtful"
