@@ -50,3 +50,15 @@ The workflow runs tests before the simulation and saves the text report as an ar
 - The model is an estimate, not a guarantee or a historically proven edge.
 - First-half probabilities are approximate splits of full-game scoring.
 - The simulator does not currently verify official inactives, starting quarterbacks, weather, or sportsbook line movement automatically. Check those before final picks.
+
+
+## NFL pregame workflow
+
+Run a matchup manually from **Actions → Run Doug's Elite Game Simulator → Run workflow**.
+Choose the home and away abbreviations; the default trial count is 100,000. Optional sportsbook inputs are spread, total, home/away American moneyline odds, and over/under American odds.
+
+Each manual run refreshes current-season team statistics and the latest nflverse player, roster, depth-chart, and weekly injury feeds. The pregame check validates data age, reads the current depth-chart QB1, and blocks team probabilities if either team has no active QB1 in the feed. A depth-chart listing is not proof of the official game-day starter.
+
+The workflow intentionally does **not** create player props. Final game-day inactives and official starting lineups must be confirmed separately. Team-score injury adjustments, stadium weather adjustments, automatic sportsbook odds, and historical probability calibration are not yet integrated. The output labels these limitations and is not a betting-ready recommendation.
+
+Code pushes run validation only; matchup simulations require an explicit manual workflow dispatch.
