@@ -33,33 +33,39 @@ on:
         default: "100000"
         type: string
       spread:
-        description: Sportsbook spread (home-team perspective, optional)
-        required: false
+        description: Sportsbook spread (home-team perspective)
+        required: true
+        default: "+3.0"
         type: string
       total:
-        description: Sportsbook game total (optional)
-        required: false
+        description: Sportsbook game total
+        required: true
+        default: "52.5"
         type: string
       home_odds:
-        description: Home moneyline American odds (optional)
-        required: false
+        description: Home moneyline American odds
+        required: true
+        default: "+140"
         type: string
       away_odds:
-        description: Away moneyline American odds (optional)
-        required: false
+        description: Away moneyline American odds
+        required: true
+        default: "-166"
         type: string
       over_odds:
-        description: Over American odds (optional)
-        required: false
+        description: Over American odds
+        required: true
+        default: "-109"
         type: string
       under_odds:
-        description: Under American odds (optional)
-        required: false
+        description: Under American odds
+        required: true
+        default: "-111"
         type: string
       neutral_site:
         description: Neutral-site game (disables home-field advantage)
         required: true
-        default: false
+        default: true
         type: boolean
 
 permissions:
@@ -92,7 +98,7 @@ jobs:
         run: python refresh_player_data.py --weeks 5 --output player_pool.json
 
       - name: Validate fresh pregame context
-        run: python pregame_context.py --home "${{ inputs.home || 'BAL' }}" --away "${{ inputs.away || 'JAX' }}" --input player_pool.json --output pregame-context.json
+        run: python pregame_context.py --home "${{ inputs.home || 'ATL' }}" --away "${{ inputs.away || 'CIN' }}" --input player_pool.json --output pregame-context.json
 
       - name: Run tests
         run: python -m unittest -v
