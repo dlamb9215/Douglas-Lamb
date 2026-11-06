@@ -117,6 +117,11 @@ def main():
     parser.add_argument("--under-odds", type=int)
     parser.add_argument("--trials", type=int, default=100000)
     parser.add_argument("--pregame-report", help="Fresh pregame context JSON")
+    parser.add_argument(
+        "--neutral-site",
+        action="store_true",
+        help="Disable the 1.5-point home-field scoring adjustment for neutral venues",
+    )
     parser.add_argument("--seed", type=int, default=42,
                         help="Random seed for reproducible simulations")
 
@@ -286,8 +291,9 @@ def main():
         print("SIMULATION BLOCKED: Missing scoring data.")
         return
 
+    home_field_points = 0 if args.neutral_site else 1.5
     scoring_projection = project_matchup_scoring(
-        database, home_code, away_code
+        database, home_code, away_code, home_field_points=home_field_points
     )
 
     home_mean = (
@@ -303,7 +309,10 @@ def main():
     print("===================================")
     print(f"{home['name']}: {home_mean:.2f} points")
     print(f"{away['name']}: {away_mean:.2f} points")
-    print("Includes a 1.5-point home-field adjustment and a shrunk yardage matchup adjustment.")
+    if args.neutral_site:
+        print("Neutral-site mode: no home-field scoring adjustment; shrunk yardage matchup adjustment retained.")
+    else:
+        print("Includes a 1.5-point home-field adjustment and a shrunk yardage matchup adjustment.")
 
     model_spread = away_mean - home_mean
     model_total = home_mean + away_mean
