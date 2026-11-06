@@ -56,6 +56,11 @@ on:
         description: Under American odds (optional)
         required: false
         type: string
+      neutral_site:
+        description: Neutral-site game (disables home-field advantage)
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -103,6 +108,7 @@ jobs:
           if [[ -n "${{ inputs.away_odds }}" ]]; then ARGS+=(--away-odds "${{ inputs.away_odds }}"); fi
           if [[ -n "${{ inputs.over_odds }}" ]]; then ARGS+=(--over-odds "${{ inputs.over_odds }}"); fi
           if [[ -n "${{ inputs.under_odds }}" ]]; then ARGS+=(--under-odds "${{ inputs.under_odds }}"); fi
+          if [[ "${{ inputs.neutral_site }}" == "true" ]]; then ARGS+=(--neutral-site); fi
           python main.py "${ARGS[@]}" | tee simulation-results.txt
 
       - name: Save results
