@@ -129,7 +129,7 @@ def main() -> None:
     else:
         result["national_rank_context"] = {"warning": "National ranking file unavailable."}
     Path(args.output).write_text(json.dumps(result, indent=2), encoding="utf-8")
-    print(f"DOUG'S ELITE NCAA FOOTBALL SIMULATOR | {args.season}")
+    print(f"DOUG'S ELITE NCAA FOOTBALL SIMULATOR | {args.season} | {args.classification.upper()}")
     print(f"{args.away} at {args.home}")
     print(f"Trials: {args.trials:,} | Seed: {args.seed}")
     print(f"Projected score: {args.home} {result['projected_score'][args.home]} - "
