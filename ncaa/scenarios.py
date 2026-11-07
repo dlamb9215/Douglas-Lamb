@@ -28,7 +28,7 @@ def run_sensitivity_scenarios(
     }
     output = {}
     for index, (name, (home_eff, away_eff, pace)) in enumerate(scenarios.items()):
-        h = replace(
+        h = home if name == "baseline" else replace(
             home,
             points_for=max(1.0, home.points_for * home_eff),
             yards_per_play=max(1.0, home.yards_per_play * home_eff),
@@ -36,7 +36,7 @@ def run_sensitivity_scenarios(
             yards_per_carry=max(0.1, home.yards_per_carry * home_eff),
             plays_per_game=max(40.0, min(100.0, home.plays_per_game * pace)),
         )
-        a = replace(
+        a = away if name == "baseline" else replace(
             away,
             points_for=max(1.0, away.points_for * away_eff),
             yards_per_play=max(1.0, away.yards_per_play * away_eff),
