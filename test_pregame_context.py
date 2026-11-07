@@ -59,5 +59,14 @@ class PregameContextTests(unittest.TestCase):
             build_pregame_report(self.pool, "BAL", "JAX", now=self.now)
 
 
+    def test_legacy_la_abbreviation_is_normalized_to_lar(self):
+        self.pool["players"].append({
+            "team": "LA", "name": "Rams QB", "position": "QB",
+            "depth_order": 1, "roster_status": "active",
+            "injury_status": "active",
+        })
+        report = build_pregame_report(self.pool, "LAR", "JAX", now=self.now)
+        self.assertTrue(report["team_simulation_ready"])
+        self.assertEqual(report["teams"]["LAR"]["projected_qb1"], "Rams QB")
 if __name__ == "__main__":
     unittest.main()
