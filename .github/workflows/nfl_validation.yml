@@ -53,16 +53,16 @@ jobs:
 
       - name: Build fresh matchup pregame gate
         env:
-          HOME_TEAM: ${{ inputs.home || 'ATL' }}
-          AWAY_TEAM: ${{ inputs.away || 'CIN' }}
+          HOME_TEAM: ${{ github.event.inputs.home || 'ATL' }}
+          AWAY_TEAM: ${{ github.event.inputs.away || 'CIN' }}
         run: |
           python pregame_context.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --input player_pool.json --output pregame-context.json
 
       - name: Run reproducible 100,000-trial matchup
         env:
-          HOME_TEAM: ${{ inputs.home || 'ATL' }}
-          AWAY_TEAM: ${{ inputs.away || 'CIN' }}
-          TRIALS: ${{ inputs.trials || '100000' }}
+          HOME_TEAM: ${{ github.event.inputs.home || 'ATL' }}
+          AWAY_TEAM: ${{ github.event.inputs.away || 'CIN' }}
+          TRIALS: ${{ github.event.inputs.trials || '100000' }}
         run: |
           python main.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --pregame-report pregame-context.json --seed 42 | tee nfl-simulation-report.txt
 
