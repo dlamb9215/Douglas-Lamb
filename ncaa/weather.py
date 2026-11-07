@@ -38,7 +38,13 @@ def _get_open_meteo(latitude: float, longitude: float) -> dict:
 def fetch_game_weather(year: int, home: str, away: str, api_key: str,
                        kickoff: str | None = None, season_type: str = "both",
                        classification: str = "fbs") -> dict:
-    games = api_get("/games", {
+    rankings_path = Path("ncaa/data/team_rankings.json" if classification == "fbs" else "ncaa/data/team_rankings_fcs.json")
+    if rankings_path.exists():
+        rank_data = json.loads(rankings_path.read_text(encoding="utf-8"))
+        aliases = rank_data.get("metadata", {}).get("team_aliases", {})
+        home = aliases.get(home.casefold(), home)
+        away = aliases.get(away.casefold(), away)
+    games = api_get("/games",
         "year": year, "seasonType": season_type, "home": home, "away": away,
         "classification": classification,
     }, api_key)
