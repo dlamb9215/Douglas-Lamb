@@ -62,6 +62,21 @@ def load_player_inputs(path: str | Path) -> list[dict]:
         age = (date.today() - checked_date).days
         if age < 0 or age > 2:
             raise ValueError(f"{name}: player input is {age} days old; refresh before use")
+        availability = _finite(item.get("availability_probability", 1.0), f"{name} availability_probability")
+        if availability > 1:
+            raise ValueError(f"{name}: availability_probability must be <= 1")
+        availability_source = str(item.get("availability_source", "")).strip()
+        availability_checked_at = str(item.get("availability_checked_at", "")).strip()
+        if availability < 1 and (not availability_source or not availability_checked_at):
+            raise ValueError(f"{name}: reduced availability requires source and availability_checked_at")
+        if availability_checked_at:
+            try:
+                availability_date = date.fromisoformat(availability_checked_at[:10])
+            except ValueError as exc:
+                raise ValueError(f"{name}: availability_checked_at must begin with YYYY-MM-DD") from exc
+            availability_age = (date.today() - availability_date).days
+            if availability_age < 0 or availability_age > 1:
+                raise ValueError(f"{name}: availability check must be within last 24-48 hours")
         prop_lines = item.get("prop_lines", {})
         if not isinstance(prop_lines, dict):
             raise ValueError(f"{name}: prop_lines must be an object")
@@ -75,6 +90,9 @@ def load_player_inputs(path: str | Path) -> list[dict]:
             "source": source, "as_of": as_of, "prop_lines": prop_lines,
             "games_sampled": int(item.get("games_sampled", 0) or 0),
             "games_basis": str(item.get("games_basis", "manual input")),
+            "availability_probability": availability,
+            "availability_source": availability_source,
+            "availability_checked_at": availability_checked_at,
         })
     return players
 
@@ -98,7 +116,10 @@ def simulate_player(player: dict, trials: int = 100_000, seed: int = 20261104,
     rng = random.Random(seed)
     opportunity_counts, successes, yards, touchdowns = [], [], [], []
     for _ in range(trials):
-        count = _poisson(player["expected_opportunities"], rng)
+        if rng.random() > player.get("availability_probability", 1.0):
+            count = 0
+        else:
+            count = _poisson(player["expected_opportunities"], rng)
         made = sum(rng.random() < player["success_probability"] for _ in range(count))
         total_yards = sum(max(0.0, rng.gauss(
             player["yards_per_success"], player["yards_sd_per_success"]
@@ -135,8 +156,11 @@ def simulate_player(player: dict, trials: int = 100_000, seed: int = 20261104,
         "prop_probabilities": lines,
         "input_provenance": {"source": player["source"], "as_of": player["as_of"],
                              "games_sampled": player.get("games_sampled", 0),
-                             "games_basis": player.get("games_basis", "manual input")},
-        "warning": "Season-average workload and approximate per-opportunity yardage distribution; no live availability verification or teammate/game correlation.",
+                             "games_basis": player.get("games_basis", "manual input"),
+                             "availability_probability": player.get("availability_probability", 1.0),
+                             "availability_source": player.get("availability_source", ""),
+                             "availability_checked_at": player.get("availability_checked_at", "")},
+        "warning": "Season-average workload and approximate per-opportunity yardage distribution; availability is only the explicitly supplied assumption and is not independently verified; teammate/game correlation is not modeled.",
     }
 
 
