@@ -6,6 +6,7 @@ from pathlib import Path
 from .data import get_profile, load_profiles
 from .engine import MarketLines, simulate_game
 from .market import remove_vig_two_way, expected_value_per_100
+from .scenarios import run_sensitivity_scenarios
 
 
 def main() -> None:
@@ -35,6 +36,10 @@ def main() -> None:
         home, away, args.trials,
         MarketLines(args.home_spread, args.total),
         args.seed, args.neutral_site,
+    )
+    result["scenario_sensitivity"] = run_sensitivity_scenarios(
+        home, away, args.trials, MarketLines(args.home_spread, args.total),
+        args.seed + args.trials, args.neutral_site,
     )
     result["season"] = args.season
     result["sportsbook_analysis"] = {}
@@ -92,6 +97,11 @@ def main() -> None:
     print("Projected score ranges (10th percentile / median / 90th percentile):")
     for team, band in result["score_ranges"].items():
         print(f"  {team}: {band['p10']} / {band['median']} / {band['p90']}")
+    print("Sensitivity scenarios (assumption stress tests, not calibrated probabilities):")
+    for scenario, values in result["scenario_sensitivity"]["scenarios"].items():
+        score = values["projected_score"]
+        print(f"  {scenario}: {args.home} {score[args.home]} - {args.away} {score[args.away]} | "
+              f"home win {values['home_win_probability']:.1%} | total {values['projected_total']:.1f}")
     if result["sportsbook_analysis"]:
         print("Vig-adjusted sportsbook comparison:")
         print(json.dumps(result["sportsbook_analysis"], indent=2))
