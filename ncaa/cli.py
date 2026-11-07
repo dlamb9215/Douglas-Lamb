@@ -61,8 +61,10 @@ def main() -> None:
         args.seed + args.trials, args.neutral_site,
     )
     result["pregame_verification"] = pregame
+    weather_context = None
     if args.weather_json:
-        result["weather_context"] = json.loads(Path(args.weather_json).read_text(encoding="utf-8"))
+        weather_context = json.loads(Path(args.weather_json).read_text(encoding="utf-8"))
+        result["weather_context"] = weather_context
     if args.players:
         result["player_projections"] = simulate_players(args.players, args.trials, args.seed + 1000)
     result["season"] = args.season
@@ -98,8 +100,9 @@ def main() -> None:
         "under": args.under_odds,
     }
     if args.ledger:
+        ledger_kickoff = args.kickoff or (weather_context or {}).get("kickoff")
         result["forecast_ledger"] = append_forecast(
-            result, args.ledger, kickoff=args.kickoff,
+            result, args.ledger, kickoff=ledger_kickoff,
         )
     result["data_file"] = args.data
     ranking_path = Path(args.rankings)
