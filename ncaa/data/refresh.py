@@ -19,6 +19,9 @@ BASE_URL = "https://api.collegefootballdata.com"
 PROFILE_FIELDS = [
     "team", "points_for", "points_against", "yards_per_play",
     "yards_per_play_allowed", "plays_per_game", "points_per_drive",
+    "pass_yards_per_game", "rush_yards_per_game", "pass_attempts_per_game", "completions_per_game", "completion_pct", "yards_per_pass_attempt",
+    "pass_tds_per_game", "interceptions_per_game", "pass_first_downs_per_game", "rush_attempts_per_game", "yards_per_carry", "rush_tds_per_game", "rush_first_downs_per_game",
+    "pass_yards_allowed_per_game", "opponent_pass_attempts_per_game", "opponent_completions_per_game", "opponent_yards_per_completion", "rush_yards_allowed_per_game", "opponent_rush_attempts_per_game", "opponent_yards_per_carry_allowed",
     "turnovers_per_game", "takeaways_per_game", "turnover_margin_per_game", "explosive_play_rate",
     "success_rate", "strength_rating", "games_sampled", "source", "as_of",
 ]
@@ -198,6 +201,8 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
                 "turnovers": 0.0, "takeaways": 0.0, "pass_yards": 0.0,
                 "rush_yards": 0.0, "pass_attempts": 0.0, "completions": 0.0,
                 "rush_attempts": 0.0, "first_downs": 0.0, "sacks": 0.0,
+                "pass_tds": 0.0, "interceptions_thrown": 0.0, "pass_first_downs": 0.0, "rush_tds": 0.0, "rush_first_downs": 0.0,
+                "pass_yards_allowed": 0.0, "opp_pass_attempts": 0.0, "opp_completions": 0.0, "rush_yards_allowed": 0.0, "opp_rush_attempts": 0.0,
             })
             stats = extract_stats(team)
             row["games"] += 1
@@ -206,7 +211,12 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
             row["rush_yards"] += pick(stats, "rushingYards", "rushYards") or 0.0
             row["pass_attempts"] += pick(stats, "passAttempts", "passingAttempts") or 0.0
             row["completions"] += pick(stats, "passCompletions", "completions") or 0.0
+            row["pass_tds"] += pick(stats, "passingTDs", "passTDs") or 0.0
+            row["interceptions_thrown"] += pick(stats, "interceptions", "interceptionsThrown") or 0.0
+            row["pass_first_downs"] += pick(stats, "passingFirstDowns", "passFirstDowns") or 0.0
             row["rush_attempts"] += pick(stats, "rushAttempts", "rushingAttempts") or 0.0
+            row["rush_tds"] += pick(stats, "rushingTDs", "rushTDs") or 0.0
+            row["rush_first_downs"] += pick(stats, "rushingFirstDowns", "rushFirstDowns") or 0.0
             row["first_downs"] += pick(stats, " firstDowns", "firstDowns") or 0.0
             row["turnovers"] += pick(stats, "turnovers", "totalTurnovers") or 0.0
             row["sacks"] += pick(stats, "sacks", "sacksAllowed") or 0.0
@@ -238,6 +248,11 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
             if other_yards is None:
                 other_yards = (pick(other_stats, "netPassingYards", "passingYards", "passYards") or 0.0) + (pick(other_stats, "rushingYards", "rushYards") or 0.0)
             row["yards_allowed"] += other_yards
+            row["pass_yards_allowed"] += pick(other_stats, "netPassingYards", "passingYards", "passYards") or 0.0
+            row["opp_pass_attempts"] += pick(other_stats, "passAttempts", "passingAttempts") or 0.0
+            row["opp_completions"] += pick(other_stats, "passCompletions", "completions") or 0.0
+            row["rush_yards_allowed"] += pick(other_stats, "rushingYards", "rushYards") or 0.0
+            row["opp_rush_attempts"] += pick(other_stats, "rushAttempts", "rushingAttempts") or 0.0
             other_plays = pick(other_stats, "totalPlays", "plays")
             if other_plays is None:
                 other_plays = (pick(other_stats, "passAttempts", "passingAttempts") or 0.0) + (pick(other_stats, "rushAttempts", "rushingAttempts") or 0.0) + (pick(other_stats, "sacks") or 0.0)
@@ -293,6 +308,26 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
             "yards_per_play_allowed": round(ypp_allowed, 4),
             "plays_per_game": round(plays_pg, 3),
             "points_per_drive": "",
+            "pass_yards_per_game": round(raw["pass_yards"] / games_n, 2),
+            "rush_yards_per_game": round(raw["rush_yards"] / games_n, 2),
+            "pass_attempts_per_game": round(raw["pass_attempts"] / games_n, 2),
+            "completions_per_game": round(raw["completions"] / games_n, 2),
+            "completion_pct": round(raw["completions"] / raw["pass_attempts"], 4) if raw["pass_attempts"] else 0.0,
+            "yards_per_pass_attempt": round(raw["pass_yards"] / raw["pass_attempts"], 3) if raw["pass_attempts"] else 0.0,
+            "pass_tds_per_game": round(raw["pass_tds"] / games_n, 3),
+            "interceptions_per_game": round(raw["interceptions_thrown"] / games_n, 3),
+            "pass_first_downs_per_game": round(raw["pass_first_downs"] / games_n, 3),
+            "rush_attempts_per_game": round(raw["rush_attempts"] / games_n, 2),
+            "yards_per_carry": round(raw["rush_yards"] / raw["rush_attempts"], 3) if raw["rush_attempts"] else 0.0,
+            "rush_tds_per_game": round(raw["rush_tds"] / games_n, 3),
+            "rush_first_downs_per_game": round(raw["rush_first_downs"] / games_n, 3),
+            "pass_yards_allowed_per_game": round(raw["pass_yards_allowed"] / games_n, 2),
+            "opponent_pass_attempts_per_game": round(raw["opp_pass_attempts"] / games_n, 2),
+            "opponent_completions_per_game": round(raw["opp_completions"] / games_n, 2),
+            "opponent_yards_per_completion": round(raw["pass_yards_allowed"] / raw["opp_completions"], 3) if raw["opp_completions"] else 0.0,
+            "rush_yards_allowed_per_game": round(raw["rush_yards_allowed"] / games_n, 2),
+            "opponent_rush_attempts_per_game": round(raw["opp_rush_attempts"] / games_n, 2),
+            "opponent_yards_per_carry_allowed": round(raw["rush_yards_allowed"] / raw["opp_rush_attempts"], 3) if raw["opp_rush_attempts"] else 0.0,
             "turnovers_per_game": round(raw["turnovers"] / games_n, 3),
             "takeaways_per_game": round(raw["takeaways"] / games_n, 3),
             "turnover_margin_per_game": round((raw["takeaways"] - raw["turnovers"]) / games_n, 3),
@@ -309,6 +344,13 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
             "points_for_per_game": profile["points_for"],
             "points_against_per_game": profile["points_against"],
             "passing_yards_per_game": round(raw["pass_yards"] / games_n, 2),
+            "pass_yards_allowed_per_game": round(raw["pass_yards_allowed"] / games_n, 2),
+            "rush_yards_allowed_per_game": round(raw["rush_yards_allowed"] / games_n, 2),
+            "completion_pct": round(raw["completions"] / raw["pass_attempts"], 4) if raw["pass_attempts"] else None,
+            "yards_per_pass_attempt": round(raw["pass_yards"] / raw["pass_attempts"], 3) if raw["pass_attempts"] else None,
+            "yards_per_carry": round(raw["rush_yards"] / raw["rush_attempts"], 3) if raw["rush_attempts"] else None,
+            "opponent_yards_per_completion": round(raw["pass_yards_allowed"] / raw["opp_completions"], 3) if raw["opp_completions"] else None,
+            "opponent_yards_per_carry_allowed": round(raw["rush_yards_allowed"] / raw["opp_rush_attempts"], 3) if raw["opp_rush_attempts"] else None,
             "rushing_yards_per_game": round(raw["rush_yards"] / games_n, 2),
             "passing_attempts_per_game": round(raw["pass_attempts"] / games_n, 2) if raw["pass_attempts"] > 0 else None,
             "completions_per_game": round(raw["completions"] / games_n, 2) if raw["completions"] > 0 else None,
@@ -334,6 +376,8 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
         "scoring_offense_rank": ("points_for_per_game", True),
         "scoring_defense_rank": ("points_against_per_game", False),
         "passing_offense_rank": ("passing_yards_per_game", True),
+        "passing_defense_rank": ("pass_yards_allowed_per_game", False),
+        "rushing_defense_rank": ("rush_yards_allowed_per_game", False),
         "rushing_offense_rank": ("rushing_yards_per_game", True),
         "total_offense_rank": ("total_yards_per_game", True),
         "total_defense_rank": ("total_yards_allowed_per_game", False),
