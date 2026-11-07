@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from ncaa.data.refresh import extract_stats, parse_advanced, resolve_play_counts, write_outputs
+from ncaa.data.refresh import build_dataset, extract_stats, parse_advanced, resolve_play_counts, write_outputs
 
 
 class RefreshTests(unittest.TestCase):
@@ -38,6 +38,50 @@ class RefreshTests(unittest.TestCase):
         raw = {"plays": 295, "plays_allowed": 310}
         with self.assertRaisesRegex(RuntimeError, "invalid offense plays/game"):
             resolve_play_counts(raw, {}, {}, 8, "Alabama")
+
+    def test_build_dataset_supports_fcs_without_mixing_fbs(self):
+        fcs_teams = [{"school": f"FCS Team {i}", "classification": "fcs"} for i in range(60)]
+        fcs_game = {
+            "id": 1001, "homePoints": 21, "awayPoints": 14,
+            "homeTeam": "FCS Team 0", "awayTeam": "FCS Team 1",
+        }
+        team_box = {"id": 1001, "teams": [
+            {"team": "FCS Team 0", "points": 21, "stats": [
+                {"category": "totalPlays", "stat": "60"},
+                {"category": "totalYards", "stat": "330"},
+                {"category": "passAttempts", "stat": "30"},
+                {"category": "passCompletions", "stat": "20"},
+                {"category": "netPassingYards", "stat": "220"},
+                {"category": "rushAttempts", "stat": "30"},
+                {"category": "rushingYards", "stat": "110"},
+            ]},
+            {"team": "FCS Team 1", "points": 14, "stats": [
+                {"category": "totalPlays", "stat": "60"},
+                {"category": "totalYards", "stat": "300"},
+                {"category": "passAttempts", "stat": "30"},
+                {"category": "passCompletions", "stat": "18"},
+                {"category": "netPassingYards", "stat": "180"},
+                {"category": "rushAttempts", "stat": "30"},
+                {"category": "rushingYards", "stat": "120"},
+            ]},
+        ]}
+        def fake_api(path, params, api_key):
+            if path == "/teams":
+                return fcs_teams + [{"school": "FBS Team", "classification": "fbs"}]
+            if path == "/games":
+                return [fcs_game]
+            if path == "/games/teams":
+                return [team_box] if params.get("week") == 1 else []
+            if path in {"/stats/season/advanced", "/ratings/elo"}:
+                return []
+            raise AssertionError(f"Unexpected endpoint {path}")
+        with patch("ncaa.data.refresh.api_get", side_effect=fake_api):
+            profiles, rankings, metadata = build_dataset(2026, "regular", "key", "fcs")
+        self.assertEqual(len(profiles), 2)
+        self.assertEqual(metadata["classification"], "fcs")
+        self.assertEqual({p["classification"] for p in profiles}, {"fcs"})
+        self.assertIn("FCS Team 0", rankings)
+        self.assertNotIn("FBS Team", rankings)
 
     def test_outputs_write_csv_and_json(self):
         with tempfile.TemporaryDirectory() as tmp:
