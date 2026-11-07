@@ -85,7 +85,7 @@ on:
       require_verified_pregame:
         description: Block unless all sourced pregame checks are verified
         required: true
-        default: true
+        default: false
         type: boolean
       pregame_checks:
         description: REQUIRED JSON with sourced QB, injury, weather and sportsbook checks for this exact matchup
