@@ -1,0 +1,78 @@
+name: NFL Simulator Validation and 100K Smoke Run
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "main.py"
+      - "drive_simulator.py"
+      - "nfl_data.py"
+      - "pregame_context.py"
+      - "injury_exposure.py"
+      - "market_data.py"
+      - "nfl_team_stats.json"
+      - "player_pool.json"
+      - "test_*.py"
+      - ".github/workflows/nfl_validation.yml"
+  workflow_dispatch:
+    inputs:
+      home:
+        description: Home team abbreviation
+        required: true
+        default: ATL
+        type: string
+      away:
+        description: Away team abbreviation
+        required: true
+        default: CIN
+        type: string
+      trials:
+        description: Monte Carlo trials
+        required: true
+        default: "100000"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-simulate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run complete unit test suite
+        run: python -m unittest -v
+
+      - name: Build fresh matchup pregame gate
+        env:
+          HOME_TEAM: ${{ inputs.home || 'ATL' }}
+          AWAY_TEAM: ${{ inputs.away || 'CIN' }}
+        run: |
+          python pregame_context.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --input player_pool.json --output pregame-context.json
+
+      - name: Run reproducible 100,000-trial matchup
+        env:
+          HOME_TEAM: ${{ inputs.home || 'ATL' }}
+          AWAY_TEAM: ${{ inputs.away || 'CIN' }}
+          TRIALS: ${{ inputs.trials || '100000' }}
+        run: |
+          python main.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --pregame-report pregame-context.json --seed 42 | tee nfl-simulation-report.txt
+
+      - name: Upload validation and simulation reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nfl-simulator-validation-and-results
+          path: |
+            nfl-simulation-report.txt
+            pregame-context.json
+          if-no-files-found: warn
+          retention-days: 14
