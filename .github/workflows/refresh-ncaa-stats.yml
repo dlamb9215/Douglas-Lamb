@@ -45,25 +45,29 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Refresh verified FBS data
+      - name: Refresh verified FBS/FCS data
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+          YEAR: ${{ inputs.year }}
+          TYPE: ${{ inputs.season_type }}
+          CLASSIFICATION: ${{ inputs.classification }}
         run: |
-          YEAR="${{ inputs.year }}"
-          TYPE="${{ inputs.season_type }}"
           if [[ -z "$YEAR" ]]; then YEAR="$(date -u +%Y)"; fi
           if [[ -z "$TYPE" ]]; then TYPE="regular"; fi
-          python -m ncaa.data.refresh --year "$YEAR" --season-type "$TYPE"
+          if [[ -z "$CLASSIFICATION" ]]; then CLASSIFICATION="fbs"; fi
+          python -m ncaa.data.refresh --year "$YEAR" --season-type "$TYPE" --classification "$CLASSIFICATION"
       - name: Refresh player season statistics and usage (optional)
         continue-on-error: true
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+          YEAR: ${{ inputs.year }}
+          TYPE: ${{ inputs.season_type }}
+          CLASSIFICATION: ${{ inputs.classification }}
         run: |
-          YEAR="${{ inputs.year }}"
-          TYPE="${{ inputs.season_type }}"
           if [[ -z "$YEAR" ]]; then YEAR="$(date -u +%Y)"; fi
           if [[ -z "$TYPE" ]]; then TYPE="regular"; fi
-          python -m ncaa.data.player_refresh --year "$YEAR" --season-type "$TYPE"
+          if [[ -z "$CLASSIFICATION" ]]; then CLASSIFICATION="fbs"; fi
+          python -m ncaa.data.player_refresh --year "$YEAR" --season-type "$TYPE" --classification "$CLASSIFICATION"
       - name: Reconcile completed games against forecast ledger (optional)
         continue-on-error: true
         env:
