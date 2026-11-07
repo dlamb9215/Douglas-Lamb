@@ -51,7 +51,7 @@ def main() -> None:
         parser.error("--require-verified-pregame needs --pregame-checks")
     pregame = (load_pregame_checks(
         args.pregame_checks, args.home, args.away,
-        require_verified=args.require_verified_pregame,
+        require_verified=args.require_verified_pregame, aliases=aliases,
     ) if args.pregame_checks else {
         "all_verified": False,
         "unverified": ["starting quarterbacks", "injuries", "weather", "sportsbook"],
