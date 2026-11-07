@@ -104,9 +104,47 @@ def calibration_summary(path="nfl_forecast_ledger.csv"):
                 for r in settled]
     probabilities = [float(r["home_win_probability"]) / 100 for r in settled]
     brier = sum((p-y)**2 for p, y in zip(probabilities, outcomes)) / len(settled)
+    spread_rows = [
+        r for r in settled
+        if r.get("home_spread") not in ("", None)
+        and r.get("home_cover_probability") not in ("", None)
+        and float(r["actual_home_score"]) - float(r["actual_away_score"]) + float(r["home_spread"]) != 0
+    ]
+    spread_brier = None
+    spread_accuracy = None
+    if spread_rows:
+        spread_outcomes = [
+            1 if float(r["actual_home_score"]) - float(r["actual_away_score"]) + float(r["home_spread"]) > 0 else 0
+            for r in spread_rows
+        ]
+        spread_probs = [float(r["home_cover_probability"]) / 100 for r in spread_rows]
+        spread_brier = sum((p-y)**2 for p, y in zip(spread_probs, spread_outcomes)) / len(spread_rows)
+        spread_accuracy = sum((p >= 0.5) == bool(y) for p, y in zip(spread_probs, spread_outcomes)) / len(spread_rows)
+    total_rows = [
+        r for r in settled
+        if r.get("total_line") not in ("", None)
+        and r.get("over_probability") not in ("", None)
+        and float(r["actual_home_score"]) + float(r["actual_away_score"]) != float(r["total_line"])
+    ]
+    total_brier = None
+    total_accuracy = None
+    if total_rows:
+        total_outcomes = [
+            1 if float(r["actual_home_score"]) + float(r["actual_away_score"]) > float(r["total_line"]) else 0
+            for r in total_rows
+        ]
+        total_probs = [float(r["over_probability"]) / 100 for r in total_rows]
+        total_brier = sum((p-y)**2 for p, y in zip(total_probs, total_outcomes)) / len(total_rows)
+        total_accuracy = sum((p >= 0.5) == bool(y) for p, y in zip(total_probs, total_outcomes)) / len(total_rows)
     return {
         "settled_games": len(settled),
         "home_win_brier_score": round(brier, 6),
+        "spread_brier_score": round(spread_brier, 6) if spread_brier is not None else None,
+        "spread_decision_accuracy": round(spread_accuracy, 4) if spread_accuracy is not None else None,
+        "spread_sample_size": len(spread_rows),
+        "total_brier_score": round(total_brier, 6) if total_brier is not None else None,
+        "total_decision_accuracy": round(total_accuracy, 4) if total_accuracy is not None else None,
+        "total_sample_size": len(total_rows),
         "status": "INSUFFICIENT_SAMPLE" if len(settled) < 100 else "REVIEW_REQUIRED",
         "calibrated": False,
         "note": "Use time-ordered out-of-sample seasons and market-specific calibration before enabling betting thresholds.",
