@@ -1,7 +1,10 @@
 import unittest
+import json
+import tempfile
+from pathlib import Path
 from datetime import datetime, timezone
 from game_day_confirmations import validate_confirmation_file, confirmed_player_copy
-from matchup_player_pipeline import analyze_matchup
+from matchup_player_pipeline import analyze_matchup, load_prop_lines
 
 
 class TestGameDayConfirmations(unittest.TestCase):
@@ -57,6 +60,21 @@ class TestMatchupPlayerPipeline(unittest.TestCase):
                 "status": "active", "starter": True, "note": "official inactive report"
             }
         }
+
+    def test_prop_line_file_requires_fresh_source_timestamp(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "lines.json"
+            payload = {
+                "source":"Example Sportsbook",
+                "checked_at_utc":datetime.now(timezone.utc).isoformat(),
+                "props":{"BUF:Example Receiver:receiving_yards":{
+                    "line":69.5,"over_odds":-110,"under_odds":-110
+                }}
+            }
+            path.write_text(json.dumps(payload),encoding="utf-8")
+            props, metadata = load_prop_lines(path)
+            self.assertEqual(props["BUF:Example Receiver:receiving_yards"]["line"],69.5)
+            self.assertEqual(metadata["source"],"Example Sportsbook")
 
     def test_unconfirmed_players_are_blocked_by_default(self):
         report = analyze_matchup("BUF", "MIA", self.pool)
