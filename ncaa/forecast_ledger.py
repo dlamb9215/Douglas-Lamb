@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 FIELDS = [
-    "run_id", "recorded_at", "kickoff", "pregame_status", "season",
+    "run_id", "recorded_at", "kickoff", "pregame_status", "season", "classification",
     "home_team", "away_team", "trials", "seed",
     "home_win_probability", "home_spread", "home_cover_probability",
     "total_line", "over_probability", "home_moneyline_odds", "away_moneyline_odds",
@@ -56,6 +56,7 @@ def append_forecast(result: dict, path: str | Path, kickoff: str | None = None,
         "kickoff": kickoff_value,
         "pregame_status": status,
         "season": result.get("season", ""),
+        "classification": result.get("classification", "fbs"),
         "home_team": result.get("home_team", ""),
         "away_team": result.get("away_team", ""),
         "trials": result.get("trials", ""),
