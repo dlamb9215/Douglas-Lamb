@@ -68,8 +68,17 @@ def reconcile_results(schedule_rows, path="nfl_forecast_ledger.csv"):
     for row in rows:
         if row.get("settled_at_utc") or not row.get("week") or not row.get("season"):
             continue
-        key = (str(row["season"]), str(row["week"]), row["home_team"], row["away_team"])
-        score = games.get(key)
+        if row.get("week"):
+            key = (str(row["season"]), str(row["week"]), row["home_team"], row["away_team"])
+            score = games.get(key)
+        else:
+            matches = [
+                value for game_key, value in games.items()
+                if game_key[0] == str(row["season"])
+                and game_key[2] == row["home_team"]
+                and game_key[3] == row["away_team"]
+            ]
+            score = matches[0] if len(matches) == 1 else None
         if score is None:
             continue
         row["actual_home_score"], row["actual_away_score"] = score
