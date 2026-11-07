@@ -1,5 +1,13 @@
 # NFL Simulator: Game-Day Inputs and Readiness
 
+## Current validation status
+
+The technical CI workflow verifies imports, unit tests, fresh pregame-context generation, and a reproducible 100,000-trial smoke simulation. A successful smoke run is **not** a betting-readiness approval.
+
+The NFL validation workflow now attempts to fetch matchup-specific kickoff weather automatically (weather failure is non-blocking), and exposes optional spread, total, two-way moneyline, and over/under price inputs. If any market field is supplied, the workflow requires a sportsbook/source name and a timezone-aware ISO-8601 timestamp no older than six hours.
+
+NFL team statistics refresh daily at 12:00 UTC. Player data refreshes daily at 13:30 UTC.
+
 ## Run the NFL workflow
 
 Open **Actions → Run Doug's Elite Game Simulator → Run workflow**.
@@ -36,6 +44,6 @@ Both over and under prices are required to remove vig. The report calculates mod
 
 ## What is still required before real betting recommendations
 
-The software deliberately does not claim full betting readiness. Final official inactives and starters must be supplied for each game, market lines must be sourced and timestamped, and the forecast ledger needs a meaningful time-ordered sample (at least 100 settled games for an initial review, preferably multiple seasons). Weather and injury coefficients, prop dispersion, expected value, ROI and closing-line value still require out-of-sample validation. The current workflow labels outputs as model indications, not betting picks, until these gates are met.
+The software deliberately does not claim full betting readiness. Do not override these gates manually or infer betting readiness from a green GitHub Actions run. Final official inactives and starters must be supplied for each game, market lines must be sourced and timestamped, and the forecast ledger needs a meaningful time-ordered sample (at least 100 settled games for an initial review, preferably multiple seasons). Weather and injury coefficients, prop dispersion, expected value, ROI and closing-line value still require out-of-sample validation. The current workflow labels outputs as model indications, not betting picks, until these gates are met.
 
 A 100,000-trial simulation reduces Monte Carlo noise; it does not make an uncalibrated projection accurate.
