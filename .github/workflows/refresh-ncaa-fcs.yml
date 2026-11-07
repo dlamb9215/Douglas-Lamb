@@ -11,7 +11,7 @@ on:
       season_type:
         description: Season segment
         required: true
-        default: regular
+        default: both
         type: choice
         options:
           - regular
@@ -44,7 +44,7 @@ jobs:
           SEASON_TYPE: ${{ inputs.season_type }}
         run: |
           if [[ -z "$YEAR" ]]; then YEAR="$(date -u +%Y)"; fi
-          if [[ -z "$SEASON_TYPE" ]]; then SEASON_TYPE="regular"; fi
+          if [[ -z "$SEASON_TYPE" ]]; then SEASON_TYPE="both"; fi
           python -m ncaa.data.refresh --year "$YEAR" --season-type "$SEASON_TYPE" --classification fcs
       - name: Reconcile completed FBS/FCS forecast outcomes (optional)
         continue-on-error: true
