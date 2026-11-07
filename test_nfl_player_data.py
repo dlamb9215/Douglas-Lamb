@@ -33,6 +33,7 @@ class TestNFLPlayerData(unittest.TestCase):
         self.assertEqual(player["receiving_yards_per_game"],78.0)
         self.assertEqual(player["offense_snaps_total"],105.0)
         self.assertEqual(player["offense_snap_pct_avg"],78.5)
+        self.assertEqual(player["receiving_yards_stddev_per_game"],6.0)
 
     def test_2025_plus_depth_chart_schema_is_read_correctly(self):
         self.depth = [{
