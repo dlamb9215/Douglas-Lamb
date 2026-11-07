@@ -30,18 +30,17 @@ on:
       - "nfl_weather.py"
       - "market_data.py"
       - "test_market_data.py"
-      - ".github/workflows/run-simulator.yml"
   workflow_dispatch:
     inputs:
       home:
         description: Home team
         required: true
-        default: ATL
+        default: CAR
         type: string
       away:
         description: Away team
         required: true
-        default: CIN
+        default: DEN
         type: string
       trials:
         description: Simulation trials
