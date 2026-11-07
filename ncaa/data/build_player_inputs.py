@@ -38,7 +38,13 @@ ALIASES = {
 def build_player_inputs(player_data_path: str | Path, team_profiles_path: str | Path,
                         output_path: str | Path, teams: set[str] | None = None,
                         classification: str = "fbs") -> list[dict]:
-    payload = json.loads(Path(player_data_path).read_text(encoding="utf-8"))
+    player_data_path = Path(player_data_path)
+    status_path = player_data_path.with_name("player_data_status.json")
+    if status_path.exists():
+        status = json.loads(status_path.read_text(encoding="utf-8"))
+        if not status.get("stats_available"):
+            raise ValueError("Latest CFBD player stats refresh failed; refusing to project from a preserved old cache")
+    payload = json.loads(player_data_path.read_text(encoding="utf-8"))
     metadata = payload.get("metadata", {})
     cached_classification = metadata.get("classification")
     if cached_classification and str(cached_classification).casefold() != classification.casefold():
