@@ -16,6 +16,18 @@ on:
       - "test_simulator.py"
       - "calibration.py"
       - "test_calibration.py"
+      - "test_player_prop_simulator.py"
+      - "test_matchup_player_pipeline.py"
+      - "player_projections.py"
+      - "player_prop_simulator.py"
+      - "matchup_player_pipeline.py"
+      - "game_day_confirmations.py"
+      - "test_nfl_forecast_ledger.py"
+      - "test_injury_exposure.py"
+      - "test_nfl_weather.py"
+      - "nfl_forecast_ledger.py"
+      - "injury_exposure.py"
+      - "nfl_weather.py"
       - ".github/workflows/run-simulator.yml"
   workflow_dispatch:
     inputs:
@@ -71,7 +83,7 @@ on:
         type: boolean
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   simulate:
