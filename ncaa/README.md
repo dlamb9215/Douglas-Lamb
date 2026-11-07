@@ -178,3 +178,8 @@ A meaningful calibration claim still requires a substantial number of independen
 
 
 The CFBD player refresh also attempts the current-season FBS `/roster` endpoint. When that feed is available, automatic player inputs are filtered to players listed on the selected teams' current-season rosters and the output marks roster membership as verified. Roster membership is not confirmation that a player is active, starting, healthy, or expected to play; those still require current team/injury confirmation. If roster access is unavailable, the data pipeline records the warning and player projections explicitly show that roster membership was not verified.
+
+
+## Kickoff weather context
+
+The matchup workflow attempts to match the selected home/away teams to the CFBD schedule, resolve the venue coordinates, and retrieve the hourly kickoff forecast from Open-Meteo. The result includes temperature, precipitation, wind and gusts with source and retrieval timestamps. If the schedule, venue coordinates, forecast horizon or API access is unavailable, the optional step records no weather and the simulation continues with a warning. Weather is **context only** and is not yet used to change score probabilities: no weather coefficients have been validated against this simulator's historical forecast ledger. Do not interpret the weather report as a model adjustment.
