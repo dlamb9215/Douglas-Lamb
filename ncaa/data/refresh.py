@@ -97,6 +97,28 @@ def parse_advanced(rows: list) -> dict:
     return result
 
 
+def resolve_play_counts(raw: dict, offense_advanced: dict,
+                        defense_advanced: dict, games_n: int,
+                        team: str) -> tuple[float, float]:
+    """Use CFBD advanced play totals; reject implausible fallback denominators."""
+    if games_n <= 0:
+        raise RuntimeError(f"{team}: cannot validate play counts without completed games.")
+    offense_plays = number(offense_advanced.get("plays"))
+    defense_plays = number(defense_advanced.get("plays"))
+    if offense_plays is None:
+        offense_plays = raw.get("plays")
+    if defense_plays is None:
+        defense_plays = raw.get("plays_allowed")
+    for label, total in (("offense", offense_plays), ("defense", defense_plays)):
+        per_game = total / games_n if total is not None else 0.0
+        if not 40.0 <= per_game <= 100.0:
+            raise RuntimeError(
+                f"{team}: invalid {label} plays/game ({per_game:.1f}); "
+                "advanced CFBD play totals are required when box-score play counts are incomplete."
+            )
+    return offense_plays, defense_plays
+
+
 def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict, dict]:
     fbs_rows = api_get("/teams/fbs", {"year": year}, api_key)
     if not isinstance(fbs_rows, list) or not fbs_rows:
@@ -239,13 +261,21 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
         games_n = raw["games"]
         if games_n <= 0:
             continue
-        plays_pg = raw["plays"] / games_n
-        yards_pg = raw["yards_for"] / games_n
-        allowed_pg = raw["yards_allowed"] / games_n
-        ypp = raw["yards_for"] / raw["plays"] if raw["plays"] else 5.8
-        ypp_allowed = raw["yards_allowed"] / raw["plays_allowed"] if raw["plays_allowed"] else 5.8
         adv = advanced.get(team.casefold(), {})
         off_adv, def_adv = adv.get("offense", {}), adv.get("defense", {})
+        offense_plays, defense_plays = resolve_play_counts(
+            raw, off_adv, def_adv, games_n, team
+        )
+        plays_pg = offense_plays / games_n
+        yards_pg = raw["yards_for"] / games_n
+        allowed_pg = raw["yards_allowed"] / games_n
+        ypp = raw["yards_for"] / offense_plays
+        ypp_allowed = raw["yards_allowed"] / defense_plays
+        if not 2.0 <= ypp <= 9.5 or not 2.0 <= ypp_allowed <= 9.5:
+            raise RuntimeError(
+                f"{team}: implausible yards-per-play values "
+                f"(offense {ypp:.2f}, defense {ypp_allowed:.2f}); refusing to publish."
+            )
         success = number(off_adv.get("successRate"))
         # CFBD's advanced "explosiveness" is an efficiency index, not a
         # probability/rate. The simulator expects a 0..1 explosive-play rate,
@@ -280,8 +310,8 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
             "points_against_per_game": profile["points_against"],
             "passing_yards_per_game": round(raw["pass_yards"] / games_n, 2),
             "rushing_yards_per_game": round(raw["rush_yards"] / games_n, 2),
-            "passing_attempts_per_game": round(raw["pass_attempts"] / games_n, 2),
-            "completions_per_game": round(raw["completions"] / games_n, 2),
+            "passing_attempts_per_game": round(raw["pass_attempts"] / games_n, 2) if raw["pass_attempts"] > 0 else None,
+            "completions_per_game": round(raw["completions"] / games_n, 2) if raw["completions"] > 0 else None,
             "rushing_attempts_per_game": round(raw["rush_attempts"] / games_n, 2),
             "first_downs_per_game": round(raw["first_downs"] / games_n, 2),
             "yards_per_play": round(ypp, 3),
