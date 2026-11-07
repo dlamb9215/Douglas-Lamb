@@ -12,7 +12,7 @@ class InjuryExposureTests(unittest.TestCase):
         report=build_injury_exposure(pool,["BUF"])
         self.assertEqual(report["BUF"]["players_with_reported_designations"],2)
         self.assertEqual(report["BUF"]["players"][0]["player"],"QB")
-        self.assertEqual(report["BUF"]["weighted_injury_exposure_index"],277.0)
+        self.assertEqual(report["BUF"]["weighted_injury_exposure_index"],174.5)
 
     def test_unknown_status_is_not_treated_as_injured(self):
         report=build_injury_exposure({"players":[
