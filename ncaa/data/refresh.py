@@ -95,7 +95,7 @@ def pass_completions_attempts(stats: dict) -> tuple[float | None, float | None]:
     combined = stats.get("completionattempts")
     if combined is not None:
         import re
-        match = re.search(r"(\d+(?:\.\d+)?)\\s*[-/]\\s*(\d+(?:\.\d+)?)", str(combined))
+        match = re.search(r"(\d+(?:\.\d+)?)\s*[-/]\s*(\d+(?:\.\d+)?)", str(combined))
         if match:
             combined_completions, combined_attempts = map(float, match.groups())
             if completions is None:
