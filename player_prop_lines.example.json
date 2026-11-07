@@ -1,0 +1,11 @@
+{
+  "source": "Sportsbook name",
+  "checked_at_utc": "REPLACE_WITH_CURRENT_ISO8601_TIMESTAMP",
+  "props": {
+    "BUF:Example Receiver:receiving_yards": {
+      "line": 69.5,
+      "over_odds": -110,
+      "under_odds": -110
+    }
+  }
+}
