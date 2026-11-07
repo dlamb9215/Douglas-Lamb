@@ -11,6 +11,14 @@ from pathlib import Path
 
 from injury_exposure import build_injury_exposure
 
+PLAYER_TEAM_ALIASES = {"LA": "LAR"}
+
+
+def canonical_player_team(value):
+    code = str(value or "").upper()
+    return PLAYER_TEAM_ALIASES.get(code, code)
+
+
 VALID_TEAMS = {
     "ARI", "ATL", "BAL", "BUF", "CAR", "CHI", "CIN", "CLE",
     "DAL", "DEN", "DET", "GB", "HOU", "IND", "JAX", "KC",
@@ -41,7 +49,7 @@ def build_pregame_report(pool, home, away, max_age_hours=36, now=None):
 
     teams = {}
     for team in (home, away):
-        rows = [p for p in pool["players"] if str(p.get("team", "")).upper() == team]
+        rows = [p for p in pool["players"] if canonical_player_team(p.get("team")) == team]
         qbs = sorted(
             [p for p in rows if p.get("position") == "QB"],
             key=lambda p: (p.get("depth_order", 99), p.get("name", "")),
