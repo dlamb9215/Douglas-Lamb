@@ -43,7 +43,7 @@ def build_player_inputs(player_data_path: str | Path, team_profiles_path: str | 
     if status_path.exists():
         status = json.loads(status_path.read_text(encoding="utf-8"))
         if not status.get("stats_available"):
-            raise ValueError("Latest CFBD player stats refresh failed; refusing to project from a preserved old cache")
+            raise ValueError("latest CFBD player stats refresh failed; refusing to project from a preserved old cache")
     payload = json.loads(player_data_path.read_text(encoding="utf-8"))
     metadata = payload.get("metadata", {})
     cached_classification = metadata.get("classification")
