@@ -36,10 +36,11 @@ def _get_open_meteo(latitude: float, longitude: float) -> dict:
 
 
 def fetch_game_weather(year: int, home: str, away: str, api_key: str,
-                       kickoff: str | None = None, season_type: str = "both") -> dict:
+                       kickoff: str | None = None, season_type: str = "both",
+                       classification: str = "fbs") -> dict:
     games = api_get("/games", {
         "year": year, "seasonType": season_type, "home": home, "away": away,
-        "classification": "fbs",
+        "classification": classification,
     }, api_key)
     if not isinstance(games, list):
         raise RuntimeError("CFBD schedule endpoint returned an unexpected response")
@@ -138,12 +139,13 @@ def main() -> None:
     parser.add_argument("--away", required=True)
     parser.add_argument("--kickoff", default=None)
     parser.add_argument("--season-type", choices=("regular", "postseason", "both"), default="both")
+    parser.add_argument("--classification", choices=("fbs", "fcs"), default="fbs")
     parser.add_argument("--output", default="weather.json")
     args = parser.parse_args()
     key = os.environ.get("CFBD_API_KEY", "").strip()
     if not key:
         raise SystemExit("CFBD_API_KEY is missing.")
-    result = fetch_game_weather(args.year, args.home, args.away, key, args.kickoff, args.season_type)
+    result = fetch_game_weather(args.year, args.home, args.away, key, args.kickoff, args.season_type, args.classification)
     Path(args.output).write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(json.dumps(result, indent=2))
 
