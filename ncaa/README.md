@@ -67,3 +67,12 @@ python -m ncaa.backtest --input ncaa-predictions.csv --output ncaa-backtest-resu
 ```
 
 The report includes sample size, Brier score, log loss, accuracy, and reliability bins for each market with available data. Only forecasts recorded before kickoff should be included. This is an evaluation framework; it does not claim calibrated performance until a meaningful historical prediction ledger has been accumulated.
+
+
+## Expanded team matchup layer (November 2026)
+
+The refresh pipeline now also writes passing and rushing offense/defense splits to each team profile and the national ranking snapshot: pass yards, attempts, completions, completion rate, yards per attempt, passing TDs/interceptions/first downs, rush yards/attempts/yards per carry/TDs/first downs, opponent pass/rush yards and attempts, and yards allowed per completion/attempt/carry where the source fields are present. National ranks are generated for passing/rushing efficiency and passing/rushing defense. Each simulation JSON includes a side-by-side offense/defense/turnover profile and the national rank context for the two teams. Pass and rush efficiency matchup terms now contribute to expected points per drive when valid source metrics exist.
+
+These added fields depend on the next successful CFBD refresh; existing CSV files will continue to load with default zero values for newly added fields until refreshed. A zero or missing metric is not evidence of poor performance; it means the provider did not supply the field.
+
+Still not automated in this release: verified injury/availability reports, confirmed starting quarterbacks and depth charts, player-level usage/props, venue-specific weather, live line ingestion and vig removal, scenario-based injury/game-script runs, and an independent first-half clock model. Do not treat the current output as fully calibrated or as a guaranteed betting edge.
