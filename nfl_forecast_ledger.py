@@ -1,0 +1,122 @@
+"""Persistent NFL forecast ledger and settled-result calibration.
+
+Forecasts are appended before kickoff. Reconciliation reads completed games
+from nflverse schedules; metrics are descriptive and never self-certify model
+calibration or betting readiness.
+"""
+import csv
+import json
+import os
+from datetime import datetime, timezone
+from pathlib import Path
+
+FIELDS = [
+    "run_id", "recorded_at_utc", "season", "week", "home_team", "away_team",
+    "kickoff", "trials", "seed", "home_win_probability", "away_win_probability",
+    "home_spread", "home_cover_probability", "away_cover_probability",
+    "total_line", "over_probability", "under_probability",
+    "home_moneyline_odds", "away_moneyline_odds", "over_odds", "under_odds",
+    "weather_available", "weather_wind_mph", "weather_precipitation_mm_per_hour",
+    "pregame_verified", "actual_home_score", "actual_away_score", "settled_at_utc",
+]
+
+
+def append_forecast(record, path="nfl_forecast_ledger.csv"):
+    required = ("run_id", "home_team", "away_team", "home_win_probability", "away_win_probability")
+    if any(record.get(key) in (None, "") for key in required):
+        raise ValueError("Forecast record is missing required identifiers or win probabilities.")
+    if record["home_team"] == record["away_team"]:
+        raise ValueError("Home and away teams must differ.")
+    for key in ("home_win_probability", "away_win_probability"):
+        value = float(record[key])
+        if not 0 <= value <= 100:
+            raise ValueError(f"{key} must be between 0 and 100.")
+    target = Path(path)
+    rows = []
+    if target.exists():
+        with target.open(newline="", encoding="utf-8") as handle:
+            rows = list(csv.DictReader(handle))
+        if any(row.get("run_id") == str(record["run_id"]) for row in rows):
+            return False
+    normalized = {field: record.get(field, "") for field in FIELDS}
+    normalized["recorded_at_utc"] = normalized["recorded_at_utc"] or datetime.now(timezone.utc).isoformat()
+    write_header = not target.exists() or target.stat().st_size == 0
+    with target.open("a", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=FIELDS)
+        if write_header:
+            writer.writeheader()
+        writer.writerow(normalized)
+    return True
+
+
+def reconcile_results(schedule_rows, path="nfl_forecast_ledger.csv"):
+    target = Path(path)
+    if not target.exists():
+        return {"settled": 0, "unsettled": 0}
+    with target.open(newline="", encoding="utf-8") as handle:
+        rows = list(csv.DictReader(handle))
+    games = {}
+    for game in schedule_rows:
+        if game.get("game_type") not in {"REG", "POST"}:
+            continue
+        key = (str(game.get("season")), str(game.get("week")),
+               str(game.get("home_team")), str(game.get("away_team")))
+        if game.get("home_score") not in ("", None) and game.get("away_score") not in ("", None):
+            games[key] = (game["home_score"], game["away_score"])
+    now = datetime.now(timezone.utc).isoformat()
+    settled = 0
+    for row in rows:
+        if row.get("settled_at_utc") or not row.get("week") or not row.get("season"):
+            continue
+        key = (str(row["season"]), str(row["week"]), row["home_team"], row["away_team"])
+        score = games.get(key)
+        if score is None:
+            continue
+        row["actual_home_score"], row["actual_away_score"] = score
+        row["settled_at_utc"] = now
+        settled += 1
+    with target.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=FIELDS)
+        writer.writeheader()
+        writer.writerows(rows)
+    return {"settled": settled, "unsettled": sum(not row.get("settled_at_utc") for row in rows)}
+
+
+def calibration_summary(path="nfl_forecast_ledger.csv"):
+    target = Path(path)
+    if not target.exists():
+        return {"settled_games": 0, "status": "NO_LEDGER"}
+    with target.open(newline="", encoding="utf-8") as handle:
+        rows = list(csv.DictReader(handle))
+    settled = [r for r in rows if r.get("settled_at_utc") and r.get("actual_home_score") not in ("", None)]
+    if not settled:
+        return {"settled_games": 0, "status": "NO_SETTLED_GAMES"}
+    outcomes = [1 if float(r["actual_home_score"]) > float(r["actual_away_score"]) else 0
+                for r in settled]
+    probabilities = [float(r["home_win_probability"]) / 100 for r in settled]
+    brier = sum((p-y)**2 for p, y in zip(probabilities, outcomes)) / len(settled)
+    return {
+        "settled_games": len(settled),
+        "home_win_brier_score": round(brier, 6),
+        "status": "INSUFFICIENT_SAMPLE" if len(settled) < 100 else "REVIEW_REQUIRED",
+        "calibrated": False,
+        "note": "Use time-ordered out-of-sample seasons and market-specific calibration before enabling betting thresholds.",
+    }
+
+
+def main():
+    import argparse
+    from nfl_weather import _get_rows, SCHEDULE_URL
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ledger", default="nfl_forecast_ledger.csv")
+    parser.add_argument("--reconcile", action="store_true")
+    parser.add_argument("--summary", action="store_true")
+    args = parser.parse_args()
+    if args.reconcile:
+        print(json.dumps(reconcile_results(_get_rows(SCHEDULE_URL), args.ledger), indent=2))
+    if args.summary or not args.reconcile:
+        print(json.dumps(calibration_summary(args.ledger), indent=2))
+
+
+if __name__ == "__main__":
+    main()
