@@ -34,6 +34,7 @@ def main() -> None:
     parser.add_argument("--require-verified-pregame", action="store_true")
     parser.add_argument("--players", default=None, help="Current, sourced player workload JSON")
     parser.add_argument("--kickoff", default=None, help="Game kickoff ISO-8601 timestamp with timezone")
+    parser.add_argument("--weather-json", default=None, help="Venue weather context JSON")
     parser.add_argument("--ledger", default=None, help="Optional CSV path for timestamped forecast history")
     args = parser.parse_args()
 
@@ -60,6 +61,8 @@ def main() -> None:
         args.seed + args.trials, args.neutral_site,
     )
     result["pregame_verification"] = pregame
+    if args.weather_json:
+        result["weather_context"] = json.loads(Path(args.weather_json).read_text(encoding="utf-8"))
     if args.players:
         result["player_projections"] = simulate_players(args.players, args.trials, args.seed + 1000)
     result["season"] = args.season
