@@ -120,3 +120,30 @@ Example `checks.json` structure (fill in real sourced details, not placeholders)
 ```
 
 For each genuinely verified entry, add `"source": "source name or URL"`, `"checked_at": "2026-11-07T12:00:00Z"`, and the relevant observations. A verified check means only that the provided metadata passed format and freshness validation; it does not certify that a source is accurate. Do not claim a matchup is fully vetted without independent confirmation.
+
+
+## Player workload and prop simulations
+
+Optional `--players player-inputs.json` adds player-level Monte Carlo outputs and probabilities for user-supplied prop lines. Each player entry requires player/team/role, expected opportunities, success probability, yards per success, yards standard deviation, touchdown rate per opportunity, source and an ISO date. Inputs older than two days are rejected. For a receiver, opportunities can represent targets and success probability the catch rate; for a rusher, opportunities can represent carries and success probability should normally be 1.0; for a QB, opportunities can represent pass attempts and success probability completion rate. The generic output is an opportunity/success/yards model and is not a complete position-specific stat model: it does not yet separate passing, rushing and receiving yards for dual-role players, model sacks/interceptions, or correlate players on the same team.
+
+Example structure (replace all values with real, sourced pregame data):
+
+```json
+[
+  {
+    "player": "PLAYER NAME",
+    "team": "TEAM NAME",
+    "role": "RB",
+    "expected_opportunities": 18.0,
+    "success_probability": 1.0,
+    "yards_per_success": 4.5,
+    "yards_sd_per_success": 2.0,
+    "touchdown_rate_per_opportunity": 0.03,
+    "source": "source name or URL",
+    "as_of": "2026-11-07",
+    "prop_lines": {"yards": 70.5, "opportunities": 17.5, "touchdowns": 0.5}
+  }
+]
+```
+
+The GitHub workflow accepts optional `player_inputs` JSON, sourced `pregame_checks` JSON, and moneyline/total American odds. It writes these as temporary run inputs and includes the results in the uploaded artifact. Do not enter guessed workloads or mark availability verified without checking a current source.
