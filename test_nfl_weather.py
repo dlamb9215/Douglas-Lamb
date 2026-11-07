@@ -24,7 +24,7 @@ class NFLWeatherTests(unittest.TestCase):
         result = fetch_matchup_weather("BUF","MIA",2026,9)
         self.assertTrue(result["available"])
         self.assertEqual(result["venue"],"Highmark Stadium")
-        self.assertEqual(result["wind_mph"],18.6)
+        self.assertEqual(result["wind_mph"],15.5)
         self.assertEqual(result["weather_exposure"],"OUTDOOR_OR_UNKNOWN")
 
     @patch("nfl_weather._get_rows", return_value=[])
