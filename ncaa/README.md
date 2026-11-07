@@ -160,3 +160,18 @@ The first-half projection runs a separate 30-minute simulation. Each possession 
 
 
 When CFBD player stats refresh succeeds, the matchup workflow attempts to build player inputs automatically for the two selected teams. It uses player games played when the provider includes it; otherwise it uses the team's completed-game count and labels that fallback in the output. QB workload is based on season pass attempts/completions; RB on carries; WR/TE on receptions. This is a season-average workload baseline, not a depth-chart-adjusted projection. The per-opportunity yardage standard deviation is a documented heuristic (60% of average yards, with a 2-yard floor), not a fitted player-specific variance. The generated output retains player sample size and denominator provenance.
+
+
+## Forecast ledger and automatic results reconciliation
+
+The matchup workflow can accept a timezone-aware kickoff timestamp. When supplied, each forecast is appended to `ncaa/forecast_ledger.csv` with its timestamp, seed, trial count, market probabilities, sportsbook prices, and team-data dates. A kickoff in the future at recording time is marked `pregame`; a past kickoff is marked `postgame`; no kickoff is marked `unknown`. Only `pregame` rows are included in backtesting when the status field is present.
+
+The scheduled NCAA refresh workflow and the next matchup workflow attempt to reconcile prior forecasts with completed CFBD game scores. Final scores populate moneyline, spread and total outcomes; pushes remain blank and are excluded from that market's sample. The workflows serialize ledger writes and commit the updated CSV to the repository. Reconciliation is based on exact home/away team names and kickoff within 48 hours, so verify matchup naming and kickoff input. No outcome is invented when a match cannot be found.
+
+Run calibration with:
+
+```bash
+python -m ncaa.backtest --input ncaa/forecast_ledger.csv --output ncaa-backtest-results.json
+```
+
+A meaningful calibration claim still requires a substantial number of independently verified, pregame forecasts and completed outcomes. A small early ledger is not evidence of predictive accuracy.
