@@ -442,7 +442,7 @@ def build_dataset(year: int, season_type: str, api_key: str,
         for rank_name, (field, descending) in rank_specs.items():
             ordered = sorted(
                 rankings.items(),
-                key=lambda pair: pair[1].get(field, 0.0),
+                key=lambda pair: (number(pair[1].get(field)) if number(pair[1].get(field)) is not None else 0.0),
                 reverse=descending,
             )
             value[rank_name] = next(i for i, pair in enumerate(ordered, 1) if pair[0] == metric)
