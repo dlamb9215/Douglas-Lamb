@@ -17,7 +17,7 @@ from urllib.request import Request, urlopen
 
 BASE_URL = "https://api.collegefootballdata.com"
 PROFILE_FIELDS = [
-    "team", "points_for", "points_against", "yards_per_play",
+    "team", "classification", "points_for", "points_against", "yards_per_play",
     "yards_per_play_allowed", "plays_per_game", "points_per_drive",
     "pass_yards_per_game", "rush_yards_per_game", "pass_attempts_per_game", "completions_per_game", "completion_pct", "yards_per_pass_attempt",
     "pass_tds_per_game", "interceptions_per_game", "pass_first_downs_per_game", "rush_attempts_per_game", "yards_per_carry", "rush_tds_per_game", "rush_first_downs_per_game",
@@ -122,19 +122,34 @@ def resolve_play_counts(raw: dict, offense_advanced: dict,
     return offense_plays, defense_plays
 
 
-def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict, dict]:
-    fbs_rows = api_get("/teams/fbs", {"year": year}, api_key)
-    if not isinstance(fbs_rows, list) or not fbs_rows:
-        raise RuntimeError("CFBD did not return the FBS team directory; refusing to publish unfiltered data.")
-    fbs_names = {
+def build_dataset(year: int, season_type: str, api_key: str,
+                  classification: str = "fbs") -> tuple[list, dict, dict]:
+    classification = classification.casefold()
+    if classification not in {"fbs", "fcs"}:
+        raise ValueError("classification must be fbs or fcs")
+    directory_rows = api_get(
+        "/teams/fbs" if classification == "fbs" else "/teams",
+        {"year": year} if classification == "fbs" else {},
+        api_key,
+    )
+    if not isinstance(directory_rows, list) or not directory_rows:
+        raise RuntimeError(f"CFBD did not return the {classification.upper()} team directory.")
+    selected_rows = [
+        row for row in directory_rows
+        if classification == "fbs" or str(row.get("classification", "")).casefold() == "fcs"
+    ]
+    team_names = {
         str(row.get("school") or row.get("name") or "").casefold()
-        for row in fbs_rows
+        for row in selected_rows
         if row.get("school") or row.get("name")
     }
-    if len(fbs_names) < 100:
-        raise RuntimeError(f"CFBD returned only {len(fbs_names)} FBS teams; refusing to publish an incomplete directory.")
+    if len(team_names) < 50:
+        raise RuntimeError(
+            f"CFBD returned only {len(team_names)} {classification.upper()} teams; "
+            "refusing to publish an incomplete directory."
+        )
     games = api_get("/games", {
-        "year": year, "seasonType": season_type, "classification": "fbs"
+        "year": year, "seasonType": season_type, "classification": classification
     }, api_key)
     # CFBD requires one of week, team, or conference when querying
     # game-level team box scores by season. Fetch each FBS week separately.
@@ -142,7 +157,7 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
     for week in range(1, 18):
         week_rows = api_get("/games/teams", {
             "year": year, "week": week, "seasonType": season_type,
-            "classification": "fbs"
+            "classification": classification
         }, api_key)
         if isinstance(week_rows, list):
             team_games.extend(week_rows)
@@ -170,7 +185,7 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
         g for g in games
         if g.get("homePoints") is not None and g.get("awayPoints") is not None
         and g.get("homeTeam") and g.get("awayTeam")
-        and str(g.get("homeTeam")).casefold() in fbs_names
+        and str(g.get("homeTeam")).casefold() in team_names
         and str(g.get("awayTeam")).casefold() in fbs_names
     ]
     if not completed:
@@ -179,8 +194,7 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
             "refusing to overwrite team data with an empty dataset."
         )
 
-    # Keep only completed FBS-vs-FBS games. The CFBD box-score endpoint can
-    # return FCS opponents even when classification=fbs is supplied.
+    # Keep only completed games between teams in the selected classification.
     completed_ids = {g.get("id") for g in completed}
     team_games = [
         game for game in team_games
@@ -193,7 +207,7 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
             continue
         for team in game.get("teams", []) or []:
             name = team.get("team")
-            if not name or str(name).casefold() not in fbs_names:
+            if not name or str(name).casefold() not in team_names:
                 continue
             row = team_totals.setdefault(name, {
                 "games": 0, "points_for": 0.0, "points_against": 0.0,
@@ -302,6 +316,7 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
         strength = (elo_rating - 1500.0) / 25.0 if elo_rating else 0.0
         profile = {
             "team": team,
+            "classification": classification,
             "points_for": round(raw["points_for"] / games_n, 3),
             "points_against": round(raw["points_against"] / games_n, 3),
             "yards_per_play": round(ypp, 4),
@@ -406,7 +421,9 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
         "provider": "CollegeFootballData",
         "year": year,
         "season_type": season_type,
-        "fbs_completed_games": len(completed),
+        "classification": classification,
+        "classification_completed_games": len(completed),
+        "fbs_completed_games": len(completed) if classification == "fbs" else 0,
         "teams_with_box_scores": len(profiles),
         "retrieved_at": datetime.now(timezone.utc).isoformat(),
         "note": "Ranks are among teams returned with usable game box scores; incomplete-season ranks change weekly.",
@@ -415,38 +432,42 @@ def build_dataset(year: int, season_type: str, api_key: str) -> tuple[list, dict
     return profiles, rankings, metadata
 
 
-def write_outputs(profiles: list, rankings: dict, metadata: dict, output_dir: Path) -> None:
+def write_outputs(profiles: list, rankings: dict, metadata: dict, output_dir: Path,
+                  classification: str = "fbs") -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
-    profile_path = output_dir / "team_profiles.csv"
+    suffix = "" if classification == "fbs" else "_fcs"
+    profile_path = output_dir / f"team_profiles{suffix}.csv"
     temp_path = profile_path.with_suffix(".csv.tmp")
     with temp_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=PROFILE_FIELDS)
         writer.writeheader()
         writer.writerows(profiles)
     temp_path.replace(profile_path)
-    (output_dir / "team_rankings.json").write_text(
+    (output_dir / f"team_rankings{suffix}.json").write_text(
         json.dumps({"metadata": metadata, "teams": rankings}, indent=2),
         encoding="utf-8",
     )
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Refresh NCAA FBS team profiles from CFBD")
+    parser = argparse.ArgumentParser(description="Refresh NCAA FBS/FCS team profiles from CFBD")
     parser.add_argument("--year", type=int, required=True)
     parser.add_argument("--season-type", choices=("regular", "postseason", "both"), default="regular")
+    parser.add_argument("--classification", choices=("fbs", "fcs"), default="fbs")
     parser.add_argument("--output-dir", default="ncaa/data")
     args = parser.parse_args()
     key = os.environ.get("CFBD_API_KEY", "").strip()
     if not key:
         raise SystemExit("CFBD_API_KEY is missing. Add it as a GitHub Actions secret.")
-    profiles, rankings, metadata = build_dataset(args.year, args.season_type, key)
+    profiles, rankings, metadata = build_dataset(args.year, args.season_type, key, args.classification)
     if len(profiles) < 50:
         raise SystemExit(
             f"Only {len(profiles)} FBS profiles were produced; refusing to publish a partial national dataset."
         )
-    write_outputs(profiles, rankings, metadata, Path(args.output_dir))
-    print(f"Refreshed {len(profiles)} FBS team profiles from {metadata['fbs_completed_games']} completed games.")
-    print(f"Updated {args.output_dir}/team_profiles.csv and team_rankings.json")
+    write_outputs(profiles, rankings, metadata, Path(args.output_dir), args.classification)
+    suffix = "" if args.classification == "fbs" else "_fcs"
+    print(f"Refreshed {len(profiles)} {args.classification.upper()} team profiles from {metadata['classification_completed_games']} completed games.")
+    print(f"Updated {args.output_dir}/team_profiles{suffix}.csv and team_rankings{suffix}.json")
 
 
 if __name__ == "__main__":
