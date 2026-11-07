@@ -175,7 +175,7 @@ def build_dataset(year: int, season_type: str, api_key: str,
     # game-level team box scores by season. Fetch each week separately.
     team_games = []
     max_week = 22 if classification == "fcs" else 18
-    for week in range(1, max_week):
+    for week in range(0, max_week):
         week_rows = api_get("/games/teams", {
             "year": year, "week": week, "seasonType": season_type,
             "classification": classification
