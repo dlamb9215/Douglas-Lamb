@@ -33,34 +33,34 @@ on:
         default: "100000"
         type: string
       spread:
-        description: Sportsbook spread (home-team perspective)
-        required: true
-        default: "+3.0"
+        description: Current sportsbook spread (home-team perspective); leave blank if unavailable
+        required: false
+        default: ""
         type: string
       total:
-        description: Sportsbook game total
-        required: true
-        default: "52.5"
+        description: Current sportsbook total; leave blank if unavailable
+        required: false
+        default: ""
         type: string
       home_odds:
-        description: Home moneyline American odds
-        required: true
-        default: "+140"
+        description: Current home moneyline American odds; leave blank if unavailable
+        required: false
+        default: ""
         type: string
       away_odds:
-        description: Away moneyline American odds
-        required: true
-        default: "-166"
+        description: Current away moneyline American odds; leave blank if unavailable
+        required: false
+        default: ""
         type: string
       over_odds:
-        description: Over American odds
-        required: true
-        default: "-109"
+        description: Current over American odds; leave blank if unavailable
+        required: false
+        default: ""
         type: string
       under_odds:
-        description: Under American odds
-        required: true
-        default: "-111"
+        description: Current under American odds; leave blank if unavailable
+        required: false
+        default: ""
         type: string
       neutral_site:
         description: Neutral-site game (disables home-field advantage)
