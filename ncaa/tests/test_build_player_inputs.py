@@ -90,6 +90,24 @@ class BuildPlayerInputsTests(unittest.TestCase):
                 build_player_inputs(player_path, team_path, root / "out.json",
                                     classification="fcs")
 
+    def test_blocks_old_cache_when_latest_refresh_failed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            player_path = root / "player_season_data.json"
+            team_path = root / "teams.csv"
+            player_path.write_text(json.dumps({
+                "metadata": {"retrieved_at": datetime.now(timezone.utc).isoformat(),
+                             "classification": "fbs"},
+                "season_stats": [], "usage": [], "rosters": [],
+            }))
+            (root / "player_data_status.json").write_text(json.dumps({
+                "stats_available": False,
+                "warnings": ["provider denied access"],
+            }))
+            team_path.write_text("team,games_sampled\n")
+            with self.assertRaisesRegex(ValueError, "latest CFBD player stats refresh failed"):
+                build_player_inputs(player_path, team_path, root / "out.json")
+
     def test_rejects_stale_player_cache(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
