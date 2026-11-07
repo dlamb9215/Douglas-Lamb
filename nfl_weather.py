@@ -1,7 +1,8 @@
 """Fetch matchup-specific NFL kickoff weather from nflverse schedule + Open-Meteo.
 
 Weather is contextual only: no unvalidated weather coefficients are applied
-to scoring or betting probabilities.
+to scoring or betting probabilities. Venue resolution fails closed rather than
+silently selecting a geocoder result in the wrong country.
 """
 import argparse
 import csv
@@ -14,6 +15,17 @@ from urllib.request import Request, urlopen
 
 
 SCHEDULE_URL = "https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv"
+
+# nflverse may label international games as location="Neutral". Keep explicit
+# venue aliases so a neutral-site game is geocoded at the actual stadium.
+INTERNATIONAL_VENUES = {
+    "bernabeu": ("Madrid, Spain", "ES"),
+    "santiago bernabeu": ("Madrid, Spain", "ES"),
+    "tottenham hotspur stadium": ("London, United Kingdom", "GB"),
+    "wembley stadium": ("London, United Kingdom", "GB"),
+    "allianz arena": ("Munich, Germany", "DE"),
+    "estadio azteca": ("Mexico City, Mexico", "MX"),
+}
 
 
 def _get_json(url):
@@ -35,6 +47,39 @@ def _kickoff(row):
         raise ValueError("Schedule row is missing gameday.")
     local = datetime.strptime(f"{day} {clock}", "%Y-%m-%d %H:%M")
     return local.replace(tzinfo=ZoneInfo("America/New_York"))
+
+
+def _resolve_venue_location(venue, schedule_location):
+    """Return (search location, expected country code) for the stadium."""
+    normalized = (venue or "").strip().lower()
+    for alias, location in INTERNATIONAL_VENUES.items():
+        if alias in normalized:
+            return location
+    location = (schedule_location or "").strip()
+    if location and location.lower() not in {"neutral", "international", "tbd"}:
+        # NFL domestic venues in nflverse schedule data are U.S. locations.
+        return location + ", United States", "US"
+    raise RuntimeError(
+        f"Schedule location is ambiguous for venue {venue!r}; refusing to guess weather coordinates."
+    )
+
+
+def _select_geocoding_result(results, expected_country, venue, location):
+    if not results:
+        raise RuntimeError(f"No geocoding results for {venue}, {location}.")
+    matching = [item for item in results if item.get("country_code") == expected_country]
+    if not matching:
+        countries = sorted({item.get("country_code", "unknown") for item in results})
+        raise RuntimeError(
+            f"Geocoder did not return expected country {expected_country} for {venue}, {location}; "
+            f"returned countries: {countries}."
+        )
+    # Prefer a city-level result over an unrelated same-country result.
+    location_terms = [part.strip().lower() for part in location.split(",") if part.strip()]
+    def score(item):
+        fields = " ".join(str(item.get(k, "")) for k in ("name", "admin1", "country")).lower()
+        return sum(term in fields for term in location_terms)
+    return max(matching, key=score)
 
 
 def fetch_matchup_weather(home, away, season=None, week=None):
@@ -61,24 +106,21 @@ def fetch_matchup_weather(home, away, season=None, week=None):
     now = datetime.now(timezone.utc)
     future = [item for item in candidates if item[0].astimezone(timezone.utc) >= now]
     kickoff, game = min(future or candidates, key=lambda item: abs((item[0].astimezone(timezone.utc)-now).total_seconds()))
-    venue = game.get("stadium") or game.get("location") or ""
-    city = game.get("location") or ""
-    query = ", ".join(part for part in (venue, city, "United States") if part)
+    venue = game.get("stadium") or ""
+    location, expected_country = _resolve_venue_location(venue, game.get("location"))
+    query = ", ".join(part for part in (venue, location) if part)
     geo_url = "https://geocoding-api.open-meteo.com/v1/search?" + urlencode({
-        "name": query, "count": 5, "language": "en", "format": "json"
+        "name": query, "count": 10, "language": "en", "format": "json"
     })
     geo = _get_json(geo_url)
     results = geo.get("results") or []
-    if not results and city:
+    if not results:
         fallback_url = "https://geocoding-api.open-meteo.com/v1/search?" + urlencode({
-            "name": city, "count": 5, "language": "en", "format": "json"
+            "name": location, "count": 10, "language": "en", "format": "json"
         })
         geo = _get_json(fallback_url)
         results = geo.get("results") or []
-    if not results:
-        raise RuntimeError(f"Could not geocode NFL venue or city: {query}")
-    # Pick the result whose country is the United States and prefer stadium/city match.
-    place = next((x for x in results if x.get("country_code") == "US"), results[0])
+    place = _select_geocoding_result(results, expected_country, venue, location)
     forecast_url = "https://api.open-meteo.com/v1/forecast?" + urlencode({
         "latitude": place["latitude"], "longitude": place["longitude"],
         "hourly": "temperature_2m,precipitation,wind_speed_10m,wind_gusts_10m",
@@ -106,7 +148,8 @@ def fetch_matchup_weather(home, away, season=None, week=None):
     return {
         "available": True, "home_team": home, "away_team": away,
         "season": game.get("season"), "week": game.get("week"),
-        "kickoff": kickoff.isoformat(), "venue": venue, "venue_city": city,
+        "kickoff": kickoff.isoformat(), "venue": venue, "venue_city": location,
+        "schedule_location": game.get("location"), "country_code": place.get("country_code"),
         "roof": game.get("roof"), "surface": game.get("surface"),
         "latitude": place["latitude"], "longitude": place["longitude"],
         "temperature_f": round(float(temp)*9/5+32, 1) if temp is not None else None,
