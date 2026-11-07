@@ -1,0 +1,13 @@
+{
+  "source": "Official NFL/team game-day inactive and starter report",
+  "checked_at_utc": "REPLACE_WITH_CURRENT_ISO8601_TIMESTAMP",
+  "players": [
+    {
+      "name": "Example Player",
+      "team": "BUF",
+      "status": "active",
+      "starter": true,
+      "note": "Replace with verified official game-day starter information"
+    }
+  ]
+}
