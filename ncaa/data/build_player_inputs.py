@@ -36,9 +36,13 @@ ALIASES = {
 
 
 def build_player_inputs(player_data_path: str | Path, team_profiles_path: str | Path,
-                        output_path: str | Path, teams: set[str] | None = None) -> list[dict]:
+                        output_path: str | Path, teams: set[str] | None = None,
+                        classification: str = "fbs") -> list[dict]:
     payload = json.loads(Path(player_data_path).read_text(encoding="utf-8"))
     metadata = payload.get("metadata", {})
+    cached_classification = metadata.get("classification")
+    if cached_classification and str(cached_classification).casefold() != classification.casefold():
+        raise ValueError("Player cache classification does not match requested team subdivision; refresh player data.")
     retrieved = metadata.get("retrieved_at", "")
     if not retrieved:
         raise ValueError("Player cache is missing retrieval timestamp")
@@ -167,10 +171,12 @@ def main() -> None:
     parser.add_argument("--team-profiles", default="ncaa/data/team_profiles.csv")
     parser.add_argument("--output", default="ncaa/data/player_projection_inputs.json")
     parser.add_argument("--teams", nargs="*", default=None)
+    parser.add_argument("--classification", choices=("fbs", "fcs"), default="fbs")
     args = parser.parse_args()
     players = build_player_inputs(
         args.player_data, args.team_profiles, args.output,
         set(args.teams) if args.teams else None,
+        args.classification,
     )
     print(f"Built {len(players)} player projection inputs from current CFBD season data.")
     print(f"Saved to {args.output}; verify availability and next-game workload separately.")
