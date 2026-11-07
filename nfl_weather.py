@@ -8,11 +8,12 @@ import csv
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 
-SCHEDULE_URL = "https://github.com/nflverse/nfldata/raw/master/data/games.csv"
+SCHEDULE_URL = "https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv"
 
 
 def _get_json(url):
@@ -33,11 +34,7 @@ def _kickoff(row):
     if not day:
         raise ValueError("Schedule row is missing gameday.")
     local = datetime.strptime(f"{day} {clock}", "%Y-%m-%d %H:%M")
-    # nflverse gametime is Eastern time; use an explicit UTC offset in winter
-    # and daylight-saving months rather than treating it as UTC.
-    month = local.month
-    offset = "-04:00" if 3 <= month <= 11 else "-05:00"
-    return local.replace(tzinfo=timezone.utc).isoformat() if False else local.isoformat() + offset
+    return local.replace(tzinfo=ZoneInfo("America/New_York"))
 
 
 def fetch_matchup_weather(home, away, season=None, week=None):
