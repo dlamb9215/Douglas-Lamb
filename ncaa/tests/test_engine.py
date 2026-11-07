@@ -59,6 +59,10 @@ class SimulatorTests(unittest.TestCase):
         self.assertIn("projected_first_half_score", result)
         self.assertIn("score_ranges", result)
         self.assertIn("first_half_win_probability_home", result)
+        self.assertIn("projected_first_half_drives", result)
+        self.assertIn("clock-limited", result["first_half_engine"])
+        self.assertGreater(result["projected_first_half_drives"]["Home U"], 0)
+        self.assertGreater(result["projected_first_half_drives"]["Away U"], 0)
         self.assertGreaterEqual(result["first_half_win_probability_home"], 0)
         self.assertLessEqual(result["first_half_win_probability_home"], 1)
 
