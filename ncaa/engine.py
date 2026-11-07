@@ -33,6 +33,9 @@ class TeamProfile:
     rush_tds_per_game: float = 0.0
     rush_first_downs_per_game: float = 0.0
     pass_yards_allowed_per_game: float = 0.0
+    plays_allowed_per_game: float = 0.0
+    pass_first_downs_allowed_per_game: float = 0.0
+    rush_first_downs_allowed_per_game: float = 0.0
     opponent_pass_attempts_per_game: float = 0.0
     opponent_completions_per_game: float = 0.0
     opponent_yards_per_completion: float = 0.0
@@ -319,6 +322,9 @@ def _team_metrics(team: TeamProfile) -> dict:
         },
         "defense": {
             "pass_yards_allowed_per_game": team.pass_yards_allowed_per_game,
+            "plays_allowed_per_game": team.plays_allowed_per_game,
+            "pass_first_downs_allowed_per_game": team.pass_first_downs_allowed_per_game,
+            "rush_first_downs_allowed_per_game": team.rush_first_downs_allowed_per_game,
             "opponent_pass_attempts_per_game": team.opponent_pass_attempts_per_game,
             "opponent_completions_per_game": team.opponent_completions_per_game,
             "opponent_yards_per_completion": team.opponent_yards_per_completion,
