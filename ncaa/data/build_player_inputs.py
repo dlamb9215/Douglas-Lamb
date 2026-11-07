@@ -7,7 +7,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 
@@ -43,6 +43,12 @@ def build_player_inputs(player_data_path: str | Path, team_profiles_path: str | 
     if not retrieved:
         raise ValueError("Player cache is missing retrieval timestamp")
     retrieved_date = retrieved[:10]
+    try:
+        age = (date.today() - date.fromisoformat(retrieved_date)).days
+    except ValueError as exc:
+        raise ValueError("Player cache has an invalid retrieval date") from exc
+    if age < 0 or age > 2:
+        raise ValueError(f"Player cache is {age} days old; refresh before building projections")
     team_games = {}
     with Path(team_profiles_path).open(newline="", encoding="utf-8") as handle:
         for row in csv.DictReader(handle):
