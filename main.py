@@ -482,6 +482,19 @@ def main():
     print(f"\nSIMULATION RESULTS: {args.trials:,} TRIALS")
     print(f"Random seed: {args.seed} (first-half seed: {args.seed + 1})")
 
+    print("\nMONTE CARLO UNCERTAINTY (95% WILSON INTERVALS)")
+    for label, simulation, key in (
+        ("Full-game home win", result, "home_win"),
+        ("Full-game away win", result, "away_win"),
+        ("Full-game home cover", result, "home_cover"),
+        ("Full-game away cover", result, "away_cover"),
+        ("Full-game over", result, "over"),
+        ("Full-game under", result, "under"),
+        ("First-half home win", first_half, "home_win"),
+        ("First-half away win", first_half, "away_win"),
+    ):
+        low, high = simulation["probability_ci95"][key]
+        print(f"{label}: {low:.2f}%–{high:.2f}%")
     print("\nWIN PROBABILITIES")
     print(f"{home['name']}: {result['home_win']:.2f}%")
     print(f"{away['name']}: {result['away_win']:.2f}%")
