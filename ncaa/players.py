@@ -52,7 +52,7 @@ def load_player_inputs(path: str | Path) -> list[dict]:
             raise ValueError(f"{name}: touchdown_rate_per_opportunity must be <= 1")
         if not item.get("source") or not item.get("as_of"):
             raise ValueError(f"{name}: source and as_of are required")
-        players.append({
+        as_of = str(item["as_of"])\n        try:\n            checked_date = date.fromisoformat(as_of[:10])\n        except ValueError as exc:\n            raise ValueError(f"{name}: as_of must begin with YYYY-MM-DD") from exc\n        age = (date.today() - checked_date).days\n        if age < 0 or age > 2:\n            raise ValueError(f"{name}: player input is {age} days old; refresh before use")\n        prop_lines = item.get("prop_lines", {})\n        if not isinstance(prop_lines, dict):\n            raise ValueError(f"{name}: prop_lines must be an object")\n        players.append({
             "player": name, "team": team, "role": role,
             "expected_opportunities": opportunities,
             "success_probability": success,
@@ -60,7 +60,7 @@ def load_player_inputs(path: str | Path) -> list[dict]:
             "yards_sd_per_success": yards_sd,
             "touchdown_rate_per_opportunity": td_rate,
             "source": str(item["source"]),
-            "as_of": str(item["as_of"]),
+            "as_of": as_of, "prop_lines": prop_lines,
         })
     return players
 
