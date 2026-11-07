@@ -76,3 +76,17 @@ The refresh pipeline now also writes passing and rushing offense/defense splits 
 These added fields depend on the next successful CFBD refresh; existing CSV files will continue to load with default zero values for newly added fields until refreshed. A zero or missing metric is not evidence of poor performance; it means the provider did not supply the field.
 
 Still not automated in this release: verified injury/availability reports, confirmed starting quarterbacks and depth charts, player-level usage/props, venue-specific weather, live line ingestion and vig removal, scenario-based injury/game-script runs, and an independent first-half clock model. Do not treat the current output as fully calibrated or as a guaranteed betting edge.
+
+## Sportsbook price comparison
+
+Optional CLI inputs accept American moneyline and totals prices. When both sides are supplied, the CLI removes proportional two-way vig, compares the model probability with the fair market probability, and reports expected value per $100 at the quoted price. Example:
+
+```bash
+python -m ncaa.cli --home Georgia --away Alabama --trials 500000 --home-spread -3.5 --total 52.5 --home-ml-odds -165 --away-ml-odds 145 --over-odds -110 --under-odds -110
+```
+
+This is price math only: it does not fetch live sportsbook prices, guarantee a positive edge, or account for limits, stale lines, correlated parlays, or market movement. Use exact book prices and record their timestamp.
+
+## Readiness and data gates
+
+The team-level simulator can run from a validated CFBD refresh and accepts user-entered market lines. It deliberately does not invent injury status, confirmed starting quarterbacks, player snap/route/touch projections, or weather. CFBD documents that weather availability varies and its weather endpoint requires an eligible paid tier. No verified injury feed is currently wired into this repository. Treat these as manual pregame checks until a trustworthy source is configured. Forecasts remain uncalibrated until a sufficiently large, timestamped pregame ledger is collected and evaluated with `ncaa.backtest`.
