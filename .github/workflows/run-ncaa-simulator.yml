@@ -77,6 +77,11 @@ jobs:
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
         run: python -m ncaa.data.refresh --year 2026 --season-type regular
+      - name: Refresh player season statistics and usage (optional provider entitlement)
+        continue-on-error: true
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+        run: python -m ncaa.data.player_refresh --year 2026 --season-type regular
       - name: Run NCAA simulator tests
         run: python -m unittest discover -s ncaa/tests -v
       - name: Write optional pregame and player inputs
@@ -123,5 +128,7 @@ jobs:
             ncaa-simulation-results.txt
             ncaa/data/team_rankings.json
             ncaa/data/team_profiles.csv
+            ncaa/data/player_season_data.json
+            ncaa/data/player_data_status.json
             pregame-checks.json
             player-inputs.json
