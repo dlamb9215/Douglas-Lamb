@@ -20,6 +20,7 @@ def main() -> None:
     parser.add_argument("--season", default="2026")
     parser.add_argument("--classification", choices=("fbs", "fcs"), default="fbs")
     parser.add_argument("--data", default=None)
+    parser.add_argument("--allow-prior", action="store_true", help="Allow league-average priors when a team profile is missing")
     parser.add_argument("--home-spread", type=float, default=None,
                         help="Sportsbook handicap attached to home team (e.g. -6.5)")
     parser.add_argument("--total", type=float, default=None)
@@ -52,6 +53,10 @@ def main() -> None:
     data_path = args.data or ("ncaa/data/team_profiles.csv" if args.classification == "fbs" else "ncaa/data/team_profiles_fcs.csv")
     rankings_file = args.rankings or ("ncaa/data/team_rankings.json" if args.classification == "fbs" else "ncaa/data/team_rankings_fcs.json")
     profiles = load_profiles(data_path)
+    missing_profiles = [name for name in (args.home, args.away) if name.casefold() not in profiles]
+    if missing_profiles and not args.allow_prior:
+        parser.error("Missing current team profile(s): " + ", ".join(missing_profiles) +
+                     ". Refresh the selected classification or explicitly pass --allow-prior.")
     home = get_profile(args.home, profiles)
     away = get_profile(args.away, profiles)
     result = simulate_game(
