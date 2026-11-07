@@ -77,9 +77,17 @@ def main() -> None:
     weather_context = None
     if args.weather_json:
         weather_context = json.loads(Path(args.weather_json).read_text(encoding="utf-8"))
-        result["weather_context"] = weather_context
+    else:
+        weather_context = {"available": False, "weather_warning": "No venue weather context was supplied."}
+    result["weather_context"] = weather_context
     if args.players:
         result["player_projections"] = simulate_players(args.players, args.trials, args.seed + 1000)
+        result["player_projection_status"] = {"available": True, "players": len(result["player_projections"])}
+    else:
+        result["player_projection_status"] = {
+            "available": False,
+            "warning": "No current sourced player workload inputs; player projections and props are omitted.",
+        }
     result["season"] = args.season
     result["classification"] = args.classification
     result["sportsbook_analysis"] = {}
@@ -154,11 +162,15 @@ def main() -> None:
         print(f"  {scenario}: {args.home} {score[args.home]} - {args.away} {score[args.away]} | "
               f"home win {values['home_win_probability']:.1%} | total {values['projected_total']:.1f}")
     if args.players:
-        print("PLAYER PROJECTIONS (manual sourced workload inputs):")
+        print("PLAYER PROJECTIONS (sourced season workload baseline):")
         for player in result["player_projections"]:
             print(f"  {player['player']} ({player['team']}): {player['projected_yards']} yards, "
                   f"{player['expected_successes']} successes, "
                   f"{player['expected_touchdowns']} TDs")
+    else:
+        print("PLAYER PROJECTIONS NOT AVAILABLE: " + result["player_projection_status"]["warning"])
+    if not weather_context.get("available"):
+        print("WEATHER NOT AVAILABLE: " + weather_context.get("weather_warning", "No weather context."))
     if result["sportsbook_analysis"]:
         print("Vig-adjusted sportsbook comparison:")
         print(json.dumps(result["sportsbook_analysis"], indent=2))
