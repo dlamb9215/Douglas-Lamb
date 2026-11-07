@@ -123,7 +123,7 @@ def build_pregame_report(pool, home, away, max_age_hours=36, now=None):
         ],
         "player_props_ready": False,
         "blocking_note": "Do not issue player props until official game-day active/inactive and starting-lineup confirmations are supplied.",
-        "weather_status": "NOT_INTEGRATED",
+        "weather_status": "NOT_AVAILABLE",
         "sportsbook_status": "MANUAL_LINES_REQUIRED",
     }
 
