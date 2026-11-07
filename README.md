@@ -71,3 +71,8 @@ Code pushes run validation only; matchup simulations require an explicit manual 
 - The player-feed normalizer maps nflverse's legacy `LA` code to the simulator's canonical `LAR` code for Rams player and injury lookups.
 - A run must not be described as betting-ready solely because the simulation completed. Current official starters/inactives, verified team-stat freshness, current sportsbook prices, weather treatment, and out-of-sample calibration are separate readiness gates.
 - Do not issue player props from this team-level simulator. Its active output is team-level only.
+
+
+## Automated validation workflow
+
+The **NFL Simulator Validation and 100K Smoke Run** workflow runs the unit-test suite and a reproducible 100,000-trial pregame-gated smoke matchup (default: Atlanta home vs Cincinnati away) after relevant pushes to `main`. It can also be started manually from GitHub Actions with home team, away team, and trial-count inputs. Successful or partial reports are uploaded as the `nfl-simulator-validation-and-results` artifact.
