@@ -485,13 +485,13 @@ def main():
     print(f"Under: {result['under']:.2f}%")
     print(f"Push: {result['total_push']:.2f}%")
 
-    print("\nPROBABILITY-BASED MODEL LEANS")
+    print("\nPROBABILITY-BASED MODEL INDICATIONS - NOT BETS")
     print("=============================")
 
     if args.home_odds is None or args.away_odds is None:
         print("MONEYLINE: PASS - current two-way sportsbook prices are required.")
     elif result["home_win"] >= 55:
-        print(f"MODEL FAVORITE: {home['name']} ({result['home_win']:.1f}%)")
+        print(f"MODEL FAVORITE (NOT A BET): {home['name']} ({result['home_win']:.1f}%)")
     elif result["away_win"] >= 55:
         print(f"MODEL FAVORITE: {away['name']} ({result['away_win']:.1f}%)")
     else:
@@ -500,7 +500,7 @@ def main():
     if args.spread is None:
         print("SPREAD: PASS - current sportsbook spread is required.")
     elif result["home_cover"] >= 55:
-        print(f"MODEL SPREAD LEAN: {home['name']} ({result['home_cover']:.1f}%)")
+        print(f"MODEL SPREAD INDICATION (NOT A BET): {home['name']} ({result['home_cover']:.1f}%)")
     elif result["away_cover"] >= 55:
         print(f"MODEL SPREAD LEAN: {away['name']} ({result['away_cover']:.1f}%)")
     else:
@@ -509,7 +509,7 @@ def main():
     if args.total is None:
         print("TOTAL: PASS - current sportsbook total is required.")
     elif result["over"] >= 55:
-        print(f"MODEL TOTAL LEAN: OVER ({result['over']:.1f}%)")
+        print(f"MODEL TOTAL INDICATION (NOT A BET): OVER ({result['over']:.1f}%)")
     elif result["under"] >= 55:
         print(f"MODEL TOTAL LEAN: UNDER ({result['under']:.1f}%)")
     else:
