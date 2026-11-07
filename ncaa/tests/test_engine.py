@@ -95,6 +95,9 @@ class SimulatorTests(unittest.TestCase):
         result = run_sensitivity_scenarios(self.home, self.away, 500, seed=90)
         scenarios = result["scenarios"]
         self.assertEqual(len(scenarios), 6)
+        baseline = simulate_game(self.home, self.away, 500, seed=90)
+        self.assertEqual(scenarios["baseline"]["home_win_probability"],
+                         baseline["home_win_probability"])
         self.assertIn("baseline", scenarios)
         self.assertIn("home_offense_down_10pct", scenarios)
         self.assertIn("slow_pace_down_8pct", scenarios)
