@@ -35,12 +35,10 @@ on:
       home:
         description: Home college team
         required: true
-        default: Minnesota
         type: string
       away:
         description: Away college team
         required: true
-        default: UCLA
         type: string
       trials:
         description: Monte Carlo trials
