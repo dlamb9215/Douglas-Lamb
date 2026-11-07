@@ -11,6 +11,7 @@ Team-level NFL matchup simulator. Player-prop projections are not part of the ac
 - Full-game and first-half moneyline, spread, and total probabilities
 - Vig-free sportsbook comparison when odds and lines are supplied
 - Reproducible Monte Carlo runs (default: 100,000 trials)
+- 95% Wilson confidence intervals for simulated event probabilities, showing Monte Carlo sampling uncertainty
 
 ## Run one matchup
 
@@ -41,7 +42,7 @@ The workflow runs tests before the simulation and saves the text report as an ar
 
 - Team statistics are refreshed by the scheduled **Update NFL Statistics** workflow (Tuesday 12:00 UTC) and can also be run manually from Actions.
 - The simulator blocks a matchup when required team statistics are missing.
-- Current team-stat inputs are through the most recently completed refresh; the report displays the season and refresh timestamp. Validation rejects invalid team coverage, games played, and scoring averages. Verify injury/news reports before betting.
+- The current checked-in `nfl_team_stats.json` has 32-team coverage and 7–8 games per team, but its records currently omit `season` and `data_updated_at`. The simulator now prints a freshness warning instead of implying that this file has a verified refresh time. The stats updater must populate those metadata fields before freshness can be certified. Validation rejects invalid team coverage, games played, and scoring averages. Treat this early-season sample cautiously.
 - Scoring projections blend team points scored with opponent points allowed, then apply a shrunk offense-versus-defense yardage adjustment and a 1.5-point home-field assumption. This adjustment is transparent but not yet empirically calibrated.
 - Rankings are calculated for each available passing, rushing, total-offense, total-defense, and turnover metric. Higher is better for offensive production and takeaways; lower is better for defensive allowances and giveaways.
 - The scoring model uses team scoring averages and opponent points allowed, with drive-level Monte Carlo variation. Turnover probabilities are applied to drives, while non-turnover drive scoring is normalized so the observed team scoring averages are not reduced a second time by the same historical turnovers.
@@ -49,7 +50,7 @@ The workflow runs tests before the simulation and saves the text report as an ar
 - Tied regulation outcomes receive a simplified overtime approximation with one possession per team; a tie can remain. This is not a full NFL rules/play-by-play overtime engine.
 - The model is an estimate, not a guarantee or a historically proven edge.
 - First-half probabilities are approximate splits of full-game scoring.
-- The simulator does not currently verify official inactives, starting quarterbacks, weather, or sportsbook line movement automatically. Check those before final picks.
+- The player pool is sourced from nflverse and the pregame gate checks feed age, depth-chart QB1 status, and injury designations. Depth-chart order is not official game-day confirmation; official inactives and starters remain unverified until supplied by authoritative game-day sources. Weather is context only and does not apply an unvalidated scoring adjustment. Sportsbook lines are manually supplied and timestamp-checked; automatic odds and line movement are not integrated.
 
 
 ## NFL pregame workflow
@@ -62,3 +63,11 @@ Each manual run refreshes current-season team statistics and the latest nflverse
 The workflow intentionally does **not** create player props. Final game-day inactives and official starting lineups must be confirmed separately. Team-score injury adjustments, stadium weather adjustments, automatic sportsbook odds, and historical probability calibration are not yet integrated. The output labels these limitations and is not a betting-ready recommendation.
 
 Code pushes run validation only; matchup simulations require an explicit manual workflow dispatch.
+
+
+## Validation status and safeguards
+
+- Monte Carlo event probabilities now include two-sided 95% Wilson intervals. These quantify simulation sampling error only; they do not measure model misspecification or guarantee predictive accuracy.
+- The player-feed normalizer maps nflverse's legacy `LA` code to the simulator's canonical `LAR` code for Rams player and injury lookups.
+- A run must not be described as betting-ready solely because the simulation completed. Current official starters/inactives, verified team-stat freshness, current sportsbook prices, weather treatment, and out-of-sample calibration are separate readiness gates.
+- Do not issue player props from this team-level simulator. Its active output is team-level only.
