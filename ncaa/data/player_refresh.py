@@ -39,6 +39,14 @@ def refresh_player_data(year: int, season_type: str, api_key: str,
         warnings.append(f"Player usage metrics unavailable: {exc}")
         usage = None
 
+    try:
+        rosters = api_get("/roster", {"year": year, "classification": "fbs"}, api_key)
+        if not isinstance(rosters, list) or not rosters:
+            raise RuntimeError("CFBD roster endpoint returned no players.")
+    except RuntimeError as exc:
+        warnings.append(f"Current-season roster data unavailable: {exc}")
+        rosters = None
+
     retrieved_at = datetime.now(timezone.utc).isoformat()
     status = {
         "provider": "CollegeFootballData",
@@ -47,6 +55,7 @@ def refresh_player_data(year: int, season_type: str, api_key: str,
         "retrieved_at": retrieved_at,
         "stats_available": bool(stats),
         "usage_available": bool(usage),
+        "roster_available": bool(rosters),
         "warnings": warnings,
     }
     if stats:
@@ -54,6 +63,7 @@ def refresh_player_data(year: int, season_type: str, api_key: str,
             "metadata": status,
             "season_stats": stats,
             "usage": usage or [],
+            "rosters": rosters or [],
         }
         destination = output_dir / "player_season_data.json"
         temporary = destination.with_suffix(".json.tmp")
