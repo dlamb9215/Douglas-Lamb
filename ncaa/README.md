@@ -157,3 +157,6 @@ The scheduled/dispatch team refresh now has a separate optional player-data refr
 ## First-half projection method update
 
 The first-half projection runs a separate 30-minute simulation. Each possession consumes a sampled drive duration and possession alternates between teams. The output includes expected first-half drives by team. This is a clock-limited drive-level approximation, not a full play-by-play engine; end-of-half clock management, timeouts, quarter boundaries and two-minute strategy are not explicitly represented.
+
+
+When CFBD player stats refresh succeeds, the matchup workflow attempts to build player inputs automatically for the two selected teams. It uses player games played when the provider includes it; otherwise it uses the team's completed-game count and labels that fallback in the output. QB workload is based on season pass attempts/completions; RB on carries; WR/TE on receptions. This is a season-average workload baseline, not a depth-chart-adjusted projection. The per-opportunity yardage standard deviation is a documented heuristic (60% of average yards, with a 2-yard floor), not a fitted player-specific variance. The generated output retains player sample size and denominator provenance.
