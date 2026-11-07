@@ -76,6 +76,7 @@ def analyze_matchup(home, away, player_pool, prop_lines=None,
                 item["simulation"] = simulate_player_prop(
                     projection, stat, float(line),
                     trials=trials, seed=seed + index,
+                    standard_deviation=projection["projected_stats"].get(stat + "_stddev"),
                 )
             props.append(item)
         reports.append({
