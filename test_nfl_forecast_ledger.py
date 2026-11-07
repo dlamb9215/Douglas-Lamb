@@ -26,6 +26,10 @@ class NFLForecastLedgerTests(unittest.TestCase):
             self.assertEqual(summary["settled_games"],1)
             self.assertEqual(summary["home_win_brier_score"],0.1444)
             self.assertFalse(summary["calibrated"])
+            self.assertEqual(summary["spread_sample_size"], 1)
+            self.assertEqual(summary["total_sample_size"], 1)
+            self.assertEqual(summary["spread_brier_score"], 0.2025)
+            self.assertEqual(summary["total_brier_score"], 0.2601)
 
     def test_rejects_invalid_probabilities(self):
         with tempfile.TemporaryDirectory() as directory:
