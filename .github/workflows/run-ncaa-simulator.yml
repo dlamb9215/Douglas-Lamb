@@ -110,8 +110,9 @@ jobs:
           AWAY_TEAM: ${{ inputs.away }}
           GAME_KICKOFF: ${{ inputs.kickoff }}
           SEASON_YEAR: ${{ inputs.season_year }}
+          SEASON_TYPE: ${{ inputs.season_type }}
         run: |
-          args=(--year "$SEASON_YEAR" --home "$HOME_TEAM" --away "$AWAY_TEAM" --output weather.json)
+          args=(--year "$SEASON_YEAR" --season-type "$SEASON_TYPE" --home "$HOME_TEAM" --away "$AWAY_TEAM" --output weather.json)
           if [[ -n "$GAME_KICKOFF" ]]; then args+=(--kickoff "$GAME_KICKOFF"); fi
           python -m ncaa.weather "${args[@]}"
       - name: Refresh player season statistics and usage (optional provider entitlement)
