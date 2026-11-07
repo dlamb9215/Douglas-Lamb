@@ -6,6 +6,7 @@ NFL MATCHUP AND 100,000 TRIAL ENGINE
 import random
 import argparse
 import json
+import os
 from drive_simulator import simulate_drive_game
 from nfl_data import (
     load_team_stats,
@@ -399,6 +400,61 @@ def main():
         away_turnover_rate=away['turnovers']['giveaways'] / max(away.get('games_played', 1), 1) / 10.6,
     )
 
+
+    if pregame_report:
+        weather = pregame_report.get("weather", {})
+        print("\\nKICKOFF WEATHER CONTEXT")
+        print("======================")
+        if weather.get("available"):
+            print(f"Venue: {weather.get('venue')} | {weather.get('venue_city')}")
+            print(f"Kickoff: {weather.get('kickoff')} | Roof: {weather.get('roof')} | Surface: {weather.get('surface')}")
+            print(f"Temperature: {weather.get('temperature_f')} F | Wind: {weather.get('wind_mph')} mph | Gusts: {weather.get('wind_gust_mph')} mph | Precipitation: {weather.get('precipitation_mm_per_hour')} mm/hr")
+            print("Weather treatment: CONTEXT ONLY - no unvalidated scoring coefficient applied.")
+        else:
+            print(f"Weather unavailable: {weather.get('warning', 'not supplied')}")
+        print("\\nSNAP-WEIGHTED INJURY EXPOSURE")
+        print("=============================")
+        for team_code, exposure in pregame_report.get("injury_exposure", {}).items():
+            print(f"{team_code}: index {exposure.get('weighted_injury_exposure_index')} | flagged players: {exposure.get('players_with_reported_designations')}")
+            for injured in exposure.get("players", [])[:5]:
+                print(f"  {injured.get('player')} ({injured.get('position')}) {injured.get('injury_status')} | snap share {injured.get('snap_share_pct')}% | exposure {injured.get('weighted_exposure')}")
+        print("Injury exposure is a sensitivity indicator, not a calibrated point deduction.")
+
+    from nfl_forecast_ledger import append_forecast, calibration_summary
+    weather = pregame_report.get("weather", {}) if pregame_report else {}
+    ledger_record = {
+        "run_id": os.environ.get("GITHUB_RUN_ID", f"local-{home_code}-{away_code}-{args.seed}"),
+        "season": pregame_report.get("season") if pregame_report else home.get("season"),
+        "week": weather.get("week", ""),
+        "home_team": home_code,
+        "away_team": away_code,
+        "kickoff": weather.get("kickoff", ""),
+        "trials": args.trials,
+        "seed": args.seed,
+        "home_win_probability": result["home_win"],
+        "away_win_probability": result["away_win"],
+        "home_spread": args.spread if args.spread is not None else "",
+        "home_cover_probability": result["home_cover"] if args.spread is not None else "",
+        "away_cover_probability": result["away_cover"] if args.spread is not None else "",
+        "total_line": args.total if args.total is not None else "",
+        "over_probability": result["over"] if args.total is not None else "",
+        "under_probability": result["under"] if args.total is not None else "",
+        "home_moneyline_odds": args.home_odds if args.home_odds is not None else "",
+        "away_moneyline_odds": args.away_odds if args.away_odds is not None else "",
+        "over_odds": args.over_odds if args.over_odds is not None else "",
+        "under_odds": args.under_odds if args.under_odds is not None else "",
+        "weather_available": bool(weather.get("available")),
+        "weather_wind_mph": weather.get("wind_mph", ""),
+        "weather_precipitation_mm_per_hour": weather.get("precipitation_mm_per_hour", ""),
+        "pregame_verified": False,
+    }
+    added = append_forecast(ledger_record)
+    summary = calibration_summary()
+    print("\\nNFL FORECAST TRACKING")
+    print("=====================")
+    print(f"Forecast ledger: {'APPENDED' if added else 'DUPLICATE RUN SKIPPED'}")
+    print(f"Settled games available for calibration review: {summary.get('settled_games', 0)}")
+    print(f"Historical calibration status: {summary.get('status')} (calibrated={summary.get('calibrated', False)})")
 
     print("\nFIRST-HALF SIMULATION")
     print("=====================")
