@@ -178,6 +178,7 @@ def simulate_game(
     away_first_scores: list[int] = []
     home_wins = ties = home_covers = home_cover_pushes = overs = total_pushes = 0
     margin_sum = total_sum = first_home_sum = first_away_sum = 0.0
+    first_half_home_drives = first_half_away_drives = 0
 
     for _ in range(trials):
         # Small shared game-environment shock creates correlated pace/scoring variance.
