@@ -152,7 +152,7 @@ def build_dataset(year: int, season_type: str, api_key: str,
         "year": year, "seasonType": season_type, "classification": classification
     }, api_key)
     # CFBD requires one of week, team, or conference when querying
-    # game-level team box scores by season. Fetch each FBS week separately.
+    # game-level team box scores by season. Fetch each week separately.
     team_games = []
     for week in range(1, 18):
         week_rows = api_get("/games/teams", {
@@ -164,7 +164,7 @@ def build_dataset(year: int, season_type: str, api_key: str,
     provider_warnings = []
     try:
         advanced_rows = api_get("/stats/season/advanced", {
-            "year": year, "excludeGarbageTime": "true"
+            "year": year, "excludeGarbageTime": "true", "classification": classification
         }, api_key)
     except RuntimeError as exc:
         if "403" not in str(exc) and "404" not in str(exc):
@@ -186,7 +186,7 @@ def build_dataset(year: int, season_type: str, api_key: str,
         if g.get("homePoints") is not None and g.get("awayPoints") is not None
         and g.get("homeTeam") and g.get("awayTeam")
         and str(g.get("homeTeam")).casefold() in team_names
-        and str(g.get("awayTeam")).casefold() in fbs_names
+        and str(g.get("awayTeam")).casefold() in team_names
     ]
     if not completed:
         raise RuntimeError(
