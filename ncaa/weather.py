@@ -44,7 +44,7 @@ def fetch_game_weather(year: int, home: str, away: str, api_key: str,
         aliases = rank_data.get("metadata", {}).get("team_aliases", {})
         home = aliases.get(home.casefold(), home)
         away = aliases.get(away.casefold(), away)
-    games = api_get("/games",
+    games = api_get("/games", {
         "year": year, "seasonType": season_type, "home": home, "away": away,
         "classification": classification,
     }, api_key)
