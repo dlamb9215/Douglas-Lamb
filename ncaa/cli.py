@@ -58,7 +58,7 @@ def main() -> None:
     )
     result["scenario_sensitivity"] = run_sensitivity_scenarios(
         home, away, args.trials, MarketLines(args.home_spread, args.total),
-        args.seed + args.trials, args.neutral_site,
+        args.seed, args.neutral_site,
     )
     result["pregame_verification"] = pregame
     weather_context = None
