@@ -403,7 +403,7 @@ def main():
 
     if pregame_report:
         weather = pregame_report.get("weather", {})
-        print("\\nKICKOFF WEATHER CONTEXT")
+        print("\nKICKOFF WEATHER CONTEXT")
         print("======================")
         if weather.get("available"):
             print(f"Venue: {weather.get('venue')} | {weather.get('venue_city')}")
@@ -412,7 +412,7 @@ def main():
             print("Weather treatment: CONTEXT ONLY - no unvalidated scoring coefficient applied.")
         else:
             print(f"Weather unavailable: {weather.get('warning', 'not supplied')}")
-        print("\\nSNAP-WEIGHTED INJURY EXPOSURE")
+        print("\nSNAP-WEIGHTED INJURY EXPOSURE")
         print("=============================")
         for team_code, exposure in pregame_report.get("injury_exposure", {}).items():
             print(f"{team_code}: index {exposure.get('weighted_injury_exposure_index')} | flagged players: {exposure.get('players_with_reported_designations')}")
@@ -450,7 +450,7 @@ def main():
     }
     added = append_forecast(ledger_record)
     summary = calibration_summary()
-    print("\\nNFL FORECAST TRACKING")
+    print("\nNFL FORECAST TRACKING")
     print("=====================")
     print(f"Forecast ledger: {'APPENDED' if added else 'DUPLICATE RUN SKIPPED'}")
     print(f"Settled games available for calibration review: {summary.get('settled_games', 0)}")
