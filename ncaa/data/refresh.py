@@ -21,7 +21,7 @@ PROFILE_FIELDS = [
     "yards_per_play_allowed", "plays_per_game", "points_per_drive",
     "pass_yards_per_game", "rush_yards_per_game", "pass_attempts_per_game", "completions_per_game", "completion_pct", "yards_per_pass_attempt",
     "pass_tds_per_game", "interceptions_per_game", "pass_first_downs_per_game", "rush_attempts_per_game", "yards_per_carry", "rush_tds_per_game", "rush_first_downs_per_game",
-    "pass_yards_allowed_per_game", "opponent_pass_attempts_per_game", "opponent_completions_per_game", "opponent_yards_per_completion", "opponent_yards_per_pass_attempt_allowed", "rush_yards_allowed_per_game", "opponent_rush_attempts_per_game", "opponent_yards_per_carry_allowed",
+    "pass_yards_allowed_per_game", "plays_allowed_per_game", "pass_first_downs_allowed_per_game", "rush_first_downs_allowed_per_game", "opponent_pass_attempts_per_game", "opponent_completions_per_game", "opponent_yards_per_completion", "opponent_yards_per_pass_attempt_allowed", "rush_yards_allowed_per_game", "opponent_rush_attempts_per_game", "opponent_yards_per_carry_allowed",
     "turnovers_per_game", "takeaways_per_game", "turnover_margin_per_game", "explosive_play_rate",
     "success_rate", "strength_rating", "games_sampled", "source", "as_of",
 ]
@@ -238,6 +238,7 @@ def build_dataset(year: int, season_type: str, api_key: str,
                 "rush_attempts": 0.0, "first_downs": 0.0, "sacks": 0.0,
                 "pass_tds": 0.0, "interceptions_thrown": 0.0, "pass_first_downs": 0.0, "rush_tds": 0.0, "rush_first_downs": 0.0,
                 "pass_yards_allowed": 0.0, "opp_pass_attempts": 0.0, "opp_completions": 0.0, "rush_yards_allowed": 0.0, "opp_rush_attempts": 0.0,
+                "pass_first_downs_allowed": 0.0, "rush_first_downs_allowed": 0.0,
             })
             stats = extract_stats(team)
             row["games"] += 1
@@ -288,6 +289,8 @@ def build_dataset(year: int, season_type: str, api_key: str,
             row["opp_completions"] += pick(other_stats, "passCompletions", "completions") or 0.0
             row["rush_yards_allowed"] += pick(other_stats, "rushingYards", "rushYards") or 0.0
             row["opp_rush_attempts"] += pick(other_stats, "rushAttempts", "rushingAttempts") or 0.0
+            row["pass_first_downs_allowed"] += pick(other_stats, "passingFirstDowns", "passFirstDowns") or 0.0
+            row["rush_first_downs_allowed"] += pick(other_stats, "rushingFirstDowns", "rushFirstDowns") or 0.0
             other_plays = pick(other_stats, "totalPlays", "plays")
             if other_plays is None:
                 other_plays = (pick(other_stats, "passAttempts", "passingAttempts") or 0.0) + (pick(other_stats, "rushAttempts", "rushingAttempts") or 0.0) + (pick(other_stats, "sacks") or 0.0)
