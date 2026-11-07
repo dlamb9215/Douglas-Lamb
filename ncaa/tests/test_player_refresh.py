@@ -13,13 +13,16 @@ class PlayerRefreshTests(unittest.TestCase):
             with patch("ncaa.data.player_refresh.api_get", side_effect=[
                 [{"player": "Sample", "category": "rushing", "statType": "YDS", "stat": "100"}],
                 [{"id": "1", "name": "Sample", "team": "Sample U", "usage": {"rush": 0.4}}],
+                [{"id": "1", "firstName": "Sample", "lastName": "Player", "team": "Sample U", "position": "RB"}],
             ]):
                 status = refresh_player_data(2026, "regular", "test-key", directory)
             self.assertTrue(status["stats_available"])
             self.assertTrue(status["usage_available"])
+            self.assertTrue(status["roster_available"])
             payload = json.loads((Path(directory) / "player_season_data.json").read_text())
             self.assertEqual(payload["season_stats"][0]["player"], "Sample")
             self.assertEqual(payload["usage"][0]["usage"]["rush"], 0.4)
+            self.assertEqual(payload["rosters"][0]["id"], "1")
 
     def test_provider_failure_preserves_previous_player_cache(self):
         with tempfile.TemporaryDirectory() as directory:
