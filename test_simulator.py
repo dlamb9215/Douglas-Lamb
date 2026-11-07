@@ -147,5 +147,23 @@ class TestDougSimulator(unittest.TestCase):
         self.assertLess(result["home_avg"], 30)
         self.assertLess(result["away_avg"], 30)
 
+    def test_wilson_confidence_intervals_are_valid_and_narrow_with_more_trials(self):
+        from drive_simulator import _wilson_interval
+        small = _wilson_interval(50, 100)
+        large = _wilson_interval(5000, 10000)
+        self.assertLess(small[0], 50.0)
+        self.assertGreater(small[1], 50.0)
+        self.assertLess(large[0], 50.0)
+        self.assertGreater(large[1], 50.0)
+        self.assertLess(large[1] - large[0], small[1] - small[0])
+
+    def test_simulation_returns_confidence_intervals_for_outcomes(self):
+        result = simulate_drive_game(24, 21, -3, 45, trials=10000, seed=17)
+        for key in ("home_win", "away_win", "home_cover", "away_cover", "over", "under"):
+            low, high = result["probability_ci95"][key]
+            self.assertGreaterEqual(low, 0.0)
+            self.assertLessEqual(high, 100.0)
+            self.assertLessEqual(low, result[key])
+            self.assertGreaterEqual(high, result[key])
 if __name__ == "__main__":
     unittest.main()
