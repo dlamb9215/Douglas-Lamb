@@ -69,12 +69,20 @@ def _score(rows: list[dict], probability_field: str, outcome_field: str) -> dict
 def evaluate_predictions(rows: list[dict]) -> dict:
     if not rows:
         raise ValueError("No prediction rows found")
+    has_status = any("pregame_status" in row for row in rows)
+    eligible = ([row for row in rows if row.get("pregame_status", "").strip().lower() == "pregame"]
+                if has_status else rows)
+    excluded = len(rows) - len(eligible)
+    if not eligible:
+        raise ValueError("No verified pregame forecast rows available for calibration")
     return {
-        "games": len(rows),
-        "moneyline": _score(rows, "home_win_probability", "home_win"),
-        "spread": _score(rows, "home_cover_probability", "home_cover"),
-        "total": _score(rows, "over_probability", "over"),
-        "warning": "Evaluation is meaningful only for timestamped predictions saved before kickoff.",
+        "games": len(eligible),
+        "excluded_non_pregame_or_unknown": excluded,
+        "moneyline": _score(eligible, "home_win_probability", "home_win"),
+        "spread": _score(eligible, "home_cover_probability", "home_cover"),
+        "total": _score(eligible, "over_probability", "over"),
+        "warning": ("Only rows marked pregame are evaluated when status is present. "
+                    "Legacy CSVs without pregame_status are accepted but cannot be independently verified."),
     }
 
 
