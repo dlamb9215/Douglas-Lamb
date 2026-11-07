@@ -40,6 +40,13 @@ def main() -> None:
     parser.add_argument("--ledger", default=None, help="Optional CSV path for timestamped forecast history")
     args = parser.parse_args()
 
+    data_path = args.data or ("ncaa/data/team_profiles.csv" if args.classification == "fbs" else "ncaa/data/team_profiles_fcs.csv")
+    rankings_file = args.rankings or ("ncaa/data/team_rankings.json" if args.classification == "fbs" else "ncaa/data/team_rankings_fcs.json")
+    ranking_path = Path(rankings_file)
+    ranking_data = json.loads(ranking_path.read_text(encoding="utf-8")) if ranking_path.exists() else {}
+    aliases = ranking_data.get("metadata", {}).get("team_aliases", {})
+    args.home = aliases.get(args.home.casefold(), args.home)
+    args.away = aliases.get(args.away.casefold(), args.away)
     if args.require_verified_pregame and not args.pregame_checks:
         parser.error("--require-verified-pregame needs --pregame-checks")
     pregame = (load_pregame_checks(
@@ -50,8 +57,6 @@ def main() -> None:
         "unverified": ["starting quarterbacks", "injuries", "weather", "sportsbook"],
         "warning": "No sourced pregame checks supplied.",
     })
-    data_path = args.data or ("ncaa/data/team_profiles.csv" if args.classification == "fbs" else "ncaa/data/team_profiles_fcs.csv")
-    rankings_file = args.rankings or ("ncaa/data/team_rankings.json" if args.classification == "fbs" else "ncaa/data/team_rankings_fcs.json")
     profiles = load_profiles(data_path)
     missing_profiles = [name for name in (args.home, args.away) if name.casefold() not in profiles]
     if missing_profiles and not args.allow_prior:
@@ -114,9 +119,7 @@ def main() -> None:
             result, args.ledger, kickoff=ledger_kickoff,
         )
     result["data_file"] = data_path
-    ranking_path = Path(rankings_file)
-    if ranking_path.exists():
-        ranking_data = json.loads(ranking_path.read_text(encoding="utf-8"))
+    if ranking_data:
         ranking_teams = ranking_data.get("teams", {})
         def team_rank(name):
             key = next((k for k in ranking_teams if k.casefold() == name.casefold()), None)
