@@ -194,6 +194,13 @@ def main():
     print(f"Season: {seasons[-1] if seasons else 'Not recorded'}")
     print(f"Data refreshed: {timestamps[-1] if timestamps else 'Timestamp unavailable'}")
     print(f"Teams loaded: {len(database)}")
+    if not seasons or not timestamps:
+        print("DATA FRESHNESS WARNING: season and/or refresh timestamp metadata is missing; freshness cannot be independently verified.")
+    for code in (args.home.upper(), args.away.upper()):
+        games = database.get(code, {}).get("games_played", 0)
+        print(f"{code} sample: {games} games played")
+        if games < 10:
+            print(f"SMALL-SAMPLE WARNING: {code} has fewer than 10 games in the current input; shrink projections and avoid strong confidence claims.")
 
     home_code = args.home.upper()
     away_code = args.away.upper()
