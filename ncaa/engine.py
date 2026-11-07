@@ -18,6 +18,8 @@ class TeamProfile:
     points_against: float = 28.0
     yards_per_play: float = 5.8
     yards_per_play_allowed: float = 5.8
+    total_yards_per_game: float = 0.0
+    total_yards_allowed_per_game: float = 0.0
     plays_per_game: float = 70.0
     pass_yards_per_game: float = 0.0
     rush_yards_per_game: float = 0.0
@@ -317,6 +319,7 @@ def _team_metrics(team: TeamProfile) -> dict:
             "yards_per_carry": team.yards_per_carry,
             "rush_tds_per_game": team.rush_tds_per_game,
             "rush_first_downs_per_game": team.rush_first_downs_per_game,
+            "total_yards_per_game": team.total_yards_per_game,
             "total_yards_per_play": team.yards_per_play,
             "plays_per_game": team.plays_per_game,
         },
@@ -332,6 +335,7 @@ def _team_metrics(team: TeamProfile) -> dict:
             "rush_yards_allowed_per_game": team.rush_yards_allowed_per_game,
             "opponent_rush_attempts_per_game": team.opponent_rush_attempts_per_game,
             "opponent_yards_per_carry_allowed": team.opponent_yards_per_carry_allowed,
+            "total_yards_allowed_per_game": team.total_yards_allowed_per_game,
             "total_yards_per_play_allowed": team.yards_per_play_allowed,
         },
         "turnovers": {"giveaways_per_game": team.turnovers_per_game, "takeaways_per_game": team.takeaways_per_game},
