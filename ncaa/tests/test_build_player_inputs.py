@@ -75,6 +75,34 @@ class BuildPlayerInputsTests(unittest.TestCase):
             self.assertEqual([p["player"] for p in built], ["QB One"])
             self.assertTrue(built[0]["roster_verified"])
 
+    def test_player_team_filter_resolves_mascot_alias(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            player_path = root / "player_season_data.json"
+            team_path = root / "team_profiles_fcs.csv"
+            output_path = root / "inputs.json"
+            ranking_path = root / "team_rankings_fcs.json"
+            player_path.write_text(json.dumps({
+                "metadata": {"retrieved_at": datetime.now(timezone.utc).isoformat(),
+                             "classification": "fcs", "roster_available": False},
+                "season_stats": [
+                    {"player": "Runner", "team": "Howard", "position": "RB",
+                     "category": "rushing", "statType": "CAR", "stat": "40"},
+                    {"player": "Runner", "team": "Howard", "position": "RB",
+                     "category": "rushing", "statType": "YDS", "stat": "200"},
+                ],
+                "usage": [], "rosters": [],
+            }))
+            team_path.write_text("team,games_sampled\nHoward,4\n")
+            ranking_path.write_text(json.dumps({
+                "metadata": {"team_aliases": {"howard bison": "Howard"}},
+                "teams": {},
+            }))
+            built = build_player_inputs(player_path, team_path, output_path,
+                                        teams={"Howard Bison"}, classification="fcs")
+            self.assertEqual(len(built), 1)
+            self.assertEqual(built[0]["team"], "Howard")
+
     def test_rejects_wrong_subdivision_player_cache(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
