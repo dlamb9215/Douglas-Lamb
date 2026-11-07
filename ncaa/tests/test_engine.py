@@ -19,6 +19,8 @@ class SimulatorTests(unittest.TestCase):
             yards_per_pass_attempt=8.4, yards_per_carry=5.1,
             opponent_yards_per_completion=5.8, opponent_yards_per_carry_allowed=3.7,
             pass_yards_per_game=285, rush_yards_per_game=190,
+            plays_allowed_per_game=63, pass_first_downs_allowed_per_game=8.5,
+            rush_first_downs_allowed_per_game=6.2,
             source="test data",
         )
         self.away = TeamProfile(
@@ -89,6 +91,8 @@ class SimulatorTests(unittest.TestCase):
         self.assertEqual(comparison["offense"]["rush_yards_per_game"], 190)
         self.assertEqual(comparison["defense"]["total_yards_per_play_allowed"],
                          self.home.yards_per_play_allowed)
+        self.assertEqual(comparison["defense"]["plays_allowed_per_game"], 63)
+        self.assertEqual(comparison["defense"]["pass_first_downs_allowed_per_game"], 8.5)
         self.assertIn("turnovers", comparison)
 
     def test_sensitivity_scenarios_are_explicit_and_complete(self):
