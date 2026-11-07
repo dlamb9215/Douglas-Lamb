@@ -185,7 +185,7 @@ def build_dataset(year: int, season_type: str, api_key: str,
     provider_warnings = []
     try:
         advanced_rows = api_get("/stats/season/advanced", {
-            "year": year, "excludeGarbageTime": "true", "classification": classification
+            "year": year, "seasonType": season_type, "excludeGarbageTime": "true", "classification": classification
         }, api_key)
     except RuntimeError as exc:
         if "403" not in str(exc) and "404" not in str(exc):
