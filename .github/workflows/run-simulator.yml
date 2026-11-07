@@ -28,6 +28,8 @@ on:
       - "nfl_forecast_ledger.py"
       - "injury_exposure.py"
       - "nfl_weather.py"
+      - "market_data.py"
+      - "test_market_data.py"
       - ".github/workflows/run-simulator.yml"
   workflow_dispatch:
     inputs:
@@ -73,6 +75,16 @@ on:
         type: string
       under_odds:
         description: Current under American odds; leave blank if unavailable
+        required: false
+        default: ""
+        type: string
+      odds_source:
+        description: Sportsbook name/source for all supplied market lines
+        required: false
+        default: ""
+        type: string
+      odds_checked_at:
+        description: ISO-8601 timestamp with timezone for when market lines were checked
         required: false
         default: ""
         type: string
@@ -151,6 +163,8 @@ jobs:
           if [[ -n "${{ inputs.away_odds }}" ]]; then ARGS+=(--away-odds "${{ inputs.away_odds }}"); fi
           if [[ -n "${{ inputs.over_odds }}" ]]; then ARGS+=(--over-odds "${{ inputs.over_odds }}"); fi
           if [[ -n "${{ inputs.under_odds }}" ]]; then ARGS+=(--under-odds "${{ inputs.under_odds }}"); fi
+          if [[ -n "${{ inputs.odds_source }}" ]]; then ARGS+=(--odds-source "${{ inputs.odds_source }}"); fi
+          if [[ -n "${{ inputs.odds_checked_at }}" ]]; then ARGS+=(--odds-checked-at "${{ inputs.odds_checked_at }}"); fi
           if [[ "${{ inputs.neutral_site }}" == "true" ]]; then ARGS+=(--neutral-site); fi
           python main.py "${ARGS[@]}" | tee simulation-results.txt
 
