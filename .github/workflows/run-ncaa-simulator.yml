@@ -82,6 +82,13 @@ jobs:
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
         run: python -m ncaa.data.player_refresh --year 2026 --season-type regular
+      - name: Build player projection inputs from CFBD season stats (optional)
+        continue-on-error: true
+        env:
+          HOME_TEAM: ${{ inputs.home }}
+          AWAY_TEAM: ${{ inputs.away }}
+        run: |
+          python -m ncaa.data.build_player_inputs --teams "$HOME_TEAM" "$AWAY_TEAM" --output player-inputs.json
       - name: Run NCAA simulator tests
         run: python -m unittest discover -s ncaa/tests -v
       - name: Write optional pregame and player inputs
