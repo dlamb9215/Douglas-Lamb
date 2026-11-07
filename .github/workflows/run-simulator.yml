@@ -184,11 +184,53 @@ jobs:
             echo "PLAYER PROPS BLOCKED: confirmation file is stale, invalid, or missing required data." >> player-prop-status.txt
           fi
 
+      - name: Write readable run summary
+        if: always() && github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          {
+            echo "# Doug's Elite Game Simulator"
+            echo ""
+            echo "- Matchup: ${{ inputs.away || 'CIN' }} at ${{ inputs.home || 'ATL' }}"
+            echo "- Trials requested: ${{ inputs.trials || '100000' }}"
+            echo "- Workflow run: ${{ github.run_id }}"
+            echo ""
+            echo "## Pregame gates"
+            if [[ -f pregame-context.json ]]; then
+              python - <<'PY'
+          import json
+          d=json.load(open("pregame-context.json", encoding="utf-8"))
+          print(f"- Player data source: {d.get('source', 'unknown')}")
+          print(f"- Team simulation context available: {d.get('team_simulation_ready', False)}")
+          print("- Official game-day inactives/starters: NOT CONFIRMED by feed")
+          for item in d.get("betting_readiness_blockers", []):
+              print(f"- Betting gate: {item}")
+          PY
+            else
+              echo "- Pregame context report was not created."
+            fi
+            echo ""
+            echo "## Simulation output"
+            if [[ -f simulation-results.txt ]]; then
+              cat simulation-results.txt
+            else
+              echo "No simulation-results.txt was created; inspect failed workflow steps."
+            fi
+            echo ""
+            echo "## Player-prop status"
+            if [[ -f player-prop-status.txt ]]; then
+              cat player-prop-status.txt
+            else
+              echo "Player-prop pipeline did not create a status report."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Save results
-        if: github.event_name == 'workflow_dispatch'
+        if: always() && github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
           name: matchup-simulation-results
+          if-no-files-found: warn
           path: |
             simulation-results.txt
             pregame-context.json
