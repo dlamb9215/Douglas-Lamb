@@ -90,3 +90,10 @@ This is price math only: it does not fetch live sportsbook prices, guarantee a p
 ## Readiness and data gates
 
 The team-level simulator can run from a validated CFBD refresh and accepts user-entered market lines. It deliberately does not invent injury status, confirmed starting quarterbacks, player snap/route/touch projections, or weather. CFBD documents that weather availability varies and its weather endpoint requires an eligible paid tier. No verified injury feed is currently wired into this repository. Treat these as manual pregame checks until a trustworthy source is configured. Forecasts remain uncalibrated until a sufficiently large, timestamped pregame ledger is collected and evaluated with `ncaa.backtest`.
+
+
+## Scenario stress testing (added November 2026)
+
+Every CLI matchup now includes six separately seeded sensitivity runs in the JSON output and terminal summary: baseline, home offense reduced 10%, away offense reduced 10%, both offenses reduced 10%, both teams' pace reduced 8%, and both teams' pace increased 8%. These are transparent assumption stress tests. They are **not** injury-status reports, not weighted scenarios, and not calibrated probabilities. The base forecast remains the primary projection. Scenario results are intended to show whether a pick is fragile to reasonable changes in efficiency or pace.
+
+Verified injuries, confirmed starting quarterbacks, depth charts and player usage remain pregame manual checks because no trustworthy automated feed is configured. Entering an assumption into a scenario is not evidence that a player is injured or unavailable.
