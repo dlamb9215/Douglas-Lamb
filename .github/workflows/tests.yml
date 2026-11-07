@@ -20,9 +20,9 @@ jobs:
       - name: Install NBA dependency
         run: python -m pip install --upgrade pip numpy
       - name: Compile all simulator modules
-        run: python -m compileall -q ncaa nba
+        run: python -m compileall -q .
       - name: Run NFL simulator tests
-        run: python -m unittest -v test_simulator
+        run: python -m unittest -v test_simulator test_pregame_context test_nfl_player_data test_player_availability test_player_prop_simulator test_matchup_player_pipeline test_nfl_weather test_injury_exposure test_nfl_forecast_ledger test_calibration
       - name: Run NBA simulator and backtest tests
         run: python -m unittest -v nba.test_simulator nba.test_backtest
       - name: Run NCAA simulator and data pipeline tests
