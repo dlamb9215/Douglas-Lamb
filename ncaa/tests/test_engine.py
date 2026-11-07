@@ -1,6 +1,7 @@
 import unittest
 from ncaa.engine import MarketLines, TeamProfile, simulate_game
 from ncaa.data import get_profile, load_profiles
+from ncaa.scenarios import run_sensitivity_scenarios
 
 
 class SimulatorTests(unittest.TestCase):
@@ -76,6 +77,18 @@ class SimulatorTests(unittest.TestCase):
         self.assertEqual(comparison["defense"]["total_yards_per_play_allowed"],
                          self.home.yards_per_play_allowed)
         self.assertIn("turnovers", comparison)
+
+    def test_sensitivity_scenarios_are_explicit_and_complete(self):
+        result = run_sensitivity_scenarios(self.home, self.away, 500, seed=90)
+        scenarios = result["scenarios"]
+        self.assertEqual(len(scenarios), 6)
+        self.assertIn("baseline", scenarios)
+        self.assertIn("home_offense_down_10pct", scenarios)
+        self.assertIn("slow_pace_down_8pct", scenarios)
+        self.assertIn("not weighted or calibrated", result["interpretation"])
+        for scenario in scenarios.values():
+            self.assertGreaterEqual(scenario["home_win_probability"], 0)
+            self.assertLessEqual(scenario["home_win_probability"], 1)
 
     def test_invalid_trial_count_rejected(self):
         with self.assertRaises(ValueError):
