@@ -10,13 +10,17 @@ REQUIRED = ("home_starting_qb", "away_starting_qb", "home_injuries",
 
 
 def load_pregame_checks(path: str | Path, home: str, away: str, *,
-                        require_verified: bool = False) -> dict:
+                        require_verified: bool = False,
+                        aliases: dict[str, str] | None = None) -> dict:
     raw = json.loads(Path(path).read_text(encoding="utf-8"))
     if not isinstance(raw, dict):
         raise ValueError("Pregame checks must be a JSON object")
-    if raw.get("home_team", "").casefold() != home.casefold():
+    aliases = aliases or {}
+    raw_home = aliases.get(str(raw.get("home_team", "")).casefold(), raw.get("home_team", ""))
+    raw_away = aliases.get(str(raw.get("away_team", "")).casefold(), raw.get("away_team", ""))
+    if str(raw_home).casefold() != home.casefold():
         raise ValueError("Pregame home team does not match simulation")
-    if raw.get("away_team", "").casefold() != away.casefold():
+    if str(raw_away).casefold() != away.casefold():
         raise ValueError("Pregame away team does not match simulation")
     checks = raw.get("checks")
     if not isinstance(checks, dict):
