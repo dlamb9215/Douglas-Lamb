@@ -12,7 +12,8 @@ FIELDS = [
     "home_win_probability", "home_spread", "home_cover_probability",
     "total_line", "over_probability", "home_moneyline_odds", "away_moneyline_odds",
     "over_odds", "under_odds", "home_data_as_of", "away_data_as_of",
-    "player_projection_count", "data_warnings",
+    "player_projection_count", "data_warnings", "actual_home_score", "actual_away_score",
+    "home_win", "home_cover", "over", "outcome_source", "outcome_retrieved_at",
 ]
 
 
@@ -65,6 +66,9 @@ def append_forecast(result: dict, path: str | Path, kickoff: str | None = None,
         "away_data_as_of": profiles.get(result.get("away_team"), {}).get("as_of", ""),
         "player_projection_count": len(result.get("player_projections", [])),
         "data_warnings": " | ".join(quality.get("warnings", [])),
+        "actual_home_score": "", "actual_away_score": "",
+        "home_win": "", "home_cover": "", "over": "",
+        "outcome_source": "", "outcome_retrieved_at": "",
     }
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
