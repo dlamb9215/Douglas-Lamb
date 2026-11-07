@@ -92,6 +92,17 @@ class TestMatchupPlayerPipeline(unittest.TestCase):
         self.assertTrue(projection["opponent_adjustment"]["applied"])
         self.assertEqual(projection["opponent_adjustment"]["opponent"], "MIA")
 
+    def test_player_prop_market_comparison_removes_vig_and_reports_ev(self):
+        lines = {"BUF:Example Receiver:receiving_yards": {
+            "line": 69.5, "over_odds": -110, "under_odds": -110
+        }}
+        report = analyze_matchup("BUF", "MIA", self.pool, lines, 5000, 77,
+                                 self.confirmations)
+        market = report["players"][0]["props"][2]["market_comparison"]
+        self.assertAlmostEqual(market["vig_free_over_probability"], 50.0, places=2)
+        self.assertIn("over_expected_value_per_100", market)
+        self.assertIn("under_edge_percentage_points", market)
+
     def test_invalid_same_team_matchup_rejected(self):
         with self.assertRaises(ValueError):
             analyze_matchup("BUF", "BUF", self.pool, confirmations=self.confirmations)
