@@ -53,6 +53,22 @@ class PlayerProjectionTests(unittest.TestCase):
             result = simulate_players(path, trials=500, seed=9)
             self.assertEqual(result[0]["player"], "Test Runner")
 
+    def test_reduced_availability_requires_fresh_source(self):
+        from ncaa.players import simulate_player
+        unavailable = dict(
+            self.player, availability_probability=0.0,
+            availability_source="official team report",
+            availability_checked_at=date.today().isoformat(),
+        )
+        result = simulate_player(unavailable, trials=500, seed=12)
+        self.assertEqual(result["projected_yards"], 0.0)
+        bad = dict(self.player, availability_probability=0.5)
+        with self.assertRaisesRegex(ValueError, "reduced availability requires source"):
+            with tempfile.TemporaryDirectory() as directory:
+                path = Path(directory) / "players.json"
+                path.write_text(json.dumps([bad]))
+                load_player_inputs(path)
+
     def test_invalid_role_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "players.json"
