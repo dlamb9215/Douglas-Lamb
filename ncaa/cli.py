@@ -7,6 +7,7 @@ from .data import get_profile, load_profiles
 from .engine import MarketLines, simulate_game
 from .market import remove_vig_two_way, expected_value_per_100
 from .scenarios import run_sensitivity_scenarios
+from .pregame import load_pregame_checks
 
 
 def main() -> None:
@@ -27,8 +28,20 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=20261104)
     parser.add_argument("--rankings", default="ncaa/data/team_rankings.json")
     parser.add_argument("--output", default="ncaa-results.json")
+    parser.add_argument("--pregame-checks", default=None, help="Sourced pregame verification JSON")
+    parser.add_argument("--require-verified-pregame", action="store_true")
     args = parser.parse_args()
 
+    if args.require_verified_pregame and not args.pregame_checks:
+        parser.error("--require-verified-pregame needs --pregame-checks")
+    pregame = (load_pregame_checks(
+        args.pregame_checks, args.home, args.away,
+        require_verified=args.require_verified_pregame,
+    ) if args.pregame_checks else {
+        "all_verified": False,
+        "unverified": ["starting quarterbacks", "injuries", "weather", "sportsbook"],
+        "warning": "No sourced pregame checks supplied.",
+    })
     profiles = load_profiles(args.data)
     home = get_profile(args.home, profiles)
     away = get_profile(args.away, profiles)
@@ -41,6 +54,7 @@ def main() -> None:
         home, away, args.trials, MarketLines(args.home_spread, args.total),
         args.seed + args.trials, args.neutral_site,
     )
+    result["pregame_verification"] = pregame
     result["season"] = args.season
     result["sportsbook_analysis"] = {}
     if (args.home_ml_odds is None) != (args.away_ml_odds is None):
