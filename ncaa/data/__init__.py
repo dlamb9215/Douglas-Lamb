@@ -16,7 +16,7 @@ NUMERIC_FIELDS = {
     "yards_per_carry": float, "rush_tds_per_game": float,
     "rush_first_downs_per_game": float, "pass_yards_allowed_per_game": float,
     "opponent_pass_attempts_per_game": float, "opponent_completions_per_game": float,
-    "opponent_yards_per_completion": float, "rush_yards_allowed_per_game": float,
+    "opponent_yards_per_completion": float, "opponent_yards_per_pass_attempt_allowed": float, "rush_yards_allowed_per_game": float,
     "opponent_rush_attempts_per_game": float, "opponent_yards_per_carry_allowed": float,
     "takeaways_per_game": float, "explosive_play_rate": float,
     "success_rate": float, "strength_rating": float,
