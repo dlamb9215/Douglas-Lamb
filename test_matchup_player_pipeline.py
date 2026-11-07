@@ -106,7 +106,7 @@ class TestMatchupPlayerPipeline(unittest.TestCase):
                                  confirmations=self.confirmations,
                                  team_records=team_records)
         projection = report["players"][0]
-        self.assertGreater(projection["props"][2]["recent_per_game_baseline"], 72.0)
+        self.assertGreater(projection["props"][2]["opponent_adjusted_projection"], 72.0)
         self.assertTrue(projection["opponent_adjustment"]["applied"])
         self.assertEqual(projection["opponent_adjustment"]["opponent"], "MIA")
 
