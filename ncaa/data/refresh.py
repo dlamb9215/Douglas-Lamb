@@ -122,6 +122,26 @@ def resolve_play_counts(raw: dict, offense_advanced: dict,
     return offense_plays, defense_plays
 
 
+def build_team_aliases(team_rows: list[dict]) -> dict[str, str]:
+    candidates: dict[str, set[str]] = {}
+    for row in team_rows:
+        canonical = str(row.get("school") or row.get("name") or "").strip()
+        if not canonical:
+            continue
+        values = [canonical, row.get("abbreviation")]
+        mascot = str(row.get("mascot") or "").strip()
+        if mascot:
+            values.append(f"{canonical} {mascot}")
+        alternate = row.get("alternateNames") or []
+        if isinstance(alternate, list):
+            values.extend(alternate)
+        for value in values:
+            alias = str(value or "").strip().casefold()
+            if alias:
+                candidates.setdefault(alias, set()).add(canonical)
+    return {alias: next(iter(names)) for alias, names in candidates.items() if len(names) == 1}
+
+
 def build_dataset(year: int, season_type: str, api_key: str,
                   classification: str = "fbs") -> tuple[list, dict, dict]:
     classification = classification.casefold()
@@ -423,6 +443,7 @@ def build_dataset(year: int, season_type: str, api_key: str,
         "year": year,
         "season_type": season_type,
         "classification": classification,
+        "team_aliases": build_team_aliases(selected_rows),
         "classification_completed_games": len(completed),
         "fbs_completed_games": len(completed) if classification == "fbs" else 0,
         "teams_with_box_scores": len(profiles),
