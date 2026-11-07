@@ -72,6 +72,8 @@ class RefreshTests(unittest.TestCase):
                 {"category": "netPassingYards", "stat": "180"},
                 {"category": "rushAttempts", "stat": "30"},
                 {"category": "rushingYards", "stat": "120"},
+                {"category": "passingFirstDowns", "stat": "8"},
+                {"category": "rushingFirstDowns", "stat": "6"},
             ]},
         ]}
         def fake_api(path, params, api_key):
@@ -91,6 +93,10 @@ class RefreshTests(unittest.TestCase):
         self.assertEqual({p["classification"] for p in profiles}, {"fcs"})
         self.assertIn("FCS Team 0", rankings)
         self.assertNotIn("FBS Team", rankings)
+        home_profile = next(p for p in profiles if p["team"] == "FCS Team 0")
+        self.assertEqual(home_profile["plays_allowed_per_game"], 60.0)
+        self.assertEqual(home_profile["pass_first_downs_allowed_per_game"], 8.0)
+        self.assertEqual(home_profile["rush_first_downs_allowed_per_game"], 6.0)
 
     def test_fcs_outputs_use_separate_files(self):
         with tempfile.TemporaryDirectory() as tmp:
