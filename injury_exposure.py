@@ -10,13 +10,18 @@ POSITION_WEIGHTS = {"QB": 3.0, "RB": 1.25, "WR": 1.0, "TE": 0.8, "OL": 1.4, "DL"
 STATUS_WEIGHTS = {"out": 1.0, "doubtful": 0.75, "questionable": 0.35}
 
 
+def _canonical_team(value):
+    code = str(value or "").upper()
+    return {"LA": "LAR"}.get(code, code)
+
+
 def build_injury_exposure(pool, teams):
     players = pool.get("players", [])
     result = {}
     for team in teams:
         exposures = []
         for player in players:
-            if str(player.get("team", "")).upper() != team:
+            if _canonical_team(player.get("team")) != _canonical_team(team):
                 continue
             status = str(player.get("injury_status", "unknown")).lower()
             if status not in STATUS_WEIGHTS:
