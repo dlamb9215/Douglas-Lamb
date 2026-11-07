@@ -22,12 +22,12 @@ def reconcile_ledger(path: str | Path, year: int, api_key: str) -> dict:
         rows = list(reader)
     games = []
     for classification in ("fbs", "fcs"):
-        rows = api_get("/games", {
+        game_rows = api_get("/games", {
             "year": year, "seasonType": "both", "classification": classification,
         }, api_key)
-        if not isinstance(rows, list):
+        if not isinstance(game_rows, list):
             raise RuntimeError(f"CFBD {classification.upper()} games endpoint returned unexpected data")
-        games.extend(rows)
+        games.extend(game_rows)
     candidates = []
     for game in games:
         if game.get("homePoints") is None or game.get("awayPoints") is None:
