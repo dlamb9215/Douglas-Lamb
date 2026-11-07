@@ -432,26 +432,38 @@ def main():
     print("\nPROBABILITY-BASED MODEL LEANS")
     print("=============================")
 
-    if result["home_win"] >= 55:
-        print(f"MONEYLINE LEAN: {home['name']} ({result['home_win']:.1f}%)")
+    if args.home_odds is None or args.away_odds is None:
+        print("MONEYLINE: PASS - current two-way sportsbook prices are required.")
+    elif result["home_win"] >= 55:
+        print(f"MODEL FAVORITE: {home['name']} ({result['home_win']:.1f}%)")
     elif result["away_win"] >= 55:
-        print(f"MONEYLINE LEAN: {away['name']} ({result['away_win']:.1f}%)")
+        print(f"MODEL FAVORITE: {away['name']} ({result['away_win']:.1f}%)")
     else:
-        print("MONEYLINE: PASS")
+        print("MONEYLINE: PASS - no clear model favorite.")
 
-    if result["home_cover"] >= 55:
-        print(f"SPREAD LEAN: {home['name']} ({result['home_cover']:.1f}%)")
+    if args.spread is None:
+        print("SPREAD: PASS - current sportsbook spread is required.")
+    elif result["home_cover"] >= 55:
+        print(f"MODEL SPREAD LEAN: {home['name']} ({result['home_cover']:.1f}%)")
     elif result["away_cover"] >= 55:
-        print(f"SPREAD LEAN: {away['name']} ({result['away_cover']:.1f}%)")
+        print(f"MODEL SPREAD LEAN: {away['name']} ({result['away_cover']:.1f}%)")
     else:
-        print("SPREAD: PASS")
+        print("SPREAD: PASS - no clear model lean.")
 
-    if result["over"] >= 55:
-        print(f"TOTAL LEAN: OVER ({result['over']:.1f}%)")
+    if args.total is None:
+        print("TOTAL: PASS - current sportsbook total is required.")
+    elif result["over"] >= 55:
+        print(f"MODEL TOTAL LEAN: OVER ({result['over']:.1f}%)")
     elif result["under"] >= 55:
-        print(f"TOTAL LEAN: UNDER ({result['under']:.1f}%)")
+        print(f"MODEL TOTAL LEAN: UNDER ({result['under']:.1f}%)")
     else:
-        print("TOTAL: PASS")
+        print("TOTAL: PASS - no clear model lean.")
+
+    if not pregame_report or not pregame_report.get("betting_ready", False):
+        print("FINAL BETTING STATUS: PASS - one or more pregame readiness gates remain open.")
+        if pregame_report:
+            for blocker in pregame_report.get("betting_readiness_blockers", []):
+                print(f"READINESS BLOCKER: {blocker}")
 
     print("\nPROJECTED SCORE")
     print(f"{home['name']}: {result['home_avg']:.1f}")
