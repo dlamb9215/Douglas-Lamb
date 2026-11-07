@@ -7,6 +7,7 @@ import random
 import argparse
 import json
 import os
+from datetime import datetime, timezone, timedelta
 from market_data import validate_market_snapshot
 from drive_simulator import simulate_drive_game
 from nfl_data import (
@@ -196,6 +197,19 @@ def main():
     print(f"Teams loaded: {len(database)}")
     if not seasons or not timestamps:
         print("DATA FRESHNESS WARNING: season and/or refresh timestamp metadata is missing; freshness cannot be independently verified.")
+    elif timestamps:
+        try:
+            refreshed_at = datetime.fromisoformat(timestamps[-1].replace("Z", "+00:00"))
+            if refreshed_at.tzinfo is None:
+                raise ValueError("timestamp is missing timezone")
+            data_age = datetime.now(timezone.utc) - refreshed_at.astimezone(timezone.utc)
+            print(f"Data age: {data_age.total_seconds() / 3600:.2f} hours")
+            if data_age < -timedelta(minutes=5) or data_age > timedelta(hours=36):
+                print("DATA FRESHNESS WARNING: team statistics are future-dated or older than 36 hours.")
+            else:
+                print("DATA FRESHNESS: VERIFIED WITHIN 36-HOUR WINDOW")
+        except (TypeError, ValueError, OverflowError):
+            print("DATA FRESHNESS WARNING: refresh timestamp is invalid; freshness cannot be verified.")
     for code in (args.home.upper(), args.away.upper()):
         games = database.get(code, {}).get("games_played", 0)
         print(f"{code} sample: {games} games played")
