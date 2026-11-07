@@ -67,7 +67,7 @@ class TestMatchupPlayerPipeline(unittest.TestCase):
         report = analyze_matchup("BUF", "MIA", self.pool,
                                  trials=5000, confirmations=self.confirmations)
         self.assertEqual(report["eligible_players"], 1)
-        self.assertEqual(report["players"][0]["props"][2]["recent_per_game_baseline"], 72.0)
+        self.assertEqual(report["players"][0]["props"][2]["opponent_adjusted_projection"], 72.0)
 
     def test_priced_prop_runs_reproducible_trial_set(self):
         lines = {"BUF:Example Receiver:receiving_yards": 69.5}
