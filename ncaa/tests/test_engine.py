@@ -73,6 +73,15 @@ class SimulatorTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             TeamProfile("Bad U", yards_per_play=-1).validate()
 
+    def test_bad_cfbd_profile_is_blocked(self):
+        bad = TeamProfile(
+            "Bad Data U", plays_per_game=36.9, yards_per_play=11.2,
+            source="CollegeFootballData API", as_of="2026-11-07",
+            games_sampled=8,
+        )
+        with self.assertRaisesRegex(ValueError, "invalid plays/game"):
+            get_profile("Bad Data U", {"bad data u": bad})
+
     def test_missing_profile_uses_flagged_prior(self):
         profile = get_profile("Unknown U", {})
         self.assertEqual(profile.games_sampled, 0)
