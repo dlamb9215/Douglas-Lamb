@@ -48,6 +48,33 @@ class BuildPlayerInputsTests(unittest.TestCase):
             self.assertEqual(rb["success_probability"], 1.0)
             self.assertTrue(output_path.exists())
 
+    def test_current_roster_filter_excludes_non_roster_player(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            player_path = root / "players.json"
+            team_path = root / "teams.csv"
+            output_path = root / "inputs.json"
+            stats = []
+            for pid, name, position, category, entries in [
+                ("1", "QB One", "QB", "passing", [("ATT", 40), ("CMP", 25), ("YDS", 300), ("TD", 3)]),
+                ("2", "QB Two", "QB", "passing", [("ATT", 20), ("CMP", 10), ("YDS", 100), ("TD", 1)]),
+            ]:
+                for stat_type, value in entries:
+                    stats.append({"playerId": pid, "player": name, "team": "Sample U",
+                                  "position": position, "category": category,
+                                  "statType": stat_type, "stat": str(value)})
+            player_path.write_text(json.dumps({
+                "metadata": {"retrieved_at": datetime.now(timezone.utc).isoformat(),
+                             "roster_available": True},
+                "season_stats": stats, "usage": [],
+                "rosters": [{"id": "1", "firstName": "QB", "lastName": "One",
+                             "team": "Sample U", "position": "QB"}],
+            }))
+            team_path.write_text("team,games_sampled\nSample U,4\n")
+            built = build_player_inputs(player_path, team_path, output_path)
+            self.assertEqual([p["player"] for p in built], ["QB One"])
+            self.assertTrue(built[0]["roster_verified"])
+
     def test_rejects_stale_player_cache(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
