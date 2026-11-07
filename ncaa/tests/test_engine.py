@@ -65,6 +65,11 @@ class SimulatorTests(unittest.TestCase):
         self.assertGreater(result["projected_first_half_drives"]["Away U"], 0)
         self.assertGreaterEqual(result["first_half_win_probability_home"], 0)
         self.assertLessEqual(result["first_half_win_probability_home"], 1)
+        self.assertAlmostEqual(
+            result["first_half_win_probability_home"] +
+            result["first_half_win_probability_away"] +
+            result["first_half_tie_probability"], 1.0
+        )
 
     def test_push_probabilities_account_for_pushes(self):
         result = simulate_game(self.home, self.away, 2000,
