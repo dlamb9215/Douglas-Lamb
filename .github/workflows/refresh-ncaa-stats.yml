@@ -1,4 +1,4 @@
-name: Refresh NCAA FBS Statistics
+name: Refresh NCAA FBS/FCS Statistics
 
 on:
   workflow_dispatch:
@@ -89,6 +89,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit."
           else
-            git commit -m "Refresh NCAA FBS team statistics"
+            git commit -m "Refresh NCAA team and player statistics"
             git push
           fi
