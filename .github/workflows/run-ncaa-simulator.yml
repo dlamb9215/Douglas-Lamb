@@ -6,12 +6,12 @@ on:
       home:
         description: Home college team
         required: true
-        default: Utah
+        default: Minnesota
         type: string
       away:
         description: Away college team
         required: true
-        default: BYU
+        default: UCLA
         type: string
       trials:
         description: Monte Carlo trials
@@ -21,12 +21,12 @@ on:
       home_spread:
         description: Home-team sportsbook handicap
         required: false
-        default: "-4.5"
+        default: "+4"
         type: string
       total:
         description: Sportsbook game total
         required: false
-        default: "49.5"
+        default: "38.5"
         type: string
       neutral_site:
         description: Neutral-site game
