@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from ncaa.data.refresh import extract_stats, parse_advanced, write_outputs
+from ncaa.data.refresh import extract_stats, parse_advanced, resolve_play_counts, write_outputs
 
 
 class RefreshTests(unittest.TestCase):
@@ -23,6 +23,21 @@ class RefreshTests(unittest.TestCase):
             "defense": {"successRate": 0.39},
         }])
         self.assertEqual(result["example u"]["offense"]["successRate"], 0.47)
+
+    def test_resolve_play_counts_prefers_advanced_totals(self):
+        raw = {"plays": 295, "plays_allowed": 310}
+        offense = {"plays": 461}
+        defense = {"plays": 478}
+        offense_plays, defense_plays = resolve_play_counts(
+            raw, offense, defense, 8, "Alabama"
+        )
+        self.assertEqual(offense_plays / 8, 57.625)
+        self.assertEqual(defense_plays / 8, 59.75)
+
+    def test_resolve_play_counts_rejects_bad_fallback(self):
+        raw = {"plays": 295, "plays_allowed": 310}
+        with self.assertRaisesRegex(RuntimeError, "invalid offense plays/game"):
+            resolve_play_counts(raw, {}, {}, 8, "Alabama")
 
     def test_outputs_write_csv_and_json(self):
         with tempfile.TemporaryDirectory() as tmp:
