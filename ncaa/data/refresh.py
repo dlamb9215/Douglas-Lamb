@@ -71,8 +71,11 @@ def extract_stats(team_row: dict) -> dict:
     result = {}
     for item in team_row.get("stats", []) or []:
         key = norm(item.get("category", ""))
-        value = number(item.get("stat"))
-        if key and value is not None:
+        raw_value = item.get("stat")
+        value = number(raw_value)
+        if key == "completionattempts" and raw_value not in (None, ""):
+            result[key] = str(raw_value)
+        elif key and value is not None:
             result[key] = value
     return result
 
