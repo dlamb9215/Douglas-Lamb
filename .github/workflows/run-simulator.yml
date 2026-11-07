@@ -154,6 +154,20 @@ jobs:
           if [[ "${{ inputs.neutral_site }}" == "true" ]]; then ARGS+=(--neutral-site); fi
           python main.py "${ARGS[@]}" | tee simulation-results.txt
 
+      - name: Run confirmed-starter player prop projections
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        env:
+          HOME_TEAM: ${{ inputs.home || 'ATL' }}
+          AWAY_TEAM: ${{ inputs.away || 'CIN' }}
+        run: |
+          if [[ ! -f game_day_confirmations.json ]]; then
+            python -c 'import json,os,datetime; json.dump({"source":"No official confirmation file supplied; placeholder only","checked_at_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"players":[]},open("game_day_confirmations.json","w"),indent=2)'
+          fi
+          ARGS=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --pool player_pool.json --confirmations game_day_confirmations.json --trials "${{ inputs.trials || '100000' }}" --output matchup-player-report.json)
+          if [[ -f player_prop_lines.json ]]; then ARGS+=(--lines player_prop_lines.json); fi
+          python matchup_player_pipeline.py "${ARGS[@]}" | tee player-prop-status.txt
+
       - name: Save results
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
@@ -163,6 +177,8 @@ jobs:
             simulation-results.txt
             pregame-context.json
             nfl-weather.json
+            matchup-player-report.json
+            player-prop-status.txt
             nfl_forecast_ledger.csv
 
       - name: Persist NFL forecast ledger
