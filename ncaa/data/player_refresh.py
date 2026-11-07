@@ -15,7 +15,8 @@ from .refresh import api_get
 
 
 def refresh_player_data(year: int, season_type: str, api_key: str,
-                        output_dir: str | Path = "ncaa/data") -> dict:
+                        output_dir: str | Path = "ncaa/data",
+                        classification: str = "fbs") -> dict:
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     warnings = []
@@ -40,7 +41,7 @@ def refresh_player_data(year: int, season_type: str, api_key: str,
         usage = None
 
     try:
-        rosters = api_get("/roster", {"year": year, "classification": "fbs"}, api_key)
+        rosters = api_get("/roster", {"year": year, "classification": classification}, api_key)
         if not isinstance(rosters, list) or not rosters:
             raise RuntimeError("CFBD roster endpoint returned no players.")
     except RuntimeError as exc:
@@ -52,6 +53,7 @@ def refresh_player_data(year: int, season_type: str, api_key: str,
         "provider": "CollegeFootballData",
         "year": year,
         "season_type": season_type,
+        "classification": classification,
         "retrieved_at": retrieved_at,
         "stats_available": bool(stats),
         "usage_available": bool(usage),
@@ -81,11 +83,12 @@ def main() -> None:
     parser.add_argument("--year", type=int, required=True)
     parser.add_argument("--season-type", choices=("regular", "postseason", "both"), default="regular")
     parser.add_argument("--output-dir", default="ncaa/data")
+    parser.add_argument("--classification", choices=("fbs", "fcs"), default="fbs")
     args = parser.parse_args()
     key = os.environ.get("CFBD_API_KEY", "").strip()
     if not key:
         raise SystemExit("CFBD_API_KEY is missing. Add it as a GitHub Actions secret.")
-    status = refresh_player_data(args.year, args.season_type, key, args.output_dir)
+    status = refresh_player_data(args.year, args.season_type, key, args.output_dir, args.classification)
     print(json.dumps(status, indent=2))
     if not status["stats_available"]:
         raise SystemExit("Player season data could not be refreshed; previous player cache was preserved.")
