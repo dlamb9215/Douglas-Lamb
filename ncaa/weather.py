@@ -72,53 +72,63 @@ def fetch_game_weather(year: int, home: str, away: str, api_key: str,
     if not candidates:
         raise RuntimeError("No matching scheduled game found for weather lookup")
     start, game = min(candidates, key=lambda pair: pair[0])
-    venue_id = game.get("venueId")
-    if venue_id is None:
-        raise RuntimeError("CFBD schedule did not include a venue ID")
-    venues = api_get("/venues", {}, api_key)
-    venue = next((v for v in venues if str(v.get("id")) == str(venue_id)), None) if isinstance(venues, list) else None
-    if not venue:
-        raise RuntimeError("CFBD venue lookup did not find the scheduled venue")
-    latitude, longitude = venue.get("latitude"), venue.get("longitude")
-    if latitude is None or longitude is None:
-        raise RuntimeError("CFBD venue coordinates are unavailable")
-    forecast = _get_open_meteo(float(latitude), float(longitude))
-    hourly = forecast["hourly"]
-    times = hourly.get("time", [])
-    if not times:
-        raise RuntimeError("Open-Meteo returned no hourly forecast timestamps")
-    target_index = min(range(len(times)), key=lambda i: abs(
-        (datetime.fromisoformat(times[i]).replace(tzinfo=timezone.utc) - start).total_seconds()
-    ))
-    forecast_time = datetime.fromisoformat(times[target_index]).replace(tzinfo=timezone.utc)
-    delta_minutes = abs((forecast_time - start).total_seconds()) / 60
-    if delta_minutes > 90:
-        raise RuntimeError("No hourly weather forecast close enough to kickoff")
-    def at(field):
-        values = hourly.get(field, [])
-        return values[target_index] if target_index < len(values) else None
-    temp_c = at("temperature_2m")
-    precip_mm = at("precipitation")
-    wind_kmh = at("wind_speed_10m")
-    gust_kmh = at("wind_gusts_10m")
-    return {
-        "available": True,
+    base = {
+        "available": False,
         "home_team": home,
         "away_team": away,
         "kickoff": start.isoformat(),
-        "venue": venue.get("name", ""),
-        "latitude": float(latitude),
-        "longitude": float(longitude),
-        "forecast_time": forecast_time.isoformat(),
-        "forecast_time_offset_minutes": round(delta_minutes, 1),
-        "temperature_f": round(float(temp_c) * 9 / 5 + 32, 1) if temp_c is not None else None,
-        "precipitation_mm_per_hour": precip_mm,
-        "wind_mph": round(float(wind_kmh) * 0.621371, 1) if wind_kmh is not None else None,
-        "wind_gust_mph": round(float(gust_kmh) * 0.621371, 1) if gust_kmh is not None else None,
-        "sources": ["CollegeFootballData schedule and venue", "Open-Meteo hourly forecast"],
+        "venue": game.get("venue", ""),
+        "sources": ["CollegeFootballData schedule"],
         "retrieved_at": datetime.now(timezone.utc).isoformat(),
         "model_treatment": "Context only; weather is not applied to probabilities because calibrated coefficients are not yet available.",
     }
+    try:
+        venue_id = game.get("venueId")
+        if venue_id is None:
+            raise RuntimeError("CFBD schedule did not include a venue ID")
+        venues = api_get("/venues", {}, api_key)
+        venue = next((v for v in venues if str(v.get("id")) == str(venue_id)), None) if isinstance(venues, list) else None
+        if not venue:
+            raise RuntimeError("CFBD venue lookup did not find the scheduled venue")
+        latitude, longitude = venue.get("latitude"), venue.get("longitude")
+        if latitude is None or longitude is None:
+            raise RuntimeError("CFBD venue coordinates are unavailable")
+        base["venue"] = venue.get("name", "")
+        base["latitude"] = float(latitude)
+        base["longitude"] = float(longitude)
+        forecast = _get_open_meteo(float(latitude), float(longitude))
+        hourly = forecast["hourly"]
+        times = hourly.get("time", [])
+        if not times:
+            raise RuntimeError("Open-Meteo returned no hourly forecast timestamps")
+        target_index = min(range(len(times)), key=lambda i: abs(
+            (datetime.fromisoformat(times[i]).replace(tzinfo=timezone.utc) - start).total_seconds()
+        ))
+        forecast_time = datetime.fromisoformat(times[target_index]).replace(tzinfo=timezone.utc)
+        delta_minutes = abs((forecast_time - start).total_seconds()) / 60
+        if delta_minutes > 90:
+            raise RuntimeError("No hourly weather forecast close enough to kickoff")
+        def at(field):
+            values = hourly.get(field, [])
+            return values[target_index] if target_index < len(values) else None
+        temp_c = at("temperature_2m")
+        precip_mm = at("precipitation")
+        wind_kmh = at("wind_speed_10m")
+        gust_kmh = at("wind_gusts_10m")
+        base.update({
+            "available": True,
+            "forecast_time": forecast_time.isoformat(),
+            "forecast_time_offset_minutes": round(delta_minutes, 1),
+            "temperature_f": round(float(temp_c) * 9 / 5 + 32, 1) if temp_c is not None else None,
+            "precipitation_mm_per_hour": precip_mm,
+            "wind_mph": round(float(wind_kmh) * 0.621371, 1) if wind_kmh is not None else None,
+            "wind_gust_mph": round(float(gust_kmh) * 0.621371, 1) if gust_kmh is not None else None,
+            "sources": ["CollegeFootballData schedule and venue", "Open-Meteo hourly forecast"],
+        })
+    except Exception as exc:
+        base["weather_warning"] = str(exc)
+    base["retrieved_at"] = datetime.now(timezone.utc).isoformat()
+    return base
 
 
 def main() -> None:
