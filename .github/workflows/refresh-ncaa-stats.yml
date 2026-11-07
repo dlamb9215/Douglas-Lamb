@@ -8,6 +8,14 @@ on:
         required: true
         default: "2026"
         type: string
+      classification:
+        description: NCAA division
+        required: true
+        default: fbs
+        type: choice
+        options:
+          - fbs
+          - fcs
       season_type:
         description: Season segment
         required: true
@@ -69,6 +77,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add ncaa/data/team_profiles.csv ncaa/data/team_rankings.json
+          if [[ -f ncaa/data/team_profiles_fcs.csv ]]; then git add ncaa/data/team_profiles_fcs.csv; fi
+          if [[ -f ncaa/data/team_rankings_fcs.json ]]; then git add ncaa/data/team_rankings_fcs.json; fi
           if [[ -f ncaa/data/player_season_data.json ]]; then git add ncaa/data/player_season_data.json; fi
           if [[ -f ncaa/data/player_data_status.json ]]; then git add ncaa/data/player_data_status.json; fi
           if [[ -f ncaa/forecast_ledger.csv ]]; then git add ncaa/forecast_ledger.csv; fi
