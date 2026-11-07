@@ -1,10 +1,11 @@
 """Manual-input player workload and prop Monte Carlo layer.
 
-Player inputs must be sourced and current. The module does not scrape rosters,
+Player inputs must be sourced and current. This module does not scrape rosters,
 infer availability, or model correlations between teammates.
 """
 from __future__ import annotations
 
+from datetime import date
 import json
 import math
 import random
@@ -50,23 +51,33 @@ def load_player_inputs(path: str | Path) -> list[dict]:
         td_rate = _finite(item.get("touchdown_rate_per_opportunity", 0), f"{name} touchdown_rate_per_opportunity")
         if td_rate > 1:
             raise ValueError(f"{name}: touchdown_rate_per_opportunity must be <= 1")
-        if not item.get("source") or not item.get("as_of"):
+        source = str(item.get("source", "")).strip()
+        as_of = str(item.get("as_of", "")).strip()
+        if not source or not as_of:
             raise ValueError(f"{name}: source and as_of are required")
-        as_of = str(item["as_of"])\n        try:\n            checked_date = date.fromisoformat(as_of[:10])\n        except ValueError as exc:\n            raise ValueError(f"{name}: as_of must begin with YYYY-MM-DD") from exc\n        age = (date.today() - checked_date).days\n        if age < 0 or age > 2:\n            raise ValueError(f"{name}: player input is {age} days old; refresh before use")\n        prop_lines = item.get("prop_lines", {})\n        if not isinstance(prop_lines, dict):\n            raise ValueError(f"{name}: prop_lines must be an object")\n        players.append({
+        try:
+            checked_date = date.fromisoformat(as_of[:10])
+        except ValueError as exc:
+            raise ValueError(f"{name}: as_of must begin with YYYY-MM-DD") from exc
+        age = (date.today() - checked_date).days
+        if age < 0 or age > 2:
+            raise ValueError(f"{name}: player input is {age} days old; refresh before use")
+        prop_lines = item.get("prop_lines", {})
+        if not isinstance(prop_lines, dict):
+            raise ValueError(f"{name}: prop_lines must be an object")
+        players.append({
             "player": name, "team": team, "role": role,
             "expected_opportunities": opportunities,
             "success_probability": success,
             "yards_per_success": yards,
             "yards_sd_per_success": yards_sd,
             "touchdown_rate_per_opportunity": td_rate,
-            "source": str(item["source"]),
-            "as_of": as_of, "prop_lines": prop_lines,
+            "source": source, "as_of": as_of, "prop_lines": prop_lines,
         })
     return players
 
 
 def _poisson(mean: float, rng: random.Random) -> int:
-    # Knuth sampler is stable for modest per-game workloads.
     if mean <= 0:
         return 0
     limit = math.exp(-mean)
@@ -97,17 +108,17 @@ def simulate_player(player: dict, trials: int = 100_000, seed: int = 20261104,
         yards.append(total_yards)
         touchdowns.append(td)
     lines = {}
-    for market, values in (prop_lines or {}).items():
+    for market, line in (prop_lines or {}).items():
         if market not in {"yards", "opportunities", "successes", "touchdowns"}:
             raise ValueError(f"Unsupported player prop market: {market}")
-        if not isinstance(values, (int, float)) or not math.isfinite(values):
+        if isinstance(line, bool) or not isinstance(line, (int, float)) or not math.isfinite(line):
             raise ValueError(f"{market} prop line must be finite")
         samples = {"yards": yards, "opportunities": opportunity_counts,
                    "successes": successes, "touchdowns": touchdowns}[market]
-        over = sum(value > values for value in samples) / trials
-        push = sum(value == values for value in samples) / trials
+        over = sum(value > line for value in samples) / trials
+        push = sum(value == line for value in samples) / trials
         lines[market] = {
-            "line": values,
+            "line": line,
             "over_probability": round(over, 4),
             "under_probability": round(1 - over - push, 4),
             "push_probability": round(push, 4),
@@ -128,6 +139,5 @@ def simulate_player(player: dict, trials: int = 100_000, seed: int = 20261104,
 def simulate_players(path: str | Path, trials: int = 100_000,
                      seed: int = 20261104) -> list[dict]:
     players = load_player_inputs(path)
-    return [simulate_player(
-        player, trials, seed + index, player.get("prop_lines", {})
-    ) for index, player in enumerate(players)]
+    return [simulate_player(player, trials, seed + index, player.get("prop_lines", {}))
+            for index, player in enumerate(players)]
