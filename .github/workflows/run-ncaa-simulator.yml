@@ -168,12 +168,21 @@ jobs:
           OVER_ODDS: ${{ inputs.over_odds }}
           UNDER_ODDS: ${{ inputs.under_odds }}
           REQUIRE_PREGAME: ${{ inputs.require_verified_pregame }}
+          HOME_TEAM: ${{ inputs.home }}
+          AWAY_TEAM: ${{ inputs.away }}
+          TRIALS: ${{ inputs.trials }}
+          SEASON_YEAR: ${{ inputs.season_year }}
+          CLASSIFICATION: ${{ inputs.classification }}
+          HOME_SPREAD: ${{ inputs.home_spread }}
+          TOTAL_LINE: ${{ inputs.total }}
+          NEUTRAL_SITE: ${{ inputs.neutral_site }}
+          GAME_KICKOFF: ${{ inputs.kickoff }}
         shell: bash
         run: |
-          args=(--home "${{ inputs.home }}" --away "${{ inputs.away }}" --trials "${{ inputs.trials }}" --season "${{ inputs.season_year }}" --classification "${{ inputs.classification }}")
-          if [[ -n "${{ inputs.home_spread }}" ]]; then args+=(--home-spread "${{ inputs.home_spread }}"); fi
-          if [[ -n "${{ inputs.total }}" ]]; then args+=(--total "${{ inputs.total }}"); fi
-          if [[ "${{ inputs.neutral_site }}" == "true" ]]; then args+=(--neutral-site); fi
+          args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --season "$SEASON_YEAR" --classification "$CLASSIFICATION")
+          if [[ -n "$HOME_SPREAD" ]]; then args+=(--home-spread "$HOME_SPREAD"); fi
+          if [[ -n "$TOTAL_LINE" ]]; then args+=(--total "$TOTAL_LINE"); fi
+          if [[ "$NEUTRAL_SITE" == "true" ]]; then args+=(--neutral-site); fi
           for pair in "HOME_ML_ODDS:--home-ml-odds" "AWAY_ML_ODDS:--away-ml-odds" "OVER_ODDS:--over-odds" "UNDER_ODDS:--under-odds"; do
             key="${pair%%:*}"; flag="${pair#*:}"
             value="${!key}"
@@ -182,7 +191,7 @@ jobs:
           if [[ -f pregame-checks.json ]]; then args+=(--pregame-checks pregame-checks.json); fi
           if [[ "$REQUIRE_PREGAME" == "true" ]]; then args+=(--require-verified-pregame); fi
           if [[ -f player-inputs.json ]]; then args+=(--players player-inputs.json); fi
-          if [[ -n "${{ inputs.kickoff }}" ]]; then args+=(--kickoff "${{ inputs.kickoff }}"); fi
+          if [[ -n "$GAME_KICKOFF" ]]; then args+=(--kickoff "$GAME_KICKOFF"); fi
           if [[ -f weather.json ]]; then args+=(--weather-json weather.json); fi
           python -m ncaa.cli "${args[@]}" --ledger ncaa/forecast_ledger.csv --output ncaa-results.json | tee ncaa-simulation-results.txt
       - name: Commit timestamped forecast ledger
