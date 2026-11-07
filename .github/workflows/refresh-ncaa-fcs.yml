@@ -1,0 +1,68 @@
+name: Refresh NCAA FCS Statistics
+
+on:
+  workflow_dispatch:
+    inputs:
+      year:
+        description: Season year
+        required: true
+        default: "2026"
+        type: string
+      season_type:
+        description: Season segment
+        required: true
+        default: regular
+        type: choice
+        options:
+          - regular
+          - postseason
+          - both
+  schedule:
+    - cron: "35 10 * * 2,3,4,5,6,0"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ncaa-forecast-ledger
+  cancel-in-progress: false
+
+jobs:
+  refresh-fcs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Refresh FCS team statistics
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+          YEAR: ${{ inputs.year }}
+          SEASON_TYPE: ${{ inputs.season_type }}
+        run: |
+          if [[ -z "$YEAR" ]]; then YEAR="$(date -u +%Y)"; fi
+          if [[ -z "$SEASON_TYPE" ]]; then SEASON_TYPE="regular"; fi
+          python -m ncaa.data.refresh --year "$YEAR" --season-type "$SEASON_TYPE" --classification fcs
+      - name: Reconcile completed FBS/FCS forecast outcomes (optional)
+        continue-on-error: true
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+          YEAR: ${{ inputs.year }}
+        run: |
+          if [[ -z "$YEAR" ]]; then YEAR="$(date -u +%Y)"; fi
+          python -m ncaa.reconcile --year "$YEAR" --input ncaa/forecast_ledger.csv
+      - name: Commit refreshed FCS data and ledger
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ncaa/data/team_profiles_fcs.csv ncaa/data/team_rankings_fcs.json
+          if [[ -f ncaa/forecast_ledger.csv ]]; then git add ncaa/forecast_ledger.csv; fi
+          if git diff --cached --quiet; then
+            echo "No FCS data changes to commit."
+          else
+            git commit -m "Refresh NCAA FCS team statistics"
+            git push
+          fi
