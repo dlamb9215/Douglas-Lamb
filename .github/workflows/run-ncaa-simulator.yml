@@ -48,12 +48,14 @@ on:
         default: "500000"
         type: string
       home_spread:
-        description: Home-team sportsbook handicap
+        description: Home-team sportsbook handicap (refresh before launch)
         required: false
+        default: "-4.5"
         type: string
       total:
-        description: Sportsbook game total
+        description: Sportsbook game total (refresh before launch)
         required: false
+        default: "49.5"
         type: string
       neutral_site:
         description: Neutral-site game
@@ -61,20 +63,24 @@ on:
         default: false
         type: boolean
       home_ml_odds:
-        description: Home moneyline American odds (optional)
+        description: Home moneyline American odds (Utah; refresh before launch)
         required: false
+        default: "-188"
         type: string
       away_ml_odds:
-        description: Away moneyline American odds (optional)
+        description: Away moneyline American odds (BYU; refresh before launch)
         required: false
+        default: "+155"
         type: string
       over_odds:
-        description: Over American odds (optional)
+        description: Over American odds (refresh before launch)
         required: false
+        default: "-105"
         type: string
       under_odds:
-        description: Under American odds (optional)
+        description: Under American odds (refresh before launch)
         required: false
+        default: "-115"
         type: string
       require_verified_pregame:
         description: Block unless all sourced pregame checks are verified
