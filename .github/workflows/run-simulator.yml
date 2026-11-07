@@ -89,9 +89,9 @@ on:
         default: ""
         type: string
       neutral_site:
-        description: Neutral-site game (disables home-field advantage)
+        description: Neutral-site game (Bengals at Falcons in Madrid; disables home-field advantage)
         required: true
-        default: false
+        default: true
         type: boolean
 
 permissions:
