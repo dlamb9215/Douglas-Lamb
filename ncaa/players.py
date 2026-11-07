@@ -73,6 +73,8 @@ def load_player_inputs(path: str | Path) -> list[dict]:
             "yards_sd_per_success": yards_sd,
             "touchdown_rate_per_opportunity": td_rate,
             "source": source, "as_of": as_of, "prop_lines": prop_lines,
+            "games_sampled": int(item.get("games_sampled", 0) or 0),
+            "games_basis": str(item.get("games_basis", "manual input")),
         })
     return players
 
@@ -131,8 +133,10 @@ def simulate_player(player: dict, trials: int = 100_000, seed: int = 20261104,
         "projected_yards": round(sum(yards) / trials, 2),
         "expected_touchdowns": round(sum(touchdowns) / trials, 3),
         "prop_probabilities": lines,
-        "input_provenance": {"source": player["source"], "as_of": player["as_of"]},
-        "warning": "Manual usage inputs; no live roster verification or teammate/game correlation.",
+        "input_provenance": {"source": player["source"], "as_of": player["as_of"],
+                             "games_sampled": player.get("games_sampled", 0),
+                             "games_basis": player.get("games_basis", "manual input")},
+        "warning": "Season-average workload and approximate per-opportunity yardage distribution; no live availability verification or teammate/game correlation.",
     }
 
 
