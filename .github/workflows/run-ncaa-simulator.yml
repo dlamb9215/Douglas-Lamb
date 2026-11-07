@@ -15,6 +15,14 @@ on:
         required: true
         default: "2026"
         type: string
+      classification:
+        description: NCAA division
+        required: true
+        default: fbs
+        type: choice
+        options:
+          - fbs
+          - fcs
       season_type:
         description: Season segment
         required: true
@@ -101,7 +109,8 @@ jobs:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
           SEASON_YEAR: ${{ inputs.season_year }}
           SEASON_TYPE: ${{ inputs.season_type }}
-        run: python -m ncaa.data.refresh --year "$SEASON_YEAR" --season-type "$SEASON_TYPE"
+          CLASSIFICATION: ${{ inputs.classification }}
+        run: python -m ncaa.data.refresh --year "$SEASON_YEAR" --season-type "$SEASON_TYPE" --classification "$CLASSIFICATION"
       - name: Fetch venue weather context for kickoff (optional)
         continue-on-error: true
         env:
@@ -111,8 +120,9 @@ jobs:
           GAME_KICKOFF: ${{ inputs.kickoff }}
           SEASON_YEAR: ${{ inputs.season_year }}
           SEASON_TYPE: ${{ inputs.season_type }}
+          CLASSIFICATION: ${{ inputs.classification }}
         run: |
-          args=(--year "$SEASON_YEAR" --season-type "$SEASON_TYPE" --home "$HOME_TEAM" --away "$AWAY_TEAM" --output weather.json)
+          args=(--year "$SEASON_YEAR" --season-type "$SEASON_TYPE" --classification "$CLASSIFICATION" --home "$HOME_TEAM" --away "$AWAY_TEAM" --output weather.json)
           if [[ -n "$GAME_KICKOFF" ]]; then args+=(--kickoff "$GAME_KICKOFF"); fi
           python -m ncaa.weather "${args[@]}"
       - name: Refresh player season statistics and usage (optional provider entitlement)
@@ -121,7 +131,8 @@ jobs:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
           SEASON_YEAR: ${{ inputs.season_year }}
           SEASON_TYPE: ${{ inputs.season_type }}
-        run: python -m ncaa.data.player_refresh --year "$SEASON_YEAR" --season-type "$SEASON_TYPE"
+          CLASSIFICATION: ${{ inputs.classification }}
+        run: python -m ncaa.data.player_refresh --year "$SEASON_YEAR" --season-type "$SEASON_TYPE" --classification "$CLASSIFICATION"
       - name: Reconcile previous forecast ledger with completed scores (optional)
         continue-on-error: true
         env:
@@ -133,8 +144,10 @@ jobs:
         env:
           HOME_TEAM: ${{ inputs.home }}
           AWAY_TEAM: ${{ inputs.away }}
+          CLASSIFICATION: ${{ inputs.classification }}
         run: |
-          python -m ncaa.data.build_player_inputs --teams "$HOME_TEAM" "$AWAY_TEAM" --output player-inputs.json
+          if [[ "$CLASSIFICATION" == "fcs" ]]; then profile_file="ncaa/data/team_profiles_fcs.csv"; else profile_file="ncaa/data/team_profiles.csv"; fi
+          python -m ncaa.data.build_player_inputs --team-profiles "$profile_file" --teams "$HOME_TEAM" "$AWAY_TEAM" --output player-inputs.json
       - name: Run NCAA simulator tests
         run: python -m unittest discover -s ncaa/tests -v
       - name: Write optional pregame and player inputs
@@ -159,7 +172,7 @@ jobs:
           REQUIRE_PREGAME: ${{ inputs.require_verified_pregame }}
         shell: bash
         run: |
-          args=(--home "${{ inputs.home }}" --away "${{ inputs.away }}" --trials "${{ inputs.trials }}" --season "${{ inputs.season_year }}")
+          args=(--home "${{ inputs.home }}" --away "${{ inputs.away }}" --trials "${{ inputs.trials }}" --season "${{ inputs.season_year }}" --classification "${{ inputs.classification }}")
           if [[ -n "${{ inputs.home_spread }}" ]]; then args+=(--home-spread "${{ inputs.home_spread }}"); fi
           if [[ -n "${{ inputs.total }}" ]]; then args+=(--total "${{ inputs.total }}"); fi
           if [[ "${{ inputs.neutral_site }}" == "true" ]]; then args+=(--neutral-site); fi
