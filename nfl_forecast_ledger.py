@@ -17,7 +17,8 @@ FIELDS = [
     "total_line", "over_probability", "under_probability",
     "home_moneyline_odds", "away_moneyline_odds", "over_odds", "under_odds",
     "weather_available", "weather_wind_mph", "weather_precipitation_mm_per_hour",
-    "pregame_verified", "actual_home_score", "actual_away_score", "settled_at_utc",
+    "pregame_verified", "sportsbook_source", "odds_checked_at_utc",
+    "actual_home_score", "actual_away_score", "settled_at_utc",
 ]
 
 
