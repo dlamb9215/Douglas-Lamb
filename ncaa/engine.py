@@ -338,6 +338,10 @@ def _team_metrics(team: TeamProfile) -> dict:
             "total_yards_allowed_per_game": team.total_yards_allowed_per_game,
             "total_yards_per_play_allowed": team.yards_per_play_allowed,
         },
-        "turnovers": {"giveaways_per_game": team.turnovers_per_game, "takeaways_per_game": team.takeaways_per_game},
+        "turnovers": {
+            "giveaways_per_game": team.turnovers_per_game,
+            "takeaways_per_game": team.takeaways_per_game,
+            "turnover_margin_per_game": team.takeaways_per_game - team.turnovers_per_game,
+        },
         "sample": {"games": team.games_sampled, "as_of": team.as_of, "source": team.source},
     }
