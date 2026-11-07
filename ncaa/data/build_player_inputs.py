@@ -64,7 +64,15 @@ def build_player_inputs(player_data_path: str | Path, team_profiles_path: str | 
         position = str(row.get("position", "")).strip().upper()
         category = _norm(row.get("category", ""))
         stat_type = _norm(row.get("statType", ""))
-        if not player or not team or category not in ALIASES:
+        if not player or not team:
+            continue
+        if category == "general" and stat_type in {"gp", "gamesplayed", "games"}:
+            try:
+                aggregate.setdefault((player, team, position), {})["games_played"] = float(row.get("stat", 0))
+            except (TypeError, ValueError):
+                pass
+            continue
+        if category not in ALIASES:
             continue
         if teams and team.casefold() not in {t.casefold() for t in teams}:
             continue
@@ -83,8 +91,10 @@ def build_player_inputs(player_data_path: str | Path, team_profiles_path: str | 
 
     result = []
     for (player, team, position), stats in sorted(aggregate.items()):
-        games = team_games.get(team.casefold(), 0)
-        if games < 1:
+        team_game_count = team_games.get(team.casefold(), 0)
+        games = int(stats.get("games_played") or team_game_count)
+        games_basis = "player games played" if stats.get("games_played") else "team games (player GP unavailable)"
+        if games < 1 or team_game_count < 1:
             continue
         if position in {"QB"}:
             role, group = "QB", stats.get("passing", {})
@@ -122,6 +132,8 @@ def build_player_inputs(player_data_path: str | Path, team_profiles_path: str | 
             "touchdown_rate_per_opportunity": round(total_tds / opportunities, 5),
             "source": "CollegeFootballData player season stats",
             "as_of": retrieved_date,
+            "games_sampled": games,
+            "games_basis": games_basis,
             "prop_lines": {},
         })
     if not result:
