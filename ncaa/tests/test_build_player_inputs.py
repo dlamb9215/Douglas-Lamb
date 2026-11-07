@@ -75,6 +75,21 @@ class BuildPlayerInputsTests(unittest.TestCase):
             self.assertEqual([p["player"] for p in built], ["QB One"])
             self.assertTrue(built[0]["roster_verified"])
 
+    def test_rejects_wrong_subdivision_player_cache(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            player_path = root / "players.json"
+            team_path = root / "teams.csv"
+            player_path.write_text(json.dumps({
+                "metadata": {"retrieved_at": datetime.now(timezone.utc).isoformat(),
+                             "classification": "fbs"},
+                "season_stats": [], "usage": [], "rosters": [],
+            }))
+            team_path.write_text("team,games_sampled\n")
+            with self.assertRaisesRegex(ValueError, "classification does not match"):
+                build_player_inputs(player_path, team_path, root / "out.json",
+                                    classification="fcs")
+
     def test_rejects_stale_player_cache(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
