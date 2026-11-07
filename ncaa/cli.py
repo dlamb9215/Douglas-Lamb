@@ -9,6 +9,7 @@ from .market import remove_vig_two_way, expected_value_per_100
 from .scenarios import run_sensitivity_scenarios
 from .pregame import load_pregame_checks
 from .players import simulate_players
+from .forecast_ledger import append_forecast
 
 
 def main() -> None:
@@ -32,6 +33,8 @@ def main() -> None:
     parser.add_argument("--pregame-checks", default=None, help="Sourced pregame verification JSON")
     parser.add_argument("--require-verified-pregame", action="store_true")
     parser.add_argument("--players", default=None, help="Current, sourced player workload JSON")
+    parser.add_argument("--kickoff", default=None, help="Game kickoff ISO-8601 timestamp with timezone")
+    parser.add_argument("--ledger", default=None, help="Optional CSV path for timestamped forecast history")
     args = parser.parse_args()
 
     if args.require_verified_pregame and not args.pregame_checks:
@@ -85,6 +88,16 @@ def main() -> None:
             "over_ev_per_100": expected_value_per_100(op, args.over_odds),
             "under_ev_per_100": expected_value_per_100(result["market"]["under_probability"], args.under_odds)
         }
+    result["market_prices"] = {
+        "home_moneyline": args.home_ml_odds,
+        "away_moneyline": args.away_ml_odds,
+        "over": args.over_odds,
+        "under": args.under_odds,
+    }
+    if args.ledger:
+        result["forecast_ledger"] = append_forecast(
+            result, args.ledger, kickoff=args.kickoff,
+        )
     result["data_file"] = args.data
     ranking_path = Path(args.rankings)
     if ranking_path.exists():
