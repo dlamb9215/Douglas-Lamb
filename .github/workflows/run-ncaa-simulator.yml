@@ -1,5 +1,12 @@
 name: Doug's Elite NCAA Football Simulator
 
+permissions:
+  contents: write
+
+concurrency:
+  group: ncaa-forecast-ledger
+  cancel-in-progress: false
+
 on:
   workflow_dispatch:
     inputs:
@@ -62,6 +69,10 @@ on:
         description: Optional JSON list of current sourced player usage inputs
         required: false
         type: string
+      kickoff:
+        description: Scheduled kickoff ISO-8601 timestamp with timezone (needed for verified pregame ledger)
+        required: false
+        type: string
 
 jobs:
   simulate:
@@ -82,6 +93,11 @@ jobs:
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
         run: python -m ncaa.data.player_refresh --year 2026 --season-type regular
+      - name: Reconcile previous forecast ledger with completed scores (optional)
+        continue-on-error: true
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+        run: python -m ncaa.reconcile --year 2026 --input ncaa/forecast_ledger.csv
       - name: Build player projection inputs from CFBD season stats (optional)
         continue-on-error: true
         env:
@@ -125,7 +141,19 @@ jobs:
           if [[ -f pregame-checks.json ]]; then args+=(--pregame-checks pregame-checks.json); fi
           if [[ "$REQUIRE_PREGAME" == "true" ]]; then args+=(--require-verified-pregame); fi
           if [[ -f player-inputs.json ]]; then args+=(--players player-inputs.json); fi
-          python -m ncaa.cli "${args[@]}" --output ncaa-results.json | tee ncaa-simulation-results.txt
+          if [[ -n "${{ inputs.kickoff }}" ]]; then args+=(--kickoff "${{ inputs.kickoff }}"); fi
+          python -m ncaa.cli "${args[@]}" --ledger ncaa/forecast_ledger.csv --output ncaa-results.json | tee ncaa-simulation-results.txt
+      - name: Commit timestamped forecast ledger
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ncaa/forecast_ledger.csv
+          if git diff --cached --quiet; then
+            echo "No forecast ledger changes."
+          else
+            git commit -m "Record NCAA pregame forecast"
+            git push
+          fi
       - name: Upload simulation results
         uses: actions/upload-artifact@v4
         with:
