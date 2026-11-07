@@ -11,6 +11,9 @@ class SimulatorTests(unittest.TestCase):
             plays_per_game=72, turnovers_per_game=1.0,
             takeaways_per_game=1.8, explosive_play_rate=.16,
             success_rate=.48, strength_rating=8, games_sampled=9,
+            yards_per_pass_attempt=8.4, yards_per_carry=5.1,
+            opponent_yards_per_completion=5.8, opponent_yards_per_carry_allowed=3.7,
+            pass_yards_per_game=285, rush_yards_per_game=190,
             source="test data",
         )
         self.away = TeamProfile(
@@ -64,6 +67,15 @@ class SimulatorTests(unittest.TestCase):
         self.assertAlmostEqual(
             market["over_probability"] + market["under_probability"] +
             market["total_push_probability"], 1.0)
+
+    def test_team_comparison_includes_pass_rush_and_defense(self):
+        result = simulate_game(self.home, self.away, 1000, seed=23)
+        comparison = result["team_comparison"]["Home U"]
+        self.assertEqual(comparison["offense"]["pass_yards_per_game"], 285)
+        self.assertEqual(comparison["offense"]["rush_yards_per_game"], 190)
+        self.assertEqual(comparison["defense"]["total_yards_per_play_allowed"],
+                         self.home.yards_per_play_allowed)
+        self.assertIn("turnovers", comparison)
 
     def test_invalid_trial_count_rejected(self):
         with self.assertRaises(ValueError):
