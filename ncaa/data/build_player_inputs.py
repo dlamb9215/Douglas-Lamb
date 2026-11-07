@@ -70,6 +70,15 @@ def build_player_inputs(player_data_path: str | Path, team_profiles_path: str | 
             roster_ids.add((roster_team, roster_id))
         if roster_team and roster_name:
             roster_names.add((roster_team, roster_name))
+    ranking_file = Path(team_profiles_path).with_name(
+        "team_rankings.json" if classification == "fbs" else "team_rankings_fcs.json"
+    )
+    aliases = {}
+    if ranking_file.exists():
+        ranking_data = json.loads(ranking_file.read_text(encoding="utf-8"))
+        aliases = ranking_data.get("metadata", {}).get("team_aliases", {})
+    canonical_teams = ({aliases.get(team.casefold(), team).casefold() for team in teams}
+                       if teams else None)
     team_games = {}
     with Path(team_profiles_path).open(newline="", encoding="utf-8") as handle:
         for row in csv.DictReader(handle):
@@ -101,7 +110,7 @@ def build_player_inputs(player_data_path: str | Path, team_profiles_path: str | 
             continue
         if category not in ALIASES:
             continue
-        if teams and team.casefold() not in {t.casefold() for t in teams}:
+        if canonical_teams and team.casefold() not in canonical_teams:
             continue
         stat_name = next((name for name, aliases in ALIASES[category].items()
                           if stat_type in aliases), None)
