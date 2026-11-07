@@ -1,2 +1,3 @@
 run_id,recorded_at_utc,season,week,home_team,away_team,kickoff,trials,seed,home_win_probability,away_win_probability,home_spread,home_cover_probability,away_cover_probability,total_line,over_probability,under_probability,home_moneyline_odds,away_moneyline_odds,over_odds,under_odds,weather_available,weather_wind_mph,weather_precipitation_mm_per_hour,pregame_verified,sportsbook_source,odds_checked_at_utc,actual_home_score,actual_away_score,settled_at_utc
 42395752765,2026-11-07T17:20:27.290549+00:00,2026,9,ATL,CIN,2026-11-08T09:30:00-05:00,100000,42,37.288,61.125,,,,,,,,,,,True,4.3,0.0,False,,,,,
+42396089247,2026-11-07T17:24:13.695042+00:00,2026,9,ATL,CIN,2026-11-08T09:30:00-05:00,100000,42,37.288,61.125,,,,,,,,,,,True,4.3,0.0,False,,,,,
