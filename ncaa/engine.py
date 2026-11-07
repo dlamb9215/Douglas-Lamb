@@ -170,7 +170,7 @@ def simulate_game(
     home_drives = _expected_drives(home)
     away_drives = _expected_drives(away)
     home_edge = 0.0 if neutral_site else 2.2
-    home_ppd = _clamp(home_ppd + home_edge / (home_drives * 2.2), 0.65, 5.2)
+    home_ppd = _clamp(home_ppd + home_edge / home_drives, 0.65, 5.2)
 
     home_scores: list[int] = []
     away_scores: list[int] = []
