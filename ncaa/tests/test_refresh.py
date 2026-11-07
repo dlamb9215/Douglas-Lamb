@@ -16,6 +16,17 @@ class RefreshTests(unittest.TestCase):
         self.assertEqual(result["passingyards"], 312.0)
         self.assertEqual(result["totalyards"], 450.0)
 
+    def test_combined_completion_attempts_are_parsed(self):
+        stats = extract_stats({"stats": [
+            {"category": "completionAttempts", "stat": "21-32"},
+            {"category": "netPassingYards", "stat": "275"},
+        ]})
+        completions, attempts = __import__(
+            "ncaa.data.refresh", fromlist=["pass_completions_attempts"]
+        ).pass_completions_attempts(stats)
+        self.assertEqual(completions, 21.0)
+        self.assertEqual(attempts, 32.0)
+
     def test_advanced_rows_accept_nested_metrics(self):
         result = parse_advanced([{
             "team": "Example U",
