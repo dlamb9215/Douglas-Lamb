@@ -207,6 +207,8 @@ jobs:
             ncaa-simulation-results.txt
             ncaa/data/team_rankings.json
             ncaa/data/team_profiles.csv
+            ncaa/data/team_rankings_fcs.json
+            ncaa/data/team_profiles_fcs.csv
             ncaa/data/player_season_data.json
             ncaa/data/player_data_status.json
             pregame-checks.json
