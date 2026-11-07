@@ -143,6 +143,40 @@ def main() -> None:
     print(f"DOUG'S ELITE NCAA FOOTBALL SIMULATOR | {args.season} | {args.classification.upper()}")
     print(f"{args.away} at {args.home}")
     print(f"Trials: {args.trials:,} | Seed: {args.seed}")
+    print('TEAM-VS-TEAM STATISTICAL BREAKDOWN:')
+    for team in (args.home, args.away):
+        comparison = result["team_comparison"][team]
+        offense = comparison["offense"]
+        defense = comparison["defense"]
+        turnovers = comparison["turnovers"]
+        print(f"  {team} OFFENSE:")
+        print(f"    Passing: {offense['pass_yards_per_game']:.1f} pass yds/g, "
+              f"{offense['pass_attempts_per_game']:.1f} att/g, {offense['completions_per_game']:.1f} comp/g, "
+              f"{offense['completion_pct']:.1%} comp, {offense['yards_per_pass_attempt']:.2f} YPA, "
+              f"{offense['pass_tds_per_game']:.2f} pass TD/g, {offense['interceptions_per_game']:.2f} INT/g")
+        print(f"    Rushing: {offense['rush_yards_per_game']:.1f} rush yds/g, "
+              f"{offense['rush_attempts_per_game']:.1f} att/g, {offense['yards_per_carry']:.2f} YPC, "
+              f"{offense['rush_tds_per_game']:.2f} rush TD/g")
+        print(f"    Total: {offense['plays_per_game']:.1f} plays/g, {offense['total_yards_per_play']:.2f} yards/play")
+        print(f"  {team} DEFENSE:")
+        print(f"    Passing allowed: {defense['pass_yards_allowed_per_game']:.1f} yds/g, "
+              f"{defense['opponent_pass_attempts_per_game']:.1f} opp att/g, {defense['opponent_completions_per_game']:.1f} opp comp/g, "
+              f"{defense['opponent_yards_per_completion']:.2f} yards/completion, "
+              f"{defense['opponent_yards_per_pass_attempt_allowed']:.2f} YPA allowed")
+        print(f"    Rushing allowed: {defense['rush_yards_allowed_per_game']:.1f} yds/g, "
+              f"{defense['opponent_rush_attempts_per_game']:.1f} opp att/g, "
+              f"{defense['opponent_yards_per_carry_allowed']:.2f} YPC allowed")
+        print(f"    Total: {defense['total_yards_per_play_allowed']:.2f} yards/play allowed")
+        print(f"    Turnovers: {turnovers['giveaways_per_game']:.2f} giveaways/g, {turnovers['takeaways_per_game']:.2f} takeaways/g")
+        ranks = result.get("national_rank_context", {}).get(team, {})
+        if ranks:
+            rank_fields = ("scoring_offense_rank", "scoring_defense_rank", "passing_offense_rank",
+                           "passing_attempts_rank", "completion_pct_rank", "yards_per_pass_attempt_rank",
+                           "rushing_offense_rank", "rushing_yards_per_carry_rank", "passing_defense_rank",
+                           "rushing_defense_rank", "total_offense_rank", "total_defense_rank", "turnover_margin_rank")
+            available_ranks = {key: ranks[key] for key in rank_fields if key in ranks}
+            print(f"    National ranks: {json.dumps(available_ranks)}")
+    print('END TEAM COMPARISON')
     print(f"Projected score: {args.home} {result['projected_score'][args.home]} - "
           f"{args.away} {result['projected_score'][args.away]}")
     print(f"Home win: {result['home_win_probability']:.1%} | "
