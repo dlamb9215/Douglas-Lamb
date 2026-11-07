@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from .data import get_profile, load_profiles
 from .engine import MarketLines, simulate_game
+from .market import remove_vig_two_way, expected_value_per_100
 
 
 def main() -> None:
@@ -17,6 +18,10 @@ def main() -> None:
     parser.add_argument("--home-spread", type=float, default=None,
                         help="Sportsbook handicap attached to home team (e.g. -6.5)")
     parser.add_argument("--total", type=float, default=None)
+    parser.add_argument("--home-ml-odds", type=float, default=None)
+    parser.add_argument("--away-ml-odds", type=float, default=None)
+    parser.add_argument("--over-odds", type=float, default=None)
+    parser.add_argument("--under-odds", type=float, default=None)
     parser.add_argument("--neutral-site", action="store_true")
     parser.add_argument("--seed", type=int, default=20261104)
     parser.add_argument("--rankings", default="ncaa/data/team_rankings.json")
@@ -32,6 +37,31 @@ def main() -> None:
         args.seed, args.neutral_site,
     )
     result["season"] = args.season
+    result["sportsbook_analysis"] = {}
+    if (args.home_ml_odds is None) != (args.away_ml_odds is None):
+        parser.error("Provide both moneyline prices.")
+    if args.home_ml_odds is not None:
+        fair = remove_vig_two_way(args.home_ml_odds, args.away_ml_odds)
+        hp = result["home_win_probability"]
+        result["sportsbook_analysis"]["moneyline"] = {
+            **fair, "model_home_probability": hp,
+            "model_edge_home": round(hp - fair["fair_probability_a"], 4),
+            "home_ev_per_100": expected_value_per_100(hp, args.home_ml_odds),
+            "away_ev_per_100": expected_value_per_100(result["away_win_probability"], args.away_ml_odds)
+        }
+    if (args.over_odds is None) != (args.under_odds is None):
+        parser.error("Provide both over and under prices.")
+    if args.over_odds is not None:
+        if args.total is None or "over_probability" not in result["market"]:
+            parser.error("A --total line is required with over/under prices.")
+        fair = remove_vig_two_way(args.over_odds, args.under_odds)
+        op = result["market"]["over_probability"]
+        result["sportsbook_analysis"]["total"] = {
+            **fair, "model_over_probability": op,
+            "model_edge_over": round(op - fair["fair_probability_a"], 4),
+            "over_ev_per_100": expected_value_per_100(op, args.over_odds),
+            "under_ev_per_100": expected_value_per_100(result["market"]["under_probability"], args.under_odds)
+        }
     result["data_file"] = args.data
     ranking_path = Path(args.rankings)
     if ranking_path.exists():
@@ -62,6 +92,9 @@ def main() -> None:
     print("Projected score ranges (10th percentile / median / 90th percentile):")
     for team, band in result["score_ranges"].items():
         print(f"  {team}: {band['p10']} / {band['median']} / {band['p90']}")
+    if result["sportsbook_analysis"]:
+        print("Vig-adjusted sportsbook comparison:")
+        print(json.dumps(result["sportsbook_analysis"], indent=2))
     if result["market"]:
         print("Market probabilities:")
         for key, value in result["market"].items():
