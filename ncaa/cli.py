@@ -8,6 +8,7 @@ from .engine import MarketLines, simulate_game
 from .market import remove_vig_two_way, expected_value_per_100
 from .scenarios import run_sensitivity_scenarios
 from .pregame import load_pregame_checks
+from .players import simulate_players
 
 
 def main() -> None:
@@ -30,6 +31,7 @@ def main() -> None:
     parser.add_argument("--output", default="ncaa-results.json")
     parser.add_argument("--pregame-checks", default=None, help="Sourced pregame verification JSON")
     parser.add_argument("--require-verified-pregame", action="store_true")
+    parser.add_argument("--players", default=None, help="Current, sourced player workload JSON")
     args = parser.parse_args()
 
     if args.require_verified_pregame and not args.pregame_checks:
@@ -55,6 +57,8 @@ def main() -> None:
         args.seed + args.trials, args.neutral_site,
     )
     result["pregame_verification"] = pregame
+    if args.players:
+        result["player_projections"] = simulate_players(args.players, args.trials, args.seed + 1000)
     result["season"] = args.season
     result["sportsbook_analysis"] = {}
     if (args.home_ml_odds is None) != (args.away_ml_odds is None):
@@ -116,6 +120,12 @@ def main() -> None:
         score = values["projected_score"]
         print(f"  {scenario}: {args.home} {score[args.home]} - {args.away} {score[args.away]} | "
               f"home win {values['home_win_probability']:.1%} | total {values['projected_total']:.1f}")
+    if args.players:
+        print("PLAYER PROJECTIONS (manual sourced workload inputs):")
+        for player in result["player_projections"]:
+            print(f"  {player['player']} ({player['team']}): {player['projected_yards']} yards, "
+                  f"{player['expected_successes']} successes, "
+                  f"{player['expected_touchdowns']} TDs")
     if result["sportsbook_analysis"]:
         print("Vig-adjusted sportsbook comparison:")
         print(json.dumps(result["sportsbook_analysis"], indent=2))
