@@ -62,8 +62,22 @@ def apply_opponent_adjustment(projection, player, home, away, team_records, shri
         factors[category] = round(factor, 4)
     stats = projection.get("projected_stats", {})
     applied = {}
+    qb_formula = None
     if player.get("position") == "QB":
-        category_map = {"passing_yards": "passing", "rushing_yards": "rushing"}
+        opponent_pass = defense.get("passing", {})
+        allowed_yards = opponent_pass.get("yards_per_game")
+        allowed_completions = opponent_pass.get("completions_per_game")
+        player_completions = stats.get("completions")
+        if (isinstance(allowed_yards, (int, float))
+                and isinstance(allowed_completions, (int, float))
+                and allowed_completions > 0
+                and isinstance(player_completions, (int, float))):
+            opponent_yards_per_completion = float(allowed_yards) / float(allowed_completions)
+            qb_formula = float(player_completions) * opponent_yards_per_completion
+            recent_baseline = stats.get("passing_yards", qb_formula)
+            stats["passing_yards"] = round(0.5 * float(recent_baseline) + 0.5 * qb_formula, 2)
+            applied["passing_yards_completion_formula"] = 0.5
+        category_map = {"rushing_yards": "rushing"}
     elif player.get("position") == "RB":
         category_map = {"rushing_yards": "rushing", "receiving_yards": "passing"}
     else:
@@ -80,7 +94,8 @@ def apply_opponent_adjustment(projection, player, home, away, team_records, shri
     projection["opponent_adjustment"] = {
         "applied": bool(applied), "opponent": opponent,
         "factors": applied,
-        "method": "35% shrink toward league-average opponent yards allowed; capped at +/-15%; provisional, not historically calibrated."
+        "qb_completions_times_opponent_yards_per_completion": round(qb_formula, 2) if qb_formula is not None else None,
+        "method": "QB passing yards blend 50% recent baseline with 50% completions x opponent yards/completion; other yardage uses 35% shrink toward league-average opponent yards allowed, capped at +/-15%. Provisional, not historically calibrated."
     }
     return projection
 
