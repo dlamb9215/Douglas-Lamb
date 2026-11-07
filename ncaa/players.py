@@ -164,7 +164,11 @@ def simulate_player(player: dict, trials: int = 100_000, seed: int = 20261104,
                              "availability_probability": player.get("availability_probability", 1.0),
                              "availability_source": player.get("availability_source", ""),
                              "availability_checked_at": player.get("availability_checked_at", "")},
-        "warning": "Season-average workload and approximate per-opportunity yardage distribution; availability is only the explicitly supplied assumption and is not independently verified; teammate/game correlation is not modeled.",
+        "warning": ("Season-average workload and approximate per-opportunity yardage distribution; "
+                    "availability is only the explicitly supplied assumption and is not independently verified; "
+                    "teammate/game correlation is not modeled. " +
+                    ("Current roster membership matched; active/injury status remains unverified."
+                     if player.get("roster_verified") else "Current roster membership was not verified.")),
     }
 
 
