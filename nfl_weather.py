@@ -51,7 +51,7 @@ def fetch_matchup_weather(home, away, season=None, week=None):
         if row.get("game_type") not in {"REG", "POST"}:
             continue
         try:
-            kickoff = datetime.fromisoformat(_kickoff(row))
+            kickoff = _kickoff(row)
         except (TypeError, ValueError):
             continue
         candidates.append((kickoff, row))
