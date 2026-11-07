@@ -20,11 +20,14 @@ def reconcile_ledger(path: str | Path, year: int, api_key: str) -> dict:
         if reader.fieldnames != FIELDS:
             raise ValueError("Forecast ledger schema mismatch")
         rows = list(reader)
-    games = api_get("/games", {
-        "year": year, "seasonType": "both", "classification": "fbs",
-    }, api_key)
-    if not isinstance(games, list):
-        raise RuntimeError("CFBD games endpoint returned unexpected data")
+    games = []
+    for classification in ("fbs", "fcs"):
+        rows = api_get("/games", {
+            "year": year, "seasonType": "both", "classification": classification,
+        }, api_key)
+        if not isinstance(rows, list):
+            raise RuntimeError(f"CFBD {classification.upper()} games endpoint returned unexpected data")
+        games.extend(rows)
     candidates = []
     for game in games:
         if game.get("homePoints") is None or game.get("awayPoints") is None:
