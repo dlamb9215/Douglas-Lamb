@@ -124,14 +124,43 @@ def analyze_matchup(home, away, player_pool, prop_lines=None,
             if mean is None:
                 continue
             line_key = f"{player['team']}:{player['name']}:{stat}"
-            line = prop_lines.get(line_key)
-            item = {"stat": stat, "recent_per_game_baseline": mean}
-            if line is not None:
-                item["simulation"] = simulate_player_prop(
-                    projection, stat, float(line),
+            line_input = prop_lines.get(line_key)
+            item = {"stat": stat, "opponent_adjusted_projection": mean}
+            if line_input is not None:
+                if isinstance(line_input, dict):
+                    line = float(line_input["line"])
+                    over_odds = line_input.get("over_odds")
+                    under_odds = line_input.get("under_odds")
+                else:
+                    line = float(line_input)
+                    over_odds = under_odds = None
+                simulation = simulate_player_prop(
+                    projection, stat, line,
                     trials=trials, seed=seed + index,
                     standard_deviation=projection["projected_stats"].get(stat + "_stddev"),
                 )
+                item["simulation"] = simulation
+                if over_odds is not None and under_odds is not None:
+                    def implied(odds):
+                        odds = float(odds)
+                        if odds == 0:
+                            raise ValueError("American odds cannot be zero.")
+                        return 100.0 / (odds + 100.0) if odds > 0 else -odds / (-odds + 100.0)
+                    over_raw, under_raw = implied(over_odds), implied(under_odds)
+                    total_raw = over_raw + under_raw
+                    over_fair, under_fair = over_raw / total_raw, under_raw / total_raw
+                    def ev_per_100(probability, odds):
+                        profit = float(odds) if float(odds) > 0 else 10000.0 / -float(odds)
+                        return round(probability * profit - (1.0 - probability) * 100.0, 2)
+                    item["market_comparison"] = {
+                        "over_odds": over_odds, "under_odds": under_odds,
+                        "vig_free_over_probability": round(over_fair * 100, 2),
+                        "vig_free_under_probability": round(under_fair * 100, 2),
+                        "over_edge_percentage_points": round(simulation["over_probability"] - over_fair * 100, 2),
+                        "under_edge_percentage_points": round(simulation["under_probability"] - under_fair * 100, 2),
+                        "over_expected_value_per_100": ev_per_100(simulation["over_probability"] / 100, over_odds),
+                        "under_expected_value_per_100": ev_per_100(simulation["under_probability"] / 100, under_odds),
+                    }
             props.append(item)
         reports.append({
             "player": player["name"],
@@ -159,8 +188,8 @@ def analyze_matchup(home, away, player_pool, prop_lines=None,
         "warnings": [
             "Only players explicitly confirmed active starters in the fresh game-day confirmation file are projected.",
             "The confirmation file must be sourced from official NFL/team game-day inactive and starter information.",
-            "Recent per-game production is a baseline, not opponent-adjusted.",
-            "A prop probability is only produced when a sportsbook line is supplied.",
+            "Recent per-game production is opponent-adjusted with a capped, shrunk defense factor; this adjustment is provisional.",
+            "A prop probability is only produced when a sportsbook line is supplied; vig-free edge and EV require both sides of the price.",
             "Normal-approximation dispersion remains provisional pending historical calibration.",
         ],
     }
