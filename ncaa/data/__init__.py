@@ -42,5 +42,37 @@ def load_profiles(path: str | Path) -> dict[str, TeamProfile]:
 def get_profile(name: str, profiles: dict[str, TeamProfile]) -> TeamProfile:
     found = profiles.get(name.casefold())
     if found:
+        if found.source == "CollegeFootballData API":
+            from datetime import date
+            if not found.as_of:
+                raise ValueError(
+                    f"{name}: verified NCAA profile has no data date; refresh team statistics."
+                )
+            try:
+                data_date = date.fromisoformat(found.as_of)
+            except ValueError as exc:
+                raise ValueError(
+                    f"{name}: invalid NCAA profile date; refresh team statistics."
+                ) from exc
+            age_days = (date.today() - data_date).days
+            if age_days < 0 or age_days > 2:
+                raise ValueError(
+                    f"{name}: NCAA profile is {age_days} days old; refresh team statistics before simulating."
+                )
+            if not 40.0 <= found.plays_per_game <= 100.0:
+                raise ValueError(
+                    f"{name}: invalid plays/game ({found.plays_per_game:.1f}); "
+                    "refresh NCAA statistics before simulating."
+                )
+            if not 2.0 <= found.yards_per_play <= 9.5:
+                raise ValueError(
+                    f"{name}: invalid yards/play ({found.yards_per_play:.2f}); "
+                    "refresh NCAA statistics before simulating."
+                )
+            if not 2.0 <= found.yards_per_play_allowed <= 9.5:
+                raise ValueError(
+                    f"{name}: invalid yards allowed/play ({found.yards_per_play_allowed:.2f}); "
+                    "refresh NCAA statistics before simulating."
+                )
         return found
     return TeamProfile(name=name)
