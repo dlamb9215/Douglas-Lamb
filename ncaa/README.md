@@ -54,7 +54,7 @@ Open Actions → **Doug's Elite NCAA Football Simulator** → Run workflow. Ente
 
 ## Model limitations
 
-This engine is a transparent drive-outcome Monte Carlo model, not a play-by-play NCAA rules simulator. First-half estimates split simulated drives approximately in half; they are not a separate clock-accurate half-game engine. It does not yet model player availability, play-calling, fourth-down decisions, overtime rules, weather, injuries, transfer portal changes, or conference-specific calibration. Its probabilities require a complete, current and consistently sourced profile file and subsequent backtesting before they should be used for wagering.
+This engine is a transparent drive-outcome Monte Carlo model, not a play-by-play NCAA rules simulator. First-half estimates now use a separate 30-minute clock-limited drive-duration simulation with alternating possessions. It is more explicit than splitting full-game drives, but remains a drive-duration approximation, not a play-by-play clock model; it does not explicitly simulate timeouts, two-minute rules, quarter boundaries, or possession/clock strategy. It does not yet model player availability, play-calling, fourth-down decisions, overtime rules, weather, injuries, transfer portal changes, or conference-specific calibration. Its probabilities require a complete, current and consistently sourced profile file and subsequent backtesting before they should be used for wagering.
 
 ## Forecast backtesting and calibration
 
@@ -152,3 +152,8 @@ The GitHub workflow accepts optional `player_inputs` JSON, sourced `pregame_chec
 ## Automated CFBD player-data cache
 
 The scheduled/dispatch team refresh now has a separate optional player-data refresh step. It requests season player statistics from `/stats/player/season` and player usage metrics from `/player/usage`, and saves the raw sourced response with retrieval metadata to `ncaa/data/player_season_data.json`. The separate status file records endpoint availability and provider warnings. If player stats are unavailable or the account lacks entitlement, the workflow preserves the previous player cache and continues the team simulation; it does not silently convert missing player data into zeroes. This is season production/usage context, not real-time availability, confirmed starter status, or a complete player projection feed. The CFBD API account must have access to the relevant endpoints.
+
+
+## First-half projection method update
+
+The first-half projection runs a separate 30-minute simulation. Each possession consumes a sampled drive duration and possession alternates between teams. The output includes expected first-half drives by team. This is a clock-limited drive-level approximation, not a full play-by-play engine; end-of-half clock management, timeouts, quarter boundaries and two-minute strategy are not explicitly represented.
