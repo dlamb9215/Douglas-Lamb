@@ -7,6 +7,7 @@ import random
 import argparse
 import json
 import os
+from market_data import validate_market_snapshot
 from drive_simulator import simulate_drive_game
 from nfl_data import (
     load_team_stats,
@@ -116,6 +117,8 @@ def main():
     parser.add_argument("--away-odds", type=int)
     parser.add_argument("--over-odds", type=int)
     parser.add_argument("--under-odds", type=int)
+    parser.add_argument("--odds-source")
+    parser.add_argument("--odds-checked-at")
     parser.add_argument("--trials", type=int, default=100000)
     parser.add_argument("--pregame-report", help="Fresh pregame context JSON")
     parser.add_argument(
@@ -127,6 +130,14 @@ def main():
                         help="Random seed for reproducible simulations")
 
     args = parser.parse_args()
+    try:
+        market_snapshot = validate_market_snapshot({
+            "spread": args.spread, "total": args.total,
+            "home_odds": args.home_odds, "away_odds": args.away_odds,
+            "over_odds": args.over_odds, "under_odds": args.under_odds,
+        }, args.odds_source, args.odds_checked_at)
+    except ValueError as exc:
+        parser.error(str(exc))
     if args.trials < 1:
         parser.error("--trials must be greater than zero")
     def implied_probability(odds):
@@ -447,6 +458,8 @@ def main():
         "weather_wind_mph": weather.get("wind_mph", ""),
         "weather_precipitation_mm_per_hour": weather.get("precipitation_mm_per_hour", ""),
         "pregame_verified": False,
+        "sportsbook_source": market_snapshot.get("source") or "",
+        "odds_checked_at_utc": market_snapshot.get("checked_at_utc") or "",
     }
     added = append_forecast(ledger_record)
     summary = calibration_summary()
