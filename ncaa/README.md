@@ -175,3 +175,6 @@ python -m ncaa.backtest --input ncaa/forecast_ledger.csv --output ncaa-backtest-
 ```
 
 A meaningful calibration claim still requires a substantial number of independently verified, pregame forecasts and completed outcomes. A small early ledger is not evidence of predictive accuracy.
+
+
+The CFBD player refresh also attempts the current-season FBS `/roster` endpoint. When that feed is available, automatic player inputs are filtered to players listed on the selected teams' current-season rosters and the output marks roster membership as verified. Roster membership is not confirmation that a player is active, starting, healthy, or expected to play; those still require current team/injury confirmation. If roster access is unavailable, the data pipeline records the warning and player projections explicitly show that roster membership was not verified.
