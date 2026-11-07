@@ -97,6 +97,7 @@ class SimulatorTests(unittest.TestCase):
         self.assertEqual(comparison["defense"]["plays_allowed_per_game"], 63)
         self.assertEqual(comparison["defense"]["pass_first_downs_allowed_per_game"], 8.5)
         self.assertIn("turnovers", comparison)
+        self.assertAlmostEqual(comparison["turnovers"]["turnover_margin_per_game"], 0.8)
 
     def test_sensitivity_scenarios_are_explicit_and_complete(self):
         result = run_sensitivity_scenarios(self.home, self.away, 500, seed=90)
