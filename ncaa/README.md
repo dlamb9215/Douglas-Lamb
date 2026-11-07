@@ -21,12 +21,12 @@ python -m unittest discover -s ncaa/tests -v
 python -m ncaa.cli --home Georgia --away Alabama --trials 100000 --home-spread -3.5 --total 52.5
 ```
 
-## Automatic FBS data pipeline
+## Automatic FBS/FCS data pipeline
 
-The refresh job uses the CollegeFootballData API for FBS schedules/results, game team box scores, advanced team-season metrics, and Elo ratings. It creates:
+The refresh job uses the CollegeFootballData API for FBS or FCS schedules/results, game team box scores, advanced team-season metrics, and available Elo ratings. Select the division explicitly; FBS and FCS outputs are stored separately and their national ranks are not mixed. It creates:
 
-- `ncaa/data/team_profiles.csv`: the simulator's normalized inputs
-- `ncaa/data/team_rankings.json`: national comparison metrics, ranks, source and retrieval metadata
+- `ncaa/data/team_profiles.csv` / `team_profiles_fcs.csv`: the simulator's normalized inputs
+- `ncaa/data/team_rankings.json` / `team_rankings_fcs.json`: division-specific comparison metrics, ranks, source and retrieval metadata
 
 The pipeline only counts completed games and refuses to replace the dataset if the provider returns no completed games or fewer than 50 team profiles. Current-season ranks are provisional and change as games are played. Some advanced fields may be unavailable early in the season and are clearly represented by neutral fallback values in the profile.
 
@@ -50,7 +50,7 @@ Optional: `points_per_drive`.
 
 ## GitHub Actions
 
-Open Actions → **Doug's Elite NCAA Football Simulator** → Run workflow. Enter the home and away school names, trial count, optional home spread and total, and whether the game is at a neutral site. The run uploads `ncaa-results.json` as an artifact.
+Open Actions → **Doug's Elite NCAA Football Simulator** → Run workflow. Choose season year, FBS/FCS classification, season segment, home and away schools, trial count, optional current sportsbook lines/odds, kickoff timestamp, and whether the game is at a neutral site. The run uploads `ncaa-results.json` and supporting data as an artifact.
 
 ## Model limitations
 
