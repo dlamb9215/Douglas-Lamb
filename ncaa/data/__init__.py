@@ -6,6 +6,7 @@ from ..engine import TeamProfile
 
 NUMERIC_FIELDS = {
     "points_for": float, "points_against": float,
+    "total_yards_per_game": float, "total_yards_allowed_per_game": float,
     "yards_per_play": float, "yards_per_play_allowed": float,
     "plays_per_game": float, "turnovers_per_game": float,
     "pass_yards_per_game": float, "rush_yards_per_game": float,
