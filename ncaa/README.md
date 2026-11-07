@@ -193,3 +193,6 @@ The data refresh now accepts `--classification fbs` or `--classification fcs`. F
 ## Missing-team data safety gate
 
 The CLI now blocks a matchup if either selected team is absent from the chosen FBS/FCS profile file. This prevents an accidental FCS/FBS mismatch or silent league-average prior from being presented as a data-backed matchup. Use `--allow-prior` only when you intentionally want a flagged league-average prior for exploratory testing; the normal GitHub matchup workflow does not enable this override.
+
+
+The team directory cache also creates unambiguous aliases from official abbreviations, alternate school names, and school-plus-mascot names. For example, a team may be entered by its school name or full mascot name; ambiguous mascot-only aliases are intentionally not created. The simulator resolves aliases to the canonical CFBD school name before checking profiles and pregame inputs.
