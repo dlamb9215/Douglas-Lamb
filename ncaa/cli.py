@@ -19,6 +19,7 @@ def main() -> None:
     parser.add_argument("--total", type=float, default=None)
     parser.add_argument("--neutral-site", action="store_true")
     parser.add_argument("--seed", type=int, default=20261104)
+    parser.add_argument("--rankings", default="ncaa/data/team_rankings.json")
     parser.add_argument("--output", default="ncaa-results.json")
     args = parser.parse_args()
 
@@ -32,6 +33,20 @@ def main() -> None:
     )
     result["season"] = args.season
     result["data_file"] = args.data
+    ranking_path = Path(args.rankings)
+    if ranking_path.exists():
+        ranking_data = json.loads(ranking_path.read_text(encoding="utf-8"))
+        ranking_teams = ranking_data.get("teams", {})
+        def team_rank(name):
+            key = next((k for k in ranking_teams if k.casefold() == name.casefold()), None)
+            return ranking_teams.get(key, {}) if key else {}
+        result["national_rank_context"] = {
+            args.home: team_rank(args.home),
+            args.away: team_rank(args.away),
+            "metadata": ranking_data.get("metadata", {}),
+        }
+    else:
+        result["national_rank_context"] = {"warning": "National ranking file unavailable."}
     Path(args.output).write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(f"DOUG'S ELITE NCAA FOOTBALL SIMULATOR | {args.season}")
     print(f"{args.away} at {args.home}")
