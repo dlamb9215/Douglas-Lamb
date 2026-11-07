@@ -79,6 +79,19 @@ class TestMatchupPlayerPipeline(unittest.TestCase):
         self.assertAlmostEqual(sim["over_probability"] + sim["under_probability"]
                                + sim["push_probability"], 100.0, places=2)
 
+    def test_recent_player_baseline_is_adjusted_for_opponent_defense(self):
+        team_records = [
+            {"team":"BUF","defense":{"passing":{"yards_per_game":200},"rushing":{"yards_per_game":100}}},
+            {"team":"MIA","defense":{"passing":{"yards_per_game":250},"rushing":{"yards_per_game":150}}},
+        ]
+        report = analyze_matchup("BUF", "MIA", self.pool, trials=1000,
+                                 confirmations=self.confirmations,
+                                 team_records=team_records)
+        projection = report["players"][0]
+        self.assertGreater(projection["props"][2]["recent_per_game_baseline"], 72.0)
+        self.assertTrue(projection["opponent_adjustment"]["applied"])
+        self.assertEqual(projection["opponent_adjustment"]["opponent"], "MIA")
+
     def test_invalid_same_team_matchup_rejected(self):
         with self.assertRaises(ValueError):
             analyze_matchup("BUF", "BUF", self.pool, confirmations=self.confirmations)
