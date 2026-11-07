@@ -35,12 +35,11 @@ on:
       home:
         description: Home college team
         required: true
-        default: Texas A&M
-        type: string
+        default: South Carolinang
       away:
         description: Away college team
         required: true
-        default: South Carolina
+        default: Texas A&Mna
         type: string
       trials:
         description: Monte Carlo trials
