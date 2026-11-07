@@ -39,6 +39,7 @@ def _kickoff(row):
 
 def fetch_matchup_weather(home, away, season=None, week=None):
     home, away = home.upper(), away.upper()
+    season = season or datetime.now(timezone.utc).year
     rows = _get_rows(SCHEDULE_URL)
     candidates = []
     for row in rows:
@@ -68,8 +69,14 @@ def fetch_matchup_weather(home, away, season=None, week=None):
     })
     geo = _get_json(geo_url)
     results = geo.get("results") or []
+    if not results and city:
+        fallback_url = "https://geocoding-api.open-meteo.com/v1/search?" + urlencode({
+            "name": city, "count": 5, "language": "en", "format": "json"
+        })
+        geo = _get_json(fallback_url)
+        results = geo.get("results") or []
     if not results:
-        raise RuntimeError(f"Could not geocode NFL venue: {query}")
+        raise RuntimeError(f"Could not geocode NFL venue or city: {query}")
     # Pick the result whose country is the United States and prefer stadium/city match.
     place = next((x for x in results if x.get("country_code") == "US"), results[0])
     forecast_url = "https://api.open-meteo.com/v1/forecast?" + urlencode({
