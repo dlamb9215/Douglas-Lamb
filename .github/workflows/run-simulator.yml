@@ -91,7 +91,7 @@ on:
       neutral_site:
         description: Neutral-site game (Bengals at Falcons in Madrid; disables home-field advantage)
         required: true
-        default: true
+        default: false
         type: boolean
 
 permissions:
