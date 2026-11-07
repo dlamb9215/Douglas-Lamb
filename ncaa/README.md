@@ -188,3 +188,8 @@ The matchup workflow attempts to match the selected home/away teams to the CFBD 
 ## FBS and FCS support
 
 The data refresh now accepts `--classification fbs` or `--classification fcs`. FBS retains the existing `team_profiles.csv` and `team_rankings.json` paths; FCS uses separate `team_profiles_fcs.csv` and `team_rankings_fcs.json` files so national ranks are not mixed across subdivisions. The matchup workflow has a division selector and automatically loads the matching profile/ranking files, roster feed, and schedule/weather classification. The scheduled refresh workflow defaults to FBS; choose FCS when manually refreshing FCS data. Forecast reconciliation checks both subdivisions. Games crossing FBS/FCS subdivisions are not included in either same-division team profile dataset; use caution for cross-subdivision matchups and do not assume the FBS/FCS model profiles are directly calibrated against one another.
+
+
+## Missing-team data safety gate
+
+The CLI now blocks a matchup if either selected team is absent from the chosen FBS/FCS profile file. This prevents an accidental FCS/FBS mismatch or silent league-average prior from being presented as a data-backed matchup. Use `--allow-prior` only when you intentionally want a flagged league-average prior for exploratory testing; the normal GitHub matchup workflow does not enable this override.
