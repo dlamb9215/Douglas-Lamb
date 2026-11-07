@@ -149,17 +149,22 @@ def analyze_matchup(home, away, player_pool, prop_lines=None,
                     over_raw, under_raw = implied(over_odds), implied(under_odds)
                     total_raw = over_raw + under_raw
                     over_fair, under_fair = over_raw / total_raw, under_raw / total_raw
-                    def ev_per_100(probability, odds):
+                    def ev_per_100(probability, push_probability, odds):
                         profit = float(odds) if float(odds) > 0 else 10000.0 / -float(odds)
-                        return round(probability * profit - (1.0 - probability) * 100.0, 2)
+                        loss_probability = max(0.0, 1.0 - probability - push_probability)
+                        return round(probability * profit - loss_probability * 100.0, 2)
+                    decision_total = simulation["over_probability"] + simulation["under_probability"]
+                    over_decision = simulation["over_probability"] / decision_total if decision_total else 0.0
+                    under_decision = simulation["under_probability"] / decision_total if decision_total else 0.0
+                    push_probability = simulation["push_probability"] / 100.0
                     item["market_comparison"] = {
                         "over_odds": over_odds, "under_odds": under_odds,
                         "vig_free_over_probability": round(over_fair * 100, 2),
                         "vig_free_under_probability": round(under_fair * 100, 2),
-                        "over_edge_percentage_points": round(simulation["over_probability"] - over_fair * 100, 2),
-                        "under_edge_percentage_points": round(simulation["under_probability"] - under_fair * 100, 2),
-                        "over_expected_value_per_100": ev_per_100(simulation["over_probability"] / 100, over_odds),
-                        "under_expected_value_per_100": ev_per_100(simulation["under_probability"] / 100, under_odds),
+                        "over_edge_percentage_points": round(over_decision * 100 - over_fair * 100, 2),
+                        "under_edge_percentage_points": round(under_decision * 100 - under_fair * 100, 2),
+                        "over_expected_value_per_100": ev_per_100(simulation["over_probability"] / 100, push_probability, over_odds),
+                        "under_expected_value_per_100": ev_per_100(simulation["under_probability"] / 100, push_probability, under_odds),
                     }
             props.append(item)
         reports.append({
