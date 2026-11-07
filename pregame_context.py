@@ -9,6 +9,8 @@ import json
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
+from injury_exposure import build_injury_exposure
+
 VALID_TEAMS = {
     "ARI", "ATL", "BAL", "BUF", "CAR", "CHI", "CIN", "CLE",
     "DAL", "DEN", "DET", "GB", "HOU", "IND", "JAX", "KC",
@@ -97,6 +99,7 @@ def build_pregame_report(pool, home, away, max_age_hours=36, now=None):
         if not teams[team]["projected_qb1_available_in_feed"]
     ]
 
+    injury_exposure = build_injury_exposure(pool, (home, away))
     return {
         "season": pool.get("season"),
         "source": pool.get("source"),
@@ -106,16 +109,17 @@ def build_pregame_report(pool, home, away, max_age_hours=36, now=None):
         "home": home,
         "away": away,
         "teams": teams,
-        "team_simulation_context": "Current player injury/depth context loaded; this team-score engine does not yet quantify player-specific injury impact.",
+        "injury_exposure": injury_exposure,
+        "team_simulation_context": "Recent snap-weighted injury exposure is reported as a sensitivity indicator; no uncalibrated point penalty is applied to team scoring.",
         "team_simulation_ready": team_simulation_ready,
         "team_simulation_blockers": blockers,
         "betting_ready": False,
         "betting_readiness_blockers": [
-            "Player-specific injury impact is not modeled in team scoring.",
+            "Injury exposure is reported but has no validated team-scoring adjustment coefficient.",
             "Final game-day inactives and official starting lineups are not confirmed.",
-            "Weather is not integrated.",
-            "Sportsbook prices must be entered manually.",
-            "Win-probability thresholds have not been historically calibrated.",
+            "Weather is contextual only; validated scoring adjustments are not available.",
+            "Sportsbook prices must be current, timestamped and supplied for this matchup.",
+            "Win-probability thresholds have not been validated out of sample.",
         ],
         "player_props_ready": False,
         "blocking_note": "Do not issue player props until official game-day active/inactive and starting-lineup confirmations are supplied.",
@@ -131,10 +135,24 @@ def main():
     parser.add_argument("--input", default="player_pool.json")
     parser.add_argument("--output", default="pregame-context.json")
     parser.add_argument("--max-age-hours", type=int, default=36)
+    parser.add_argument("--weather-input", default=None)
     args = parser.parse_args()
     with open(args.input, encoding="utf-8") as handle:
         pool = json.load(handle)
     report = build_pregame_report(pool, args.home, args.away, args.max_age_hours)
+    if args.weather_input:
+        try:
+            with open(args.weather_input, encoding="utf-8") as weather_file:
+                weather = json.load(weather_file)
+            if weather.get("home_team") != args.home.upper() or weather.get("away_team") != args.away.upper():
+                raise ValueError("Weather report teams do not match matchup.")
+            report["weather"] = weather
+            report["weather_status"] = "AVAILABLE_CONTEXT_ONLY" if weather.get("available") else "UNAVAILABLE"
+        except (OSError, json.JSONDecodeError, ValueError) as exc:
+            raise SystemExit(f"Weather context validation failed: {exc}") from exc
+    else:
+        report["weather"] = {"available": False, "warning": "No weather report supplied."}
+        report["weather_status"] = "NOT_AVAILABLE"
     Path(args.output).write_text(json.dumps(report, indent=2) + chr(10), encoding="utf-8")
     print("PREGAME CONTEXT CHECK PASSED")
     print(f"Matchup: {report['away']} at {report['home']}")
