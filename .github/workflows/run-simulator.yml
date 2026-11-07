@@ -111,8 +111,31 @@ jobs:
       - name: Refresh current-season player, injury, roster and depth-chart data
         run: python refresh_player_data.py --weeks 5 --output player_pool.json
 
+      - name: Fetch matchup kickoff weather
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        env:
+          HOME_TEAM: ${{ inputs.home || 'ATL' }}
+          AWAY_TEAM: ${{ inputs.away || 'CIN' }}
+        run: |
+          if ! python nfl_weather.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --output nfl-weather.json; then
+            python -c 'import json,os; json.dump({"available":False,"home_team":os.environ["HOME_TEAM"],"away_team":os.environ["AWAY_TEAM"],"warning":"Weather lookup unavailable; no adjustment applied."},open("nfl-weather.json","w"),indent=2)'
+          fi
+
+      - name: Validate fresh pregame context with weather
+        if: github.event_name == 'workflow_dispatch'
+        run: python pregame_context.py --home "${{ inputs.home || 'ATL' }}" --away "${{ inputs.away || 'CIN' }}" --input player_pool.json --weather-input nfl-weather.json --output pregame-context.json
+
       - name: Validate fresh pregame context
-        run: python pregame_context.py --home "${{ inputs.home || 'ATL' }}" --away "${{ inputs.away || 'CIN' }}" --input player_pool.json --output pregame-context.json
+        if: github.event_name != 'workflow_dispatch'
+        run: python pregame_context.py --home ATL --away CIN --input player_pool.json --output pregame-context.json
+
+      - name: Reconcile prior NFL forecasts and report calibration
+        shell: bash
+        run: |
+          if ! python nfl_forecast_ledger.py --reconcile --summary; then
+            echo "Forecast reconciliation unavailable; existing ledger retained."
+          fi
 
       - name: Run tests
         run: python -m unittest -v
