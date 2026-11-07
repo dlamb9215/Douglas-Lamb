@@ -147,3 +147,8 @@ Example structure (replace all values with real, sourced pregame data):
 ```
 
 The GitHub workflow accepts optional `player_inputs` JSON, sourced `pregame_checks` JSON, and moneyline/total American odds. It writes these as temporary run inputs and includes the results in the uploaded artifact. Do not enter guessed workloads or mark availability verified without checking a current source.
+
+
+## Automated CFBD player-data cache
+
+The scheduled/dispatch team refresh now has a separate optional player-data refresh step. It requests season player statistics from `/stats/player/season` and player usage metrics from `/player/usage`, and saves the raw sourced response with retrieval metadata to `ncaa/data/player_season_data.json`. The separate status file records endpoint availability and provider warnings. If player stats are unavailable or the account lacks entitlement, the workflow preserves the previous player cache and continues the team simulation; it does not silently convert missing player data into zeroes. This is season production/usage context, not real-time availability, confirmed starter status, or a complete player projection feed. The CFBD API account must have access to the relevant endpoints.
