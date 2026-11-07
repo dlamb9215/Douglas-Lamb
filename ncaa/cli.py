@@ -18,7 +18,8 @@ def main() -> None:
     parser.add_argument("--away", required=True, help="Away school name")
     parser.add_argument("--trials", type=int, default=100_000)
     parser.add_argument("--season", default="2026")
-    parser.add_argument("--data", default="ncaa/data/team_profiles.csv")
+    parser.add_argument("--classification", choices=("fbs", "fcs"), default="fbs")
+    parser.add_argument("--data", default=None)
     parser.add_argument("--home-spread", type=float, default=None,
                         help="Sportsbook handicap attached to home team (e.g. -6.5)")
     parser.add_argument("--total", type=float, default=None)
@@ -28,7 +29,7 @@ def main() -> None:
     parser.add_argument("--under-odds", type=float, default=None)
     parser.add_argument("--neutral-site", action="store_true")
     parser.add_argument("--seed", type=int, default=20261104)
-    parser.add_argument("--rankings", default="ncaa/data/team_rankings.json")
+    parser.add_argument("--rankings", default=None)
     parser.add_argument("--output", default="ncaa-results.json")
     parser.add_argument("--pregame-checks", default=None, help="Sourced pregame verification JSON")
     parser.add_argument("--require-verified-pregame", action="store_true")
@@ -48,7 +49,9 @@ def main() -> None:
         "unverified": ["starting quarterbacks", "injuries", "weather", "sportsbook"],
         "warning": "No sourced pregame checks supplied.",
     })
-    profiles = load_profiles(args.data)
+    data_path = args.data or ("ncaa/data/team_profiles.csv" if args.classification == "fbs" else "ncaa/data/team_profiles_fcs.csv")
+    rankings_file = args.rankings or ("ncaa/data/team_rankings.json" if args.classification == "fbs" else "ncaa/data/team_rankings_fcs.json")
+    profiles = load_profiles(data_path)
     home = get_profile(args.home, profiles)
     away = get_profile(args.away, profiles)
     result = simulate_game(
@@ -68,6 +71,7 @@ def main() -> None:
     if args.players:
         result["player_projections"] = simulate_players(args.players, args.trials, args.seed + 1000)
     result["season"] = args.season
+    result["classification"] = args.classification
     result["sportsbook_analysis"] = {}
     if (args.home_ml_odds is None) != (args.away_ml_odds is None):
         parser.error("Provide both moneyline prices.")
@@ -104,8 +108,8 @@ def main() -> None:
         result["forecast_ledger"] = append_forecast(
             result, args.ledger, kickoff=ledger_kickoff,
         )
-    result["data_file"] = args.data
-    ranking_path = Path(args.rankings)
+    result["data_file"] = data_path
+    ranking_path = Path(rankings_file)
     if ranking_path.exists():
         ranking_data = json.loads(ranking_path.read_text(encoding="utf-8"))
         ranking_teams = ranking_data.get("teams", {})
