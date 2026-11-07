@@ -183,3 +183,8 @@ The CFBD player refresh also attempts the current-season FBS `/roster` endpoint.
 ## Kickoff weather context
 
 The matchup workflow attempts to match the selected home/away teams to the CFBD schedule, resolve the venue coordinates, and retrieve the hourly kickoff forecast from Open-Meteo. The result includes temperature, precipitation, wind and gusts with source and retrieval timestamps. If the schedule, venue coordinates, forecast horizon or API access is unavailable, the optional step records no weather and the simulation continues with a warning. Weather is **context only** and is not yet used to change score probabilities: no weather coefficients have been validated against this simulator's historical forecast ledger. Do not interpret the weather report as a model adjustment.
+
+
+## FBS and FCS support
+
+The data refresh now accepts `--classification fbs` or `--classification fcs`. FBS retains the existing `team_profiles.csv` and `team_rankings.json` paths; FCS uses separate `team_profiles_fcs.csv` and `team_rankings_fcs.json` files so national ranks are not mixed across subdivisions. The matchup workflow has a division selector and automatically loads the matching profile/ranking files, roster feed, and schedule/weather classification. The scheduled refresh workflow defaults to FBS; choose FCS when manually refreshing FCS data. Forecast reconciliation checks both subdivisions. Games crossing FBS/FCS subdivisions are not included in either same-division team profile dataset; use caution for cross-subdivision matchups and do not assume the FBS/FCS model profiles are directly calibrated against one another.
