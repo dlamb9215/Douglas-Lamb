@@ -35,12 +35,12 @@ on:
       home:
         description: Home team
         required: true
-        default: KC
+        default: MIA
         type: string
       away:
         description: Away team
         required: true
-        default: NYJ
+        default: DET
         type: string
       trials:
         description: Simulation trials
