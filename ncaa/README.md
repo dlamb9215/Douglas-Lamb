@@ -97,3 +97,26 @@ The team-level simulator can run from a validated CFBD refresh and accepts user-
 Every CLI matchup now includes six separately seeded sensitivity runs in the JSON output and terminal summary: baseline, home offense reduced 10%, away offense reduced 10%, both offenses reduced 10%, both teams' pace reduced 8%, and both teams' pace increased 8%. These are transparent assumption stress tests. They are **not** injury-status reports, not weighted scenarios, and not calibrated probabilities. The base forecast remains the primary projection. Scenario results are intended to show whether a pick is fragile to reasonable changes in efficiency or pace.
 
 Verified injuries, confirmed starting quarterbacks, depth charts and player usage remain pregame manual checks because no trustworthy automated feed is configured. Entering an assumption into a scenario is not evidence that a player is injured or unavailable.
+
+## Sourced pregame verification gate
+
+The CLI accepts `--pregame-checks checks.json` and an optional `--require-verified-pregame` flag. The latter blocks the matchup unless all six checks are marked verified with a nonempty source and an offset-aware timestamp no older than 24 hours. Checks are: home and away starting QB, home and away injury report, weather, and sportsbook prices. Team names must match. Without a file, the output explicitly says that pregame checks are unverified. This is a manual provenance gate, **not** an automatic source lookup or independent authentication.
+
+Example `checks.json` structure (fill in real sourced details, not placeholders):
+
+```json
+{
+  "home_team": "Georgia",
+  "away_team": "Alabama",
+  "checks": {
+    "home_starting_qb": {"verified": false},
+    "away_starting_qb": {"verified": false},
+    "home_injuries": {"verified": false},
+    "away_injuries": {"verified": false},
+    "weather": {"verified": false},
+    "sportsbook": {"verified": false}
+  }
+}
+```
+
+For each genuinely verified entry, add `"source": "source name or URL"`, `"checked_at": "2026-11-07T12:00:00Z"`, and the relevant observations. A verified check means only that the provided metadata passed format and freshness validation; it does not certify that a source is accurate. Do not claim a matchup is fully vetted without independent confirmation.
