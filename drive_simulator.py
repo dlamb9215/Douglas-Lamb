@@ -82,6 +82,19 @@ def _validate_inputs(home_mean, away_mean, spread, total, trials,
         raise ValueError("Trials must be greater than zero.")
 
 
+def _wilson_interval(successes, trials, z=1.959963984540054):
+    """Return a two-sided Wilson score interval as percentages."""
+    if trials < 1:
+        raise ValueError("trials must be greater than zero")
+    if successes < 0 or successes > trials:
+        raise ValueError("successes must be between zero and trials")
+    p = successes / trials
+    z2 = z * z
+    denominator = 1.0 + z2 / trials
+    center = (p + z2 / (2.0 * trials)) / denominator
+    margin = z * math.sqrt((p * (1.0 - p) / trials) + z2 / (4.0 * trials * trials)) / denominator
+    return (max(0.0, (center - margin) * 100.0), min(100.0, (center + margin) * 100.0))
+
 def simulate_drive_game(
     home_mean, away_mean, spread, total, trials=100000, seed=42,
     first_half=False, home_sd=10.0, away_sd=10.0,
@@ -172,6 +185,10 @@ def simulate_drive_game(
             counts["total_push"] += 1
 
     results = {key: value * 100.0 / trials for key, value in counts.items()}
+    results["probability_ci95"] = {
+        key: _wilson_interval(value, trials)
+        for key, value in counts.items()
+    }
     results["home_avg"] = home_score_sum / trials
     results["away_avg"] = away_score_sum / trials
     return results
