@@ -19,6 +19,26 @@ class TeamProfile:
     yards_per_play: float = 5.8
     yards_per_play_allowed: float = 5.8
     plays_per_game: float = 70.0
+    pass_yards_per_game: float = 0.0
+    rush_yards_per_game: float = 0.0
+    pass_attempts_per_game: float = 0.0
+    completions_per_game: float = 0.0
+    completion_pct: float = 0.0
+    yards_per_pass_attempt: float = 0.0
+    pass_tds_per_game: float = 0.0
+    interceptions_per_game: float = 0.0
+    pass_first_downs_per_game: float = 0.0
+    rush_attempts_per_game: float = 0.0
+    yards_per_carry: float = 0.0
+    rush_tds_per_game: float = 0.0
+    rush_first_downs_per_game: float = 0.0
+    pass_yards_allowed_per_game: float = 0.0
+    opponent_pass_attempts_per_game: float = 0.0
+    opponent_completions_per_game: float = 0.0
+    opponent_yards_per_completion: float = 0.0
+    rush_yards_allowed_per_game: float = 0.0
+    opponent_rush_attempts_per_game: float = 0.0
+    opponent_yards_per_carry_allowed: float = 0.0
     points_per_drive: Optional[float] = None
     turnovers_per_game: float = 1.4
     takeaways_per_game: float = 1.4
@@ -71,11 +91,17 @@ def _points_per_drive(offense: TeamProfile, defense: TeamProfile) -> float:
     def_ppd_allowed = defense.points_against / _expected_drives(defense)
     base = 0.58 * off_ppd + 0.42 * def_ppd_allowed
     efficiency = (offense.yards_per_play / max(defense.yards_per_play_allowed, 0.1))
+    pass_edge = 0.0
+    if offense.yards_per_pass_attempt > 0 and defense.opponent_yards_per_completion > 0:
+        pass_edge = _clamp((offense.yards_per_pass_attempt - defense.opponent_yards_per_completion) / 8.0, -0.18, 0.18)
+    rush_edge = 0.0
+    if offense.yards_per_carry > 0 and defense.opponent_yards_per_carry_allowed > 0:
+        rush_edge = _clamp((offense.yards_per_carry - defense.opponent_yards_per_carry_allowed) / 6.0, -0.18, 0.18)
     success = (offense.success_rate - 0.42) * 1.7
     explosive = (offense.explosive_play_rate - 0.12) * 2.0
     strength = (offense.strength_rating - defense.strength_rating) / 30.0
     turnover_edge = (defense.takeaways_per_game - offense.turnovers_per_game) * 0.11
-    return _clamp(base + (efficiency - 1.0) * 1.15 + success + explosive
+    return _clamp(base + (efficiency - 1.0) * 1.15 + pass_edge * 0.45 + rush_edge * 0.35 + success + explosive
                   + strength + turnover_edge, 0.65, 5.2)
 
 
@@ -190,6 +216,7 @@ def simulate_game(
         "home_win_probability": round(home_wins / trials, 4),
         "away_win_probability": round((trials - home_wins) / trials, 4),
         "expected_points_per_drive": {home.name: round(home_ppd, 3), away.name: round(away_ppd, 3)},
+        "team_comparison": {home.name: _team_metrics(home), away.name: _team_metrics(away)},
         "expected_drives": {home.name: round(home_drives, 2), away.name: round(away_drives, 2)},
         "market": {},
         "data_quality": {
@@ -232,3 +259,37 @@ def _warnings(home: TeamProfile, away: TeamProfile) -> list[str]:
         if team.source == "league-average prior":
             warnings.append(f"{team.name}: replace prior with current-season data before betting use")
     return warnings
+
+
+def _team_metrics(team: TeamProfile) -> dict:
+    return {
+        "offense": {
+            "pass_yards_per_game": team.pass_yards_per_game,
+            "pass_attempts_per_game": team.pass_attempts_per_game,
+            "completions_per_game": team.completions_per_game,
+            "completion_pct": team.completion_pct,
+            "yards_per_pass_attempt": team.yards_per_pass_attempt,
+            "pass_tds_per_game": team.pass_tds_per_game,
+            "interceptions_per_game": team.interceptions_per_game,
+            "pass_first_downs_per_game": team.pass_first_downs_per_game,
+            "rush_yards_per_game": team.rush_yards_per_game,
+            "rush_attempts_per_game": team.rush_attempts_per_game,
+            "yards_per_carry": team.yards_per_carry,
+            "rush_tds_per_game": team.rush_tds_per_game,
+            "rush_first_downs_per_game": team.rush_first_downs_per_game,
+            "total_yards_per_play": team.yards_per_play,
+            "plays_per_game": team.plays_per_game,
+        },
+        "defense": {
+            "pass_yards_allowed_per_game": team.pass_yards_allowed_per_game,
+            "opponent_pass_attempts_per_game": team.opponent_pass_attempts_per_game,
+            "opponent_completions_per_game": team.opponent_completions_per_game,
+            "opponent_yards_per_completion": team.opponent_yards_per_completion,
+            "rush_yards_allowed_per_game": team.rush_yards_allowed_per_game,
+            "opponent_rush_attempts_per_game": team.opponent_rush_attempts_per_game,
+            "opponent_yards_per_carry_allowed": team.opponent_yards_per_carry_allowed,
+            "total_yards_per_play_allowed": team.yards_per_play_allowed,
+        },
+        "turnovers": {"giveaways_per_game": team.turnovers_per_game, "takeaways_per_game": team.takeaways_per_game},
+        "sample": {"games": team.games_sampled, "as_of": team.as_of, "source": team.source},
+    }
