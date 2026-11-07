@@ -65,7 +65,7 @@ on:
       neutral_site:
         description: Neutral-site game (disables home-field advantage)
         required: true
-        default: true
+        default: false
         type: boolean
 
 permissions:
@@ -107,7 +107,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         shell: bash
         run: |
-          ARGS=(--home "${{ inputs.home || 'BAL' }}" --away "${{ inputs.away || 'JAX' }}" --trials "${{ inputs.trials || '100000' }}" --pregame-report pregame-context.json)
+          ARGS=(--home "${{ inputs.home || 'ATL' }}" --away "${{ inputs.away || 'CIN' }}" --trials "${{ inputs.trials || '100000' }}" --pregame-report pregame-context.json)
           if [[ -n "${{ inputs.spread }}" ]]; then ARGS+=(--spread "${{ inputs.spread }}"); fi
           if [[ -n "${{ inputs.total }}" ]]; then ARGS+=(--total "${{ inputs.total }}"); fi
           if [[ -n "${{ inputs.home_odds }}" ]]; then ARGS+=(--home-odds "${{ inputs.home_odds }}"); fi
