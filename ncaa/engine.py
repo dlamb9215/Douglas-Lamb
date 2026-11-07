@@ -36,6 +36,7 @@ class TeamProfile:
     opponent_pass_attempts_per_game: float = 0.0
     opponent_completions_per_game: float = 0.0
     opponent_yards_per_completion: float = 0.0
+    opponent_yards_per_pass_attempt_allowed: float = 0.0
     rush_yards_allowed_per_game: float = 0.0
     opponent_rush_attempts_per_game: float = 0.0
     opponent_yards_per_carry_allowed: float = 0.0
@@ -92,8 +93,8 @@ def _points_per_drive(offense: TeamProfile, defense: TeamProfile) -> float:
     base = 0.58 * off_ppd + 0.42 * def_ppd_allowed
     efficiency = (offense.yards_per_play / max(defense.yards_per_play_allowed, 0.1))
     pass_edge = 0.0
-    if offense.yards_per_pass_attempt > 0 and defense.opponent_yards_per_completion > 0:
-        pass_edge = _clamp((offense.yards_per_pass_attempt - defense.opponent_yards_per_completion) / 8.0, -0.18, 0.18)
+    if offense.yards_per_pass_attempt > 0 and defense.opponent_yards_per_pass_attempt_allowed > 0:
+        pass_edge = _clamp((offense.yards_per_pass_attempt - defense.opponent_yards_per_pass_attempt_allowed) / 8.0, -0.18, 0.18)
     rush_edge = 0.0
     if offense.yards_per_carry > 0 and defense.opponent_yards_per_carry_allowed > 0:
         rush_edge = _clamp((offense.yards_per_carry - defense.opponent_yards_per_carry_allowed) / 6.0, -0.18, 0.18)
@@ -285,6 +286,7 @@ def _team_metrics(team: TeamProfile) -> dict:
             "opponent_pass_attempts_per_game": team.opponent_pass_attempts_per_game,
             "opponent_completions_per_game": team.opponent_completions_per_game,
             "opponent_yards_per_completion": team.opponent_yards_per_completion,
+            "opponent_yards_per_pass_attempt_allowed": team.opponent_yards_per_pass_attempt_allowed,
             "rush_yards_allowed_per_game": team.rush_yards_allowed_per_game,
             "opponent_rush_attempts_per_game": team.opponent_rush_attempts_per_game,
             "opponent_yards_per_carry_allowed": team.opponent_yards_per_carry_allowed,
