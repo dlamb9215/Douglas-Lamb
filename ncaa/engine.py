@@ -248,6 +248,8 @@ def simulate_game(
             away.name: {"p10": _percentile(away_scores, 0.10), "median": _percentile(away_scores, 0.50), "p90": _percentile(away_scores, 0.90)},
         },
         "first_half_win_probability_home": round(sum(h > a for h, a in zip(home_first_scores, away_first_scores)) / trials, 4),
+        "first_half_win_probability_away": round(sum(a > h for h, a in zip(home_first_scores, away_first_scores)) / trials, 4),
+        "first_half_tie_probability": round(sum(h == a for h, a in zip(home_first_scores, away_first_scores)) / trials, 4),
         "home_win_probability": round(home_wins / trials, 4),
         "away_win_probability": round((trials - home_wins) / trials, 4),
         "expected_points_per_drive": {home.name: round(home_ppd, 3), away.name: round(away_ppd, 3)},
