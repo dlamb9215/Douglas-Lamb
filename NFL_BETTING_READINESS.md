@@ -18,6 +18,10 @@ Open **Actions → Run Doug's Elite Game Simulator → Run workflow**.
 - The spread is the **home-team handicap** (home -3.5 means the home team is laying 3.5).
 - If any spread, total, or odds are supplied, also supply the sportsbook source and an ISO-8601 timestamp with timezone. Market snapshots older than six hours are rejected.
 
+## Neutral-site handling
+
+The scoring engine removes its home-field adjustment when the weather/schedule context identifies a neutral-site venue. The manual `neutral_site` input is an additional override for cases where the schedule/weather feed cannot identify the venue. It defaults to false for ordinary home games.
+
 ## Final player availability
 
 The nflverse roster, injury and depth-chart feeds are useful pregame context, but are not official final inactive lists. The player-prop workflow therefore requires a separate `game_day_confirmations.json` file.
