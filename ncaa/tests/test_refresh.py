@@ -94,6 +94,8 @@ class RefreshTests(unittest.TestCase):
         self.assertIn("FCS Team 0", rankings)
         self.assertNotIn("FBS Team", rankings)
         home_profile = next(p for p in profiles if p["team"] == "FCS Team 0")
+        self.assertEqual(home_profile["total_yards_per_game"], 330.0)
+        self.assertEqual(home_profile["total_yards_allowed_per_game"], 300.0)
         self.assertEqual(home_profile["plays_allowed_per_game"], 60.0)
         self.assertEqual(home_profile["pass_first_downs_allowed_per_game"], 8.0)
         self.assertEqual(home_profile["rush_first_downs_allowed_per_game"], 6.0)
