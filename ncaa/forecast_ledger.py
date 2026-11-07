@@ -12,7 +12,10 @@ FIELDS = [
     "home_win_probability", "home_spread", "home_cover_probability",
     "total_line", "over_probability", "home_moneyline_odds", "away_moneyline_odds",
     "over_odds", "under_odds", "home_data_as_of", "away_data_as_of",
-    "player_projection_count", "pregame_verified", "unverified_pregame_checks",
+    "player_projection_count", "roster_verified_player_count", "weather_available",
+    "weather_temperature_f", "weather_precipitation_mm_per_hour", "weather_wind_mph",
+    "weather_wind_gust_mph", "weather_source", "weather_retrieved_at",
+    "pregame_verified", "unverified_pregame_checks",
     "data_warnings", "actual_home_score", "actual_away_score",
     "home_win", "home_cover", "over", "outcome_source", "outcome_retrieved_at",
 ]
@@ -44,6 +47,8 @@ def append_forecast(result: dict, path: str | Path, kickoff: str | None = None,
     profiles = result.get("profiles", {})
     prices = result.get("market_prices", {})
     pregame = result.get("pregame_verification", {})
+    weather = result.get("weather_context", {})
+    players = result.get("player_projections", [])
     row = {
         "run_id": str(run_id or os.environ.get("GITHUB_RUN_ID") or
                       f"{result.get('seed', '')}-{recorded_at.isoformat()}"),
@@ -66,7 +71,15 @@ def append_forecast(result: dict, path: str | Path, kickoff: str | None = None,
         "under_odds": prices.get("under", ""),
         "home_data_as_of": profiles.get(result.get("home_team"), {}).get("as_of", ""),
         "away_data_as_of": profiles.get(result.get("away_team"), {}).get("as_of", ""),
-        "player_projection_count": len(result.get("player_projections", [])),
+        "player_projection_count": len(players),
+        "roster_verified_player_count": sum(bool(p.get("input_provenance", {}).get("roster_verified")) for p in players),
+        "weather_available": weather.get("available", False),
+        "weather_temperature_f": weather.get("temperature_f", ""),
+        "weather_precipitation_mm_per_hour": weather.get("precipitation_mm_per_hour", ""),
+        "weather_wind_mph": weather.get("wind_mph", ""),
+        "weather_wind_gust_mph": weather.get("wind_gust_mph", ""),
+        "weather_source": " | ".join(weather.get("sources", [])),
+        "weather_retrieved_at": weather.get("retrieved_at", ""),
         "pregame_verified": pregame.get("all_verified", False),
         "unverified_pregame_checks": " | ".join(pregame.get("unverified", [])),
         "data_warnings": " | ".join(quality.get("warnings", [])),
