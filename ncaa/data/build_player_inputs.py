@@ -98,8 +98,8 @@ def build_player_inputs(player_data_path: str | Path, team_profiles_path: str | 
             continue
         if roster_available:
             player_id = str(row.get("playerId", "")).strip()
-            roster_match = ((team.casefold(), player_id) in roster_ids if player_id and roster_ids
-                            else (team.casefold(), _norm(player)) in roster_names)
+            roster_match = ((team.casefold(), player_id) in roster_ids if player_id else False)
+            roster_match = roster_match or (team.casefold(), _norm(player)) in roster_names
             if not roster_match:
                 continue
         if category == "general" and stat_type in {"gp", "gamesplayed", "games"}:
