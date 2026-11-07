@@ -155,16 +155,34 @@ jobs:
       - name: Run matchup
         if: github.event_name == 'workflow_dispatch'
         shell: bash
+        env:
+          INPUT_SPREAD: ${{ inputs.spread }}
+          INPUT_TOTAL: ${{ inputs.total }}
+          INPUT_HOME_ODDS: ${{ inputs.home_odds }}
+          INPUT_AWAY_ODDS: ${{ inputs.away_odds }}
+          INPUT_OVER_ODDS: ${{ inputs.over_odds }}
+          INPUT_UNDER_ODDS: ${{ inputs.under_odds }}
+          INPUT_ODDS_SOURCE: ${{ inputs.odds_source }}
+          INPUT_ODDS_CHECKED_AT: ${{ inputs.odds_checked_at }}
         run: |
           ARGS=(--home "${{ inputs.home || 'ATL' }}" --away "${{ inputs.away || 'CIN' }}" --trials "${{ inputs.trials || '100000' }}" --pregame-report pregame-context.json)
-          if [[ -n "${{ inputs.spread }}" ]]; then ARGS+=(--spread "${{ inputs.spread }}"); fi
-          if [[ -n "${{ inputs.total }}" ]]; then ARGS+=(--total "${{ inputs.total }}"); fi
-          if [[ -n "${{ inputs.home_odds }}" ]]; then ARGS+=(--home-odds "${{ inputs.home_odds }}"); fi
-          if [[ -n "${{ inputs.away_odds }}" ]]; then ARGS+=(--away-odds "${{ inputs.away_odds }}"); fi
-          if [[ -n "${{ inputs.over_odds }}" ]]; then ARGS+=(--over-odds "${{ inputs.over_odds }}"); fi
-          if [[ -n "${{ inputs.under_odds }}" ]]; then ARGS+=(--under-odds "${{ inputs.under_odds }}"); fi
-          if [[ -n "${{ inputs.odds_source }}" ]]; then ARGS+=(--odds-source "${{ inputs.odds_source }}"); fi
-          if [[ -n "${{ inputs.odds_checked_at }}" ]]; then ARGS+=(--odds-checked-at "${{ inputs.odds_checked_at }}"); fi
+          HAS_MARKET_LINES=false
+          for value in "$INPUT_SPREAD" "$INPUT_TOTAL" "$INPUT_HOME_ODDS" "$INPUT_AWAY_ODDS" "$INPUT_OVER_ODDS" "$INPUT_UNDER_ODDS"; do
+            if [[ -n "$value" ]]; then HAS_MARKET_LINES=true; fi
+          done
+          if [[ "$HAS_MARKET_LINES" == "true" && ( -z "$INPUT_ODDS_SOURCE" || -z "$INPUT_ODDS_CHECKED_AT" ) ]]; then
+            echo "WARNING: Market lines entered without sportsbook source and timezone-aware checked-at timestamp. Ignoring all market lines; continuing with the 100,000-trial matchup simulation."
+            echo "Market lines ignored: missing sportsbook source and/or timestamp." > market-data-warning.txt
+          else
+            [[ -n "$INPUT_SPREAD" ]] && ARGS+=(--spread "$INPUT_SPREAD")
+            [[ -n "$INPUT_TOTAL" ]] && ARGS+=(--total "$INPUT_TOTAL")
+            [[ -n "$INPUT_HOME_ODDS" ]] && ARGS+=(--home-odds "$INPUT_HOME_ODDS")
+            [[ -n "$INPUT_AWAY_ODDS" ]] && ARGS+=(--away-odds "$INPUT_AWAY_ODDS")
+            [[ -n "$INPUT_OVER_ODDS" ]] && ARGS+=(--over-odds "$INPUT_OVER_ODDS")
+            [[ -n "$INPUT_UNDER_ODDS" ]] && ARGS+=(--under-odds "$INPUT_UNDER_ODDS")
+            [[ -n "$INPUT_ODDS_SOURCE" ]] && ARGS+=(--odds-source "$INPUT_ODDS_SOURCE")
+            [[ -n "$INPUT_ODDS_CHECKED_AT" ]] && ARGS+=(--odds-checked-at "$INPUT_ODDS_CHECKED_AT")
+          fi
           if [[ "${{ inputs.neutral_site }}" == "true" ]]; then ARGS+=(--neutral-site); fi
           python main.py "${ARGS[@]}" | tee simulation-results.txt
 
@@ -210,6 +228,7 @@ jobs:
               echo "- Pregame context report was not created."
             fi
             echo ""
+            if [[ -f market-data-warning.txt ]]; then cat market-data-warning.txt; echo ""; fi
             echo "## Simulation output"
             if [[ -f simulation-results.txt ]]; then
               cat simulation-results.txt
@@ -238,6 +257,7 @@ jobs:
             matchup-player-report.json
             player-prop-status.txt
             nfl_forecast_ledger.csv
+            market-data-warning.txt
 
       - name: Persist NFL forecast ledger
         if: github.event_name == 'workflow_dispatch'
