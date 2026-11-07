@@ -83,6 +83,15 @@ class RefreshTests(unittest.TestCase):
         self.assertIn("FCS Team 0", rankings)
         self.assertNotIn("FBS Team", rankings)
 
+    def test_fcs_outputs_use_separate_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            profiles = [{"team": "Howard", "classification": "fcs"}]
+            write_outputs(profiles, {"Howard": {"games": 4}},
+                          {"year": 2026, "classification": "fcs"}, Path(tmp), "fcs")
+            self.assertTrue((Path(tmp) / "team_profiles_fcs.csv").exists())
+            self.assertTrue((Path(tmp) / "team_rankings_fcs.json").exists())
+            self.assertFalse((Path(tmp) / "team_profiles.csv").exists())
+
     def test_outputs_write_csv_and_json(self):
         with tempfile.TemporaryDirectory() as tmp:
             profiles = [{
