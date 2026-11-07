@@ -39,6 +39,8 @@ def append_forecast(result: dict, path: str | Path, kickoff: str | None = None,
     moneyline = sportsbook.get("moneyline", {})
     total = sportsbook.get("total", {})
     quality = result.get("data_quality", {})
+    profiles = result.get("profiles", {})
+    prices = result.get("market_prices", {})
     row = {
         "run_id": str(run_id or os.environ.get("GITHUB_RUN_ID") or
                       f"{result.get('seed', '')}-{recorded_at.isoformat()}"),
@@ -55,12 +57,12 @@ def append_forecast(result: dict, path: str | Path, kickoff: str | None = None,
         "home_cover_probability": market.get("home_cover_probability", ""),
         "total_line": market.get("total_line", ""),
         "over_probability": market.get("over_probability", ""),
-        "home_moneyline_odds": moneyline.get("home_odds", ""),
-        "away_moneyline_odds": moneyline.get("away_odds", ""),
-        "over_odds": total.get("over_odds", ""),
-        "under_odds": total.get("under_odds", ""),
-        "home_data_as_of": quality.get("home_as_of", ""),
-        "away_data_as_of": quality.get("away_as_of", ""),
+        "home_moneyline_odds": prices.get("home_moneyline", ""),
+        "away_moneyline_odds": prices.get("away_moneyline", ""),
+        "over_odds": prices.get("over", ""),
+        "under_odds": prices.get("under", ""),
+        "home_data_as_of": profiles.get(result.get("home_team"), {}).get("as_of", ""),
+        "away_data_as_of": profiles.get(result.get("away_team"), {}).get("as_of", ""),
         "player_projection_count": len(result.get("player_projections", [])),
         "data_warnings": " | ".join(quality.get("warnings", [])),
     }
