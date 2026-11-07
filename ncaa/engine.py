@@ -123,6 +123,32 @@ def _drive_points(ppd: float, turnover_rate: float, rng: random.Random) -> int:
     return 0
 
 
+
+def _simulate_first_half(home_ppd: float, away_ppd: float,
+                         home_turnovers: float, away_turnovers: float,
+                         rng: random.Random) -> tuple[int, int, int, int]:
+    """Clock-limited 30-minute half using alternating drive durations.
+
+    This is a drive-duration approximation, not a play-by-play clock simulator.
+    """
+    remaining = 30.0 * 60.0
+    home_score = away_score = home_drives = away_drives = 0
+    home_ball = rng.random() < 0.5
+    while remaining > 0:
+        duration = _clamp(rng.lognormvariate(math.log(150.0), 0.35), 55.0, 330.0)
+        if duration > remaining:
+            break
+        if home_ball:
+            home_score += _drive_points(home_ppd, home_turnovers, rng)
+            home_drives += 1
+        else:
+            away_score += _drive_points(away_ppd, away_turnovers, rng)
+            away_drives += 1
+        remaining -= duration
+        home_ball = not home_ball
+    return home_score, away_score, home_drives, away_drives
+
+
 def simulate_game(
     home: TeamProfile,
     away: TeamProfile,
@@ -158,13 +184,15 @@ def simulate_game(
         game_shock = rng.gauss(0.0, 0.12)
         h_count = max(6, round(rng.gauss(home_drives, 0.85)))
         a_count = max(6, round(rng.gauss(away_drives, 0.85)))
-        h_first_count = max(1, round(h_count / 2))
-        a_first_count = max(1, round(a_count / 2))
         h_outcomes = [_drive_points(_clamp(home_ppd + game_shock, 0.65, 5.2),
                                     home.turnovers_per_game, rng) for _ in range(h_count)]
         a_outcomes = [_drive_points(_clamp(away_ppd + game_shock, 0.65, 5.2),
                                     away.turnovers_per_game, rng) for _ in range(a_count)]
-        h1, a1 = sum(h_outcomes[:h_first_count]), sum(a_outcomes[:a_first_count])
+        h1, a1, h1_drives, a1_drives = _simulate_first_half(
+            home_ppd, away_ppd, home.turnovers_per_game, away.turnovers_per_game, rng
+        )
+        first_half_home_drives += h1_drives
+        first_half_away_drives += a1_drives
         hs, as_ = sum(h_outcomes), sum(a_outcomes)
         home_first_scores.append(h1)
         away_first_scores.append(a1)
@@ -209,6 +237,11 @@ def simulate_game(
             away.name: round(first_away_sum / trials, 2),
         },
         "projected_first_half_total": round((first_home_sum + first_away_sum) / trials, 2),
+        "projected_first_half_drives": {
+            home.name: round(first_half_home_drives / trials, 2),
+            away.name: round(first_half_away_drives / trials, 2),
+        },
+        "first_half_engine": "30-minute clock-limited drive-duration approximation; not play-by-play",
         "score_ranges": {
             home.name: {"p10": _percentile(home_scores, 0.10), "median": _percentile(home_scores, 0.50), "p90": _percentile(home_scores, 0.90)},
             away.name: {"p10": _percentile(away_scores, 0.10), "median": _percentile(away_scores, 0.50), "p90": _percentile(away_scores, 0.90)},
