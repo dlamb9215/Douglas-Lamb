@@ -66,7 +66,7 @@ def reconcile_results(schedule_rows, path="nfl_forecast_ledger.csv"):
     now = datetime.now(timezone.utc).isoformat()
     settled = 0
     for row in rows:
-        if row.get("settled_at_utc") or not row.get("week") or not row.get("season"):
+        if row.get("settled_at_utc") or not row.get("season"):
             continue
         if row.get("week"):
             key = (str(row["season"]), str(row["week"]), row["home_team"], row["away_team"])
