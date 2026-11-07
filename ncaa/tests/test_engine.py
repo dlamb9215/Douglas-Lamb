@@ -1,7 +1,11 @@
 import unittest
+import json
+import tempfile
+from pathlib import Path
 from ncaa.engine import MarketLines, TeamProfile, simulate_game
 from ncaa.data import get_profile, load_profiles
 from ncaa.scenarios import run_sensitivity_scenarios
+from ncaa.pregame import load_pregame_checks
 
 
 class SimulatorTests(unittest.TestCase):
@@ -89,6 +93,27 @@ class SimulatorTests(unittest.TestCase):
         for scenario in scenarios.values():
             self.assertGreaterEqual(scenario["home_win_probability"], 0)
             self.assertLessEqual(scenario["home_win_probability"], 1)
+
+    def test_pregame_gate_rejects_missing_verification(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "checks.json"
+            path.write_text(json.dumps({
+                "home_team": "Home U", "away_team": "Away U",
+                "checks": {"home_starting_qb": {"verified": False}},
+            }))
+            report = load_pregame_checks(path, "Home U", "Away U")
+            self.assertFalse(report["all_verified"])
+            with self.assertRaisesRegex(ValueError, "Unverified pregame checks"):
+                load_pregame_checks(path, "Home U", "Away U", require_verified=True)
+
+    def test_pregame_gate_rejects_mismatched_game(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "checks.json"
+            path.write_text(json.dumps({
+                "home_team": "Different U", "away_team": "Away U", "checks": {},
+            }))
+            with self.assertRaisesRegex(ValueError, "home team"):
+                load_pregame_checks(path, "Home U", "Away U")
 
     def test_invalid_trial_count_rejected(self):
         with self.assertRaises(ValueError):
