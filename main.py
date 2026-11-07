@@ -324,7 +324,10 @@ def main():
         print("SIMULATION BLOCKED: Missing scoring data.")
         return
 
-    home_field_points = 0 if args.neutral_site else 1.5
+    weather_context = pregame_report.get("weather", {}) if pregame_report else {}
+    schedule_location = str(weather_context.get("schedule_location", "")).strip().lower()
+    neutral_site = args.neutral_site or schedule_location == "neutral"
+    home_field_points = 0 if neutral_site else 1.5
     scoring_projection = project_matchup_scoring(
         database, home_code, away_code, home_field_points=home_field_points
     )
@@ -342,7 +345,7 @@ def main():
     print("===================================")
     print(f"{home['name']}: {home_mean:.2f} points")
     print(f"{away['name']}: {away_mean:.2f} points")
-    if args.neutral_site:
+    if neutral_site:
         print("Neutral-site mode: no home-field scoring adjustment; shrunk yardage matchup adjustment retained.")
     else:
         print("Includes a 1.5-point home-field adjustment and a shrunk yardage matchup adjustment.")
