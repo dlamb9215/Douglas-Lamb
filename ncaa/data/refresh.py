@@ -1,4 +1,4 @@
-"""Fetch and normalize FBS team-season data from CollegeFootballData.
+"""Fetch and normalize FBS/FCS team-season data from CollegeFootballData.
 
 Requires CFBD_API_KEY in the environment. Never commits credentials or silently
 replaces a valid cache after a failed/incomplete API response.
