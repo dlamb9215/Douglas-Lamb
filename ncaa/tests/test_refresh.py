@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from ncaa.data.refresh import build_dataset, extract_stats, parse_advanced, resolve_play_counts, write_outputs
+from ncaa.data.refresh import build_dataset, build_team_aliases, extract_stats, parse_advanced, resolve_play_counts, write_outputs
 
 
 class RefreshTests(unittest.TestCase):
@@ -38,6 +38,15 @@ class RefreshTests(unittest.TestCase):
         raw = {"plays": 295, "plays_allowed": 310}
         with self.assertRaisesRegex(RuntimeError, "invalid offense plays/game"):
             resolve_play_counts(raw, {}, {}, 8, "Alabama")
+
+    def test_team_aliases_include_mascot_and_abbreviation(self):
+        aliases = build_team_aliases([{
+            "school": "Howard", "mascot": "Bison", "abbreviation": "HOW",
+            "alternateNames": ["Howard University"],
+        }])
+        self.assertEqual(aliases["howard bison"], "Howard")
+        self.assertEqual(aliases["how"], "Howard")
+        self.assertEqual(aliases["howard university"], "Howard")
 
     def test_build_dataset_supports_fcs_without_mixing_fbs(self):
         fcs_teams = [{"school": f"FCS Team {i}", "classification": "fcs"} for i in range(60)]
