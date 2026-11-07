@@ -8,6 +8,7 @@ Final inactives and official game-day starters must be checked separately.
 import csv
 import io
 import json
+from statistics import pstdev
 from datetime import datetime, timezone
 from urllib.request import Request, urlopen
 
@@ -136,11 +137,23 @@ def _aggregate_stats(stat_rows, season, last_n_weeks):
                 "receiving_yards": ("receiving_yards",),
                 "receiving_tds": ("receiving_tds", "receiving_touchdowns"),
             }[stat])) for r in selected), 2)
-        for stat in ("passing_attempts", "completions", "passing_yards",
-                     "passing_tds", "interceptions", "carries",
-                     "rushing_yards", "rushing_tds", "targets",
-                     "receptions", "receiving_yards", "receiving_tds"):
-            entry[stat + "_per_game"] = round(entry[stat] / max(1, entry["games"]), 2)
+        stat_fields = {
+            "passing_attempts": ("attempts", "passing_attempts"),
+            "completions": ("completions", "passing_completions"),
+            "passing_yards": ("passing_yards",),
+            "passing_tds": ("passing_tds", "passing_touchdowns"),
+            "interceptions": ("interceptions", "passing_interceptions"),
+            "carries": ("carries", "rushing_attempts"),
+            "rushing_yards": ("rushing_yards",),
+            "rushing_tds": ("rushing_tds", "rushing_touchdowns"),
+            "targets": ("targets",), "receptions": ("receptions",),
+            "receiving_yards": ("receiving_yards",),
+            "receiving_tds": ("receiving_tds", "receiving_touchdowns"),
+        }
+        for stat, aliases in stat_fields.items():
+            values = [_float(row, *aliases) for row in selected]
+            entry[stat + "_per_game"] = round(sum(values) / max(1, len(values)), 2)
+            entry[stat + "_stddev_per_game"] = round(pstdev(values), 2) if len(values) > 1 else 0.0
         entry["weeks_in_sample"] = weeks[-last_n_weeks:]
         result.append(entry)
     return result
