@@ -6,7 +6,7 @@ not infer final game-day inactives from a depth chart.
 """
 import argparse
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from game_day_confirmations import validate_confirmation_file, confirmed_player_copy
 
@@ -33,6 +33,31 @@ def load_player_pool(path="player_pool.json"):
     if not data.get("retrieved_at_utc") or not data.get("source"):
         raise ValueError("Player pool is missing source freshness metadata.")
     return data
+
+
+
+def load_prop_lines(path, max_age_hours=6, now=None):
+    """Load priced prop lines only when their source and quote time are supplied."""
+    with open(path, "r", encoding="utf-8") as handle:
+        data = json.load(handle)
+    if not isinstance(data, dict) or not isinstance(data.get("props"), dict):
+        raise ValueError("Player prop line file must contain source, checked_at_utc and a props object.")
+    source = data.get("source")
+    checked = data.get("checked_at_utc")
+    if not source or not checked:
+        raise ValueError("Player prop line file requires source and checked_at_utc.")
+    try:
+        timestamp = datetime.fromisoformat(str(checked).replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError("Player prop checked_at_utc must be ISO-8601.") from exc
+    if timestamp.tzinfo is None:
+        raise ValueError("Player prop checked_at_utc must include a timezone.")
+    now = now or datetime.now(timezone.utc)
+    age = now - timestamp.astimezone(timezone.utc)
+    if age < timedelta(minutes=-5) or age > timedelta(hours=max_age_hours):
+        raise ValueError(f"Player prop line snapshot is future-dated or older than {max_age_hours} hours.")
+    return data["props"], {"source": str(source), "checked_at_utc": timestamp.astimezone(timezone.utc).isoformat()}
+
 
 
 def apply_opponent_adjustment(projection, player, home, away, team_records, shrink=0.35):
@@ -240,9 +265,9 @@ def main():
     args = parser.parse_args()
     pool = load_player_pool(args.pool)
     lines = {}
+    line_metadata = None
     if args.lines:
-        with open(args.lines, "r", encoding="utf-8") as handle:
-            lines = json.load(handle)
+        lines, line_metadata = load_prop_lines(args.lines)
     with open(args.confirmations, "r", encoding="utf-8") as handle:
         confirmation_data = json.load(handle)
     confirmations = validate_confirmation_file(confirmation_data)
@@ -252,6 +277,7 @@ def main():
         args.home, args.away, pool, lines, args.trials, args.seed,
         confirmations, team_records,
     )
+    report["sportsbook_prop_lines"] = line_metadata or {"provided": False}
     with open(args.output, "w", encoding="utf-8") as handle:
         json.dump(report, handle, indent=2)
     print(f"Matchup: {args.away.upper()} at {args.home.upper()}")
