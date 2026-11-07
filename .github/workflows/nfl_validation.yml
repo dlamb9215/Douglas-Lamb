@@ -31,6 +31,38 @@ on:
         required: true
         default: "100000"
         type: string
+      spread:
+        description: Home-team spread; blank to skip
+        required: false
+        type: string
+      total:
+        description: Game total; blank to skip
+        required: false
+        type: string
+      home_odds:
+        description: Home moneyline American odds; blank to skip
+        required: false
+        type: string
+      away_odds:
+        description: Away moneyline American odds; blank to skip
+        required: false
+        type: string
+      over_odds:
+        description: Over American odds; blank to skip
+        required: false
+        type: string
+      under_odds:
+        description: Under American odds; blank to skip
+        required: false
+        type: string
+      odds_source:
+        description: Sportsbook/source name for supplied lines
+        required: false
+        type: string
+      odds_checked_at:
+        description: ISO-8601 timestamp with timezone when lines were checked
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -57,20 +89,49 @@ jobs:
       - name: Run complete unit test suite
         run: python -m unittest -v
 
+      - name: Fetch matchup kickoff weather context
+        continue-on-error: true
+        env:
+          HOME_TEAM: ${{ github.event.inputs.home || 'ATL' }}
+          AWAY_TEAM: ${{ github.event.inputs.away || 'CIN' }}
+        run: python nfl_weather.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --output kickoff-weather.json
+
       - name: Build fresh matchup pregame gate
         env:
           HOME_TEAM: ${{ github.event.inputs.home || 'ATL' }}
           AWAY_TEAM: ${{ github.event.inputs.away || 'CIN' }}
         run: |
-          python pregame_context.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --input player_pool.json --output pregame-context.json
+          if [ -s kickoff-weather.json ]; then
+            python pregame_context.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --input player_pool.json --output pregame-context.json --weather-input kickoff-weather.json
+          else
+            python pregame_context.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --input player_pool.json --output pregame-context.json
+          fi
 
       - name: Run reproducible 100,000-trial matchup
         env:
           HOME_TEAM: ${{ github.event.inputs.home || 'ATL' }}
           AWAY_TEAM: ${{ github.event.inputs.away || 'CIN' }}
           TRIALS: ${{ github.event.inputs.trials || '100000' }}
+          SPREAD: ${{ github.event.inputs.spread || '' }}
+          TOTAL: ${{ github.event.inputs.total || '' }}
+          HOME_ODDS: ${{ github.event.inputs.home_odds || '' }}
+          AWAY_ODDS: ${{ github.event.inputs.away_odds || '' }}
+          OVER_ODDS: ${{ github.event.inputs.over_odds || '' }}
+          UNDER_ODDS: ${{ github.event.inputs.under_odds || '' }}
+          ODDS_SOURCE: ${{ github.event.inputs.odds_source || '' }}
+          ODDS_CHECKED_AT: ${{ github.event.inputs.odds_checked_at || '' }}
         run: |
-          python main.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --pregame-report pregame-context.json --seed 42 | tee nfl-simulation-report.txt
+          args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --pregame-report pregame-context.json --seed 42)
+          [ -n "$SPREAD" ] && args+=(--spread "$SPREAD")
+          [ -n "$TOTAL" ] && args+=(--total "$TOTAL")
+          [ -n "$HOME_ODDS" ] && args+=(--home-odds "$HOME_ODDS")
+          [ -n "$AWAY_ODDS" ] && args+=(--away-odds "$AWAY_ODDS")
+          [ -n "$OVER_ODDS" ] && args+=(--over-odds "$OVER_ODDS")
+          [ -n "$UNDER_ODDS" ] && args+=(--under-odds "$UNDER_ODDS")
+          if [ -n "$SPREAD$TOTAL$HOME_ODDS$AWAY_ODDS$OVER_ODDS$UNDER_ODDS" ]; then
+            args+=(--odds-source "$ODDS_SOURCE" --odds-checked-at "$ODDS_CHECKED_AT")
+          fi
+          python main.py "${args[@]}" | tee nfl-simulation-report.txt
 
       - name: Upload validation and simulation reports
         if: always()
