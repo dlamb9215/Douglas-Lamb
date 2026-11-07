@@ -14,6 +14,8 @@ on:
       - "test_pregame_context.py"
       - "test_nfl_player_data.py"
       - "test_simulator.py"
+      - "calibration.py"
+      - "test_calibration.py"
       - ".github/workflows/run-simulator.yml"
   workflow_dispatch:
     inputs:
