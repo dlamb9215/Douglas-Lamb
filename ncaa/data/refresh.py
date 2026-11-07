@@ -85,6 +85,23 @@ def pick(stats: dict, *keys):
     return None
 
 
+def pass_completions_attempts(stats: dict) -> tuple[float | None, float | None]:
+    """Read CFBD's combined completionAttempts box-score field (e.g. '21-32')."""
+    completions = pick(stats, "passCompletions", "completions", "completion")
+    attempts = pick(stats, "passAttempts", "passingAttempts", "attempts")
+    combined = stats.get("completionattempts")
+    if combined is not None:
+        import re
+        match = re.search(r"(\\d+(?:\\.\\d+)?)\\s*[-/]\\s*(\\d+(?:\\.\\d+)?)", str(combined))
+        if match:
+            combined_completions, combined_attempts = map(float, match.groups())
+            if completions is None:
+                completions = combined_completions
+            if attempts is None:
+                attempts = combined_attempts
+    return completions, attempts
+
+
 def parse_advanced(rows: list) -> dict:
     result = {}
     for row in rows:
@@ -246,8 +263,9 @@ def build_dataset(year: int, season_type: str, api_key: str,
             row["points_for"] += number(team.get("points")) or 0.0
             row["pass_yards"] += pick(stats, "netPassingYards", "passingYards", "passYards") or 0.0
             row["rush_yards"] += pick(stats, "rushingYards", "rushYards") or 0.0
-            row["pass_attempts"] += pick(stats, "passAttempts", "passingAttempts") or 0.0
-            row["completions"] += pick(stats, "passCompletions", "completions") or 0.0
+            game_completions, game_attempts = pass_completions_attempts(stats)
+            row["pass_attempts"] += game_attempts or 0.0
+            row["completions"] += game_completions or 0.0
             row["pass_tds"] += pick(stats, "passingTDs", "passTDs") or 0.0
             row["interceptions_thrown"] += pick(stats, "interceptions", "interceptionsThrown") or 0.0
             row["pass_first_downs"] += pick(stats, "passingFirstDowns", "passFirstDowns") or 0.0
@@ -286,8 +304,9 @@ def build_dataset(year: int, season_type: str, api_key: str,
                 other_yards = (pick(other_stats, "netPassingYards", "passingYards", "passYards") or 0.0) + (pick(other_stats, "rushingYards", "rushYards") or 0.0)
             row["yards_allowed"] += other_yards
             row["pass_yards_allowed"] += pick(other_stats, "netPassingYards", "passingYards", "passYards") or 0.0
-            row["opp_pass_attempts"] += pick(other_stats, "passAttempts", "passingAttempts") or 0.0
-            row["opp_completions"] += pick(other_stats, "passCompletions", "completions") or 0.0
+            opp_completions, opp_attempts = pass_completions_attempts(other_stats)
+            row["opp_pass_attempts"] += opp_attempts or 0.0
+            row["opp_completions"] += opp_completions or 0.0
             row["rush_yards_allowed"] += pick(other_stats, "rushingYards", "rushYards") or 0.0
             row["opp_rush_attempts"] += pick(other_stats, "rushAttempts", "rushingAttempts") or 0.0
             row["pass_first_downs_allowed"] += pick(other_stats, "passingFirstDowns", "passFirstDowns") or 0.0
@@ -315,6 +334,14 @@ def build_dataset(year: int, season_type: str, api_key: str,
         games_n = raw["games"]
         if games_n <= 0:
             continue
+        # Never publish a season profile with silently missing passing volume.
+        if raw["pass_yards"] > 0 and (raw["pass_attempts"] <= 0 or raw["completions"] <= 0):
+            raise RuntimeError(
+                f"{team}: passing yards were returned but completion/attempt totals were not parsed; "
+                "check CFBD completionAttempts data before publishing."
+            )
+        if raw["completions"] > raw["pass_attempts"]:
+            raise RuntimeError(f"{team}: completions exceed pass attempts; refusing invalid profile.")
         adv = advanced.get(team.casefold(), {})
         off_adv, def_adv = adv.get("offense", {}), adv.get("defense", {})
         offense_plays, defense_plays = resolve_play_counts(
