@@ -92,6 +92,29 @@ class TestMatchupPlayerPipeline(unittest.TestCase):
         self.assertTrue(projection["opponent_adjustment"]["applied"])
         self.assertEqual(projection["opponent_adjustment"]["opponent"], "MIA")
 
+    def test_qb_passing_yards_uses_completions_times_opponent_yards_per_completion(self):
+        pool = dict(self.pool)
+        pool["players"] = list(self.pool["players"]) + [{
+            "name":"Example QB","team":"BUF","position":"QB","status":"active",
+            "starter":True,"games":5,"completions_per_game":25.0,
+            "passing_yards_per_game":220.0,"passing_attempts_per_game":36.0,
+            "passing_tds_per_game":1.5,"interceptions_per_game":0.5,
+            "rushing_yards_per_game":12.0,"carries_per_game":2.0,
+        }]
+        confirmations = dict(self.confirmations)
+        confirmations[("BUF","example qb")] = {
+            "status":"active","starter":True,"note":"official team starter report"
+        }
+        team_records = [
+            {"team":"BUF","defense":{"passing":{"yards_per_game":200,"completions_per_game":20},"rushing":{"yards_per_game":100}}},
+            {"team":"MIA","defense":{"passing":{"yards_per_game":250,"completions_per_game":20},"rushing":{"yards_per_game":150}}},
+        ]
+        report = analyze_matchup("BUF","MIA",pool,trials=1000,
+                                 confirmations=confirmations,team_records=team_records)
+        qb = next(player for player in report["players"] if player["position"] == "QB")
+        self.assertEqual(qb["props"][0]["opponent_adjusted_projection"],266.25)
+        self.assertEqual(qb["opponent_adjustment"]["qb_completions_times_opponent_yards_per_completion"],312.5)
+
     def test_player_prop_market_comparison_removes_vig_and_reports_ev(self):
         lines = {"BUF:Example Receiver:receiving_yards": {
             "line": 69.5, "over_odds": -110, "under_odds": -110
