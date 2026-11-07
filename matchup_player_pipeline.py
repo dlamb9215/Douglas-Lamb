@@ -35,8 +35,59 @@ def load_player_pool(path="player_pool.json"):
     return data
 
 
+def apply_opponent_adjustment(projection, player, home, away, team_records, shrink=0.35):
+    """Apply a conservative opponent-allowed yardage adjustment to recent baselines."""
+    if not team_records:
+        projection["opponent_adjustment"] = {"applied": False, "reason": "Team defense dataset not supplied."}
+        return projection
+    records = {row.get("team"): row for row in team_records if isinstance(row, dict)}
+    opponent = away if player.get("team") == home else home
+    defense = records.get(opponent, {}).get("defense", {})
+    league_values = {}
+    for category in ("passing", "rushing"):
+        values = [
+            row.get("defense", {}).get(category, {}).get("yards_per_game")
+            for row in records.values()
+        ]
+        values = [float(value) for value in values if isinstance(value, (int, float)) and value > 0]
+        league_values[category] = sum(values) / len(values) if values else None
+    factors = {}
+    for category in ("passing", "rushing"):
+        allowed = defense.get(category, {}).get("yards_per_game")
+        average = league_values.get(category)
+        if not isinstance(allowed, (int, float)) or not average:
+            continue
+        raw_ratio = float(allowed) / average
+        factor = max(0.85, min(1.15, 1.0 + shrink * (raw_ratio - 1.0)))
+        factors[category] = round(factor, 4)
+    stats = projection.get("projected_stats", {})
+    applied = {}
+    if player.get("position") == "QB":
+        category_map = {"passing_yards": "passing", "rushing_yards": "rushing"}
+    elif player.get("position") == "RB":
+        category_map = {"rushing_yards": "rushing", "receiving_yards": "passing"}
+    else:
+        category_map = {"receiving_yards": "passing"}
+    for stat, category in category_map.items():
+        factor = factors.get(category)
+        if factor is None or stat not in stats:
+            continue
+        stats[stat] = round(float(stats[stat]) * factor, 2)
+        sd_key = stat + "_stddev"
+        if sd_key in stats:
+            stats[sd_key] = round(float(stats[sd_key]) * factor, 2)
+        applied[stat] = factor
+    projection["opponent_adjustment"] = {
+        "applied": bool(applied), "opponent": opponent,
+        "factors": applied,
+        "method": "35% shrink toward league-average opponent yards allowed; capped at +/-15%; provisional, not historically calibrated."
+    }
+    return projection
+
+
 def analyze_matchup(home, away, player_pool, prop_lines=None,
-                    trials=100000, seed=42, confirmations=None):
+                    trials=100000, seed=42, confirmations=None,
+                    team_records=None):
     home, away = home.upper(), away.upper()
     if home == away:
         raise ValueError("Home and away teams must be different.")
@@ -64,6 +115,9 @@ def analyze_matchup(home, away, player_pool, prop_lines=None,
     reports = []
     for index, player in enumerate(eligible):
         projection = project_from_recent_player_data(player)
+        projection = apply_opponent_adjustment(
+            projection, player, home, away, team_records
+        )
         props = []
         for stat in SUPPORTED_STATS[player["position"]]:
             mean = projection["projected_stats"].get(stat)
@@ -88,6 +142,7 @@ def analyze_matchup(home, away, player_pool, prop_lines=None,
             "snap_percentage": player.get("offense_snap_pct_avg"),
             "props": props,
             "data_note": projection["data_note"],
+            "opponent_adjustment": projection.get("opponent_adjustment", {"applied": False}),
         })
 
     return {
@@ -121,6 +176,8 @@ def main():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--confirmations", required=True,
                         help="Fresh JSON file with official game-day active/starter confirmations")
+    parser.add_argument("--team-stats", default="nfl_team_stats.json",
+                        help="Current nflverse team defense JSON for opponent adjustment")
     parser.add_argument("--output", default="matchup-player-report.json")
     args = parser.parse_args()
     pool = load_player_pool(args.pool)
@@ -131,9 +188,11 @@ def main():
     with open(args.confirmations, "r", encoding="utf-8") as handle:
         confirmation_data = json.load(handle)
     confirmations = validate_confirmation_file(confirmation_data)
+    with open(args.team_stats, "r", encoding="utf-8") as handle:
+        team_records = json.load(handle)
     report = analyze_matchup(
         args.home, args.away, pool, lines, args.trials, args.seed,
-        confirmations,
+        confirmations, team_records,
     )
     with open(args.output, "w", encoding="utf-8") as handle:
         json.dump(report, handle, indent=2)
