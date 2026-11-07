@@ -88,6 +88,17 @@ jobs:
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
         run: python -m ncaa.data.refresh --year 2026 --season-type regular
+      - name: Fetch venue weather context for kickoff (optional)
+        continue-on-error: true
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+          HOME_TEAM: ${{ inputs.home }}
+          AWAY_TEAM: ${{ inputs.away }}
+          GAME_KICKOFF: ${{ inputs.kickoff }}
+        run: |
+          args=(--year 2026 --home "$HOME_TEAM" --away "$AWAY_TEAM" --output weather.json)
+          if [[ -n "$GAME_KICKOFF" ]]; then args+=(--kickoff "$GAME_KICKOFF"); fi
+          python -m ncaa.weather "${args[@]}"
       - name: Refresh player season statistics and usage (optional provider entitlement)
         continue-on-error: true
         env:
@@ -142,6 +153,7 @@ jobs:
           if [[ "$REQUIRE_PREGAME" == "true" ]]; then args+=(--require-verified-pregame); fi
           if [[ -f player-inputs.json ]]; then args+=(--players player-inputs.json); fi
           if [[ -n "${{ inputs.kickoff }}" ]]; then args+=(--kickoff "${{ inputs.kickoff }}"); fi
+          if [[ -f weather.json ]]; then args+=(--weather-json weather.json); fi
           python -m ncaa.cli "${args[@]}" --ledger ncaa/forecast_ledger.csv --output ncaa-results.json | tee ncaa-simulation-results.txt
       - name: Commit timestamped forecast ledger
         run: |
@@ -167,3 +179,4 @@ jobs:
             ncaa/data/player_data_status.json
             pregame-checks.json
             player-inputs.json
+            weather.json
