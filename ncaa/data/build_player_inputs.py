@@ -49,6 +49,17 @@ def build_player_inputs(player_data_path: str | Path, team_profiles_path: str | 
         raise ValueError("Player cache has an invalid retrieval date") from exc
     if age < 0 or age > 2:
         raise ValueError(f"Player cache is {age} days old; refresh before building projections")
+    roster_available = bool(metadata.get("roster_available") and payload.get("rosters"))
+    roster_ids = set()
+    roster_names = set()
+    for roster_player in payload.get("rosters", []):
+        roster_team = str(roster_player.get("team", "")).casefold()
+        roster_id = str(roster_player.get("id", "")).strip()
+        roster_name = _norm(str(roster_player.get("firstName", "")) + " " + str(roster_player.get("lastName", "")))
+        if roster_team and roster_id:
+            roster_ids.add((roster_team, roster_id))
+        if roster_team and roster_name:
+            roster_names.add((roster_team, roster_name))
     team_games = {}
     with Path(team_profiles_path).open(newline="", encoding="utf-8") as handle:
         for row in csv.DictReader(handle):
@@ -66,6 +77,12 @@ def build_player_inputs(player_data_path: str | Path, team_profiles_path: str | 
         stat_type = _norm(row.get("statType", ""))
         if not player or not team:
             continue
+        if roster_available:
+            player_id = str(row.get("playerId", "")).strip()
+            roster_match = ((team.casefold(), player_id) in roster_ids if player_id and roster_ids
+                            else (team.casefold(), _norm(player)) in roster_names)
+            if not roster_match:
+                continue
         if category == "general" and stat_type in {"gp", "gamesplayed", "games"}:
             try:
                 aggregate.setdefault((player, team, position), {})["games_played"] = float(row.get("stat", 0))
@@ -134,6 +151,8 @@ def build_player_inputs(player_data_path: str | Path, team_profiles_path: str | 
             "as_of": retrieved_date,
             "games_sampled": games,
             "games_basis": games_basis,
+            "roster_verified": roster_available,
+            "roster_source": "CollegeFootballData roster API" if roster_available else "",
             "prop_lines": {},
         })
     if not result:
