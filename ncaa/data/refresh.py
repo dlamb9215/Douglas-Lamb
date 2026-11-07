@@ -17,7 +17,7 @@ from urllib.request import Request, urlopen
 
 BASE_URL = "https://api.collegefootballdata.com"
 PROFILE_FIELDS = [
-    "team", "classification", "points_for", "points_against", "yards_per_play",
+    "team", "classification", "points_for", "points_against", "total_yards_per_game", "total_yards_allowed_per_game", "yards_per_play",
     "yards_per_play_allowed", "plays_per_game", "points_per_drive",
     "pass_yards_per_game", "rush_yards_per_game", "pass_attempts_per_game", "completions_per_game", "completion_pct", "yards_per_pass_attempt",
     "pass_tds_per_game", "interceptions_per_game", "pass_first_downs_per_game", "rush_attempts_per_game", "yards_per_carry", "rush_tds_per_game", "rush_first_downs_per_game",
