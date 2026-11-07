@@ -106,6 +106,18 @@ class SimulatorTests(unittest.TestCase):
             self.assertGreaterEqual(scenario["home_win_probability"], 0)
             self.assertLessEqual(scenario["home_win_probability"], 1)
 
+    def test_pregame_gate_accepts_official_team_aliases(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "checks.json"
+            path.write_text(json.dumps({
+                "home_team": "Howard Bison", "away_team": "FCS Team",
+                "checks": {},
+            }))
+            report = load_pregame_checks(
+                path, "Howard", "FCS Team", aliases={"howard bison": "Howard"}
+            )
+            self.assertFalse(report["all_verified"])
+
     def test_pregame_gate_rejects_missing_verification(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "checks.json"
