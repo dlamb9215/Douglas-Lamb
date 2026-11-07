@@ -147,7 +147,7 @@ jobs:
           CLASSIFICATION: ${{ inputs.classification }}
         run: |
           if [[ "$CLASSIFICATION" == "fcs" ]]; then profile_file="ncaa/data/team_profiles_fcs.csv"; else profile_file="ncaa/data/team_profiles.csv"; fi
-          python -m ncaa.data.build_player_inputs --team-profiles "$profile_file" --teams "$HOME_TEAM" "$AWAY_TEAM" --output player-inputs.json
+          python -m ncaa.data.build_player_inputs --team-profiles "$profile_file" --classification "$CLASSIFICATION" --teams "$HOME_TEAM" "$AWAY_TEAM" --output player-inputs.json
       - name: Run NCAA simulator tests
         run: python -m unittest discover -s ncaa/tests -v
       - name: Write optional pregame and player inputs
