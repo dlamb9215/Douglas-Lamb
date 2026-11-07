@@ -117,7 +117,11 @@ def simulate_player_prop(projection, stat, line, trials=100000, seed=42,
         "snaps", "red_zone_opportunities",
     }
     if standard_deviation is None:
-        sd = max(0.75, math.sqrt(max(mean, 0.0))) if stat in count_stats else max(1.0, mean * 0.25)
+        empirical_sd = projection["projected_stats"].get(stat + "_stddev")
+        if isinstance(empirical_sd, (int, float)) and not isinstance(empirical_sd, bool) and empirical_sd > 0:
+            sd = float(empirical_sd)
+        else:
+            sd = max(0.75, math.sqrt(max(mean, 0.0))) if stat in count_stats else max(1.0, mean * 0.25)
     else:
         sd = _number("standard_deviation", standard_deviation, 0.01, 1000)
 
@@ -187,9 +191,11 @@ def project_from_recent_player_data(player):
 
     stats = {}
     for key in stat_map[position]:
-        stats[key.replace("_per_game", "")] = round(
-            float(player.get(key, 0) or 0), 2
-        )
+        stat_name = key.replace("_per_game", "")
+        stats[stat_name] = round(float(player.get(key, 0) or 0), 2)
+        sd_value = player.get(stat_name + "_stddev_per_game")
+        if isinstance(sd_value, (int, float)) and not isinstance(sd_value, bool) and sd_value > 0:
+            stats[stat_name + "_stddev"] = round(float(sd_value), 2)
     stats["games_in_sample"] = games
     stats["offense_snaps_per_game"] = player.get("offense_snaps_per_game")
     stats["offense_snap_pct_avg"] = player.get("offense_snap_pct_avg")
