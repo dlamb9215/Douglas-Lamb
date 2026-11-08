@@ -169,7 +169,7 @@ def simulate(home,away,trials=1_000_000,seed=42,spread=None,total=None,
     hsd=max(8.0,home.score_sd); asd=max(8.0,away.score_sd)
     hs,aws=_simulate_period(p["home_points"],p["away_points"],p["pace"],hsd,asd,trials,seed)
     margin=hs-aws; combined=hs+aws
-    r={**p,"trials":trials,"seed":seed,"home_win":float(np.mean(margin>0)*100),"away_win":float(np.mean(margin<0)*100),"win_tie":float(np.mean(margin==0)*100),"home_avg":float(np.mean(hs)),
+    r={**p,"trials":trials,"seed":seed,"home_win":float((np.mean(margin>0)+0.5*np.mean(margin==0))*100),"away_win":float((np.mean(margin<0)+0.5*np.mean(margin==0))*100),"win_tie":float(np.mean(margin==0)*100),"home_avg":float(np.mean(hs)),
        "away_avg":float(np.mean(aws)),"total_avg":float(np.mean(combined)),
        "margin_sd":float(np.std(margin,ddof=1))}
     if spread is not None:
@@ -213,13 +213,15 @@ def no_vig_probabilities(home_odds, away_odds):
     hold=hp+ap
     return {"home":hp/hold,"away":ap/hold,"market_hold":hold-1}
 
-def expected_value_per_100(probability, american_odds):
-    """Expected net profit in dollars per $100 risked; odds must be American."""
-    p=float(probability); odds=float(american_odds)
-    if not 0<=p<=1: raise ValueError("probability must be between 0 and 1")
+def expected_value_per_100(probability, american_odds, push_probability=0.0):
+    """Expected net profit per $100 risked; pushes return the stake (zero net)."""
+    p=float(probability); push=float(push_probability); odds=float(american_odds)
     if odds==0: raise ValueError("American odds cannot be zero")
+    if not 0<=p<=1 or not 0<=push<=1 or p+push>1+1e-12:
+        raise ValueError("win and push probabilities must be valid and sum to at most 1")
     profit=odds if odds>0 else 10000/abs(odds)
-    return p*profit-(1-p)*100
+    loss=1-p-push
+    return p*profit-loss*100
 
 def _decision(prob,edge,threshold=55.0,min_edge=1.5):
     if prob is None: return "NO LINE"
@@ -278,14 +280,14 @@ def main():
         print(f"\nSPREAD {a.spread:+.1f}: {h.name} cover {r['home_cover']:.2f}% | {w.name} cover {r['away_cover']:.2f}% | push {r['spread_push']:.2f}%")
         print(f"Home spread edge {r['spread_edge_points']:+.1f} pts | {h.name}: {hp} | {w.name}: {apick}")
         print(f"95% Monte Carlo interval: home {r['home_cover_ci'][0]:.2f}-{r['home_cover_ci'][1]:.2f}% | away {r['away_cover_ci'][0]:.2f}-{r['away_cover_ci'][1]:.2f}%")
-        print("Spread EV per $100 risked: home {0:+.2f} | away {1:+.2f}".format(expected_value_per_100(r["home_cover"]/100,a.spread_odds),expected_value_per_100(r["away_cover"]/100,a.spread_odds)))
+        print("Spread EV per $100 risked: home {0:+.2f} | away {1:+.2f}".format(expected_value_per_100(r["home_cover"]/100,a.spread_odds,r["spread_push"]/100),expected_value_per_100(r["away_cover"]/100,a.spread_odds,r["spread_push"]/100)))
     if a.total is not None:
         over_dec=_decision(r["over"],r["total_edge_points"])
         under_dec=_decision(r["under"],-r["total_edge_points"])
         print(f"\nTOTAL {a.total:.1f}: Over {r['over']:.2f}% | Under {r['under']:.2f}% | push {r['total_push']:.2f}%")
         print(f"Model total edge {r['total_edge_points']:+.1f} pts | Over: {over_dec} | Under: {under_dec}")
         print(f"95% Monte Carlo interval: over {r['over_ci'][0]:.2f}-{r['over_ci'][1]:.2f}% | under {r['under_ci'][0]:.2f}-{r['under_ci'][1]:.2f}%")
-        print("Total EV per $100 risked: over {0:+.2f} | under {1:+.2f}".format(expected_value_per_100(r["over"]/100,a.total_odds),expected_value_per_100(r["under"]/100,a.total_odds)))
+        print("Total EV per $100 risked: over {0:+.2f} | under {1:+.2f}".format(expected_value_per_100(r["over"]/100,a.total_odds,r["total_push"]/100),expected_value_per_100(r["under"]/100,a.total_odds,r["total_push"]/100)))
     f=r["first_half"]
     print(f"\nFIRST HALF projected score: {h.name} {f['home_avg']:.1f} - {w.name} {f['away_avg']:.1f} | Total {f['total_avg']:.1f}")
     if a.spread is not None: print(f"First-half spread cover: home {f['home_cover']:.2f}% | away {f['away_cover']:.2f}% | push {f['spread_push']:.2f}%")
