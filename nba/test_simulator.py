@@ -78,8 +78,8 @@ class TestNBAEngine(unittest.TestCase):
 
     def test_expected_value_per_100(self):
         self.assertAlmostEqual(expected_value_per_100(.5,-100),0)
-        self.assertAlmostEqual(expected_value_per_100(.45,-110,.10),-0.0,places=2)
-        self.assertAlmostEqual(expected_value_per_100(.5,-110,.05),-2.5,places=2)
+        self.assertAlmostEqual(expected_value_per_100(.45,-110,.10),-4.090909,places=2)
+        self.assertAlmostEqual(expected_value_per_100(.5,-110,.05),0.454545,places=2)
         with self.assertRaises(ValueError): expected_value_per_100(.8,-110,.3)
         self.assertAlmostEqual(expected_value_per_100(.5,100),0)
         with self.assertRaises(ValueError): expected_value_per_100(1.1,-110)
