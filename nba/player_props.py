@@ -39,7 +39,11 @@ def _get_json(url: str, timeout: int = 20) -> dict[str, Any]:
 
 def _walk_players(node: Any):
     if isinstance(node, dict):
-        if node.get("id") is not None and (node.get("fullName") or node.get("displayName")):
+        is_player = node.get("id") is not None and (
+            bool(node.get("fullName")) or
+            (bool(node.get("displayName")) and (node.get("position") is not None or node.get("jersey") is not None))
+        )
+        if is_player:
             yield node
         for value in node.values():
             yield from _walk_players(value)
@@ -237,6 +241,8 @@ def build_matchup_player_projections(home: str, away: str, game_date: date, seas
             except (RuntimeError, ValueError) as exc:
                 warnings.append(f"Skipped {player['name']} ({team_code}): {exc}")
         teams[team_code] = sorted(projections, key=lambda row: row["projected_minutes"], reverse=True)
+        if len(projections) < 5:
+            warnings.append(f"{team_code} produced only {len(projections)} eligible player projections; lineup/roster feed may be incomplete.")
     return {
         "game_date": game_date.isoformat(), "home": team_codes[0], "away": team_codes[1],
         "season": season, "trials_per_player": trials,
