@@ -23,8 +23,8 @@ jobs:
         run: python nba/update_stats.py
       - name: Validate data and engine
         run: |
-          python -m unittest -v nba.test_simulator nba.test_backtest
-          python -c "import json; d=json.load(open('nba/team_stats.json')); assert len(d['teams']) == 30"
+          python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality
+          python -m nba.data_quality --data nba/team_stats.json --max-age-hours 72
       - name: Commit refreshed stats
         run: |
           git add -f nba/team_stats.json
