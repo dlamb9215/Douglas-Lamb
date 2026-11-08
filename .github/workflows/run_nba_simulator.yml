@@ -93,12 +93,11 @@ jobs:
       - name: Install dependencies
         run: python -m pip install --upgrade pip numpy
       - name: Run NBA tests
-        run: python -m unittest -v nba.test_simulator nba.test_backtest
+        run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality
       - name: Require refreshed NBA data
         run: |
           test -s nba/team_stats.json
-          python -c "import json; d=json.load(open('nba/team_stats.json')); assert len(d.get('teams', {})) == 30, 'Expected exactly 30 NBA teams'"
-          python -c "import json,datetime; d=json.load(open('nba/team_stats.json')); t=datetime.datetime.fromisoformat(d['updated_at'].replace('Z','+00:00')); age=(datetime.datetime.now(datetime.timezone.utc)-t).total_seconds()/3600; assert 0 <= age <= 72, f'NBA team data is stale or future-dated: {age:.1f} hours old'"
+          python -m nba.data_quality --data nba/team_stats.json --max-age-hours 72
       - name: Run matchup
         env:
           HOME_TEAM: ${{ inputs.home }}
