@@ -41,7 +41,7 @@ class TestNBASchedule(unittest.TestCase):
         dates = {
             date(2026, 11, 5): [row("2026-11-05", "BOS", "MIA")],
             date(2026, 11, 6): [row("2026-11-06", "NY", "ATL")],
-            date(2026, 11, 7): [row("2026-11-07", "BOS", "NY")],
+            date(2026, 11, 7): [row("2026-11-07", "LAL", "PHX")],
             date(2026, 11, 8): [row("2026-11-08", "BOS", "NY", False)],
         }
         with patch("nba.schedule.fetch_scoreboard", side_effect=lambda d: dates.get(d, [])):
