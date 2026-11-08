@@ -145,7 +145,7 @@ jobs:
 
       - name: Validate fresh pregame context with weather
         if: github.event_name == 'workflow_dispatch'
-        run: python pregame_context.py --home "${{ inputs.home || 'WAS' }}" --away "${{ inputs.away || 'LAR' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "${{ inputs.home_qb_confirmed || 'Caleb Williams' }}" --away-qb-confirmed "${{ inputs.away_qb_confirmed || 'Baker Mayfield' }}" --home-qb-source "https://www.commanders.com/team/depth-chart/" --away-qb-source "https://www.therams.com/team/depth-chart/" --output pregame-context.json
+        run: python pregame_context.py --home "${{ inputs.home || 'WAS' }}" --away "${{ inputs.away || 'LAR' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "${{ inputs.home_qb_confirmed || 'Jayden Daniels' }}" --away-qb-confirmed "${{ inputs.away_qb_confirmed || 'Matthew Stafford' }}" --home-qb-source "https://www.commanders.com/team/depth-chart/" --away-qb-source "https://www.therams.com/team/depth-chart/" --output pregame-context.json
 
       - name: Validate fresh pregame context
         if: github.event_name != 'workflow_dispatch'
