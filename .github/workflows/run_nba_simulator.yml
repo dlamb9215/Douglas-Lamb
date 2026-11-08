@@ -22,6 +22,26 @@ on:
         required: false
         default: "234.5"
         type: string
+      home_ml_odds:
+        description: Home moneyline American odds (optional)
+        required: false
+        default: ""
+        type: string
+      away_ml_odds:
+        description: Away moneyline American odds (optional)
+        required: false
+        default: ""
+        type: string
+      spread_odds:
+        description: American odds for spread sides
+        required: true
+        default: "-110"
+        type: string
+      total_odds:
+        description: American odds for total sides
+        required: true
+        default: "-110"
+        type: string
       trials:
         description: Baseline Monte Carlo trials
         required: true
@@ -84,6 +104,10 @@ jobs:
           AWAY_TEAM: ${{ inputs.away }}
           SPREAD: ${{ inputs.spread }}
           TOTAL: ${{ inputs.total }}
+          HOME_ML_ODDS: ${{ inputs.home_ml_odds }}
+          AWAY_ML_ODDS: ${{ inputs.away_ml_odds }}
+          SPREAD_ODDS: ${{ inputs.spread_odds }}
+          TOTAL_ODDS: ${{ inputs.total_odds }}
           TRIALS: ${{ inputs.trials }}
           SEED: ${{ inputs.seed }}
           HOME_REST: ${{ inputs.home_rest }}
@@ -93,7 +117,8 @@ jobs:
           HOME_INJURY: ${{ inputs.home_injury_points }}
           AWAY_INJURY: ${{ inputs.away_injury_points }}
         run: |
-          args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --seed "$SEED" --home-rest "$HOME_REST" --away-rest "$AWAY_REST" --home-travel "$HOME_TRAVEL" --away-travel "$AWAY_TRAVEL" --home-injury-points "$HOME_INJURY" --away-injury-points "$AWAY_INJURY" --json-output nba-simulation-results.json)
+          args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --seed "$SEED" --home-rest "$HOME_REST" --away-rest "$AWAY_REST" --home-travel "$HOME_TRAVEL" --away-travel "$AWAY_TRAVEL" --home-injury-points "$HOME_INJURY" --away-injury-points "$AWAY_INJURY" --spread-odds "$SPREAD_ODDS" --total-odds "$TOTAL_ODDS" --json-output nba-simulation-results.json)
+          if [ -n "$HOME_ML_ODDS" ] && [ -n "$AWAY_ML_ODDS" ]; then args+=(--home-ml-odds "$HOME_ML_ODDS" --away-ml-odds "$AWAY_ML_ODDS"); fi
           if [ -n "$SPREAD" ]; then args+=(--spread "$SPREAD"); fi
           if [ -n "$TOTAL" ]; then args+=(--total "$TOTAL"); fi
           python -m nba.simulator "${args[@]}" | tee nba-simulation-results.txt
