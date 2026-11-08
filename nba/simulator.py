@@ -124,7 +124,7 @@ def matchup_projection(home,away,home_rest=2,away_rest=2,home_travel=0,away_trav
     a_off=.85*a_off+.15*away.recent_off_rating if away.recent_off_rating is not None else a_off
     h_def=.85*h_def+.15*home.recent_def_rating if home.recent_def_rating is not None else h_def
     a_def=.85*a_def+.15*away.recent_def_rating if away.recent_def_rating is not None else a_def
-    he=(h_off+a_def)/2+_factor_adjustment(home,away)+_shot_profile_adjustment(home,away)+1.35
+    home_court=0.0 if neutral_site else 1.35\n    he=(h_off+a_def)/2+_factor_adjustment(home,away)+_shot_profile_adjustment(home,away)+home_court
     ae=(a_off+h_def)/2+_factor_adjustment(away,home)+_shot_profile_adjustment(away,home)
     # Small transparent schedule effects; capped to avoid exaggerated travel/rest adjustments.
     h_rest=max(0,min(3,home_rest-1))*0.35
@@ -138,7 +138,7 @@ def matchup_projection(home,away,home_rest=2,away_rest=2,home_travel=0,away_trav
     hp=pace*he/100+home_injury_points
     ap=pace*ae/100+away_injury_points
     return {"pace":pace,"home_efficiency":he,"away_efficiency":ae,
-            "home_points":hp,"away_points":ap,"home_margin":hp-ap,
+            "home_points":hp,"away_points":ap,"home_margin":hp-ap,"home_court_points":home_court,"neutral_site":bool(neutral_site),
             "total_points":hp+ap,"home_rest_adjustment":h_rest-h_b2b-h_travel,
             "away_rest_adjustment":a_rest-a_b2b-a_travel}
 
@@ -266,7 +266,7 @@ def main():
     print(f"Projected pace {r['pace']:.1f} | Score {h.name} {r['home_points']:.1f} - {w.name} {r['away_points']:.1f}")
     print(f"Projected total {r['total_points']:.1f} | Home margin {r['home_margin']:+.1f}")
     print(f"Trials {r['trials']:,} | Seed {r['seed']} | Margin SD {r['margin_sd']:.1f}")
-    print(f"Schedule adjustments: home {r['home_rest_adjustment']:+.2f} pts | away {r['away_rest_adjustment']:+.2f} pts")
+    print(f"Schedule adjustments: home {r['home_rest_adjustment']:+.2f} pts | away {r['away_rest_adjustment']:+.2f} pts | home court {r['home_court_points']:+.2f} pts")\n    if schedule_context:\n        print(f"ESPN schedule: event {schedule_context['event']['event_id']} | {schedule_context['event']['date']} | neutral site {schedule_context['event']['neutral_site']}")\n        print(f"Automatic rest: home {schedule_context['home_rest_days']} days | away {schedule_context['away_rest_days']} days")\n        for warning in schedule_context[\"warnings\"]: print(f\"DATA WARNING: {warning}\")
     ml_pick=h.name if r["home_win"]>=55 else (w.name if r["away_win"]>=55 else "PASS — no 55% win-probability edge")
     print(f"\nMONEYLINE: {h.name} win {r['home_win']:.2f}% | {w.name} win {r['away_win']:.2f}% | tie {r['win_tie']:.2f}%")
     print(f"Moneyline pick: {ml_pick}")
