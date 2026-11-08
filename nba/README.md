@@ -17,7 +17,7 @@ A team-level NBA forecasting and betting-analysis engine. It is separate from th
 - Fixed seeds and machine-readable JSON output for auditability.
 - Betting leans require both at least 55% model probability and at least 1.5 points of model line edge. Otherwise the output is PASS.
 - Historical evaluation utility reports point MAE, margin/total MAE, Brier score, log loss, calibration buckets, hit rates and optional closing-line movement.
-- Optional American-odds inputs calculate proportional no-vig moneyline probabilities and expected net value per $100 risked for moneyline, spread and total markets. Spread/total EV accounts for pushes as stake refunds; moneyline ties are split evenly between teams in the model estimate.
+- Optional The Odds API v4 integration retrieves current NBA moneyline, spread and total markets across US books, selects best prices at the selected consensus line, reports no-vig market probabilities and calculates expected net value per $100 risked. Manual odds remain supported. Spread/total EV accounts for pushes as stake refunds; moneyline ties are split evenly between teams in the model estimate.
 - A shared data-quality gate validates all 30 expected teams, metric ranges, season metadata, timezone-aware timestamps and 72-hour freshness; it reports early-season sample-size and unavailable-feature warnings without inventing values.
 
 ## User-specific output scope
@@ -26,13 +26,13 @@ This is team-level only: it provides team moneyline probabilities plus spread an
 ## Refresh data
 Run the **Update NBA Statistics** workflow. It requests current and prior-season ESPN-derived team aggregates through DunkAPI. The updater validates all 30 teams and writes only after both season requests and data checks succeed. It preserves the last good file if a refresh fails.
 
-The scheduled updater uses the 2026-27 season and 2025-26 as the prior baseline. Confirm the season settings when a new season begins. It requires the `DUNKAPI_API_KEY` Actions secret. The provider does not currently supply all opponent Four Factors, recent form, home/road splits, player availability, rotations, 3P accuracy, or team game-log residual distributions; the model uses documented neutral/fixed fallbacks rather than fabricating these fields. The matchup workflow rejects data older than 72 hours. ESPN's public scoreboard adapter supplies schedule event identity, neutral-site status and recent rest context, but it is an undocumented feed and does not replace official NBA injury reports or a supported data contract.
+To enable live sportsbook lines, add an `ODDS_API_KEY` Actions secret and select `auto_odds` when launching the matchup workflow. The integration uses The Odds API v4 featured NBA markets; coverage and quota depend on the account plan. Without the secret, leave `auto_odds` disabled and enter actual sportsbook lines/prices manually. The scheduled updater uses the 2026-27 season and 2025-26 as the prior baseline. Confirm the season settings when a new season begins. It requires the `DUNKAPI_API_KEY` Actions secret. The provider does not currently supply all opponent Four Factors, recent form, home/road splits, player availability, rotations, 3P accuracy, or team game-log residual distributions; the model uses documented neutral/fixed fallbacks rather than fabricating these fields. The matchup workflow rejects data older than 72 hours. ESPN's public scoreboard adapter supplies schedule event identity, neutral-site status and recent rest context, but it is an undocumented feed and does not replace official NBA injury reports or a supported data contract.
 
 ## Run on GitHub
 1. Open Actions.
 2. Run **Update NBA Statistics** and confirm it completes successfully.
 3. Run **Run Doug's Elite NBA Simulator**.
-4. Enter home/away abbreviations, sportsbook home spread and total, optional paired moneyline odds, spread/total prices, and manual team-level injury point adjustments. Supply the game date to automatically look up the ESPN schedule, rest days and neutral-site status; otherwise enter rest manually.
+4. Enter home/away abbreviations and manual team-level injury point adjustments. Either select `auto_odds` (after adding `ODDS_API_KEY`) or enter the actual sportsbook home spread, total and prices manually. Supply the game date to automatically look up the ESPN schedule, rest days and neutral-site status; otherwise enter rest manually.
 5. Keep the default 1,000,000 trials. The engine increases borderline runs to 5,000,000.
 6. Download the text and JSON results artifact.
 
@@ -41,7 +41,7 @@ Spread convention: enter the home team's sportsbook line (for example, -4.5 when
 ## Run locally
 ```bash
 python -m pip install numpy
-python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule
+python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule nba.test_odds
 python -m nba.simulator --home BOS --away NYK --spread -3.5 --total 221.5 --trials 1000000
 ```
 
@@ -58,7 +58,7 @@ Do not call the model calibrated until it has enough chronologically separated o
 ## Known limitations
 - Team-level injury point adjustments are manual. No official inactive/lineup feed is currently integrated.
 - Rest days and neutral-site status can be fetched from ESPN's public scoreboard when a game date is supplied. Travel miles are not auto-computed. ESPN's feed is undocumented and may change; schedule lookup failure blocks the requested auto-context run.
-- No live sportsbook line ingestion, player rotations, player props, official injury/lineup integration, automatic travel-mile calculation, or play-by-play possession simulation.
+- No automatic official injury/lineup feed, player rotations/minutes, player prop projections, automatic travel-mile calculation, or play-by-play possession simulation. Live featured odds require the user to add an Odds API key and enable the workflow input.
 - The score distribution is a transparent approximation pending fitting against historical game residuals. One million trials reduce Monte Carlo sampling noise; they do not correct bad inputs or model misspecification.
 - Probabilities are estimates, not guaranteed outcomes or proof of a profitable betting edge.
 
