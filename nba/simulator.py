@@ -300,7 +300,11 @@ def main():
         if not a.game_date: ap.error("--auto-injuries requires --game-date")
         from datetime import date
         from nba.injuries import fetch_official_injuries
-        injury_context=fetch_official_injuries(date.fromisoformat(a.game_date),a.home,a.away,meta.get("season",2027))
+        try:
+            injury_context=fetch_official_injuries(date.fromisoformat(a.game_date),a.home,a.away,meta.get("season",2027))
+        except (RuntimeError, OSError, ValueError) as exc:
+            injury_context={"source":"NBA official injury report","status":"unavailable","error":str(exc),"warnings":["Official injury data could not be retrieved; no automatic player availability or injury-point adjustment was applied. Verify injuries independently before betting."]}
+            print(f"INJURY DATA WARNING: official report unavailable: {exc}")
     r=simulate(h,w,a.trials,a.seed,a.spread,a.total,**kwargs)
     close=abs(r["home_margin"]+ (a.spread or 0))<=3
     if a.spread is not None: close=close or 47<=r["home_cover"]<=53
