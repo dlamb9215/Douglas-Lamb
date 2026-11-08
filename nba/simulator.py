@@ -278,12 +278,14 @@ def main():
         print(f"\nSPREAD {a.spread:+.1f}: {h.name} cover {r['home_cover']:.2f}% | {w.name} cover {r['away_cover']:.2f}% | push {r['spread_push']:.2f}%")
         print(f"Home spread edge {r['spread_edge_points']:+.1f} pts | {h.name}: {hp} | {w.name}: {apick}")
         print(f"95% Monte Carlo interval: home {r['home_cover_ci'][0]:.2f}-{r['home_cover_ci'][1]:.2f}% | away {r['away_cover_ci'][0]:.2f}-{r['away_cover_ci'][1]:.2f}%")
+        print("Spread EV per $100 risked: home {0:+.2f} | away {1:+.2f}".format(expected_value_per_100(r["home_cover"]/100,a.spread_odds),expected_value_per_100(r["away_cover"]/100,a.spread_odds)))
     if a.total is not None:
         over_dec=_decision(r["over"],r["total_edge_points"])
         under_dec=_decision(r["under"],-r["total_edge_points"])
         print(f"\nTOTAL {a.total:.1f}: Over {r['over']:.2f}% | Under {r['under']:.2f}% | push {r['total_push']:.2f}%")
         print(f"Model total edge {r['total_edge_points']:+.1f} pts | Over: {over_dec} | Under: {under_dec}")
         print(f"95% Monte Carlo interval: over {r['over_ci'][0]:.2f}-{r['over_ci'][1]:.2f}% | under {r['under_ci'][0]:.2f}-{r['under_ci'][1]:.2f}%")
+        print("Total EV per $100 risked: over {0:+.2f} | under {1:+.2f}".format(expected_value_per_100(r["over"]/100,a.total_odds),expected_value_per_100(r["under"]/100,a.total_odds)))
     f=r["first_half"]
     print(f"\nFIRST HALF projected score: {h.name} {f['home_avg']:.1f} - {w.name} {f['away_avg']:.1f} | Total {f['total_avg']:.1f}")
     if a.spread is not None: print(f"First-half spread cover: home {f['home_cover']:.2f}% | away {f['away_cover']:.2f}% | push {f['spread_push']:.2f}%")
@@ -292,6 +294,6 @@ def main():
     print("Injury adjustment is manual unless an independently verified report is supplied.")
     print("Model status: estimates require out-of-sample backtesting before being treated as betting edges.")
     if a.json_output:
-        payload={"home_team":h.abbreviation,"away_team":w.abbreviation,"season":meta.get("season"),"data_updated_at":meta.get("updated_at"),"spread_line":a.spread,"total_line":a.total,"home_rest":a.home_rest,"away_rest":a.away_rest,"home_travel_miles":a.home_travel,"away_travel_miles":a.away_travel,"home_injury_points":a.home_injury_points,"away_injury_points":a.away_injury_points,"moneyline_pick":ml_pick,"result":r}
+        payload={"home_team":h.abbreviation,"away_team":w.abbreviation,"season":meta.get("season"),"data_updated_at":meta.get("updated_at"),"spread_line":a.spread,"total_line":a.total,"home_rest":a.home_rest,"away_rest":a.away_rest,"home_travel_miles":a.home_travel,"away_travel_miles":a.away_travel,"home_injury_points":a.home_injury_points,"away_injury_points":a.away_injury_points,"moneyline_pick":ml_pick,"home_ml_odds":a.home_ml_odds,"away_ml_odds":a.away_ml_odds,"spread_odds":a.spread_odds,"total_odds":a.total_odds,"result":r}
         Path(a.json_output).write_text(json.dumps(payload,indent=2)+"\\n",encoding="utf-8")
 if __name__=="__main__": main()
