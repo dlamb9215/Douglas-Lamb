@@ -18,7 +18,7 @@ A team-level NBA forecasting and betting-analysis engine. It is separate from th
 - Betting leans require both at least 55% model probability and at least 1.5 points of model line edge. Otherwise the output is PASS.
 - Historical evaluation utility reports point MAE, margin/total MAE, Brier score, log loss, calibration buckets, hit rates and optional closing-line movement.
 - Optional American-odds inputs calculate proportional no-vig moneyline probabilities and expected net value per $100 risked for moneyline, spread and total markets. Spread/total EV accounts for pushes as stake refunds; moneyline ties are split evenly between teams in the model estimate.
-- Workflow rejects NBA team-stat files older than 72 hours or future-dated; refresh statistics before a matchup run.
+- A shared data-quality gate validates all 30 expected teams, metric ranges, season metadata, timezone-aware timestamps and 72-hour freshness; it reports early-season sample-size and unavailable-feature warnings without inventing values.
 
 ## User-specific output scope
 This is team-level only: it provides team moneyline probabilities plus spread and game-total analysis, full game and first half. It has no player-prop projections or player-prop data pipeline. No alternate spreads are created.
@@ -61,3 +61,8 @@ Do not call the model calibrated until it has enough chronologically separated o
 - No live sportsbook line ingestion, player rotations, player props, official injury/lineup integration, automatic schedule/travel ingestion, or play-by-play possession simulation.
 - The score distribution is a transparent approximation pending fitting against historical game residuals. One million trials reduce Monte Carlo sampling noise; they do not correct bad inputs or model misspecification.
 - Probabilities are estimates, not guaranteed outcomes or proof of a profitable betting edge.
+
+ 
+## Data-readiness gate
+
+`python -m nba.data_quality --data nba/team_stats.json --max-age-hours 72` is run by the CI, statistics-refresh and matchup workflows. It blocks incomplete, malformed, future-dated or stale team data and reports warnings for small current-season samples and provider fields that are unavailable. Passing this gate means the input file is structurally ready; it does not establish predictive calibration or a profitable betting edge.
