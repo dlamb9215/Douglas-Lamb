@@ -19,6 +19,14 @@ def canonical_player_team(value):
     return PLAYER_TEAM_ALIASES.get(code, code)
 
 
+def canonical_player_name(value):
+    """Normalize display-name suffixes so roster-feed variants still match."""
+    parts = str(value or "").casefold().replace(".", "").replace(",", "").split()
+    while parts and parts[-1] in {"jr", "sr", "ii", "iii", "iv", "v"}:
+        parts.pop()
+    return " ".join(parts)
+
+
 VALID_TEAMS = {
     "ARI", "ATL", "BAL", "BUF", "CAR", "CHI", "CIN", "CLE",
     "DAL", "DEN", "DET", "GB", "HOU", "IND", "JAX", "KC",
@@ -74,7 +82,7 @@ def build_pregame_report(pool, home, away, max_age_hours=36, now=None, confirmed
             return bool(qb and str(qb.get("roster_status", "")).lower() in {"act", "active", "1"} and qb.get("injury_status") == "active")
         requested_name = confirmed_qbs.get(team)
         source_url = str(qb_sources.get(team, "")).strip()
-        confirmed_qb = next((p for p in qbs if requested_name and str(p.get("name", "")).casefold() == str(requested_name).casefold()), None)
+        confirmed_qb = next((p for p in qbs if requested_name and canonical_player_name(p.get("name")) == canonical_player_name(requested_name)), None)
         if requested_name and not available(confirmed_qb):
             raise ValueError(f"Confirmed starting QB for {team} is not an available active roster QB.")
         if requested_name and not source_url.startswith("https://"):
