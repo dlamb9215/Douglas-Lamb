@@ -27,7 +27,7 @@ VALID_TEAMS = {
 }
 
 
-def build_pregame_report(pool, home, away, max_age_hours=36, now=None):
+def build_pregame_report(pool, home, away, max_age_hours=36, now=None, confirmed_qbs=None, qb_sources=None):
     now = now or datetime.now(timezone.utc)
     home, away = home.upper(), away.upper()
     if home not in VALID_TEAMS or away not in VALID_TEAMS or home == away:
@@ -47,6 +47,8 @@ def build_pregame_report(pool, home, away, max_age_hours=36, now=None):
     if age < timedelta(minutes=-5) or age > timedelta(hours=max_age_hours):
         raise ValueError("Player availability/depth data is stale or future-dated.")
 
+    confirmed_qbs = confirmed_qbs or {}
+    qb_sources = qb_sources or {}
     teams = {}
     for team in (home, away):
         rows = [p for p in pool["players"] if canonical_player_team(p.get("team")) == team]
@@ -68,12 +70,17 @@ def build_pregame_report(pool, home, away, max_age_hours=36, now=None):
             for p in rows
             if p.get("injury_status", "unknown") in {"out", "doubtful", "questionable"}
         ]
-        qb1 = next((p for p in qbs if p.get("depth_order") == 1), None)
-        qb1_ready = bool(
-            qb1
-            and str(qb1.get("roster_status", "")).lower() in {"act", "active", "1"}
-            and qb1.get("injury_status") == "active"
-        )
+        def available(qb):
+            return bool(qb and str(qb.get("roster_status", "")).lower() in {"act", "active", "1"} and qb.get("injury_status") == "active")
+        requested_name = confirmed_qbs.get(team)
+        source_url = str(qb_sources.get(team, "")).strip()
+        confirmed_qb = next((p for p in qbs if requested_name and str(p.get("name", "")).casefold() == str(requested_name).casefold()), None)
+        if requested_name and not available(confirmed_qb):
+            raise ValueError(f"Confirmed starting QB for {team} is not an available active roster QB.")
+        if requested_name and not source_url.startswith("https://"):
+            raise ValueError(f"Confirmed starting QB for {team} requires an HTTPS source.")
+        qb1 = confirmed_qb or next((p for p in qbs if p.get("depth_order") == 1), None)
+        qb1_ready = available(qb1)
         teams[team] = {
             "player_records": len(rows),
             "quarterback_depth_chart": [
@@ -92,9 +99,11 @@ def build_pregame_report(pool, home, away, max_age_hours=36, now=None):
             ],
             "projected_qb1": qb1.get("name") if qb1 else None,
             "projected_qb1_available_in_feed": qb1_ready,
+            "quarterback_confirmation_method": "official_source_override" if confirmed_qb else "depth_chart_feed",
+            "quarterback_confirmation_source": source_url if confirmed_qb else None,
             "reported_injuries": injury_rows,
             "official_game_day_inactives_confirmed": False,
-            "official_starting_quarterback_confirmed": False,
+            "official_starting_quarterback_confirmed": bool(confirmed_qb),
         }
 
     team_simulation_ready = all(
@@ -143,11 +152,17 @@ def main():
     parser.add_argument("--input", default="player_pool.json")
     parser.add_argument("--output", default="pregame-context.json")
     parser.add_argument("--max-age-hours", type=int, default=36)
+    parser.add_argument("--home-qb-confirmed", default=None)
+    parser.add_argument("--away-qb-confirmed", default=None)
+    parser.add_argument("--home-qb-source", default=None)
+    parser.add_argument("--away-qb-source", default=None)
     parser.add_argument("--weather-input", default=None)
     args = parser.parse_args()
     with open(args.input, encoding="utf-8") as handle:
         pool = json.load(handle)
-    report = build_pregame_report(pool, args.home, args.away, args.max_age_hours)
+    confirmed_qbs = {team: name for team, name in ((args.home.upper(), args.home_qb_confirmed), (args.away.upper(), args.away_qb_confirmed)) if name}
+    qb_sources = {team: url for team, url in ((args.home.upper(), args.home_qb_source), (args.away.upper(), args.away_qb_source)) if url}
+    report = build_pregame_report(pool, args.home, args.away, args.max_age_hours, confirmed_qbs=confirmed_qbs, qb_sources=qb_sources)
     if args.weather_input:
         try:
             with open(args.weather_input, encoding="utf-8") as weather_file:
@@ -168,6 +183,7 @@ def main():
     for team, details in report["teams"].items():
         print(f"{team}: {details['player_records']} player records; {len(details['reported_injuries'])} reported injury designations")
         print(f"  QB depth chart: {details['quarterback_depth_chart']}")
+        print(f"  Selected QB: {details['projected_qb1']} | official confirmation: {details['official_starting_quarterback_confirmed']}")
     print(f"Team simulation ready: {report['team_simulation_ready']}")
     for blocker in report["team_simulation_blockers"]:
         print(f"BLOCKER: {blocker}")
