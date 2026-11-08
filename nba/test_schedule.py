@@ -45,8 +45,9 @@ class TestNBASchedule(unittest.TestCase):
             date(2026, 11, 8): [row("2026-11-08", "BOS", "NY", False)],
         }
         with patch("nba.schedule.fetch_scoreboard", side_effect=lambda d: dates.get(d, [])):
-            with patch("nba.schedule.time.sleep"):
-                result = build_context("BOS", "NYK", date(2026, 11, 8), lookback_days=3)
+            with patch("nba.schedule._event_row", side_effect=lambda event, scoreboard_day=None: event):
+                with patch("nba.schedule.time.sleep"):
+                    result = build_context("BOS", "NYK", date(2026, 11, 8), lookback_days=3)
         self.assertEqual(result["home_rest_days"], 2)
         self.assertEqual(result["away_rest_days"], 1)
         self.assertIsNone(result["home_travel_miles"])
@@ -54,9 +55,10 @@ class TestNBASchedule(unittest.TestCase):
 
     def test_rejects_missing_or_ambiguous_matchup(self):
         with patch("nba.schedule.fetch_scoreboard", return_value=[]):
-            with patch("nba.schedule.time.sleep"):
-                with self.assertRaisesRegex(ValueError, "found 0"):
-                    build_context("BOS", "NYK", date(2026, 11, 8), lookback_days=1)
+            with patch("nba.schedule._event_row", return_value=None):
+                with patch("nba.schedule.time.sleep"):
+                    with self.assertRaisesRegex(ValueError, "found 0"):
+                        build_context("BOS", "NYK", date(2026, 11, 8), lookback_days=1)
 
 if __name__ == "__main__":
     unittest.main()
