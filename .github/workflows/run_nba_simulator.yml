@@ -15,12 +15,12 @@ on:
       spread:
         description: Home spread, e.g. -3.5; blank to skip
         required: false
-        default: "-7.5"
+        default: ""
         type: string
       total:
         description: Game total; blank to skip
         required: false
-        default: "234.5"
+        default: ""
         type: string
       home_ml_odds:
         description: Home moneyline American odds (optional)
@@ -67,6 +67,11 @@ on:
         required: true
         default: "0"
         type: string
+      auto_odds:
+        description: Fetch current moneyline, spread and total from The Odds API (requires ODDS_API_KEY secret)
+        required: true
+        default: false
+        type: boolean
       game_date:
         description: Scheduled matchup date YYYY-MM-DD for ESPN rest and neutral-site context
         required: false
@@ -98,7 +103,7 @@ jobs:
       - name: Install dependencies
         run: python -m pip install --upgrade pip numpy
       - name: Run NBA tests
-        run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule
+        run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule nba.test_odds
       - name: Require refreshed NBA data
         run: |
           test -s nba/team_stats.json
@@ -120,6 +125,8 @@ jobs:
           HOME_TRAVEL: ${{ inputs.home_travel }}
           AWAY_TRAVEL: ${{ inputs.away_travel }}
           GAME_DATE: ${{ inputs.game_date }}
+          AUTO_ODDS: ${{ inputs.auto_odds }}
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
           HOME_INJURY: ${{ inputs.home_injury_points }}
           AWAY_INJURY: ${{ inputs.away_injury_points }}
         run: |
@@ -128,6 +135,7 @@ jobs:
           if [ -n "$SPREAD" ]; then args+=(--spread "$SPREAD"); fi
           if [ -n "$TOTAL" ]; then args+=(--total "$TOTAL"); fi
           if [ -n "$GAME_DATE" ]; then args+=(--game-date "$GAME_DATE"); fi
+          if [ "$AUTO_ODDS" = "true" ]; then args+=(--auto-odds); fi
           python -m nba.simulator "${args[@]}" | tee nba-simulation-results.txt
       - uses: actions/upload-artifact@v4
         with:
