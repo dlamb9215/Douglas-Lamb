@@ -206,7 +206,8 @@ def project_player(player: dict[str, Any], games: list[dict[str, Any]], injury_s
     }
 
 def build_matchup_player_projections(home: str, away: str, game_date: date, season: int = 2027,
-                                     trials: int = 50000, seed: int = 42) -> dict[str, Any]:
+                                     trials: int = 50000, seed: int = 42,
+                                     lines_by_player: dict[str, dict[str, float]] | None = None) -> dict[str, Any]:
     injury = fetch_official_injuries(game_date, home, away, season)
     status_map = {(row["team"], row["player"].casefold()): row["status"] for row in injury["player_statuses"]}
     aliases = {"GSW": "GS", "NOP": "NO", "NYK": "NY", "SAS": "SA", "UTA": "UTAH", "WAS": "WSH"}
@@ -229,7 +230,8 @@ def build_matchup_player_projections(home: str, away: str, game_date: date, seas
             try:
                 time.sleep(0.25)
                 games = fetch_player_gamelog(player["id"], season, game_date)
-                projection = project_player(player, games, status, trials, seed + int(player["id"]) % 100000)
+                player_lines = (lines_by_player or {}).get(player["name"].casefold())
+                projection = project_player(player, games, status, trials, seed + int(player["id"]) % 100000, player_lines)
                 if projection:
                     projections.append(projection)
             except (RuntimeError, ValueError) as exc:
@@ -259,8 +261,15 @@ def main():
     parser.add_argument("--trials", type=int, default=50000)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--output", default="nba-player-projections.json")
+    parser.add_argument("--lines-json", default="", help="Optional JSON mapping lowercase player names to points/rebounds/assists/pra lines")
     args = parser.parse_args()
-    result = build_matchup_player_projections(args.home, args.away, date.fromisoformat(args.date), args.season, args.trials, args.seed)
+    lines = {}
+    if args.lines_json:
+        raw_lines = json.loads(Path(args.lines_json).read_text(encoding="utf-8"))
+        if not isinstance(raw_lines, dict):
+            parser.error("--lines-json must contain an object keyed by player name")
+        lines = {str(name).casefold(): values for name, values in raw_lines.items() if isinstance(values, dict)}
+    result = build_matchup_player_projections(args.home, args.away, date.fromisoformat(args.date), args.season, args.trials, args.seed, lines)
     Path(args.output).write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(result, indent=2))
 
