@@ -35,22 +35,22 @@ on:
       home:
         description: Home team
         required: true
-        default: WAS
+        default: PHI
         type: string
       away:
         description: Away team
         required: true
-        default: LAR
+        default: NYG
         type: string
       home_qb_confirmed:
         description: Officially confirmed home-team starting QB
         required: false
-        default: "Jayden Daniels"
+        default: "Joe Milton III"
         type: string
       away_qb_confirmed:
         description: Officially confirmed away-team starting QB
         required: false
-        default: "Matthew Stafford"
+        default: "Jameis Winston"
         type: string
       trials:
         description: Simulation trials
@@ -136,8 +136,8 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         shell: bash
         env:
-          HOME_TEAM: ${{ inputs.home || 'WAS' }}
-          AWAY_TEAM: ${{ inputs.away || 'LAR' }}
+          HOME_TEAM: ${{ inputs.home || 'PHI' }}
+          AWAY_TEAM: ${{ inputs.away || 'NYG' }}
         run: |
           if ! python nfl_weather.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --output nfl-weather.json; then
             python -c 'import json,os; json.dump({"available":False,"home_team":os.environ["HOME_TEAM"],"away_team":os.environ["AWAY_TEAM"],"warning":"Weather lookup unavailable; no adjustment applied."},open("nfl-weather.json","w"),indent=2)'
@@ -145,7 +145,7 @@ jobs:
 
       - name: Validate fresh pregame context with weather
         if: github.event_name == 'workflow_dispatch'
-        run: python pregame_context.py --home "${{ inputs.home || 'WAS' }}" --away "${{ inputs.away || 'LAR' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "${{ inputs.home_qb_confirmed || 'Jayden Daniels' }}" --away-qb-confirmed "${{ inputs.away_qb_confirmed || 'Matthew Stafford' }}" --home-qb-source "https://www.commanders.com/team/depth-chart/" --away-qb-source "https://www.therams.com/team/depth-chart/" --output pregame-context.json
+        run: python pregame_context.py --home "${{ inputs.home || 'PHI' }}" --away "${{ inputs.away || 'NYG' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "${{ inputs.home_qb_confirmed || 'Joe Milton III' }}" --away-qb-confirmed "${{ inputs.away_qb_confirmed || 'Jameis Winston' }}" --home-qb-source "https://www.philadelphiaeagles.com/team/depth-chart/" --away-qb-source "https://www.giants.com/team/depth-chart/" --output pregame-context.json
 
       - name: Validate fresh pregame context
         if: github.event_name != 'workflow_dispatch'
@@ -174,7 +174,7 @@ jobs:
           INPUT_ODDS_SOURCE: ${{ inputs.odds_source }}
           INPUT_ODDS_CHECKED_AT: ${{ inputs.odds_checked_at }}
         run: |
-          ARGS=(--home "${{ inputs.home || 'WAS' }}" --away "${{ inputs.away || 'LAR' }}" --trials "${{ inputs.trials || '100000' }}" --pregame-report pregame-context.json)
+          ARGS=(--home "${{ inputs.home || 'PHI' }}" --away "${{ inputs.away || 'NYG' }}" --trials "${{ inputs.trials || '100000' }}" --pregame-report pregame-context.json)
           HAS_MARKET_LINES=false
           for value in "$INPUT_SPREAD" "$INPUT_TOTAL" "$INPUT_HOME_ODDS" "$INPUT_AWAY_ODDS" "$INPUT_OVER_ODDS" "$INPUT_UNDER_ODDS"; do
             if [[ -n "$value" ]]; then HAS_MARKET_LINES=true; fi
@@ -199,8 +199,8 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         shell: bash
         env:
-          HOME_TEAM: ${{ inputs.home || 'WAS' }}
-          AWAY_TEAM: ${{ inputs.away || 'LAR' }}
+          HOME_TEAM: ${{ inputs.home || 'PHI' }}
+          AWAY_TEAM: ${{ inputs.away || 'NYG' }}
         run: |
           if [[ ! -f game_day_confirmations.json ]]; then
             python -c 'import json,os,datetime; json.dump({"source":"No official confirmation file supplied; placeholder only","checked_at_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"players":[]},open("game_day_confirmations.json","w"),indent=2)'
@@ -218,7 +218,7 @@ jobs:
           {
             echo "# Doug's Elite Game Simulator"
             echo ""
-            echo "- Matchup: ${{ inputs.away || 'LAR' }} at ${{ inputs.home || 'WAS' }}"
+            echo "- Matchup: ${{ inputs.away || 'NYG' }} at ${{ inputs.home || 'PHI' }}"
             echo "- Trials requested: ${{ inputs.trials || '100000' }}"
             echo "- Workflow run: ${{ github.run_id }}"
             echo ""
