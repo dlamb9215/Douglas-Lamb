@@ -19,7 +19,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install NBA simulator dependency
-        run: python -m pip install --upgrade pip numpy
+        run: python -m pip install --upgrade pip -r requirements-nba.txt
 
       - name: Compile all simulator modules
         run: python -m compileall -q .
