@@ -159,6 +159,7 @@ def project_player(player: dict[str, Any], games: list[dict[str, Any]], injury_s
     projected_minutes = 0.65 * season_minutes + 0.35 * recent_minutes
     rng = np.random.default_rng(seed)
     projections = {}
+    draws = {}
     for stat in ("points", "rebounds", "assists"):
         season_total = sum(float(g[stat]) for g in games)
         season_rate = season_total / max(1e-9, sum(float(g["minutes"]) for g in games))
@@ -173,6 +174,7 @@ def project_player(player: dict[str, Any], games: list[dict[str, Any]], injury_s
         rate_draw = 0.5 * sampled_rate + 0.5 * shrunk_rate
         minute_draw = 0.5 * sampled_minutes + 0.5 * projected_minutes
         distribution = np.maximum(0, rate_draw * minute_draw)
+        draws[stat] = distribution
         line = (lines or {}).get(stat)
         projections[stat] = {
             "mean": float(np.mean(distribution)),
@@ -183,11 +185,16 @@ def project_player(player: dict[str, Any], games: list[dict[str, Any]], injury_s
             "under_probability": float(np.mean(distribution < line) * 100) if line is not None else None,
             "push_probability": float(np.mean(distribution == line) * 100) if line is not None else None,
         }
+    pra_distribution = draws["points"] + draws["rebounds"] + draws["assists"]
+    pra_line = (lines or {}).get("pra")
     projections["pra"] = {
-        "mean": sum(projections[s]["mean"] for s in ("points", "rebounds", "assists")),
-        "median": sum(projections[s]["median"] for s in ("points", "rebounds", "assists")),
-        "p75": sum(projections[s]["p75"] for s in ("points", "rebounds", "assists")),
-        "line": (lines or {}).get("pra"),
+        "mean": float(np.mean(pra_distribution)),
+        "median": float(np.percentile(pra_distribution, 50)),
+        "p75": float(np.percentile(pra_distribution, 75)),
+        "line": pra_line,
+        "over_probability": float(np.mean(pra_distribution > pra_line) * 100) if pra_line is not None else None,
+        "under_probability": float(np.mean(pra_distribution < pra_line) * 100) if pra_line is not None else None,
+        "push_probability": float(np.mean(pra_distribution == pra_line) * 100) if pra_line is not None else None,
     }
     return {
         "player_id": player["id"], "player": player["name"], "position": player.get("position"),
