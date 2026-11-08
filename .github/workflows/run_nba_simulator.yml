@@ -67,6 +67,11 @@ on:
         required: true
         default: "0"
         type: string
+      player_props:
+        description: Generate experimental player points/rebounds/assists/PRA projections (requires game_date)
+        required: true
+        default: false
+        type: boolean
       auto_injuries:
         description: Fetch official NBA injury report PDF (requires game_date)
         required: true
@@ -108,7 +113,7 @@ jobs:
       - name: Install dependencies
         run: python -m pip install --upgrade pip -r requirements-nba.txt
       - name: Run NBA tests
-        run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule nba.test_odds nba.test_injuries
+        run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule nba.test_odds nba.test_injuries nba.test_player_props
       - name: Require refreshed NBA data
         run: |
           test -s nba/team_stats.json
@@ -144,9 +149,20 @@ jobs:
           if [ "$AUTO_INJURIES" = "true" ]; then args+=(--auto-injuries); fi
           if [ "$AUTO_ODDS" = "true" ]; then args+=(--auto-odds); fi
           python -m nba.simulator "${args[@]}" | tee nba-simulation-results.txt
+      - name: Run experimental player prop projections
+        if: ${{ inputs.player_props }}
+        env:
+          HOME_TEAM: ${{ inputs.home }}
+          AWAY_TEAM: ${{ inputs.away }}
+          GAME_DATE: ${{ inputs.game_date }}
+        run: |
+          test -n "$GAME_DATE" || { echo "game_date is required when player_props is enabled"; exit 1; }
+          python -m nba.player_props --home "$HOME_TEAM" --away "$AWAY_TEAM" --date "$GAME_DATE" --season 2027 --trials 50000 --output nba-player-projections.json
       - uses: actions/upload-artifact@v4
         with:
           name: nba-matchup-results
+          if-no-files-found: ignore
           path: |
             nba-simulation-results.txt
             nba-simulation-results.json
+            nba-player-projections.json
