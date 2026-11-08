@@ -1,7 +1,18 @@
 import unittest
-from nba.player_props import parse_gamelog, project_player
+from nba.player_props import parse_gamelog, project_player, _walk_players
 
 class TestNBAPlayerProps(unittest.TestCase):
+    def test_roster_walker_ignores_team_objects(self):
+        payload = {
+            "team": {"id": "2", "displayName": "Boston Celtics"},
+            "athletes": [
+                {"id": "10", "fullName": "Player One", "displayName": "Player One", "position": {"abbreviation": "G"}},
+                {"id": "11", "displayName": "Player Two", "jersey": "4", "position": {"abbreviation": "F"}},
+            ],
+        }
+        found = list(_walk_players(payload))
+        self.assertEqual({str(player["id"]) for player in found}, {"10", "11"})
+
     def test_parse_gamelog_from_espn_v3_shape(self):
         payload = {
             "labels": ["MIN", "FG", "3PT", "FT", "REB", "AST", "STL", "BLK", "PTS"],
