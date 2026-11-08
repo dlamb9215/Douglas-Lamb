@@ -110,7 +110,7 @@ def _factor_adjustment(t,o):
     return own+opp
 
 def matchup_projection(home,away,home_rest=2,away_rest=2,home_travel=0,away_travel=0,
-                       home_injury_points=0,away_injury_points=0):
+                       home_injury_points=0,away_injury_points=0,neutral_site=False):
     pace=(home.pace+away.pace)/2
     if home.recent_pace is not None or away.recent_pace is not None:
         recent_home=home.recent_pace if home.recent_pace is not None else home.pace
@@ -124,7 +124,8 @@ def matchup_projection(home,away,home_rest=2,away_rest=2,home_travel=0,away_trav
     a_off=.85*a_off+.15*away.recent_off_rating if away.recent_off_rating is not None else a_off
     h_def=.85*h_def+.15*home.recent_def_rating if home.recent_def_rating is not None else h_def
     a_def=.85*a_def+.15*away.recent_def_rating if away.recent_def_rating is not None else a_def
-    home_court=0.0 if neutral_site else 1.35\n    he=(h_off+a_def)/2+_factor_adjustment(home,away)+_shot_profile_adjustment(home,away)+home_court
+    home_court=0.0 if neutral_site else 1.35
+    he=(h_off+a_def)/2+_factor_adjustment(home,away)+_shot_profile_adjustment(home,away)+home_court
     ae=(a_off+h_def)/2+_factor_adjustment(away,home)+_shot_profile_adjustment(away,home)
     # Small transparent schedule effects; capped to avoid exaggerated travel/rest adjustments.
     h_rest=max(0,min(3,home_rest-1))*0.35
@@ -159,13 +160,13 @@ def _simulate_period(hmean,amean,pace,hsd,asd,trials,seed):
 
 def simulate(home,away,trials=1_000_000,seed=42,spread=None,total=None,
              home_rest=2,away_rest=2,home_travel=0,away_travel=0,
-             home_injury_points=0,away_injury_points=0):
+             home_injury_points=0,away_injury_points=0,neutral_site=False):
     if trials<1: raise ValueError("trials must be positive")
     if home_rest<0 or away_rest<0: raise ValueError("rest days cannot be negative")
     if spread is not None and not -40<=spread<=40: raise ValueError("spread outside supported range")
     if total is not None and not 120<=total<=350: raise ValueError("total outside supported range")
     p=matchup_projection(home,away,home_rest,away_rest,home_travel,away_travel,
-                         home_injury_points,away_injury_points)
+                         home_injury_points,away_injury_points,neutral_site)
     hsd=max(8.0,home.score_sd); asd=max(8.0,away.score_sd)
     hs,aws=_simulate_period(p["home_points"],p["away_points"],p["pace"],hsd,asd,trials,seed)
     margin=hs-aws; combined=hs+aws
@@ -242,6 +243,7 @@ def main():
     ap.add_argument("--home-travel",type=float,default=0); ap.add_argument("--away-travel",type=float,default=0)
     ap.add_argument("--home-injury-points",type=float,default=0,help="Manual estimated team points lost to unavailable players")
     ap.add_argument("--away-injury-points",type=float,default=0)
+    ap.add_argument("--game-date",default="",help="YYYY-MM-DD; fetch ESPN schedule and override rest/neutral-site context")
     ap.add_argument("--trials",type=int,default=1_000_000); ap.add_argument("--max-trials",type=int,default=5_000_000)
     ap.add_argument("--seed",type=int,default=42); ap.add_argument("--no-auto-refine",action="store_true"); ap.add_argument("--json-output",default="")
     a=ap.parse_args()
@@ -254,6 +256,14 @@ def main():
     h,w=teams[a.home.upper()],teams[a.away.upper()]
     kwargs=dict(home_rest=a.home_rest,away_rest=a.away_rest,home_travel=a.home_travel,away_travel=a.away_travel,
                 home_injury_points=a.home_injury_points,away_injury_points=a.away_injury_points)
+    schedule_context=None
+    if a.game_date:
+        from datetime import date
+        from nba.schedule import build_context
+        schedule_context=build_context(a.home,a.away,date.fromisoformat(a.game_date))
+        if schedule_context["home_rest_days"] is not None: kwargs["home_rest"]=schedule_context["home_rest_days"]
+        if schedule_context["away_rest_days"] is not None: kwargs["away_rest"]=schedule_context["away_rest_days"]
+        kwargs["neutral_site"]=schedule_context["event"]["neutral_site"]
     r=simulate(h,w,a.trials,a.seed,a.spread,a.total,**kwargs)
     close=abs(r["home_margin"]+ (a.spread or 0))<=3
     if a.spread is not None: close=close or 47<=r["home_cover"]<=53
@@ -296,6 +306,6 @@ def main():
     print("Injury adjustment is manual unless an independently verified report is supplied.")
     print("Model status: estimates require out-of-sample backtesting before being treated as betting edges.")
     if a.json_output:
-        payload={"home_team":h.abbreviation,"away_team":w.abbreviation,"season":meta.get("season"),"data_updated_at":meta.get("updated_at"),"spread_line":a.spread,"total_line":a.total,"home_rest":a.home_rest,"away_rest":a.away_rest,"home_travel_miles":a.home_travel,"away_travel_miles":a.away_travel,"home_injury_points":a.home_injury_points,"away_injury_points":a.away_injury_points,"moneyline_pick":ml_pick,"home_ml_odds":a.home_ml_odds,"away_ml_odds":a.away_ml_odds,"spread_odds":a.spread_odds,"total_odds":a.total_odds,"result":r}
+        payload={"home_team":h.abbreviation,"away_team":w.abbreviation,"season":meta.get("season"),"data_updated_at":meta.get("updated_at"),"spread_line":a.spread,"total_line":a.total,"home_rest":a.home_rest,"away_rest":a.away_rest,"home_travel_miles":a.home_travel,"away_travel_miles":a.away_travel,"home_injury_points":a.home_injury_points,"away_injury_points":a.away_injury_points,"schedule_context":schedule_context,"moneyline_pick":ml_pick,"home_ml_odds":a.home_ml_odds,"away_ml_odds":a.away_ml_odds,"spread_odds":a.spread_odds,"total_odds":a.total_odds,"result":r}
         Path(a.json_output).write_text(json.dumps(payload,indent=2)+"\\n",encoding="utf-8")
 if __name__=="__main__": main()
