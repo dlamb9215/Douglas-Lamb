@@ -46,7 +46,7 @@ def fetch_scoreboard(day: date) -> list[dict[str, Any]]:
     url = f"{BASE}?dates={day:%Y%m%d}"
     return _get_json(url)["events"]
 
-def _event_row(event: dict[str, Any]) -> dict[str, Any] | None:
+def _event_row(event: dict[str, Any], scoreboard_day: date | None = None) -> dict[str, Any] | None:
     competitions = event.get("competitions") or []
     if not competitions:
         return None
@@ -73,7 +73,9 @@ def _event_row(event: dict[str, Any]) -> dict[str, Any] | None:
     venue = comp.get("venue") or {}
     return {
         "event_id": str(event.get("id", "")),
-        "date": start_dt.date().isoformat(),
+        # ESPN scoreboard's requested calendar day is the league schedule day;
+        # the UTC start timestamp can fall on the next date for late local games.
+        "date": (scoreboard_day or start_dt.date()).isoformat(),
         "start_time": start_dt.astimezone(timezone.utc).isoformat(),
         "home": teams["home"],
         "away": teams["away"],
@@ -104,7 +106,7 @@ def build_context(home: str, away: str, game_date: date, lookback_days: int = 10
         day = game_date - timedelta(days=offset)
         if offset != lookback_days:
             time.sleep(0.25)
-        events.extend(_event_row(event) for event in fetch_scoreboard(day))
+        events.extend(_event_row(event, day) for event in fetch_scoreboard(day))
     events = [row for row in events if row]
     candidates = [
         row for row in events
