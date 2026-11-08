@@ -202,8 +202,24 @@ def simulate(home,away,trials=1_000_000,seed=42,spread=None,total=None,
     return r
 
 def implied_probability(odds):
+    """Convert American odds to raw implied probability (vig included)."""
+    odds=float(odds)
     if odds==0: raise ValueError("American odds cannot be zero")
     return 100/(odds+100) if odds>0 else abs(odds)/(abs(odds)+100)
+
+def no_vig_probabilities(home_odds, away_odds):
+    """Proportional two-way no-vig probabilities from paired American prices."""
+    hp=implied_probability(home_odds); ap=implied_probability(away_odds)
+    hold=hp+ap
+    return {"home":hp/hold,"away":ap/hold,"market_hold":hold-1}
+
+def expected_value_per_100(probability, american_odds):
+    """Expected net profit in dollars per $100 risked; odds must be American."""
+    p=float(probability); odds=float(american_odds)
+    if not 0<=p<=1: raise ValueError("probability must be between 0 and 1")
+    if odds==0: raise ValueError("American odds cannot be zero")
+    profit=odds if odds>0 else 10000/abs(odds)
+    return p*profit-(1-p)*100
 
 def _decision(prob,edge,threshold=55.0,min_edge=1.5):
     if prob is None: return "NO LINE"
