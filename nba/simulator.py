@@ -276,7 +276,11 @@ def main():
     print(f"Projected pace {r['pace']:.1f} | Score {h.name} {r['home_points']:.1f} - {w.name} {r['away_points']:.1f}")
     print(f"Projected total {r['total_points']:.1f} | Home margin {r['home_margin']:+.1f}")
     print(f"Trials {r['trials']:,} | Seed {r['seed']} | Margin SD {r['margin_sd']:.1f}")
-    print(f"Schedule adjustments: home {r['home_rest_adjustment']:+.2f} pts | away {r['away_rest_adjustment']:+.2f} pts | home court {r['home_court_points']:+.2f} pts")\n    if schedule_context:\n        print(f"ESPN schedule: event {schedule_context['event']['event_id']} | {schedule_context['event']['date']} | neutral site {schedule_context['event']['neutral_site']}")\n        print(f"Automatic rest: home {schedule_context['home_rest_days']} days | away {schedule_context['away_rest_days']} days")\n        for warning in schedule_context[\"warnings\"]: print(f\"DATA WARNING: {warning}\")
+    print(f"Schedule adjustments: home {r['home_rest_adjustment']:+.2f} pts | away {r['away_rest_adjustment']:+.2f} pts | home court {r['home_court_points']:+.2f} pts")
+    if schedule_context:
+        print(f"ESPN schedule: event {schedule_context['event']['event_id']} | {schedule_context['event']['date']} | neutral site {schedule_context['event']['neutral_site']}")
+        print(f"Automatic rest: home {schedule_context['home_rest_days']} days | away {schedule_context['away_rest_days']} days")
+        for warning in schedule_context["warnings"]: print(f"DATA WARNING: {warning}")
     ml_pick=h.name if r["home_win"]>=55 else (w.name if r["away_win"]>=55 else "PASS — no 55% win-probability edge")
     print(f"\nMONEYLINE: {h.name} win {r['home_win']:.2f}% | {w.name} win {r['away_win']:.2f}% | tie {r['win_tie']:.2f}%")
     print(f"Moneyline pick: {ml_pick}")
