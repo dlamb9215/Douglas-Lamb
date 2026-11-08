@@ -10,7 +10,7 @@ A team-level NBA forecasting and betting-analysis engine. It is separate from th
 - Home/road splits are supported by the engine but currently unavailable from the connected data provider; overall ratings are used instead.
 - Team scoring variance currently uses a fixed fallback because the connected team-stat provider does not supply team game-log residuals.
 - Schedule adjustments for rest, back-to-backs and travel distance. When `--game-date` is supplied, the simulator checks ESPN's public scoreboard for the matchup, derives each team's days of rest from the prior 10 calendar days, and removes home-court advantage for a neutral-site event. Travel distance remains unset unless verified itinerary/venue coordinates are available.
-- Team-level injury/availability point adjustments supplied as explicit inputs; the simulator does not pretend to verify injuries automatically.
+- Optional official NBA injury-report PDF ingestion by game date, including player status rows and team-submission warnings. It reports Out/Questionable/Doubtful/Probable/Available designations but does not invent player-minute or team-point impacts; those still require player-level modeling.
 - Correlated full-game and first-half Monte Carlo score distributions.
 - Spread and total probabilities, pushes, projected score, projected margin, projected total, and model-vs-line edge.
 - 1,000,000 baseline trials; borderline matchups refine to 5,000,000 trials.
@@ -26,13 +26,13 @@ This is team-level only: it provides team moneyline probabilities plus spread an
 ## Refresh data
 Run the **Update NBA Statistics** workflow. It requests current and prior-season ESPN-derived team aggregates through DunkAPI. The updater validates all 30 teams and writes only after both season requests and data checks succeed. It preserves the last good file if a refresh fails.
 
-To enable live sportsbook lines, add an `ODDS_API_KEY` Actions secret and select `auto_odds` when launching the matchup workflow. The integration uses The Odds API v4 featured NBA markets; coverage and quota depend on the account plan. Without the secret, leave `auto_odds` disabled and enter actual sportsbook lines/prices manually. The scheduled updater uses the 2026-27 season and 2025-26 as the prior baseline. Confirm the season settings when a new season begins. It requires the `DUNKAPI_API_KEY` Actions secret. The provider does not currently supply all opponent Four Factors, recent form, home/road splits, player availability, rotations, 3P accuracy, or team game-log residual distributions; the model uses documented neutral/fixed fallbacks rather than fabricating these fields. The matchup workflow rejects data older than 72 hours. ESPN's public scoreboard adapter supplies schedule event identity, neutral-site status and recent rest context, but it is an undocumented feed and does not replace official NBA injury reports or a supported data contract.
+To fetch the official injury report, supply `game_date` and enable `auto_injuries`; this downloads the latest NBA league injury-report PDF for that date and fails closed if only stale reports are available. To enable live sportsbook lines, add an `ODDS_API_KEY` Actions secret and select `auto_odds` when launching the matchup workflow. The integration uses The Odds API v4 featured NBA markets; coverage and quota depend on the account plan. Without the secret, leave `auto_odds` disabled and enter actual sportsbook lines/prices manually. The scheduled updater uses the 2026-27 season and 2025-26 as the prior baseline. Confirm the season settings when a new season begins. It requires the `DUNKAPI_API_KEY` Actions secret. The team-stat provider does not currently supply all opponent Four Factors, recent form, home/road splits, rotations, 3P accuracy, or team game-log residual distributions; the model uses documented neutral/fixed fallbacks rather than fabricating these fields. The matchup workflow rejects data older than 72 hours. ESPN's public scoreboard adapter supplies schedule event identity, neutral-site status and recent rest context, but it is an undocumented feed and does not replace official NBA injury reports or a supported data contract.
 
 ## Run on GitHub
 1. Open Actions.
 2. Run **Update NBA Statistics** and confirm it completes successfully.
 3. Run **Run Doug's Elite NBA Simulator**.
-4. Enter home/away abbreviations and manual team-level injury point adjustments. Either select `auto_odds` (after adding `ODDS_API_KEY`) or enter the actual sportsbook home spread, total and prices manually. Supply the game date to automatically look up the ESPN schedule, rest days and neutral-site status; otherwise enter rest manually.
+4. Enter home/away abbreviations and manual team-level injury point adjustments. Either select `auto_odds` (after adding `ODDS_API_KEY`) or enter the actual sportsbook home spread, total and prices manually. Supply the game date for ESPN schedule/rest/neutral-site context; enable `auto_injuries` to fetch the NBA's official injury report.
 5. Keep the default 1,000,000 trials. The engine increases borderline runs to 5,000,000.
 6. Download the text and JSON results artifact.
 
@@ -58,7 +58,7 @@ Do not call the model calibrated until it has enough chronologically separated o
 ## Known limitations
 - Team-level injury point adjustments are manual. No official inactive/lineup feed is currently integrated.
 - Rest days and neutral-site status can be fetched from ESPN's public scoreboard when a game date is supplied. Travel miles are not auto-computed. ESPN's feed is undocumented and may change; schedule lookup failure blocks the requested auto-context run.
-- No automatic official injury/lineup feed, player rotations/minutes, player prop projections, automatic travel-mile calculation, or play-by-play possession simulation. Live featured odds require the user to add an Odds API key and enable the workflow input.
+- Official NBA injury designations can be ingested, but confirmed starting lineups, player minutes/rotations, player-level impact estimates and player prop projections are not implemented. Automatic travel-mile calculation and play-by-play possession simulation are also not implemented. Live featured odds require the user to add an Odds API key and enable the workflow input.
 - The score distribution is a transparent approximation pending fitting against historical game residuals. One million trials reduce Monte Carlo sampling noise; they do not correct bad inputs or model misspecification.
 - Probabilities are estimates, not guaranteed outcomes or proof of a profitable betting edge.
 
