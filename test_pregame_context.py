@@ -44,6 +44,19 @@ class PregameContextTests(unittest.TestCase):
         report = build_pregame_report(self.pool, "BAL", "JAX", now=self.now)
         self.assertFalse(report["team_simulation_ready"])
 
+    def test_official_qb_override_accepts_active_backup_and_records_source(self):
+        self.pool["players"].append({"team":"BAL","name":"QB Backup","position":"QB","depth_order":2,"roster_status":"active","injury_status":"active"})
+        report=build_pregame_report(self.pool,"BAL","JAX",now=self.now,confirmed_qbs={"BAL":"QB Backup"},qb_sources={"BAL":"https://www.example.com/team"})
+        self.assertTrue(report["team_simulation_ready"])
+        self.assertEqual(report["teams"]["BAL"]["projected_qb1"],"QB Backup")
+        self.assertTrue(report["teams"]["BAL"]["official_starting_quarterback_confirmed"])
+
+    def test_official_qb_override_rejects_unavailable_or_unsourced_player(self):
+        with self.assertRaisesRegex(ValueError,"available active roster QB"):
+            build_pregame_report(self.pool,"BAL","JAX",now=self.now,confirmed_qbs={"BAL":"Not A Player"},qb_sources={"BAL":"https://www.example.com/team"})
+        with self.assertRaisesRegex(ValueError,"HTTPS source"):
+            build_pregame_report(self.pool,"BAL","JAX",now=self.now,confirmed_qbs={"BAL":"QB One"},qb_sources={"BAL":"not-a-url"})
+
     def test_stale_player_data_is_rejected(self):
         self.pool["retrieved_at_utc"] = (self.now - timedelta(hours=40)).isoformat()
         with self.assertRaisesRegex(ValueError, "stale"):
