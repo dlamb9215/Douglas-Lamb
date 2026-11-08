@@ -13,6 +13,14 @@ class TestNBAEngine(unittest.TestCase):
         r=matchup_projection(team("BOS"),team("NYK"))
         self.assertGreater(r["home_points"],0)
         self.assertGreater(r["total_points"],r["home_points"])
+
+    def test_neutral_site_removes_home_court_advantage(self):
+        home, away = team("BOS"), team("NYK")
+        regular = matchup_projection(home, away)
+        neutral = matchup_projection(home, away, neutral_site=True)
+        self.assertAlmostEqual(regular["home_court_points"], 1.35)
+        self.assertEqual(neutral["home_court_points"], 0.0)
+        self.assertAlmostEqual(regular["home_margin"] - neutral["home_margin"], 1.35 * regular["pace"] / 100, places=6)
     def test_market_probabilities(self):
         r=simulate(team("BOS"),team("NYK"),25000,7,-2.5,220.5)
         for k in ("home_cover","away_cover","over","under"):
