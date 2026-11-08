@@ -212,7 +212,19 @@ def project_player(player: dict[str, Any], games: list[dict[str, Any]], injury_s
 def build_matchup_player_projections(home: str, away: str, game_date: date, season: int = 2027,
                                      trials: int = 50000, seed: int = 42,
                                      lines_by_player: dict[str, dict[str, float]] | None = None) -> dict[str, Any]:
-    injury = fetch_official_injuries(game_date, home, away, season)
+    try:
+        injury = fetch_official_injuries(game_date, home, away, season)
+    except (RuntimeError, OSError, ValueError) as exc:
+        return {
+            "game_date": game_date.isoformat(), "home": home.upper(), "away": away.upper(),
+            "season": season, "trials_per_player": trials,
+            "source": "ESPN public roster and player game logs; official injury report unavailable",
+            "teams": {}, "warnings": [f"Player projections withheld because the official NBA injury report could not be retrieved: {exc}"],
+            "limitations": [
+                "No player projections are produced without current official injury designations.",
+                "This experimental model does not confirm starters, rotations, or expected minutes.",
+            ],
+        }
     status_map = {(row["team"], row["player"].casefold()): row["status"] for row in injury["player_statuses"]}
     aliases = {"GSW": "GS", "NOP": "NO", "NYK": "NY", "SAS": "SA", "UTA": "UTAH", "WAS": "WSH"}
     team_codes = [aliases.get(home.upper(), home.upper()), aliases.get(away.upper(), away.upper())]
