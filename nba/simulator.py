@@ -232,6 +232,10 @@ def main():
     ap.add_argument("--data",default="nba/team_stats.json")
     ap.add_argument("--spread",type=float,help="Home spread, e.g. -4.5")
     ap.add_argument("--total",type=float)
+    ap.add_argument("--home-ml-odds",type=float)
+    ap.add_argument("--away-ml-odds",type=float)
+    ap.add_argument("--spread-odds",type=float,default=-110)
+    ap.add_argument("--total-odds",type=float,default=-110)
     ap.add_argument("--home-rest",type=float,default=2); ap.add_argument("--away-rest",type=float,default=2)
     ap.add_argument("--home-travel",type=float,default=0); ap.add_argument("--away-travel",type=float,default=0)
     ap.add_argument("--home-injury-points",type=float,default=0,help="Manual estimated team points lost to unavailable players")
@@ -241,6 +245,8 @@ def main():
     a=ap.parse_args()
     if a.trials<1 or a.max_trials<a.trials: ap.error("Invalid trial counts")
     if a.home.upper()==a.away.upper(): ap.error("Home and away teams must differ")
+    if (a.home_ml_odds is None) != (a.away_ml_odds is None): ap.error("Supply both moneyline prices or neither")
+    if a.spread_odds==0 or a.total_odds==0 or a.home_ml_odds==0 or a.away_ml_odds==0: ap.error("American odds cannot be zero")
     teams,meta=load_team_stats(a.data)
     if a.home.upper() not in teams or a.away.upper() not in teams: ap.error("Team abbreviation missing from NBA data")
     h,w=teams[a.home.upper()],teams[a.away.upper()]
@@ -262,6 +268,10 @@ def main():
     ml_pick=h.name if r["home_win"]>=55 else (w.name if r["away_win"]>=55 else "PASS — no 55% win-probability edge")
     print(f"\nMONEYLINE: {h.name} win {r['home_win']:.2f}% | {w.name} win {r['away_win']:.2f}% | tie {r['win_tie']:.2f}%")
     print(f"Moneyline pick: {ml_pick}")
+    if a.home_ml_odds is not None:
+        market=no_vig_probabilities(a.home_ml_odds,a.away_ml_odds)
+        print("No-vig moneyline market: home {0:.2f}% | away {1:.2f}% | hold {2:.2f}%".format(market["home"]*100,market["away"]*100,market["market_hold"]*100))
+        print("Moneyline EV per $100 risked: home {0:+.2f} | away {1:+.2f}".format(expected_value_per_100(r["home_win"]/100,a.home_ml_odds),expected_value_per_100(r["away_win"]/100,a.away_ml_odds)))
     if a.spread is not None:
         hp=_decision(r["home_cover"],r["spread_edge_points"])
         apick=_decision(r["away_cover"],-r["spread_edge_points"])
