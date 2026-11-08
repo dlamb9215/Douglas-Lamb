@@ -249,6 +249,7 @@ def main():
     ap.add_argument("--home-injury-points",type=float,default=0,help="Manual estimated team points lost to unavailable players")
     ap.add_argument("--away-injury-points",type=float,default=0)
     ap.add_argument("--game-date",default="",help="YYYY-MM-DD; fetch ESPN schedule and override rest/neutral-site context")
+    ap.add_argument("--auto-injuries",action="store_true",help="Fetch the latest official NBA injury report PDF for the matchup date")
     ap.add_argument("--trials",type=int,default=1_000_000); ap.add_argument("--max-trials",type=int,default=5_000_000)
     ap.add_argument("--seed",type=int,default=42); ap.add_argument("--no-auto-refine",action="store_true"); ap.add_argument("--json-output",default="")
     a=ap.parse_args()
@@ -287,6 +288,7 @@ def main():
     kwargs=dict(home_rest=a.home_rest,away_rest=a.away_rest,home_travel=a.home_travel,away_travel=a.away_travel,
                 home_injury_points=a.home_injury_points,away_injury_points=a.away_injury_points)
     schedule_context=None
+    injury_context=None
     if a.game_date:
         from datetime import date
         from nba.schedule import build_context
@@ -294,6 +296,11 @@ def main():
         if schedule_context["home_rest_days"] is not None: kwargs["home_rest"]=schedule_context["home_rest_days"]
         if schedule_context["away_rest_days"] is not None: kwargs["away_rest"]=schedule_context["away_rest_days"]
         kwargs["neutral_site"]=schedule_context["event"]["neutral_site"]
+    if a.auto_injuries:
+        if not a.game_date: ap.error("--auto-injuries requires --game-date")
+        from datetime import date
+        from nba.injuries import fetch_official_injuries
+        injury_context=fetch_official_injuries(date.fromisoformat(a.game_date),a.home,a.away,meta.get("season",2027))
     r=simulate(h,w,a.trials,a.seed,a.spread,a.total,**kwargs)
     close=abs(r["home_margin"]+ (a.spread or 0))<=3
     if a.spread is not None: close=close or 47<=r["home_cover"]<=53
@@ -311,6 +318,19 @@ def main():
         print(f"ESPN schedule: event {schedule_context['event']['event_id']} | {schedule_context['event']['date']} | neutral site {schedule_context['event']['neutral_site']}")
         print(f"Automatic rest: home {schedule_context['home_rest_days']} days | away {schedule_context['away_rest_days']} days")
         for warning in schedule_context["warnings"]: print(f"DATA WARNING: {warning}")
+    if injury_context:
+        print(f"Official NBA injury report: {injury_context['report_url']}")
+        for team_code in injury_context["teams"]:
+            listed=[row for row in injury_context["player_statuses"] if row["team"]==team_code]
+            counts={}
+            for row in listed: counts[row["status"]]=counts.get(row["status"],0)+1
+            print(f"Injury report {team_code}: {len(listed)} player rows | {counts or 'no player rows listed'}")
+        for team_code,status in injury_context["team_submission"].items():
+            print(f"INJURY WARNING: {team_code} report status: {status}")
+        for row in injury_context["player_statuses"]:
+            if row["status"] in ("Questionable","Doubtful"):
+                print(f"AVAILABILITY WARNING: {row['team']} {row['player']} — {row['status']} ({row['reason']})")
+        for warning in injury_context["warnings"]: print(f"INJURY NOTE: {warning}")
     ml_pick=h.name if r["home_win"]>=55 else (w.name if r["away_win"]>=55 else "PASS — no 55% win-probability edge")
     print(f"\nMONEYLINE: {h.name} win {r['home_win']:.2f}% | {w.name} win {r['away_win']:.2f}% | tie {r['win_tie']:.2f}%")
     print(f"Moneyline pick: {ml_pick}")
@@ -344,6 +364,6 @@ def main():
     print("Injury adjustment is manual unless an independently verified report is supplied.")
     print("Model status: estimates require out-of-sample backtesting before being treated as betting edges.")
     if a.json_output:
-        payload={"home_team":h.abbreviation,"away_team":w.abbreviation,"season":meta.get("season"),"data_updated_at":meta.get("updated_at"),"spread_line":a.spread,"total_line":a.total,"home_rest":a.home_rest,"away_rest":a.away_rest,"home_travel_miles":a.home_travel,"away_travel_miles":a.away_travel,"home_injury_points":a.home_injury_points,"away_injury_points":a.away_injury_points,"schedule_context":schedule_context,"odds_context":odds_context,"moneyline_pick":ml_pick,"home_ml_odds":a.home_ml_odds,"away_ml_odds":a.away_ml_odds,"spread_odds":a.spread_odds,"total_odds":a.total_odds,"home_spread_odds":home_spread_price,"away_spread_odds":away_spread_price,"over_odds":over_price,"under_odds":under_price,"result":r}
+        payload={"home_team":h.abbreviation,"away_team":w.abbreviation,"season":meta.get("season"),"data_updated_at":meta.get("updated_at"),"spread_line":a.spread,"total_line":a.total,"home_rest":a.home_rest,"away_rest":a.away_rest,"home_travel_miles":a.home_travel,"away_travel_miles":a.away_travel,"home_injury_points":a.home_injury_points,"away_injury_points":a.away_injury_points,"schedule_context":schedule_context,"injury_context":injury_context,"odds_context":odds_context,"moneyline_pick":ml_pick,"home_ml_odds":a.home_ml_odds,"away_ml_odds":a.away_ml_odds,"spread_odds":a.spread_odds,"total_odds":a.total_odds,"home_spread_odds":home_spread_price,"away_spread_odds":away_spread_price,"over_odds":over_price,"under_odds":under_price,"result":r}
         Path(a.json_output).write_text(json.dumps(payload,indent=2)+"\\n",encoding="utf-8")
 if __name__=="__main__": main()
