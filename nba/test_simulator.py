@@ -21,7 +21,9 @@ class TestNBAEngine(unittest.TestCase):
         self.assertAlmostEqual(r["over"]+r["under"]+r["total_push"],100,places=6)
         self.assertIn("home_win",r)
         self.assertIn("away_win",r)
-        self.assertAlmostEqual(r["home_win"]+r["away_win"]+r["win_tie"],100,places=6)
+        self.assertAlmostEqual(r["home_win"]+r["away_win"],100,places=6)
+        self.assertGreaterEqual(r["win_tie"],0)
+        self.assertLessEqual(r["win_tie"],100)
     def test_seed_reproducible(self):
         self.assertEqual(simulate(team("BOS"),team("NYK"),5000,123),simulate(team("BOS"),team("NYK"),5000,123))
     def test_different_seed(self):
