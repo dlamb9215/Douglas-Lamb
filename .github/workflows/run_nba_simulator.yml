@@ -5,7 +5,7 @@ on:
       home:
         description: Home team abbreviation
         required: true
-        default: "ATL"
+        default: "DET"
         type: string
       away:
         description: Away team abbreviation
@@ -85,7 +85,7 @@ on:
       game_date:
         description: Scheduled matchup date YYYY-MM-DD for ESPN rest and neutral-site context
         required: false
-        default: "2026-11-09"
+        default: "2026-11-08"
         type: string
       home_injury_points:
         description: Manual home team points adjustment for unavailable players
