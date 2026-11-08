@@ -1,5 +1,5 @@
 import unittest
-from nba.simulator import TeamStats, matchup_projection, simulate, implied_probability, _decision
+from nba.simulator import TeamStats, matchup_projection, simulate, implied_probability, no_vig_probabilities, expected_value_per_100, _decision
 
 def team(code, **updates):
     d={"name":code,"games_played":10,"pace":99,"off_rating":115,"def_rating":112,
@@ -70,6 +70,17 @@ class TestNBAEngine(unittest.TestCase):
         adjusted=matchup_projection(h,w)
         self.assertGreater(adjusted["home_points"],baseline["home_points"])
         self.assertLess(adjusted["home_points"]-baseline["home_points"],2.0)
+    def test_no_vig_market_probabilities(self):
+        r=no_vig_probabilities(-110,-110)
+        self.assertAlmostEqual(r["home"],.5)
+        self.assertAlmostEqual(r["away"],.5)
+        self.assertGreater(r["market_hold"],0)
+
+    def test_expected_value_per_100(self):
+        self.assertAlmostEqual(expected_value_per_100(.5,-100),0)
+        self.assertAlmostEqual(expected_value_per_100(.5,100),0)
+        with self.assertRaises(ValueError): expected_value_per_100(1.1,-110)
+        with self.assertRaises(ValueError): expected_value_per_100(.5,0)
     def test_decision_requires_probability_and_line_edge(self):
         self.assertEqual(_decision(58,2),"LEAN")
         self.assertEqual(_decision(54,4),"PASS")
