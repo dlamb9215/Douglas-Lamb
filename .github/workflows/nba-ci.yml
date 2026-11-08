@@ -1,0 +1,30 @@
+name: NBA Simulator CI
+on:
+  push:
+    paths:
+      - "nba/**"
+      - ".github/workflows/run_nba_simulator.yml"
+      - ".github/workflows/update_nba_stats.yml"
+      - ".github/workflows/nba-ci.yml"
+  pull_request:
+    paths:
+      - "nba/**"
+      - ".github/workflows/run_nba_simulator.yml"
+      - ".github/workflows/update_nba_stats.yml"
+      - ".github/workflows/nba-ci.yml"
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip numpy
+      - name: Run NBA unit and backtest tests
+        run: python -m unittest -v nba.test_simulator nba.test_backtest
+      - name: Validate all 30 team records
+        run: python -c "import json; d=json.load(open('nba/team_stats.json')); assert len(d['teams']) == 30"
+      - name: CLI smoke test
+        run: python -m nba.simulator --home BOS --away NYK --spread -3.5 --total 221.5 --trials 10000 --no-auto-refine
