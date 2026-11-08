@@ -67,6 +67,11 @@ on:
         required: true
         default: "0"
         type: string
+      game_date:
+        description: Scheduled matchup date YYYY-MM-DD for ESPN rest and neutral-site context
+        required: false
+        default: ""
+        type: string
       home_injury_points:
         description: Manual home team points adjustment for unavailable players
         required: true
@@ -93,7 +98,7 @@ jobs:
       - name: Install dependencies
         run: python -m pip install --upgrade pip numpy
       - name: Run NBA tests
-        run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality
+        run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule
       - name: Require refreshed NBA data
         run: |
           test -s nba/team_stats.json
@@ -114,6 +119,7 @@ jobs:
           AWAY_REST: ${{ inputs.away_rest }}
           HOME_TRAVEL: ${{ inputs.home_travel }}
           AWAY_TRAVEL: ${{ inputs.away_travel }}
+          GAME_DATE: ${{ inputs.game_date }}
           HOME_INJURY: ${{ inputs.home_injury_points }}
           AWAY_INJURY: ${{ inputs.away_injury_points }}
         run: |
@@ -121,6 +127,7 @@ jobs:
           if [ -n "$HOME_ML_ODDS" ] && [ -n "$AWAY_ML_ODDS" ]; then args+=(--home-ml-odds "$HOME_ML_ODDS" --away-ml-odds "$AWAY_ML_ODDS"); fi
           if [ -n "$SPREAD" ]; then args+=(--spread "$SPREAD"); fi
           if [ -n "$TOTAL" ]; then args+=(--total "$TOTAL"); fi
+          if [ -n "$GAME_DATE" ]; then args+=(--game-date "$GAME_DATE"); fi
           python -m nba.simulator "${args[@]}" | tee nba-simulation-results.txt
       - uses: actions/upload-artifact@v4
         with:
