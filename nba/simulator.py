@@ -322,7 +322,7 @@ def main():
         print(f"ESPN schedule: event {schedule_context['event']['event_id']} | {schedule_context['event']['date']} | neutral site {schedule_context['event']['neutral_site']}")
         print(f"Automatic rest: home {schedule_context['home_rest_days']} days | away {schedule_context['away_rest_days']} days")
         for warning in schedule_context["warnings"]: print(f"DATA WARNING: {warning}")
-    if injury_context:
+    if injury_context and injury_context.get("report_url"):
         print(f"Official NBA injury report: {injury_context['report_url']}")
         for team_code in injury_context["teams"]:
             listed=[row for row in injury_context["player_statuses"] if row["team"]==team_code]
