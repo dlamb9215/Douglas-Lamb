@@ -36,7 +36,7 @@ class TestNBADataQuality(unittest.TestCase):
 
     def test_rejects_stale_file(self):
         with self.assertRaisesRegex(ValueError, "stale"):
-            validate_payload(payload(), 1, self.now)
+            validate_payload(payload(), 0.25, self.now)
 
     def test_rejects_future_timestamp(self):
         data = payload()
