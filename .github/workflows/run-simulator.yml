@@ -42,6 +42,16 @@ on:
         required: true
         default: ARI
         type: string
+      home_qb_confirmed:
+        description: Officially confirmed home-team starting QB
+        required: false
+        default: "Drew Lock"
+        type: string
+      away_qb_confirmed:
+        description: Officially confirmed away-team starting QB
+        required: false
+        default: "Gardner Minshew"
+        type: string
       trials:
         description: Simulation trials
         required: true
@@ -135,7 +145,7 @@ jobs:
 
       - name: Validate fresh pregame context with weather
         if: github.event_name == 'workflow_dispatch'
-        run: python pregame_context.py --home "${{ inputs.home || 'SEA' }}" --away "${{ inputs.away || 'ARI' }}" --input player_pool.json --weather-input nfl-weather.json --output pregame-context.json
+        run: python pregame_context.py --home "${{ inputs.home || 'SEA' }}" --away "${{ inputs.away || 'ARI' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "${{ inputs.home_qb_confirmed || 'Drew Lock' }}" --away-qb-confirmed "${{ inputs.away_qb_confirmed || 'Gardner Minshew' }}" --home-qb-source "https://www.seahawks.com/news/week-9-injury-report-cardinals-at-seahawks" --away-qb-source "https://www.azcardinals.com/news/gardner-minshew-named-cardinals-starting-quarterback-carson-beck-made-backup" --output pregame-context.json
 
       - name: Validate fresh pregame context
         if: github.event_name != 'workflow_dispatch'
