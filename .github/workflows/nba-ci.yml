@@ -23,8 +23,8 @@ jobs:
       - name: Install dependencies
         run: python -m pip install --upgrade pip numpy
       - name: Run NBA unit and backtest tests
-        run: python -m unittest -v nba.test_simulator nba.test_backtest
-      - name: Validate all 30 team records
-        run: python -c "import json; d=json.load(open('nba/team_stats.json')); assert len(d['teams']) == 30"
+        run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality
+      - name: Validate NBA data quality and freshness
+        run: python -m nba.data_quality --data nba/team_stats.json --max-age-hours 72
       - name: CLI smoke test
         run: python -m nba.simulator --home BOS --away NYK --spread -3.5 --total 221.5 --trials 10000 --no-auto-refine
