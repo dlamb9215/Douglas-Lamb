@@ -67,6 +67,11 @@ on:
         required: true
         default: "0"
         type: string
+      auto_injuries:
+        description: Fetch official NBA injury report PDF (requires game_date)
+        required: true
+        default: false
+        type: boolean
       auto_odds:
         description: Fetch current moneyline, spread and total from The Odds API (requires ODDS_API_KEY secret)
         required: true
@@ -101,9 +106,9 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install dependencies
-        run: python -m pip install --upgrade pip numpy
+        run: python -m pip install --upgrade pip -r requirements-nba.txt
       - name: Run NBA tests
-        run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule nba.test_odds
+        run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule nba.test_odds nba.test_injuries
       - name: Require refreshed NBA data
         run: |
           test -s nba/team_stats.json
@@ -125,6 +130,7 @@ jobs:
           HOME_TRAVEL: ${{ inputs.home_travel }}
           AWAY_TRAVEL: ${{ inputs.away_travel }}
           GAME_DATE: ${{ inputs.game_date }}
+          AUTO_INJURIES: ${{ inputs.auto_injuries }}
           AUTO_ODDS: ${{ inputs.auto_odds }}
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
           HOME_INJURY: ${{ inputs.home_injury_points }}
@@ -135,6 +141,7 @@ jobs:
           if [ -n "$SPREAD" ]; then args+=(--spread "$SPREAD"); fi
           if [ -n "$TOTAL" ]; then args+=(--total "$TOTAL"); fi
           if [ -n "$GAME_DATE" ]; then args+=(--game-date "$GAME_DATE"); fi
+          if [ "$AUTO_INJURIES" = "true" ]; then args+=(--auto-injuries); fi
           if [ "$AUTO_ODDS" = "true" ]; then args+=(--auto-odds); fi
           python -m nba.simulator "${args[@]}" | tee nba-simulation-results.txt
       - uses: actions/upload-artifact@v4
