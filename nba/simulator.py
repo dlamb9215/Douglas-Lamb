@@ -264,14 +264,22 @@ def main():
     if a.auto_odds:
         from nba.odds import matchup_odds
         odds_context=matchup_odds(h.name,w.name)
-        if a.spread is None and odds_context.get("home_spread") is not None: a.spread=odds_context["home_spread"]
-        if a.total is None and odds_context.get("total") is not None: a.total=odds_context["total"]
+        fetched_spread=odds_context.get("home_spread")
+        fetched_total=odds_context.get("total")
+        spread_line_matches=a.spread is None or (fetched_spread is not None and abs(a.spread-fetched_spread)<0.001)
+        total_line_matches=a.total is None or (fetched_total is not None and abs(a.total-fetched_total)<0.001)
+        if a.spread is None: a.spread=fetched_spread
+        if a.total is None: a.total=fetched_total
         if a.home_ml_odds is None: a.home_ml_odds=odds_context.get("home_ml_odds")
         if a.away_ml_odds is None: a.away_ml_odds=odds_context.get("away_ml_odds")
-        if a.home_spread_odds is None: a.home_spread_odds=odds_context.get("home_spread_odds")
-        if a.away_spread_odds is None: a.away_spread_odds=odds_context.get("away_spread_odds")
-        if a.over_odds is None: a.over_odds=odds_context.get("over_odds")
-        if a.under_odds is None: a.under_odds=odds_context.get("under_odds")
+        if spread_line_matches:
+            if a.home_spread_odds is None: a.home_spread_odds=odds_context.get("home_spread_odds")
+            if a.away_spread_odds is None: a.away_spread_odds=odds_context.get("away_spread_odds")
+        if total_line_matches:
+            if a.over_odds is None: a.over_odds=odds_context.get("over_odds")
+            if a.under_odds is None: a.under_odds=odds_context.get("under_odds")
+        if (a.home_ml_odds is None) != (a.away_ml_odds is None):
+            a.home_ml_odds=a.away_ml_odds=None
     home_spread_price=a.home_spread_odds if a.home_spread_odds is not None else a.spread_odds
     away_spread_price=a.away_spread_odds if a.away_spread_odds is not None else a.spread_odds
     over_price=a.over_odds if a.over_odds is not None else a.total_odds
