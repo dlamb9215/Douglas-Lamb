@@ -24,6 +24,6 @@ jobs:
       - name: Run NFL simulator tests
         run: python -m unittest -v test_simulator test_pregame_context test_nfl_player_data test_player_availability test_player_prop_simulator test_matchup_player_pipeline test_nfl_weather test_injury_exposure test_nfl_forecast_ledger test_calibration test_market_data
       - name: Run NBA simulator and backtest tests
-        run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality
+        run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule
       - name: Run NCAA simulator and data pipeline tests
         run: python -m unittest discover -s ncaa/tests -v
