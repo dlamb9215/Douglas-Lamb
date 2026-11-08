@@ -5,12 +5,12 @@ on:
       home:
         description: Home team abbreviation
         required: true
-        default: ""
+        default: "ATL"
         type: string
       away:
         description: Away team abbreviation
         required: true
-        default: ""
+        default: "LAL"
         type: string
       spread:
         description: Home spread, e.g. -3.5; blank to skip
@@ -50,7 +50,7 @@ on:
       home_rest:
         description: Home team days of rest before this game
         required: true
-        default: "2"
+        default: "1"
         type: string
       away_rest:
         description: Away team days of rest before this game
@@ -70,12 +70,12 @@ on:
       player_props:
         description: Generate experimental player points/rebounds/assists/PRA projections (requires game_date)
         required: true
-        default: false
+        default: true
         type: boolean
       auto_injuries:
         description: Fetch official NBA injury report PDF (requires game_date)
         required: true
-        default: false
+        default: true
         type: boolean
       auto_odds:
         description: Fetch current moneyline, spread and total from The Odds API (requires ODDS_API_KEY secret)
@@ -85,7 +85,7 @@ on:
       game_date:
         description: Scheduled matchup date YYYY-MM-DD for ESPN rest and neutral-site context
         required: false
-        default: ""
+        default: "2026-11-09"
         type: string
       home_injury_points:
         description: Manual home team points adjustment for unavailable players
