@@ -12,6 +12,7 @@ import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 from statistics import median
+from collections import Counter
 from typing import Any
 
 ENDPOINT = "https://api.the-odds-api.com/v4/sports/basketball_nba/odds"
@@ -24,6 +25,14 @@ def _american(value: Any) -> int:
 
 def _best(prices: list[int]) -> int | None:
     return max(prices) if prices else None
+
+def _consensus_rows(rows: list[tuple[float, int, int]]) -> tuple[float, list[tuple[float, int, int]]]:
+    counts = Counter(row[0] for row in rows)
+    highest_count = max(counts.values())
+    tied_lines = [line for line, count in counts.items() if count == highest_count]
+    center = median([row[0] for row in rows])
+    selected = min(tied_lines, key=lambda line: (abs(line - center), line))
+    return float(selected), [row for row in rows if row[0] == selected]
 
 def fetch_events(api_key: str, regions: str = "us") -> tuple[list[dict[str, Any]], dict[str, str]]:
     key = (api_key or "").strip()
@@ -109,8 +118,7 @@ def matchup_odds(home_name: str, away_name: str, api_key: str | None = None) -> 
         "quota": quota,
     }
     if spread_rows:
-        line = float(median([row[0] for row in spread_rows]))
-        at_line = [row for row in spread_rows if abs(row[0] - line) < 0.001]
+        line, at_line = _consensus_rows(spread_rows)
         result.update({
             "home_spread": line,
             "away_spread": -line,
@@ -119,8 +127,7 @@ def matchup_odds(home_name: str, away_name: str, api_key: str | None = None) -> 
             "spread_book_count": len(at_line),
         })
     if total_rows:
-        line = float(median([row[0] for row in total_rows]))
-        at_line = [row for row in total_rows if abs(row[0] - line) < 0.001]
+        line, at_line = _consensus_rows(total_rows)
         result.update({
             "total": line,
             "over_odds": _best([row[1] for row in at_line]),
