@@ -50,7 +50,7 @@ on:
       away_qb_confirmed:
         description: Officially confirmed away-team starting QB
         required: false
-        default: "Jameis Winston"
+        default: "J.J. McCarthy"
         type: string
       trials:
         description: Simulation trials
@@ -145,7 +145,7 @@ jobs:
 
       - name: Validate fresh pregame context with weather
         if: github.event_name == 'workflow_dispatch'
-        run: python pregame_context.py --home "${{ inputs.home || 'PHI' }}" --away "${{ inputs.away || 'NYG' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "${{ inputs.home_qb_confirmed || 'Joe Milton III' }}" --away-qb-confirmed "${{ inputs.away_qb_confirmed || 'Jameis Winston' }}" --home-qb-source "https://www.philadelphiaeagles.com/team/depth-chart/" --away-qb-source "https://www.giants.com/team/depth-chart/" --output pregame-context.json
+        run: python pregame_context.py --home "${{ inputs.home || 'PHI' }}" --away "${{ inputs.away || 'NYG' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "${{ inputs.home_qb_confirmed || 'Joe Milton III' }}" --away-qb-confirmed "${{ inputs.away_qb_confirmed || 'J.J. McCarthy' }}" --home-qb-source "https://www.philadelphiaeagles.com/team/depth-chart/" --away-qb-source "https://www.giants.com/team/depth-chart/" --output pregame-context.json
 
       - name: Validate fresh pregame context
         if: github.event_name != 'workflow_dispatch'
