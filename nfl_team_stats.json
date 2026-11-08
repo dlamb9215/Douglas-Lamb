@@ -1,7 +1,7 @@
 [
   {
     "team": "ARI",
-    "data_updated_at": "2026-11-07T20:25:41.521648+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812501+00:00",
     "season": 2026,
     "games_played": 8,
     "points_for_per_game": 21.88,
@@ -62,7 +62,7 @@
   },
   {
     "team": "ATL",
-    "data_updated_at": "2026-11-07T20:25:41.521696+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812543+00:00",
     "season": 2026,
     "games_played": 8,
     "points_for_per_game": 21.38,
@@ -123,7 +123,7 @@
   },
   {
     "team": "BAL",
-    "data_updated_at": "2026-11-07T20:25:41.521713+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812561+00:00",
     "season": 2026,
     "games_played": 9,
     "points_for_per_game": 21.0,
@@ -184,7 +184,7 @@
   },
   {
     "team": "BUF",
-    "data_updated_at": "2026-11-07T20:25:41.521728+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812575+00:00",
     "season": 2026,
     "games_played": 7,
     "points_for_per_game": 33.29,
@@ -245,7 +245,7 @@
   },
   {
     "team": "CAR",
-    "data_updated_at": "2026-11-07T20:25:41.521741+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812588+00:00",
     "season": 2026,
     "games_played": 7,
     "points_for_per_game": 25.43,
@@ -306,7 +306,7 @@
   },
   {
     "team": "CHI",
-    "data_updated_at": "2026-11-07T20:25:41.521754+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812600+00:00",
     "season": 2026,
     "games_played": 8,
     "points_for_per_game": 26.75,
@@ -367,7 +367,7 @@
   },
   {
     "team": "CIN",
-    "data_updated_at": "2026-11-07T20:25:41.521767+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812614+00:00",
     "season": 2026,
     "games_played": 7,
     "points_for_per_game": 29.43,
@@ -428,7 +428,7 @@
   },
   {
     "team": "CLE",
-    "data_updated_at": "2026-11-07T20:25:41.521780+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812626+00:00",
     "season": 2026,
     "games_played": 8,
     "points_for_per_game": 17.38,
@@ -489,7 +489,7 @@
   },
   {
     "team": "DAL",
-    "data_updated_at": "2026-11-07T20:25:41.521799+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812644+00:00",
     "season": 2026,
     "games_played": 8,
     "points_for_per_game": 27.38,
@@ -550,7 +550,7 @@
   },
   {
     "team": "DEN",
-    "data_updated_at": "2026-11-07T20:25:41.521812+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812657+00:00",
     "season": 2026,
     "games_played": 8,
     "points_for_per_game": 21.5,
@@ -611,7 +611,7 @@
   },
   {
     "team": "DET",
-    "data_updated_at": "2026-11-07T20:25:41.521826+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812670+00:00",
     "season": 2026,
     "games_played": 7,
     "points_for_per_game": 29.0,
@@ -672,7 +672,7 @@
   },
   {
     "team": "GB",
-    "data_updated_at": "2026-11-07T20:25:41.521839+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812682+00:00",
     "season": 2026,
     "games_played": 8,
     "points_for_per_game": 21.38,
@@ -733,7 +733,7 @@
   },
   {
     "team": "HOU",
-    "data_updated_at": "2026-11-07T20:25:41.521852+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812695+00:00",
     "season": 2026,
     "games_played": 7,
     "points_for_per_game": 23.57,
@@ -794,7 +794,7 @@
   },
   {
     "team": "IND",
-    "data_updated_at": "2026-11-07T20:25:41.521863+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812706+00:00",
     "season": 2026,
     "games_played": 8,
     "points_for_per_game": 20.12,
@@ -855,7 +855,7 @@
   },
   {
     "team": "JAX",
-    "data_updated_at": "2026-11-07T20:25:41.521875+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812719+00:00",
     "season": 2026,
     "games_played": 8,
     "points_for_per_game": 28.62,
@@ -916,7 +916,7 @@
   },
   {
     "team": "KC",
-    "data_updated_at": "2026-11-07T20:25:41.521888+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812731+00:00",
     "season": 2026,
     "games_played": 7,
     "points_for_per_game": 23.86,
@@ -977,7 +977,7 @@
   },
   {
     "team": "LAC",
-    "data_updated_at": "2026-11-07T20:25:41.521914+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812755+00:00",
     "season": 2026,
     "games_played": 7,
     "points_for_per_game": 14.14,
@@ -1038,7 +1038,7 @@
   },
   {
     "team": "LAR",
-    "data_updated_at": "2026-11-07T20:25:41.521901+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812742+00:00",
     "season": 2026,
     "games_played": 8,
     "points_for_per_game": 24.25,
@@ -1099,7 +1099,7 @@
   },
   {
     "team": "LV",
-    "data_updated_at": "2026-11-07T20:25:41.521926+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812767+00:00",
     "season": 2026,
     "games_played": 8,
     "points_for_per_game": 27.62,
@@ -1160,7 +1160,7 @@
   },
   {
     "team": "MIA",
-    "data_updated_at": "2026-11-07T20:25:41.521937+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812779+00:00",
     "season": 2026,
     "games_played": 7,
     "points_for_per_game": 16.71,
@@ -1221,7 +1221,7 @@
   },
   {
     "team": "MIN",
-    "data_updated_at": "2026-11-07T20:25:41.521949+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812791+00:00",
     "season": 2026,
     "games_played": 7,
     "points_for_per_game": 20.0,
@@ -1282,7 +1282,7 @@
   },
   {
     "team": "NE",
-    "data_updated_at": "2026-11-07T20:25:41.521960+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812802+00:00",
     "season": 2026,
     "games_played": 8,
     "points_for_per_game": 23.0,
@@ -1343,7 +1343,7 @@
   },
   {
     "team": "NO",
-    "data_updated_at": "2026-11-07T20:25:41.521973+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812813+00:00",
     "season": 2026,
     "games_played": 7,
     "points_for_per_game": 23.14,
@@ -1404,7 +1404,7 @@
   },
   {
     "team": "NYG",
-    "data_updated_at": "2026-11-07T20:25:41.521984+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812826+00:00",
     "season": 2026,
     "games_played": 7,
     "points_for_per_game": 23.29,
@@ -1465,7 +1465,7 @@
   },
   {
     "team": "NYJ",
-    "data_updated_at": "2026-11-07T20:25:41.521995+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812837+00:00",
     "season": 2026,
     "games_played": 8,
     "points_for_per_game": 21.25,
@@ -1526,7 +1526,7 @@
   },
   {
     "team": "PHI",
-    "data_updated_at": "2026-11-07T20:25:41.522008+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812849+00:00",
     "season": 2026,
     "games_played": 8,
     "points_for_per_game": 17.12,
@@ -1587,7 +1587,7 @@
   },
   {
     "team": "PIT",
-    "data_updated_at": "2026-11-07T20:25:41.522019+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812861+00:00",
     "season": 2026,
     "games_played": 8,
     "points_for_per_game": 22.5,
@@ -1648,7 +1648,7 @@
   },
   {
     "team": "SEA",
-    "data_updated_at": "2026-11-07T20:25:41.522031+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812873+00:00",
     "season": 2026,
     "games_played": 8,
     "points_for_per_game": 23.12,
@@ -1709,7 +1709,7 @@
   },
   {
     "team": "SF",
-    "data_updated_at": "2026-11-07T20:25:41.522043+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812886+00:00",
     "season": 2026,
     "games_played": 7,
     "points_for_per_game": 28.14,
@@ -1770,7 +1770,7 @@
   },
   {
     "team": "TB",
-    "data_updated_at": "2026-11-07T20:25:41.522066+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812898+00:00",
     "season": 2026,
     "games_played": 8,
     "points_for_per_game": 22.25,
@@ -1831,7 +1831,7 @@
   },
   {
     "team": "TEN",
-    "data_updated_at": "2026-11-07T20:25:41.522079+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812910+00:00",
     "season": 2026,
     "games_played": 8,
     "points_for_per_game": 18.0,
@@ -1892,7 +1892,7 @@
   },
   {
     "team": "WAS",
-    "data_updated_at": "2026-11-07T20:25:41.522091+00:00",
+    "data_updated_at": "2026-11-08T12:40:48.812923+00:00",
     "season": 2026,
     "games_played": 7,
     "points_for_per_game": 22.71,
