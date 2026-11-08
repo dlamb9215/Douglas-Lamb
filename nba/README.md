@@ -32,7 +32,7 @@ To fetch the official injury report, supply `game_date` and enable `auto_injurie
 1. Open Actions.
 2. Run **Update NBA Statistics** and confirm it completes successfully.
 3. Run **Run Doug's Elite NBA Simulator**.
-4. Enter home/away abbreviations and manual team-level injury point adjustments. Either select `auto_odds` (after adding `ODDS_API_KEY`) or enter the actual sportsbook home spread, total and prices manually. Supply the game date for ESPN schedule/rest/neutral-site context; enable `auto_injuries` to fetch the NBA's official injury report.
+4. Enter home/away abbreviations and manual team-level injury point adjustments. Optionally enable `player_props` to fetch both rosters, player game logs and official injury designations and generate experimental points/rebounds/assists/PRA projections. For manual prop lines, provide a JSON file to the player-prop CLI using `--lines-json`. Either select `auto_odds` (after adding `ODDS_API_KEY`) or enter the actual sportsbook home spread, total and prices manually. Supply the game date for ESPN schedule/rest/neutral-site context; enable `auto_injuries` to fetch the NBA's official injury report.
 5. Keep the default 1,000,000 trials. The engine increases borderline runs to 5,000,000.
 6. Download the text and JSON results artifact.
 
@@ -58,7 +58,7 @@ Do not call the model calibrated until it has enough chronologically separated o
 ## Known limitations
 - Team-level injury point adjustments are manual. No official inactive/lineup feed is currently integrated.
 - Rest days and neutral-site status can be fetched from ESPN's public scoreboard when a game date is supplied. Travel miles are not auto-computed. ESPN's feed is undocumented and may change; schedule lookup failure blocks the requested auto-context run.
-- Official NBA injury designations can be ingested, but confirmed starting lineups, player minutes/rotations, player-level impact estimates and player prop projections are not implemented. Automatic travel-mile calculation and play-by-play possession simulation are also not implemented. Live featured odds require the user to add an Odds API key and enable the workflow input.
+- Official NBA injury designations and experimental player prop projections can be ingested/generated, but confirmed starting lineups, verified minutes/rotations, player-level impact estimates and a calibrated player-prop probability model are not implemented. Automatic travel-mile calculation and play-by-play possession simulation are also not implemented. Live featured odds require the user to add an Odds API key and enable the workflow input.
 - The score distribution is a transparent approximation pending fitting against historical game residuals. One million trials reduce Monte Carlo sampling noise; they do not correct bad inputs or model misspecification.
 - Probabilities are estimates, not guaranteed outcomes or proof of a profitable betting edge.
 
