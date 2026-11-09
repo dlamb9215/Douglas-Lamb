@@ -68,6 +68,22 @@ class TestNBAEngine(unittest.TestCase):
         second = simulate(team("BOS"), team("NYK"), 5000, 456)
         self.assertNotEqual(first, second)
 
+    def test_neutral_site_removes_home_court_advantage(self):
+        h,w=team("BOS"),team("NYK")
+        normal=matchup_projection(h,w)
+        neutral=matchup_projection(h,w,neutral_site=True)
+        self.assertAlmostEqual(normal["home_court_points"],1.35)
+        self.assertEqual(neutral["home_court_points"],0)
+        self.assertAlmostEqual(normal["home_margin"]-neutral["home_margin"],1.35)
+
+    def test_away_only_recent_pace_is_used_and_first_half_ml_sums(self):
+        h,w=team("BOS"),team("NYK",recent_pace=106)
+        p=matchup_projection(h,w)
+        self.assertGreater(p["pace"],100)
+        r=simulate(h,w,10000,13)
+        first=r["first_half"]
+        self.assertAlmostEqual(first["home_win"]+first["away_win"]+first["tie"],100,places=6)
+
     def test_invalid_pace(self):
         with self.assertRaises(ValueError):
             team("BAD", pace=150)
