@@ -7,6 +7,21 @@ from nba.backtest import evaluate
 
 
 class TestBacktest(unittest.TestCase):
+    def test_rejects_invalid_probability(self):
+        rows = [{
+            "projected_home": 110, "projected_away": 105,
+            "actual_home": 112, "actual_away": 104,
+            "home_win_probability": 120,
+        }]
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "bad.csv"
+            with path.open("w", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=rows[0].keys())
+                writer.writeheader()
+                writer.writerows(rows)
+            with self.assertRaises(ValueError):
+                evaluate(path)
+
     def test_metrics_on_small_fixture(self):
         rows = [
             {
