@@ -30,8 +30,10 @@ class TestNBAEngine(unittest.TestCase):
         self.assertIn("home_win",r)
         self.assertIn("away_win",r)
         self.assertAlmostEqual(r["home_win"]+r["away_win"],100,places=6)
-        self.assertGreaterEqual(r["win_tie"],0)
-        self.assertLessEqual(r["win_tie"],100)
+        self.assertEqual(r["win_tie"],0)
+        self.assertEqual(len(r["home_win_ci"]),2)
+        self.assertLessEqual(r["home_win_ci"][0],r["home_win"])
+        self.assertGreaterEqual(r["home_win_ci"][1],r["home_win"])
     def test_seed_reproducible(self):
         self.assertEqual(simulate(team("BOS"),team("NYK"),5000,123),simulate(team("BOS"),team("NYK"),5000,123))
     def test_different_seed(self):
@@ -45,6 +47,10 @@ class TestNBAEngine(unittest.TestCase):
         self.assertGreater(r["first_half"]["home_avg"],0)
         self.assertIn("home_cover",r["first_half"])
         self.assertIn("over",r["first_half"])
+        self.assertIn("home_win",r["first_half"])
+        self.assertIn("away_win",r["first_half"])
+        self.assertIn("tie",r["first_half"])
+        self.assertAlmostEqual(r["first_half"]["home_win"]+r["first_half"]["away_win"]+r["first_half"]["tie"],100,places=6)
         self.assertAlmostEqual(r["first_half"]["home_cover"]+r["first_half"]["away_cover"]+r["first_half"]["spread_push"],100,places=6)
         self.assertAlmostEqual(r["first_half"]["over"]+r["first_half"]["under"]+r["first_half"]["total_push"],100,places=6)
         self.assertEqual(len(r["home_cover_ci"]),2)
