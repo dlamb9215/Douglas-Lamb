@@ -152,10 +152,34 @@ def simulate(home,away,trials=1_000_000,seed=42,spread=None,total=None,
                          home_injury_points,away_injury_points)
     hsd=max(8.0,home.score_sd); asd=max(8.0,away.score_sd)
     hs,aws=_simulate_period(p["home_points"],p["away_points"],p["pace"],hsd,asd,trials,seed)
+    # NBA games cannot finish tied. Resolve regulation ties with a stochastic
+    # five-minute overtime approximation; repeat rare tied OT periods.
+    tied = np.flatnonzero(hs == aws)
+    if tied.size:
+        for _ in range(10):
+            still = tied[hs[tied] == aws[tied]]
+            if not still.size:
+                break
+            ot_h = rng_poisson = np.random.default_rng(seed + 700 + _)
+            h_ot = ot_h.poisson(max(0.5, p["home_points"] * 5 / 48), still.size)
+            a_ot = ot_h.poisson(max(0.5, p["away_points"] * 5 / 48), still.size)
+            hs[still] += h_ot.astype(hs.dtype)
+            aws[still] += a_ot.astype(aws.dtype)
+        still = np.flatnonzero(hs == aws)
+        if still.size:
+            rng_ot = np.random.default_rng(seed + 799)
+            home_wins = rng_ot.random(still.size) < (
+                p["home_efficiency"] / (p["home_efficiency"] + p["away_efficiency"]))
+            hs[still] += home_wins.astype(hs.dtype)
+            aws[still] += (~home_wins).astype(aws.dtype)
     margin=hs-aws; combined=hs+aws
+    home_win_prob=float(np.mean(margin>0)*100)
     r={**p,"trials":trials,"seed":seed,"home_avg":float(np.mean(hs)),
        "away_avg":float(np.mean(aws)),"total_avg":float(np.mean(combined)),
-       "margin_sd":float(np.std(margin,ddof=1))}
+       "margin_sd":float(np.std(margin,ddof=1)),
+       "home_win":home_win_prob,"away_win":float(100-home_win_prob),
+       "home_win_ci":_wilson_interval(home_win_prob/100,trials),
+       "away_win_ci":_wilson_interval(1-home_win_prob/100,trials)}
     if spread is not None:
         # sportsbook home line is conventionally negative for a favorite
         adj=margin+spread
@@ -200,6 +224,8 @@ def main():
     ap.add_argument("--data",default="nba/team_stats.json")
     ap.add_argument("--spread",type=float,help="Home spread, e.g. -4.5")
     ap.add_argument("--total",type=float)
+    ap.add_argument("--home-odds",type=int,help="American home moneyline odds")
+    ap.add_argument("--away-odds",type=int,help="American away moneyline odds")
     ap.add_argument("--home-rest",type=float,default=2); ap.add_argument("--away-rest",type=float,default=2)
     ap.add_argument("--home-travel",type=float,default=0); ap.add_argument("--away-travel",type=float,default=0)
     ap.add_argument("--home-injury-points",type=float,default=0,help="Manual estimated team points lost to unavailable players")
@@ -226,6 +252,14 @@ def main():
     print(f"Projected pace {r['pace']:.1f} | Score {h.name} {r['home_points']:.1f} - {w.name} {r['away_points']:.1f}")
     print(f"Projected total {r['total_points']:.1f} | Home margin {r['home_margin']:+.1f}")
     print(f"Trials {r['trials']:,} | Seed {r['seed']} | Margin SD {r['margin_sd']:.1f}")
+    print(f"Moneyline: {h.name} {r['home_win']:.2f}% (95% MC CI {r['home_win_ci'][0]:.2f}-{r['home_win_ci'][1]:.2f}%) | {w.name} {r['away_win']:.2f}%")
+    if (a.home_odds is None) != (a.away_odds is None):
+        ap.error("Supply both --home-odds and --away-odds for a no-vig market comparison")
+    if a.home_odds is not None:
+        raw_h=implied_probability(a.home_odds); raw_a=implied_probability(a.away_odds)
+        no_vig_h=raw_h/(raw_h+raw_a)*100; no_vig_a=raw_a/(raw_h+raw_a)*100
+        print(f"No-vig market ML: {h.name} {no_vig_h:.2f}% | {w.name} {no_vig_a:.2f}%")
+        print(f"Model minus market: home {r['home_win']-no_vig_h:+.2f} pp | away {r['away_win']-no_vig_a:+.2f} pp")
     print(f"Schedule adjustments: home {r['home_rest_adjustment']:+.2f} pts | away {r['away_rest_adjustment']:+.2f} pts")
     if a.spread is not None:
         hp=_decision(r["home_cover"],r["spread_edge_points"])
@@ -247,6 +281,6 @@ def main():
     print("Injury adjustment is manual unless an independently verified report is supplied.")
     print("Model status: estimates require out-of-sample backtesting before being treated as betting edges.")
     if a.json_output:
-        payload={"home_team":h.abbreviation,"away_team":w.abbreviation,"season":meta.get("season"),"data_updated_at":meta.get("updated_at"),"spread_line":a.spread,"total_line":a.total,"home_rest":a.home_rest,"away_rest":a.away_rest,"home_travel_miles":a.home_travel,"away_travel_miles":a.away_travel,"home_injury_points":a.home_injury_points,"away_injury_points":a.away_injury_points,"result":r}
+        payload={"home_team":h.abbreviation,"away_team":w.abbreviation,"season":meta.get("season"),"data_updated_at":meta.get("updated_at"),"spread_line":a.spread,"total_line":a.total,"home_moneyline_odds":a.home_odds,"away_moneyline_odds":a.away_odds,"home_rest":a.home_rest,"away_rest":a.away_rest,"home_travel_miles":a.home_travel,"away_travel_miles":a.away_travel,"home_injury_points":a.home_injury_points,"away_injury_points":a.away_injury_points,"result":r}
         Path(a.json_output).write_text(json.dumps(payload,indent=2)+"\\n",encoding="utf-8")
 if __name__=="__main__": main()
