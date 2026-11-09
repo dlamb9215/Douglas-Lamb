@@ -46,8 +46,10 @@ Cleveland Cavaliers Allen, Jarrett Out Injury/Illness - Right Knee Contusion
             "athlete": {"displayName": "Example Player"},
             "injury": {"status": "Out", "details": "ankle"}
         }]}
-        with patch("nba.injuries.latest_report_url", side_effect=RuntimeError("HTTP 403")), \\
-             patch("nba.injuries._get", return_value=json.dumps(payload).encode()):
+        with (
+            patch("nba.injuries.latest_report_url", side_effect=RuntimeError("HTTP 403")),
+            patch("nba.injuries._get", return_value=json.dumps(payload).encode()),
+        ):
             from nba.injuries import fetch_official_injuries
             result = fetch_official_injuries(date(2026, 11, 9), "ATL", "LAL", 2027)
         self.assertIn("third-party fallback", result["source"])
