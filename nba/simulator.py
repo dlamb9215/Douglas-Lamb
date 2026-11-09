@@ -158,6 +158,31 @@ def _simulate_period(hmean,amean,pace,hsd,asd,trials,seed):
     a=rng.normal(amean*(1+pace_shock),asd,trials)
     return np.maximum(0,np.rint(h)).astype(np.int16),np.maximum(0,np.rint(a)).astype(np.int16)
 
+def _resolve_overtime(home_scores, away_scores, home_mean, away_mean,
+                     home_efficiency, away_efficiency, seed):
+    """Resolve regulation ties with stochastic five-minute NBA overtime periods."""
+    tied = np.flatnonzero(home_scores == away_scores)
+    if not tied.size:
+        return home_scores, away_scores
+    rng = np.random.default_rng(seed)
+    for _ in range(10):
+        still = tied[home_scores[tied] == away_scores[tied]]
+        if not still.size:
+            break
+        home_ot = rng.poisson(max(0.5, home_mean * 5 / 48), still.size)
+        away_ot = rng.poisson(max(0.5, away_mean * 5 / 48), still.size)
+        home_scores[still] += home_ot.astype(home_scores.dtype)
+        away_scores[still] += away_ot.astype(away_scores.dtype)
+    still = np.flatnonzero(home_scores == away_scores)
+    if still.size:
+        home_win = rng.random(still.size) < (
+            home_efficiency / (home_efficiency + away_efficiency)
+        )
+        home_scores[still] += home_win.astype(home_scores.dtype)
+        away_scores[still] += (~home_win).astype(away_scores.dtype)
+    return home_scores, away_scores
+
+
 def simulate(home,away,trials=1_000_000,seed=42,spread=None,total=None,
              home_rest=2,away_rest=2,home_travel=0,away_travel=0,
              home_injury_points=0,away_injury_points=0,neutral_site=False):
@@ -169,8 +194,14 @@ def simulate(home,away,trials=1_000_000,seed=42,spread=None,total=None,
                          home_injury_points,away_injury_points,neutral_site)
     hsd=max(8.0,home.score_sd); asd=max(8.0,away.score_sd)
     hs,aws=_simulate_period(p["home_points"],p["away_points"],p["pace"],hsd,asd,trials,seed)
+    hs,aws=_resolve_overtime(hs,aws,p["home_points"],p["away_points"],
+                             p["home_efficiency"],p["away_efficiency"],seed+700)
     margin=hs-aws; combined=hs+aws
-    r={**p,"trials":trials,"seed":seed,"home_win":float((np.mean(margin>0)+0.5*np.mean(margin==0))*100),"away_win":float((np.mean(margin<0)+0.5*np.mean(margin==0))*100),"win_tie":float(np.mean(margin==0)*100),"home_avg":float(np.mean(hs)),
+    home_win_probability=float(np.mean(margin>0))
+    r={**p,"trials":trials,"seed":seed,"home_win":home_win_probability*100,
+       "away_win":float(np.mean(margin<0)*100),"win_tie":float(np.mean(margin==0)*100),
+       "home_win_ci":_wilson_interval(home_win_probability,trials),
+       "away_win_ci":_wilson_interval(float(np.mean(margin<0)),trials),"home_avg":float(np.mean(hs)),
        "away_avg":float(np.mean(aws)),"total_avg":float(np.mean(combined)),
        "margin_sd":float(np.std(margin,ddof=1))}
     if spread is not None:
@@ -192,7 +223,12 @@ def simulate(home,away,trials=1_000_000,seed=42,spread=None,total=None,
     hm=hh-ha; ht=hh+ha
     r["first_half"]={"home_cover":None,"away_cover":None,
                      "home_avg":float(np.mean(hh)),"away_avg":float(np.mean(ha)),
-                     "total_avg":float(np.mean(ht))}
+                     "total_avg":float(np.mean(ht)),
+                     "home_win":float(np.mean(hm>0)*100),
+                     "away_win":float(np.mean(hm<0)*100),
+                     "tie":float(np.mean(hm==0)*100),
+                     "home_win_ci":_wilson_interval(float(np.mean(hm>0)),trials),
+                     "away_win_ci":_wilson_interval(float(np.mean(hm<0)),trials)}
     if spread is not None:
         first_line=spread/2; fm=hm+first_line
         r["first_half"].update({"home_cover":float(np.mean(fm>0)*100),
@@ -336,7 +372,8 @@ def main():
                 print(f"AVAILABILITY WARNING: {row['team']} {row['player']} — {row['status']} ({row['reason']})")
         for warning in injury_context["warnings"]: print(f"INJURY NOTE: {warning}")
     ml_pick=h.name if r["home_win"]>=55 else (w.name if r["away_win"]>=55 else "PASS — no 55% win-probability edge")
-    print(f"\nMONEYLINE: {h.name} win {r['home_win']:.2f}% | {w.name} win {r['away_win']:.2f}% | tie {r['win_tie']:.2f}%")
+    print(f"\nMONEYLINE: {h.name} win {r['home_win']:.2f}% | {w.name} win {r['away_win']:.2f}% | tie after OT {r['win_tie']:.2f}%")
+    print(f"95% Monte Carlo interval: home {r['home_win_ci'][0]:.2f}-{r['home_win_ci'][1]:.2f}% | away {r['away_win_ci'][0]:.2f}-{r['away_win_ci'][1]:.2f}%")
     print(f"Moneyline pick: {ml_pick}")
     if a.home_ml_odds is not None:
         market=no_vig_probabilities(a.home_ml_odds,a.away_ml_odds)
@@ -362,6 +399,7 @@ def main():
         print("Total EV per $100 risked: over {0:+.2f} | under {1:+.2f}".format(expected_value_per_100(r["over"]/100,over_price,r["total_push"]/100),expected_value_per_100(r["under"]/100,under_price,r["total_push"]/100)))
     f=r["first_half"]
     print(f"\nFIRST HALF projected score: {h.name} {f['home_avg']:.1f} - {w.name} {f['away_avg']:.1f} | Total {f['total_avg']:.1f}")
+    print(f"First-half moneyline: {h.name} {f['home_win']:.2f}% (95% CI {f['home_win_ci'][0]:.2f}-{f['home_win_ci'][1]:.2f}%) | {w.name} {f['away_win']:.2f}% (95% CI {f['away_win_ci'][0]:.2f}-{f['away_win_ci'][1]:.2f}%) | tie {f['tie']:.2f}%")
     if a.spread is not None: print(f"First-half spread cover: home {f['home_cover']:.2f}% | away {f['away_cover']:.2f}% | push {f['spread_push']:.2f}%")
     if a.total is not None: print(f"First-half total: over {f['over']:.2f}% | under {f['under']:.2f}% | push {f['total_push']:.2f}%")
     print(f"\nDATA: {meta.get('season','unknown')} | updated {meta.get('updated_at','unknown')}")

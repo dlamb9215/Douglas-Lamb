@@ -23,7 +23,7 @@ jobs:
         run: python nba/update_stats.py
       - name: Validate data and engine
         run: |
-          python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule nba.test_odds nba.test_injuries nba.test_player_props
+          python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule nba.test_odds nba.test_injuries nba.test_player_props nba.test_player_props_backtest
           python -m nba.data_quality --data nba/team_stats.json --max-age-hours 72
       - name: Commit refreshed stats
         run: |

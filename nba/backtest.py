@@ -1,7 +1,7 @@
 """Evaluate archived NBA predictions against final scores and closing markets.
 
 CSV columns required: projected_home, projected_away, actual_home, actual_away.
-Optional: spread, total, home_cover_probability, over_probability,
+Optional: home_win_probability, spread, total, home_cover_probability, over_probability,
 closing_spread, closing_total. Probabilities are percentages (0-100).
 """
 import argparse, csv, json, math
@@ -33,9 +33,14 @@ def evaluate(path):
         item={"projected_home":ph,"projected_away":pa,"actual_home":ah,"actual_away":aa,
               "predicted_total":ph+pa,"actual_total":ah+aa,
               "predicted_margin":ph-pa,"actual_margin":ah-aa}
-        for key in ("spread","total","home_cover_probability","over_probability","closing_spread","closing_total"):
+        for key in ("home_win_probability","spread","total","home_cover_probability","over_probability","closing_spread","closing_total"):
             try: item[key]=float(r[key]) if r.get(key,"").strip() else None
             except ValueError: item[key]=None
+        for probability_key in ("home_win_probability", "home_cover_probability", "over_probability"):
+            probability = item.get(probability_key)
+            if probability is not None and not 0 <= probability <= 100:
+                raise ValueError(f"{probability_key} outside 0-100 on CSV row {i}")
+        item["home_win"] = (1 if item["actual_home"] > item["actual_away"] else 0) if item["actual_home"] != item["actual_away"] else None
         if item["spread"] is not None:
             item["home_cover"] = 1 if item["actual_margin"]+item["spread"]>0 else 0 if item["actual_margin"]+item["spread"]<0 else None
         if item["total"] is not None:
@@ -47,9 +52,10 @@ def evaluate(path):
       "total_points_mae":mean([abs(x["predicted_total"]-x["actual_total"]) for x in rows]),
       "margin_mae":mean([abs(x["predicted_margin"]-x["actual_margin"]) for x in rows]),
       "total_bias":mean([x["predicted_total"]-x["actual_total"] for x in rows]),
+      "moneyline_games":sum(x.get("home_win") is not None for x in rows),
       "spread_games":sum(x.get("home_cover") is not None for x in rows),
       "total_games":sum(x.get("over") is not None for x in rows)}
-    for key,outcome,name in (("home_cover_probability","home_cover","spread"),("over_probability","over","total")):
+    for key,outcome,name in (("home_win_probability","home_win","moneyline"),("home_cover_probability","home_cover","spread"),("over_probability","over","total")):
         eligible=[x for x in rows if x.get(key) is not None and x.get(outcome) is not None]
         if eligible:
             probs=[x[key]/100 for x in eligible]; actual=[x[outcome] for x in eligible]

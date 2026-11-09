@@ -1,5 +1,6 @@
 import unittest
-from nba.player_props import parse_gamelog, project_player, _walk_players
+from datetime import date, datetime, timezone, timedelta
+from nba.player_props import parse_gamelog, project_player, _walk_players, confirmed_minutes, build_matchup_player_projections, validate_lineup_context
 
 class TestNBAPlayerProps(unittest.TestCase):
     def test_roster_walker_ignores_team_objects(self):
@@ -54,6 +55,38 @@ class TestNBAPlayerProps(unittest.TestCase):
         self.assertIn("pra", result["projections"])
         self.assertIsNotNone(result["projections"]["points"]["over_probability"])
         self.assertGreater(result["projected_minutes"], 0)
+
+    def test_confirmed_lineup_gate(self):
+        self.assertEqual(confirmed_minutes({"confirmed": True, "status": "available", "minutes": 34, "minutes_sd": 2}),
+                         (34.0, 2.0, None))
+        self.assertIsNotNone(confirmed_minutes({"confirmed": False, "status": "available", "minutes": 34, "minutes_sd": 2})[2])
+        self.assertIsNotNone(confirmed_minutes({"confirmed": True, "status": "questionable", "minutes": 34, "minutes_sd": 2})[2])
+        self.assertIsNotNone(confirmed_minutes({"confirmed": True, "status": "available", "minutes": 34, "minutes_sd": 9})[2])
+
+    def test_confirmed_lineup_source_and_freshness_gate(self):
+        now = datetime(2026, 11, 9, 18, 0, tzinfo=timezone.utc)
+        valid = {"source": "official team lineup", "confirmed_at": "2026-11-09T17:30:00+00:00",
+                 "teams": {"BOS": {}, "NYK": {}}}
+        self.assertTrue(validate_lineup_context(valid, ["BOS", "NYK"], now)[0])
+        stale = dict(valid, confirmed_at="2026-11-08T00:00:00+00:00")
+        self.assertFalse(validate_lineup_context(stale, ["BOS", "NYK"], now)[0])
+        missing_source = dict(valid, source="")
+        self.assertFalse(validate_lineup_context(missing_source, ["BOS", "NYK"], now)[0])
+        missing_team = dict(valid, teams={"BOS": {}})
+        self.assertFalse(validate_lineup_context(missing_team, ["BOS", "NYK"], now)[0])
+
+    def test_player_props_withheld_without_confirmed_lineups(self):
+        result = build_matchup_player_projections("BOS", "NYK", date(2026, 11, 9))
+        self.assertEqual(result["teams"], {"BOS": [], "NY": []})
+        self.assertIn("withheld", result["warnings"][0].lower())
+
+    def test_confirmed_minutes_override_historical_minutes(self):
+        player = {"id": "1", "name": "Test Player", "position": "G"}
+        games = [{"minutes": 20, "points": 12, "rebounds": 3, "assists": 4} for _ in range(8)]
+        result = project_player(player, games, "Available", trials=5000, seed=4,
+                                confirmed_minutes=35, confirmed_minutes_sd=1.5)
+        self.assertEqual(result["projected_minutes"], 35)
+        self.assertEqual(result["minutes_source"], "confirmed game-specific input")
 
     def test_projector_rejects_small_samples_and_low_minutes(self):
         player = {"id": "1", "name": "Test Player", "position": "G"}
