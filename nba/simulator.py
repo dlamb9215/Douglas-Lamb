@@ -1,7 +1,7 @@
 """Doug's Elite NBA Simulator.
 
-Team-level Monte Carlo engine. Betting outputs are spreads and totals only.
-No player-prop projections or moneyline recommendations.
+Team-level Monte Carlo engine. Produces moneyline, spread, total and first-half probabilities.
+Experimental player props live in nba.elite_analytics.
 """
 from __future__ import annotations
 import argparse, json
@@ -97,9 +97,12 @@ def _factor_adjustment(t,o):
     return own+opp
 
 def matchup_projection(home,away,home_rest=2,away_rest=2,home_travel=0,away_travel=0,
-                       home_injury_points=0,away_injury_points=0):
+                       home_injury_points=0,away_injury_points=0,neutral_site=False):
     pace=(home.pace+away.pace)/2
-    if home.recent_pace is not None: pace=.8*pace+.2*(home.recent_pace+away.recent_pace if away.recent_pace is not None else home.recent_pace)/2
+    if home.recent_pace is not None or away.recent_pace is not None:
+        recent_home=home.recent_pace if home.recent_pace is not None else home.pace
+        recent_away=away.recent_pace if away.recent_pace is not None else away.pace
+        pace=.8*pace+.2*(recent_home+recent_away)/2
     h_off=home.home_off_rating or home.off_rating
     h_def=home.home_def_rating or home.def_rating
     a_off=away.road_off_rating or away.off_rating
@@ -108,7 +111,8 @@ def matchup_projection(home,away,home_rest=2,away_rest=2,home_travel=0,away_trav
     a_off=.85*a_off+.15*away.recent_off_rating if away.recent_off_rating is not None else a_off
     h_def=.85*h_def+.15*home.recent_def_rating if home.recent_def_rating is not None else h_def
     a_def=.85*a_def+.15*away.recent_def_rating if away.recent_def_rating is not None else a_def
-    he=(h_off+a_def)/2+_factor_adjustment(home,away)+_shot_profile_adjustment(home,away)+1.35
+    home_court=0.0 if neutral_site else 1.35
+    he=(h_off+a_def)/2+_factor_adjustment(home,away)+_shot_profile_adjustment(home,away)+home_court
     ae=(a_off+h_def)/2+_factor_adjustment(away,home)+_shot_profile_adjustment(away,home)
     # Small transparent schedule effects; capped to avoid exaggerated travel/rest adjustments.
     h_rest=max(0,min(3,home_rest-1))*0.35
@@ -123,7 +127,8 @@ def matchup_projection(home,away,home_rest=2,away_rest=2,home_travel=0,away_trav
     ap=pace*ae/100+away_injury_points
     return {"pace":pace,"home_efficiency":he,"away_efficiency":ae,
             "home_points":hp,"away_points":ap,"home_margin":hp-ap,
-            "total_points":hp+ap,"home_rest_adjustment":h_rest-h_b2b-h_travel,
+            "total_points":hp+ap,"home_court_points":home_court,"neutral_site":bool(neutral_site),
+            "home_rest_adjustment":h_rest-h_b2b-h_travel,
             "away_rest_adjustment":a_rest-a_b2b-a_travel}
 
 def _wilson_interval(probability,trials,z=1.96):
@@ -143,13 +148,13 @@ def _simulate_period(hmean,amean,pace,hsd,asd,trials,seed):
 
 def simulate(home,away,trials=1_000_000,seed=42,spread=None,total=None,
              home_rest=2,away_rest=2,home_travel=0,away_travel=0,
-             home_injury_points=0,away_injury_points=0):
+             home_injury_points=0,away_injury_points=0,neutral_site=False):
     if trials<1: raise ValueError("trials must be positive")
     if home_rest<0 or away_rest<0: raise ValueError("rest days cannot be negative")
     if spread is not None and not -40<=spread<=40: raise ValueError("spread outside supported range")
     if total is not None and not 120<=total<=350: raise ValueError("total outside supported range")
     p=matchup_projection(home,away,home_rest,away_rest,home_travel,away_travel,
-                         home_injury_points,away_injury_points)
+                         home_injury_points,away_injury_points,neutral_site)
     hsd=max(8.0,home.score_sd); asd=max(8.0,away.score_sd)
     hs,aws=_simulate_period(p["home_points"],p["away_points"],p["pace"],hsd,asd,trials,seed)
     # NBA games cannot finish tied. Resolve regulation ties with a stochastic
@@ -199,7 +204,10 @@ def simulate(home,away,trials=1_000_000,seed=42,spread=None,total=None,
     hm=hh-ha; ht=hh+ha
     r["first_half"]={"home_cover":None,"away_cover":None,
                      "home_avg":float(np.mean(hh)),"away_avg":float(np.mean(ha)),
-                     "total_avg":float(np.mean(ht))}
+                     "total_avg":float(np.mean(ht)),
+                     "home_win":float(np.mean(hm>0)*100),
+                     "away_win":float(np.mean(hm<0)*100),
+                     "tie":float(np.mean(hm==0)*100)}
     if spread is not None:
         first_line=spread/2; fm=hm+first_line
         r["first_half"].update({"home_cover":float(np.mean(fm>0)*100),
@@ -230,6 +238,7 @@ def main():
     ap.add_argument("--home-travel",type=float,default=0); ap.add_argument("--away-travel",type=float,default=0)
     ap.add_argument("--home-injury-points",type=float,default=0,help="Manual estimated team points lost to unavailable players")
     ap.add_argument("--away-injury-points",type=float,default=0)
+    ap.add_argument("--neutral-site",action="store_true",help="Disable home-court advantage for a neutral venue")
     ap.add_argument("--trials",type=int,default=1_000_000); ap.add_argument("--max-trials",type=int,default=5_000_000)
     ap.add_argument("--seed",type=int,default=42); ap.add_argument("--no-auto-refine",action="store_true"); ap.add_argument("--json-output",default="")
     a=ap.parse_args()
@@ -239,7 +248,7 @@ def main():
     if a.home.upper() not in teams or a.away.upper() not in teams: ap.error("Team abbreviation missing from NBA data")
     h,w=teams[a.home.upper()],teams[a.away.upper()]
     kwargs=dict(home_rest=a.home_rest,away_rest=a.away_rest,home_travel=a.home_travel,away_travel=a.away_travel,
-                home_injury_points=a.home_injury_points,away_injury_points=a.away_injury_points)
+                home_injury_points=a.home_injury_points,away_injury_points=a.away_injury_points,neutral_site=a.neutral_site)
     r=simulate(h,w,a.trials,a.seed,a.spread,a.total,**kwargs)
     close=abs(r["home_margin"]+ (a.spread or 0))<=3
     if a.spread is not None: close=close or 47<=r["home_cover"]<=53
@@ -250,6 +259,7 @@ def main():
     for t in (h,w):
         print(f"{t.name}: GP {t.games_played} | Pace {t.pace:.1f} | ORtg {t.off_rating:.1f} | DRtg {t.def_rating:.1f} | eFG {t.efg_pct:.3f} | TOV {t.tov_pct:.3f} | ORB {t.orb_pct:.3f} | FT rate {t.ft_rate:.3f} | 3PA rate {t.three_pa_rate if t.three_pa_rate is not None else float('nan'):.3f}")
     print(f"Projected pace {r['pace']:.1f} | Score {h.name} {r['home_points']:.1f} - {w.name} {r['away_points']:.1f}")
+    print(f"Venue: {'Neutral site' if r['neutral_site'] else 'Home court'} | Home-court adjustment {r['home_court_points']:.2f} points")
     print(f"Projected total {r['total_points']:.1f} | Home margin {r['home_margin']:+.1f}")
     print(f"Trials {r['trials']:,} | Seed {r['seed']} | Margin SD {r['margin_sd']:.1f}")
     print(f"Moneyline: {h.name} {r['home_win']:.2f}% (95% MC CI {r['home_win_ci'][0]:.2f}-{r['home_win_ci'][1]:.2f}%) | {w.name} {r['away_win']:.2f}%")
@@ -276,11 +286,12 @@ def main():
     f=r["first_half"]
     print(f"\nFIRST HALF projected score: {h.name} {f['home_avg']:.1f} - {w.name} {f['away_avg']:.1f} | Total {f['total_avg']:.1f}")
     if a.spread is not None: print(f"First-half spread cover: home {f['home_cover']:.2f}% | away {f['away_cover']:.2f}% | push {f['spread_push']:.2f}%")
+    print(f"First-half winner: {h.name} {f['home_win']:.2f}% | {w.name} {f['away_win']:.2f}% | tie {f['tie']:.2f}%")
     if a.total is not None: print(f"First-half total: over {f['over']:.2f}% | under {f['under']:.2f}% | push {f['total_push']:.2f}%")
     print(f"\nDATA: {meta.get('season','unknown')} | updated {meta.get('updated_at','unknown')}")
     print("Injury adjustment is manual unless an independently verified report is supplied.")
     print("Model status: estimates require out-of-sample backtesting before being treated as betting edges.")
     if a.json_output:
-        payload={"home_team":h.abbreviation,"away_team":w.abbreviation,"season":meta.get("season"),"data_updated_at":meta.get("updated_at"),"spread_line":a.spread,"total_line":a.total,"home_moneyline_odds":a.home_odds,"away_moneyline_odds":a.away_odds,"home_rest":a.home_rest,"away_rest":a.away_rest,"home_travel_miles":a.home_travel,"away_travel_miles":a.away_travel,"home_injury_points":a.home_injury_points,"away_injury_points":a.away_injury_points,"result":r}
+        payload={"home_team":h.abbreviation,"away_team":w.abbreviation,"season":meta.get("season"),"data_updated_at":meta.get("updated_at"),"spread_line":a.spread,"total_line":a.total,"home_moneyline_odds":a.home_odds,"away_moneyline_odds":a.away_odds,"home_rest":a.home_rest,"away_rest":a.away_rest,"home_travel_miles":a.home_travel,"away_travel_miles":a.away_travel,"home_injury_points":a.home_injury_points,"away_injury_points":a.away_injury_points,"neutral_site":a.neutral_site,"result":r}
         Path(a.json_output).write_text(json.dumps(payload,indent=2)+"\\n",encoding="utf-8")
 if __name__=="__main__": main()
