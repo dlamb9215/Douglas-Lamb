@@ -88,9 +88,9 @@ on:
         default: false
         type: boolean
       game_date:
-        description: Scheduled matchup date YYYY-MM-DD for ESPN rest and neutral-site context
+        description: Optional matchup date YYYY-MM-DD; blank uses today's NBA date in America/New_York
         required: false
-        default: "2026-11-08"
+        default: ""
         type: string
       home_injury_points:
         description: Manual home team points adjustment for unavailable players
@@ -147,11 +147,13 @@ jobs:
           AWAY_INJURY: ${{ inputs.away_injury_points }}
         run: |
           set -o pipefail
+          if [ -z "$GAME_DATE" ]; then GAME_DATE="$(TZ=America/New_York date +%F)"; fi
+          echo "NBA matchup date: $GAME_DATE (America/New_York)"
           args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --seed "$SEED" --home-rest "$HOME_REST" --away-rest "$AWAY_REST" --home-travel "$HOME_TRAVEL" --away-travel "$AWAY_TRAVEL" --home-injury-points "$HOME_INJURY" --away-injury-points "$AWAY_INJURY" --spread-odds "$SPREAD_ODDS" --total-odds "$TOTAL_ODDS" --json-output nba-simulation-results.json)
           if [ -n "$HOME_ML_ODDS" ] && [ -n "$AWAY_ML_ODDS" ]; then args+=(--home-ml-odds "$HOME_ML_ODDS" --away-ml-odds "$AWAY_ML_ODDS"); fi
           if [ -n "$SPREAD" ]; then args+=(--spread "$SPREAD"); fi
           if [ -n "$TOTAL" ]; then args+=(--total "$TOTAL"); fi
-          if [ -n "$GAME_DATE" ]; then args+=(--game-date "$GAME_DATE"); fi
+          args+=(--game-date "$GAME_DATE")
           if [ "$AUTO_INJURIES" = "true" ]; then args+=(--auto-injuries); fi
           if [ "$AUTO_ODDS" = "true" ]; then args+=(--auto-odds); fi
           python -m nba.simulator "${args[@]}" | tee nba-simulation-results.txt
@@ -164,7 +166,8 @@ jobs:
           GAME_DATE: ${{ inputs.game_date }}
           LINEUPS_JSON: ${{ inputs.confirmed_lineups_json }}
         run: |
-          test -n "$GAME_DATE" || { echo "game_date is required when player_props is enabled"; exit 1; }
+          if [ -z "$GAME_DATE" ]; then GAME_DATE="$(TZ=America/New_York date +%F)"; fi
+          echo "Player-prop matchup date: $GAME_DATE (America/New_York)"
           args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --date "$GAME_DATE" --season 2027 --trials 50000 --output nba-player-projections.json)
           if [ -n "$LINEUPS_JSON" ]; then
             python -c 'import json,os; json.loads(os.environ["LINEUPS_JSON"]); open("confirmed-lineups.json","w").write(os.environ["LINEUPS_JSON"])'
