@@ -5,12 +5,12 @@ on:
       home:
         description: Home team abbreviation
         required: true
-        default: "ATL"
+        default: "DET"
         type: string
       away:
         description: Away team abbreviation
         required: true
-        default: "LAL"
+        default: "WSH"
         type: string
       spread:
         description: Home spread, e.g. -3.5; blank to skip
@@ -50,12 +50,12 @@ on:
       home_rest:
         description: Home team days of rest before this game
         required: true
-        default: "1"
+        default: "0"
         type: string
       away_rest:
         description: Away team days of rest before this game
         required: true
-        default: "0"
+        default: "1"
         type: string
       home_travel:
         description: Home team travel miles since previous game (0 if unknown)
