@@ -53,4 +53,22 @@ class TestEliteAnalytics(unittest.TestCase):
         with self.assertRaises(ValueError):
             scenario_grid({"home":110},{"bad":{"away":-2}})
 
+    def test_rejects_non_finite_player_inputs_and_lines(self):
+        for field in ("minutes", "minutes_sd", "points_per_minute", "usage_multiplier"):
+            with self.subTest(field=field):
+                with self.assertRaises(ValueError):
+                    PlayerInput.from_dict(profile(**{field: float("nan")}))
+        with self.assertRaises(ValueError):
+            simulate_player_props(profile(), trials=1000, lines={"points": float("inf")})
+        with self.assertRaises(ValueError):
+            simulate_player_props(profile(), trials=1000, lines={"steals": 1.5})
+
+    def test_rejects_non_finite_odds_and_scenario_values(self):
+        with self.assertRaises(ValueError):
+            american_implied_probability(float("nan"))
+        with self.assertRaises(ValueError):
+            expected_value_per_100(50, float("inf"))
+        with self.assertRaises(ValueError):
+            scenario_grid({"home": 110}, {"bad": {"home": float("nan")}})
+
 if __name__=="__main__": unittest.main()
