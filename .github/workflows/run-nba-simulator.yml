@@ -59,6 +59,14 @@ on:
         required: true
         default: "0"
         type: string
+      neutral_site:
+        description: Disable home-court adjustment for a neutral venue
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
       trials:
         description: Baseline Monte Carlo trials
         required: true
@@ -100,12 +108,14 @@ jobs:
           HOME_INJURY: ${{ inputs.home_injury_points }}
           AWAY_INJURY: ${{ inputs.away_injury_points }}
           TRIALS: ${{ inputs.trials }}
+          NEUTRAL_SITE: ${{ inputs.neutral_site }}
         run: |
           args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --home-rest "$HOME_REST" --away-rest "$AWAY_REST" --home-travel "$HOME_TRAVEL" --away-travel "$AWAY_TRAVEL" --home-injury-points "$HOME_INJURY" --away-injury-points "$AWAY_INJURY" --trials "$TRIALS" --json-output nba-matchup-results.json)
           [[ -n "$SPREAD" ]] && args+=(--spread "$SPREAD")
           [[ -n "$TOTAL" ]] && args+=(--total "$TOTAL")
           [[ -n "$HOME_ODDS" ]] && args+=(--home-odds "$HOME_ODDS")
           [[ -n "$AWAY_ODDS" ]] && args+=(--away-odds "$AWAY_ODDS")
+          [[ "$NEUTRAL_SITE" == "true" ]] && args+=(--neutral-site)
           python -m nba.simulator "${args[@]}" | tee nba-matchup-report.txt
       - name: Upload matchup report
         if: always()
