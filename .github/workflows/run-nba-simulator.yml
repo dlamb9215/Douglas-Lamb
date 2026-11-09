@@ -1,0 +1,118 @@
+name: Run Doug's Elite NBA Simulator
+
+on:
+  workflow_dispatch:
+    inputs:
+      home:
+        description: Home team abbreviation
+        required: true
+        default: BOS
+        type: string
+      away:
+        description: Away team abbreviation
+        required: true
+        default: NYK
+        type: string
+      spread:
+        description: Actual home spread (optional, e.g. -4.5)
+        required: false
+        type: string
+      total:
+        description: Actual full-game total (optional)
+        required: false
+        type: string
+      home_odds:
+        description: Home moneyline American odds (optional)
+        required: false
+        type: string
+      away_odds:
+        description: Away moneyline American odds (optional)
+        required: false
+        type: string
+      home_rest:
+        description: Home team rest days
+        required: true
+        default: "2"
+        type: string
+      away_rest:
+        description: Away team rest days
+        required: true
+        default: "2"
+        type: string
+      home_travel:
+        description: Home team travel miles (only if verified)
+        required: true
+        default: "0"
+        type: string
+      away_travel:
+        description: Away team travel miles (only if verified)
+        required: true
+        default: "0"
+        type: string
+      home_injury_points:
+        description: Evidence-based home points adjustment
+        required: true
+        default: "0"
+        type: string
+      away_injury_points:
+        description: Evidence-based away points adjustment
+        required: true
+        default: "0"
+        type: string
+      trials:
+        description: Baseline Monte Carlo trials
+        required: true
+        default: "1000000"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip numpy
+      - name: Refresh live NBA team data
+        run: python -m nba.update_stats
+      - name: Run NBA engine tests
+        run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_elite_analytics nba.test_player_props_backtest
+      - name: Run requested matchup
+        env:
+          HOME_TEAM: ${{ inputs.home }}
+          AWAY_TEAM: ${{ inputs.away }}
+          SPREAD: ${{ inputs.spread }}
+          TOTAL: ${{ inputs.total }}
+          HOME_ODDS: ${{ inputs.home_odds }}
+          AWAY_ODDS: ${{ inputs.away_odds }}
+          HOME_REST: ${{ inputs.home_rest }}
+          AWAY_REST: ${{ inputs.away_rest }}
+          HOME_TRAVEL: ${{ inputs.home_travel }}
+          AWAY_TRAVEL: ${{ inputs.away_travel }}
+          HOME_INJURY: ${{ inputs.home_injury_points }}
+          AWAY_INJURY: ${{ inputs.away_injury_points }}
+          TRIALS: ${{ inputs.trials }}
+        run: |
+          args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --home-rest "$HOME_REST" --away-rest "$AWAY_REST" --home-travel "$HOME_TRAVEL" --away-travel "$AWAY_TRAVEL" --home-injury-points "$HOME_INJURY" --away-injury-points "$AWAY_INJURY" --trials "$TRIALS" --json-output nba-matchup-results.json)
+          [[ -n "$SPREAD" ]] && args+=(--spread "$SPREAD")
+          [[ -n "$TOTAL" ]] && args+=(--total "$TOTAL")
+          [[ -n "$HOME_ODDS" ]] && args+=(--home-odds "$HOME_ODDS")
+          [[ -n "$AWAY_ODDS" ]] && args+=(--away-odds "$AWAY_ODDS")
+          python -m nba.simulator "${args[@]}" | tee nba-matchup-report.txt
+      - name: Upload matchup report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nba-matchup-results
+          path: |
+            nba-matchup-report.txt
+            nba-matchup-results.json
+          if-no-files-found: warn
