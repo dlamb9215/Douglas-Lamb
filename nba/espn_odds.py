@@ -99,10 +99,10 @@ def parse_espn_bet_row(row: dict[str, Any]) -> dict[str, Any]:
     ))
     total = _number(_first(row, "current_total_value", "over_under", "overUnder"))
     home_spread_price = _american(_first(
-        row, "home_team_odds_spread_odds", "home_team_odds_current_spread_american"
+        row, "home_team_odds_current_spread_american", "home_team_odds_spread_odds"
     ))
     away_spread_price = _american(_first(
-        row, "away_team_odds_spread_odds", "away_team_odds_current_spread_american"
+        row, "away_team_odds_current_spread_american", "away_team_odds_spread_odds"
     ))
     over_price = _american(_first(row, "current_over_american", "over_odds"))
     under_price = _american(_first(row, "current_under_american", "under_odds"))
