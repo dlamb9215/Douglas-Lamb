@@ -77,7 +77,7 @@ class TestNBAPlayerProps(unittest.TestCase):
 
     def test_player_props_withheld_without_confirmed_lineups(self):
         result = build_matchup_player_projections("BOS", "NYK", date(2026, 11, 9))
-        self.assertEqual(result["teams"], {"BOS": [], "NYK": []})
+        self.assertEqual(result["teams"], {"BOS": [], "NY": []})
         self.assertIn("withheld", result["warnings"][0].lower())
 
     def test_confirmed_minutes_override_historical_minutes(self):
