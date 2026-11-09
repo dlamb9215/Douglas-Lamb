@@ -1,6 +1,6 @@
 # Doug's Elite NBA Simulator
 
-A professional-style NBA forecasting and betting-analysis toolkit. The team engine and the experimental player-prop engine are separate so unsupported player inputs cannot contaminate team projections.
+A professional-style NBA forecasting and betting-analysis toolkit. The team engine and experimental player-prop engine are separate so unsupported player inputs cannot contaminate team projections.
 
 ## Team engine
 - Pace × opponent-adjusted offensive/defensive efficiency.
@@ -8,7 +8,7 @@ A professional-style NBA forecasting and betting-analysis toolkit. The team engi
 - Prior-season shrinkage, recent form, home/road splits, 3-point shot profile, rest and travel adjustments when valid data is supplied.
 - Full-game and first-half correlated Monte Carlo score distributions.
 - 1,000,000-trial default; configurable up to 5,000,000 for close decisions.
-- Spread and game-total probabilities, push rates, score/margin/total projections, model-line edge and Monte Carlo confidence intervals.
+- Moneyline, spread and game-total probabilities, push rates, score/margin/total projections, model-line edge and Monte Carlo confidence intervals. Regulation ties are resolved with a transparent stochastic overtime approximation.
 - Fixed seeds and JSON output for reproducibility.
 - PASS-first decision rule: a lean requires both a minimum probability and minimum line edge. No alternate lines are generated.
 - Injury point adjustments are explicit inputs; they must be sourced from verified player availability and impact analysis.
@@ -55,13 +55,13 @@ Current known data limitations:
 4. Keep the default 1,000,000 trials; close decisions can refine to 5,000,000.
 5. Download the text/JSON artifacts.
 
-Home spread convention: enter the home team's market line, e.g. -4.5 when the home team is favored. Do not use alternate lines.
+Home spread convention: enter the home team's market line, e.g. -4.5 when the home team is favored. Do not use alternate lines. For a moneyline comparison, supply both `--home-odds` and `--away-odds`; the report removes the two-way vig before comparing market and model probabilities.
 
 ## Run locally
 ```bash
 python -m pip install numpy
 python -m unittest -v nba.test_simulator nba.test_backtest nba.test_elite_analytics
-python -m nba.simulator --home BOS --away NYK --spread -3.5 --total 221.5 --trials 1000000
+python -m nba.simulator --home BOS --away NYK --spread -3.5 --total 221.5 --home-odds -150 --away-odds 130 --trials 1000000
 ```
 
 ## Backtesting and calibration
