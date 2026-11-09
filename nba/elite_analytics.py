@@ -88,7 +88,7 @@ class PlayerInput:
 
 
 def _normal_counts(rng, mean, sd, n):
-    return np.maximum(0.0, rng.normal(mean, max(sd, 0.05), n))
+    return np.maximum(0.0, rng.normal(mean, np.maximum(sd, 0.05), n))
 
 
 def simulate_player_props(raw: dict[str, Any] | PlayerInput, trials: int = 200_000,
