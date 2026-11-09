@@ -196,7 +196,7 @@ def fetch_official_injuries(game_date: date, home: str, away: str, season: int =
         report_url = latest_report_url(game_date, season)
         pdf = _get(report_url)
         reader = PdfReader(io.BytesIO(pdf))
-        report_text = "\\n".join(page.extract_text() or "" for page in reader.pages)
+        report_text = "\n".join(page.extract_text() or "" for page in reader.pages)
         parsed = parse_report_text(report_text, target_teams)
         if not parsed["players"] and not parsed["team_submission"]:
             raise RuntimeError("Official injury report downloaded but requested teams could not be parsed")
