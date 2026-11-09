@@ -50,6 +50,8 @@ class TestNBAEngine(unittest.TestCase):
         self.assertIn("home_win",r["first_half"])
         self.assertIn("away_win",r["first_half"])
         self.assertIn("tie",r["first_half"])
+        self.assertEqual(len(r["first_half"]["home_win_ci"]),2)
+        self.assertEqual(len(r["first_half"]["away_win_ci"]),2)
         self.assertAlmostEqual(r["first_half"]["home_win"]+r["first_half"]["away_win"]+r["first_half"]["tie"],100,places=6)
         self.assertAlmostEqual(r["first_half"]["home_cover"]+r["first_half"]["away_cover"]+r["first_half"]["spread_push"],100,places=6)
         self.assertAlmostEqual(r["first_half"]["over"]+r["first_half"]["under"]+r["first_half"]["total_push"],100,places=6)
