@@ -1,58 +1,75 @@
 # Doug's Elite NBA Simulator
 
-A team-level NBA forecasting and betting-analysis engine. It is separate from the NFL simulator.
+A professional-style NBA forecasting and betting-analysis toolkit. The team engine and the experimental player-prop engine are separate so unsupported player inputs cannot contaminate team projections.
 
-## Included model features
-- Matchup pace estimate and offensive rating versus opposing defensive rating.
-- NBA Four Factors: effective field-goal percentage, turnover rate, offensive rebounding rate and free-throw rate, plus opponent-side factors.
-- Full-season statistics blended with the prior season using an eight-game prior weight.
-- Recent 10-game offensive/defensive rating and pace, shrunk 30% toward the season baseline.
-- Home/road offensive and defensive ratings, shrunk toward the full-season baseline when venue samples are small.
-- Historical team scoring variance estimated from team game logs and blended with prior-season variance.
-- Schedule adjustments for rest, back-to-backs and travel distance.
-- Team-level injury/availability point adjustments supplied as explicit inputs; the simulator does not pretend to verify injuries automatically.
-- Correlated full-game and first-half Monte Carlo score distributions.
-- Spread and total probabilities, pushes, projected score, projected margin, projected total, and model-vs-line edge.
-- 1,000,000 baseline trials; borderline matchups refine to 5,000,000 trials.
-- Fixed seeds and machine-readable JSON output for auditability.
-- Betting leans require both at least 55% model probability and at least 1.5 points of model line edge. Otherwise the output is PASS.
-- Historical evaluation utility reports point MAE, margin/total MAE, Brier score, log loss, calibration buckets, hit rates and optional closing-line movement.
+## Team engine
+- Pace × opponent-adjusted offensive/defensive efficiency.
+- NBA Four Factors: eFG%, turnover rate, offensive rebounding rate and free-throw rate.
+- Prior-season shrinkage, recent form, home/road splits, 3-point shot profile, rest and travel adjustments when valid data is supplied.
+- Full-game and first-half correlated Monte Carlo score distributions.
+- 1,000,000-trial default; configurable up to 5,000,000 for close decisions.
+- Spread and game-total probabilities, push rates, score/margin/total projections, model-line edge and Monte Carlo confidence intervals.
+- Fixed seeds and JSON output for reproducibility.
+- PASS-first decision rule: a lean requires both a minimum probability and minimum line edge. No alternate lines are generated.
+- Injury point adjustments are explicit inputs; they must be sourced from verified player availability and impact analysis.
 
-## User-specific output scope
-This is team-level only: no player-prop projections, player-prop data pipeline or moneyline recommendations. Betting outputs are spreads and game totals, full game and first half. No alternate spreads are created.
+## Experimental player-prop engine
+The new `nba/elite_analytics.py` module provides points, rebounds, assists and PRA distributions using supplied per-minute production rates, projected minutes, minutes uncertainty, usage and matchup multipliers. It also provides two-way no-vig conversion and expected value per $100 risked.
 
-## Refresh data
-Run the **Update NBA Statistics** workflow. It requests NBA.com Stats Advanced and Four Factors data for the current and prior seasons, plus current-season last-10 and home/road splits, plus historical team game logs for score-variance estimates. The updater validates all 30 teams and writes only after every request and data check succeeds. It retries temporary request failures and preserves the last good file if a refresh fails.
+**Strict eligibility gate:** Out, doubtful, questionable, inactive, suspended or unknown players are excluded. A player must be explicitly marked available/probable, have a confirmed lineup, and have a sufficiently stable minutes projection. The code does not fetch or verify these facts automatically. It does not invent player inputs.
 
-The scheduled updater uses the 2026-27 season and 2025-26 as the prior baseline. Confirm the season settings when a new season begins. NBA Stats can rate-limit hosted runners; a failed refresh is not silently treated as current data.
+Run it with a verified JSON file:
+```bash
+python -m nba.player_props_cli --input player-projection.json --trials 200000
+```
+Example input schema:
+```json
+{
+  "player": "Example Player",
+  "team": "BOS",
+  "status": "available",
+  "lineup_confirmed": true,
+  "minutes": 34,
+  "minutes_sd": 2.5,
+  "points_per_minute": 0.72,
+  "rebounds_per_minute": 0.18,
+  "assists_per_minute": 0.20,
+  "lines": {"points": 24.5, "rebounds": 6.5, "assists": 5.5, "pra": 36.5}
+}
+```
+These player distributions are an experimental baseline, not yet a calibrated betting model. Do not use them as recommendations until the player game-log pipeline, rotation/minutes projections, injury/lineup feed, and out-of-sample prop backtests have been completed.
+
+## Data pipeline and freshness
+Run **Update NBA Statistics** before a slate. The updater requests NBA.com Stats current/prior season advanced and Four Factors data, recent form, venue splits and game-log variance; it validates all teams before replacing the last-good file. NBA.com Stats can rate-limit hosted runners. A successful data refresh does not itself prove model accuracy.
+
+Current known data limitations:
+- Some opponent and 3-point splits may be unavailable from the upstream source.
+- Official injury report ingestion, verified starting lineups, player-minute rotations and player impact estimates are not yet automatically integrated into the team engine.
+- Travel and injury impacts must not be guessed.
+- A million simulations reduce random simulation noise; they do not repair biased inputs or a misspecified model.
 
 ## Run on GitHub
-1. Open Actions.
-2. Run **Update NBA Statistics** and confirm it completes successfully.
-3. Run **Run Doug's Elite NBA Simulator**.
-4. Enter home/away abbreviations, sportsbook home spread and total, rest days, approximate travel miles, and manual team-level injury point adjustments.
-5. Keep the default 1,000,000 trials. The engine increases borderline runs to 5,000,000.
-6. Download the text and JSON results artifact.
+1. Open Actions and run **Update NBA Statistics**; confirm it succeeds.
+2. Run **Run Doug's Elite NBA Simulator**.
+3. Enter the actual home/away teams, market spread and total, rest/travel context and evidence-based injury adjustments.
+4. Keep the default 1,000,000 trials; close decisions can refine to 5,000,000.
+5. Download the text/JSON artifacts.
 
-Spread convention: enter the home team's sportsbook line (for example, -4.5 when the home team is favored). Enter only the actual market line; no alternate line recommendations are generated.
+Home spread convention: enter the home team's market line, e.g. -4.5 when the home team is favored. Do not use alternate lines.
 
 ## Run locally
 ```bash
 python -m pip install numpy
-python -m unittest -v nba.test_simulator nba.test_backtest
+python -m unittest -v nba.test_simulator nba.test_backtest nba.test_elite_analytics
 python -m nba.simulator --home BOS --away NYK --spread -3.5 --total 221.5 --trials 1000000
 ```
 
-## Historical validation
-Build a CSV of archived pregame predictions and final scores with the columns described in `nba/backtest.py`. Run:
+## Backtesting and calibration
+Archive predictions before tipoff and pair them with actual final scores and closing lines. Then run:
 ```bash
 python -m nba.backtest --csv nba/historical_predictions.csv
 ```
-Do not call the model calibrated until it has enough chronologically separated out-of-sample games and its calibration, Brier score, log loss, MAE and closing-line value have been reviewed. The backtest script evaluates data supplied to it; it does not fabricate historical predictions or results.
+Review points/margin/total MAE, Brier score, log loss, calibration buckets, hit rate and closing-line value. Require chronological out-of-sample validation; never tune and evaluate on the same games. A model is not betting-ready simply because unit tests pass or the simulation completes.
 
-## Known limitations
-- Team-level injury point adjustments are manual. No official inactive/lineup feed is currently integrated.
-- Schedule rest and travel are inputs; they are not yet fetched and verified automatically from the NBA schedule.
-- No live sportsbook line ingestion, player rotations, player props, or play-by-play possession simulation.
-- The score distribution is a transparent approximation pending fitting against historical game residuals. One million trials reduce Monte Carlo sampling noise; they do not correct bad inputs or model misspecification.
-- Probabilities are estimates, not guaranteed outcomes or proof of a profitable betting edge.
+## CI
+The NBA Elite Simulator CI workflow runs unit tests, validates all 30 team records and runs a reproducible one-million-trial smoke matchup. CI passing validates software execution, not predictive edge.
