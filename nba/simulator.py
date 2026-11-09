@@ -4,7 +4,7 @@ Team-level Monte Carlo engine. Outputs include moneyline, spread, and total pick
 No player-prop projections.
 """
 from __future__ import annotations
-import argparse, json
+import argparse, json, sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -92,9 +92,6 @@ def load_team_stats(path="nba/team_stats.json"):
     return teams,data
 
 def _shot_profile_adjustment(t,o):
-    # Small, capped correction for the offense's 3P accuracy and the defense's
-    # 3P accuracy/attempt profile allowed. eFG already captures much of this,
-    # so the adjustment is deliberately conservative to limit double-counting.
     offense_pct=t.fg3_pct if t.fg3_pct is not None else .36
     defense_pct=o.opp_fg3_pct if o.opp_fg3_pct is not None else .36
     own_rate=t.three_pa_rate if t.three_pa_rate is not None else .39
@@ -127,164 +124,118 @@ def matchup_projection(home,away,home_rest=2,away_rest=2,home_travel=0,away_trav
     home_court=0.0 if neutral_site else 1.35
     he=(h_off+a_def)/2+_factor_adjustment(home,away)+_shot_profile_adjustment(home,away)+home_court
     ae=(a_off+h_def)/2+_factor_adjustment(away,home)+_shot_profile_adjustment(away,home)
-    # Small transparent schedule effects; capped to avoid exaggerated travel/rest adjustments.
-    h_rest=max(0,min(3,home_rest-1))*0.35
-    a_rest=max(0,min(3,away_rest-1))*0.35
+    h_rest=max(0,min(3,home_rest-1))*.35
+    a_rest=max(0,min(3,away_rest-1))*.35
     h_b2b=1.0 if home_rest<=0 else 0.0
     a_b2b=1.0 if away_rest<=0 else 0.0
-    h_travel=min(max(home_travel,0)/1000,2)*0.35
-    a_travel=min(max(away_travel,0)/1000,2)*0.35
+    h_travel=min(max(home_travel,0)/1000,2)*.35
+    a_travel=min(max(away_travel,0)/1000,2)*.35
     he += (h_rest-h_b2b-h_travel) * 100/pace
     ae += (a_rest-a_b2b-a_travel) * 100/pace
     hp=pace*he/100+home_injury_points
     ap=pace*ae/100+away_injury_points
-    return {"pace":pace,"home_efficiency":he,"away_efficiency":ae,
-            "home_points":hp,"away_points":ap,"home_margin":hp-ap,"home_court_points":home_court,"neutral_site":bool(neutral_site),
-            "total_points":hp+ap,"home_rest_adjustment":h_rest-h_b2b-h_travel,
-            "away_rest_adjustment":a_rest-a_b2b-a_travel}
+    return {"pace":pace,"home_efficiency":he,"away_efficiency":ae,"home_points":hp,"away_points":ap,
+            "home_margin":hp-ap,"home_court_points":home_court,"neutral_site":bool(neutral_site),"total_points":hp+ap,
+            "home_rest_adjustment":h_rest-h_b2b-h_travel,"away_rest_adjustment":a_rest-a_b2b-a_travel}
 
 def _wilson_interval(probability,trials,z=1.96):
-    p=min(1.0,max(0.0,probability))
-    denom=1+z*z/trials
+    p=min(1.0,max(0.0,probability)); denom=1+z*z/trials
     center=(p+z*z/(2*trials))/denom
     radius=z*((p*(1-p)/trials+z*z/(4*trials*trials))**.5)/denom
     return [max(0.0,(center-radius)*100),min(100.0,(center+radius)*100)]
 
 def _simulate_period(hmean,amean,pace,hsd,asd,trials,seed):
-    rng=np.random.default_rng(seed)
-    # A shared pace/game-environment shock induces realistic positive scoring correlation.
-    pace_shock=rng.normal(0,0.025,trials)
-    h=rng.normal(hmean*(1+pace_shock),hsd,trials)
-    a=rng.normal(amean*(1+pace_shock),asd,trials)
+    rng=np.random.default_rng(seed); pace_shock=rng.normal(0,.025,trials)
+    h=rng.normal(hmean*(1+pace_shock),hsd,trials); a=rng.normal(amean*(1+pace_shock),asd,trials)
     return np.maximum(0,np.rint(h)).astype(np.int16),np.maximum(0,np.rint(a)).astype(np.int16)
 
-def _resolve_overtime(home_scores, away_scores, home_mean, away_mean,
-                     home_efficiency, away_efficiency, seed):
-    """Resolve regulation ties with stochastic five-minute NBA overtime periods."""
-    tied = np.flatnonzero(home_scores == away_scores)
-    if not tied.size:
-        return home_scores, away_scores
-    rng = np.random.default_rng(seed)
+def _resolve_overtime(home_scores,away_scores,home_mean,away_mean,home_efficiency,away_efficiency,seed):
+    tied=np.flatnonzero(home_scores==away_scores)
+    if not tied.size: return home_scores,away_scores
+    rng=np.random.default_rng(seed)
     for _ in range(10):
-        still = tied[home_scores[tied] == away_scores[tied]]
-        if not still.size:
-            break
-        home_ot = rng.poisson(max(0.5, home_mean * 5 / 48), still.size)
-        away_ot = rng.poisson(max(0.5, away_mean * 5 / 48), still.size)
-        home_scores[still] += home_ot.astype(home_scores.dtype)
-        away_scores[still] += away_ot.astype(away_scores.dtype)
-    still = np.flatnonzero(home_scores == away_scores)
+        still=tied[home_scores[tied]==away_scores[tied]]
+        if not still.size: break
+        home_ot=rng.poisson(max(.5,home_mean*5/48),still.size)
+        away_ot=rng.poisson(max(.5,away_mean*5/48),still.size)
+        home_scores[still]+=home_ot.astype(home_scores.dtype); away_scores[still]+=away_ot.astype(away_scores.dtype)
+    still=np.flatnonzero(home_scores==away_scores)
     if still.size:
-        home_win = rng.random(still.size) < (
-            home_efficiency / (home_efficiency + away_efficiency)
-        )
-        home_scores[still] += home_win.astype(home_scores.dtype)
-        away_scores[still] += (~home_win).astype(away_scores.dtype)
-    return home_scores, away_scores
+        home_win=rng.random(still.size)<home_efficiency/(home_efficiency+away_efficiency)
+        home_scores[still]+=home_win.astype(home_scores.dtype); away_scores[still]+=(~home_win).astype(away_scores.dtype)
+    return home_scores,away_scores
 
-
-def simulate(home,away,trials=1_000_000,seed=42,spread=None,total=None,
-             home_rest=2,away_rest=2,home_travel=0,away_travel=0,
-             home_injury_points=0,away_injury_points=0,neutral_site=False):
+def simulate(home,away,trials=1_000_000,seed=42,spread=None,total=None,home_rest=2,away_rest=2,
+             home_travel=0,away_travel=0,home_injury_points=0,away_injury_points=0,neutral_site=False):
     if trials<1: raise ValueError("trials must be positive")
     if home_rest<0 or away_rest<0: raise ValueError("rest days cannot be negative")
     if spread is not None and not -40<=spread<=40: raise ValueError("spread outside supported range")
     if total is not None and not 120<=total<=350: raise ValueError("total outside supported range")
-    p=matchup_projection(home,away,home_rest,away_rest,home_travel,away_travel,
-                         home_injury_points,away_injury_points,neutral_site)
-    hsd=max(8.0,home.score_sd); asd=max(8.0,away.score_sd)
+    p=matchup_projection(home,away,home_rest,away_rest,home_travel,away_travel,home_injury_points,away_injury_points,neutral_site)
+    hsd=max(8.,home.score_sd); asd=max(8.,away.score_sd)
     hs,aws=_simulate_period(p["home_points"],p["away_points"],p["pace"],hsd,asd,trials,seed)
-    hs,aws=_resolve_overtime(hs,aws,p["home_points"],p["away_points"],
-                             p["home_efficiency"],p["away_efficiency"],seed+700)
-    margin=hs-aws; combined=hs+aws
-    home_win_probability=float(np.mean(margin>0))
-    r={**p,"trials":trials,"seed":seed,"home_win":home_win_probability*100,
-       "away_win":float(np.mean(margin<0)*100),"win_tie":float(np.mean(margin==0)*100),
-       "home_win_ci":_wilson_interval(home_win_probability,trials),
+    hs,aws=_resolve_overtime(hs,aws,p["home_points"],p["away_points"],p["home_efficiency"],p["away_efficiency"],seed+700)
+    margin=hs-aws; combined=hs+aws; home_win_probability=float(np.mean(margin>0))
+    r={**p,"trials":trials,"seed":seed,"home_win":home_win_probability*100,"away_win":float(np.mean(margin<0)*100),
+       "win_tie":float(np.mean(margin==0)*100),"home_win_ci":_wilson_interval(home_win_probability,trials),
        "away_win_ci":_wilson_interval(float(np.mean(margin<0)),trials),"home_avg":float(np.mean(hs)),
-       "away_avg":float(np.mean(aws)),"total_avg":float(np.mean(combined)),
-       "margin_sd":float(np.std(margin,ddof=1))}
+       "away_avg":float(np.mean(aws)),"total_avg":float(np.mean(combined)),"margin_sd":float(np.std(margin,ddof=1))}
     if spread is not None:
-        # sportsbook home line is conventionally negative for a favorite
         adj=margin+spread
-        r.update({"spread":spread,"home_cover":float(np.mean(adj>0)*100),
-                  "away_cover":float(np.mean(adj<0)*100),"spread_push":float(np.mean(adj==0)*100),
-                  "spread_edge_points":float(p["home_margin"]+spread),
-                  "home_cover_ci":_wilson_interval(float(np.mean(adj>0)),trials),
-                  "away_cover_ci":_wilson_interval(float(np.mean(adj<0)),trials)})
+        r.update({"spread":spread,"home_cover":float(np.mean(adj>0)*100),"away_cover":float(np.mean(adj<0)*100),
+                  "spread_push":float(np.mean(adj==0)*100),"spread_edge_points":float(p["home_margin"]+spread),
+                  "home_cover_ci":_wilson_interval(float(np.mean(adj>0)),trials),"away_cover_ci":_wilson_interval(float(np.mean(adj<0)),trials)})
     if total is not None:
-        r.update({"total":total,"over":float(np.mean(combined>total)*100),
-                  "under":float(np.mean(combined<total)*100),"total_push":float(np.mean(combined==total)*100),
-                  "total_edge_points":float(p["total_points"]-total),
-                  "over_ci":_wilson_interval(float(np.mean(combined>total)),trials),
-                  "under_ci":_wilson_interval(float(np.mean(combined<total)),trials)})
-    hh,ha=_simulate_period(p["home_points"]/2,p["away_points"]/2,p["pace"]/2,
-                           hsd/np.sqrt(2),asd/np.sqrt(2),trials,seed+1)
+        r.update({"total":total,"over":float(np.mean(combined>total)*100),"under":float(np.mean(combined<total)*100),
+                  "total_push":float(np.mean(combined==total)*100),"total_edge_points":float(p["total_points"]-total),
+                  "over_ci":_wilson_interval(float(np.mean(combined>total)),trials),"under_ci":_wilson_interval(float(np.mean(combined<total)),trials)})
+    hh,ha=_simulate_period(p["home_points"]/2,p["away_points"]/2,p["pace"]/2,hsd/np.sqrt(2),asd/np.sqrt(2),trials,seed+1)
     hm=hh-ha; ht=hh+ha
-    r["first_half"]={"home_cover":None,"away_cover":None,
-                     "home_avg":float(np.mean(hh)),"away_avg":float(np.mean(ha)),
-                     "total_avg":float(np.mean(ht)),
-                     "home_win":float(np.mean(hm>0)*100),
-                     "away_win":float(np.mean(hm<0)*100),
-                     "tie":float(np.mean(hm==0)*100),
-                     "home_win_ci":_wilson_interval(float(np.mean(hm>0)),trials),
+    r["first_half"]={"home_cover":None,"away_cover":None,"home_avg":float(np.mean(hh)),"away_avg":float(np.mean(ha)),
+                     "total_avg":float(np.mean(ht)),"home_win":float(np.mean(hm>0)*100),"away_win":float(np.mean(hm<0)*100),
+                     "tie":float(np.mean(hm==0)*100),"home_win_ci":_wilson_interval(float(np.mean(hm>0)),trials),
                      "away_win_ci":_wilson_interval(float(np.mean(hm<0)),trials)}
     if spread is not None:
-        first_line=spread/2; fm=hm+first_line
-        r["first_half"].update({"home_cover":float(np.mean(fm>0)*100),
-                                "away_cover":float(np.mean(fm<0)*100),"spread_push":float(np.mean(fm==0)*100)})
+        fm=hm+spread/2
+        r["first_half"].update({"home_cover":float(np.mean(fm>0)*100),"away_cover":float(np.mean(fm<0)*100),"spread_push":float(np.mean(fm==0)*100)})
     if total is not None:
-        r["first_half"].update({"over":float(np.mean(ht>total/2)*100),
-                                "under":float(np.mean(ht<total/2)*100),"total_push":float(np.mean(ht==total/2)*100)})
+        r["first_half"].update({"over":float(np.mean(ht>total/2)*100),"under":float(np.mean(ht<total/2)*100),"total_push":float(np.mean(ht==total/2)*100)})
     return r
 
 def implied_probability(odds):
-    """Convert American odds to raw implied probability (vig included)."""
     odds=float(odds)
     if odds==0: raise ValueError("American odds cannot be zero")
     return 100/(odds+100) if odds>0 else abs(odds)/(abs(odds)+100)
 
-def no_vig_probabilities(home_odds, away_odds):
-    """Proportional two-way no-vig probabilities from paired American prices."""
-    hp=implied_probability(home_odds); ap=implied_probability(away_odds)
-    hold=hp+ap
+def no_vig_probabilities(home_odds,away_odds):
+    hp=implied_probability(home_odds); ap=implied_probability(away_odds); hold=hp+ap
     return {"home":hp/hold,"away":ap/hold,"market_hold":hold-1}
 
-def expected_value_per_100(probability, american_odds, push_probability=0.0):
-    """Expected net profit per $100 risked; pushes return the stake (zero net)."""
+def expected_value_per_100(probability,american_odds,push_probability=0.):
     p=float(probability); push=float(push_probability); odds=float(american_odds)
     if odds==0: raise ValueError("American odds cannot be zero")
-    if not 0<=p<=1 or not 0<=push<=1 or p+push>1+1e-12:
-        raise ValueError("win and push probabilities must be valid and sum to at most 1")
-    profit=odds if odds>0 else 10000/abs(odds)
-    loss=1-p-push
+    if not 0<=p<=1 or not 0<=push<=1 or p+push>1+1e-12: raise ValueError("win and push probabilities must be valid and sum to at most 1")
+    profit=odds if odds>0 else 10000/abs(odds); loss=1-p-push
     return p*profit-loss*100
 
-def _decision(prob,edge,threshold=55.0,min_edge=1.5):
+def _decision(prob,edge,threshold=55.,min_edge=1.5):
     if prob is None: return "NO LINE"
     if prob>=threshold and edge>=min_edge: return "LEAN"
     return "PASS"
 
 def main():
     ap=argparse.ArgumentParser(description="Doug's Elite NBA Simulator")
-    ap.add_argument("--home",required=True); ap.add_argument("--away",required=True)
-    ap.add_argument("--data",default="nba/team_stats.json")
-    ap.add_argument("--spread",type=float,help="Home spread, e.g. -4.5")
-    ap.add_argument("--total",type=float)
-    ap.add_argument("--home-ml-odds",type=float)
-    ap.add_argument("--away-ml-odds",type=float)
-    ap.add_argument("--spread-odds",type=float,default=-110)
-    ap.add_argument("--total-odds",type=float,default=-110)
-    ap.add_argument("--home-spread-odds",type=float)
-    ap.add_argument("--away-spread-odds",type=float)
-    ap.add_argument("--over-odds",type=float)
-    ap.add_argument("--under-odds",type=float)
+    ap.add_argument("--home",required=True); ap.add_argument("--away",required=True); ap.add_argument("--data",default="nba/team_stats.json")
+    ap.add_argument("--spread",type=float,help="Home spread, e.g. -4.5"); ap.add_argument("--total",type=float)
+    ap.add_argument("--home-ml-odds",type=float); ap.add_argument("--away-ml-odds",type=float)
+    ap.add_argument("--spread-odds",type=float,default=-110); ap.add_argument("--total-odds",type=float,default=-110)
+    ap.add_argument("--home-spread-odds",type=float); ap.add_argument("--away-spread-odds",type=float)
+    ap.add_argument("--over-odds",type=float); ap.add_argument("--under-odds",type=float)
     ap.add_argument("--auto-odds",action="store_true",help="Fetch consensus NBA odds from The Odds API using ODDS_API_KEY")
     ap.add_argument("--espn-bet-odds",action="store_true",help="Fetch ESPN BET current and opening NBA lines from ESPN Core API (provider 68)")
     ap.add_argument("--home-rest",type=float,default=2); ap.add_argument("--away-rest",type=float,default=2)
     ap.add_argument("--home-travel",type=float,default=0); ap.add_argument("--away-travel",type=float,default=0)
-    ap.add_argument("--home-injury-points",type=float,default=0,help="Manual estimated team points lost to unavailable players")
-    ap.add_argument("--away-injury-points",type=float,default=0)
+    ap.add_argument("--home-injury-points",type=float,default=0); ap.add_argument("--away-injury-points",type=float,default=0)
     ap.add_argument("--game-date",default="",help="YYYY-MM-DD; fetch ESPN schedule and override rest/neutral-site context")
     ap.add_argument("--auto-injuries",action="store_true",help="Fetch the latest official NBA injury report PDF for the matchup date")
     ap.add_argument("--trials",type=int,default=1_000_000); ap.add_argument("--max-trials",type=int,default=5_000_000)
@@ -292,22 +243,19 @@ def main():
     a=ap.parse_args()
     if a.trials<1 or a.max_trials<a.trials: ap.error("Invalid trial counts")
     if a.home.upper()==a.away.upper(): ap.error("Home and away teams must differ")
-    if (a.home_ml_odds is None) != (a.away_ml_odds is None): ap.error("Supply both moneyline prices or neither")
+    if (a.home_ml_odds is None)!=(a.away_ml_odds is None): ap.error("Supply both moneyline prices or neither")
     if a.auto_odds and a.espn_bet_odds: ap.error("Choose ESPN BET odds or The Odds API, not both")
     if a.espn_bet_odds and not a.game_date: ap.error("--espn-bet-odds requires --game-date")
     supplied_prices=[a.spread_odds,a.total_odds,a.home_spread_odds,a.away_spread_odds,a.over_odds,a.under_odds,a.home_ml_odds,a.away_ml_odds]
     if any(price==0 for price in supplied_prices if price is not None): ap.error("American odds cannot be zero")
     teams,meta=load_team_stats(a.data)
     if a.home.upper() not in teams or a.away.upper() not in teams: ap.error("Team abbreviation missing from NBA data")
-    h,w=teams[a.home.upper()],teams[a.away.upper()]
-    odds_context=None
+    h,w=teams[a.home.upper()],teams[a.away.upper()]; odds_context=None
     if a.auto_odds:
         from nba.odds import matchup_odds
-        odds_context=matchup_odds(h.name,w.name)
-        fetched_spread=odds_context.get("home_spread")
-        fetched_total=odds_context.get("total")
-        spread_line_matches=a.spread is None or (fetched_spread is not None and abs(a.spread-fetched_spread)<0.001)
-        total_line_matches=a.total is None or (fetched_total is not None and abs(a.total-fetched_total)<0.001)
+        odds_context=matchup_odds(h.name,w.name); fetched_spread=odds_context.get("home_spread"); fetched_total=odds_context.get("total")
+        spread_line_matches=a.spread is None or (fetched_spread is not None and abs(a.spread-fetched_spread)<.001)
+        total_line_matches=a.total is None or (fetched_total is not None and abs(a.total-fetched_total)<.001)
         if a.spread is None: a.spread=fetched_spread
         if a.total is None: a.total=fetched_total
         if a.home_ml_odds is None: a.home_ml_odds=odds_context.get("home_ml_odds")
@@ -318,16 +266,14 @@ def main():
         if total_line_matches:
             if a.over_odds is None: a.over_odds=odds_context.get("over_odds")
             if a.under_odds is None: a.under_odds=odds_context.get("under_odds")
-        if (a.home_ml_odds is None) != (a.away_ml_odds is None):
-            a.home_ml_odds=a.away_ml_odds=None
+        if (a.home_ml_odds is None)!=(a.away_ml_odds is None): a.home_ml_odds=a.away_ml_odds=None
     home_spread_price=a.home_spread_odds if a.home_spread_odds is not None else a.spread_odds
     away_spread_price=a.away_spread_odds if a.away_spread_odds is not None else a.spread_odds
     over_price=a.over_odds if a.over_odds is not None else a.total_odds
     under_price=a.under_odds if a.under_odds is not None else a.total_odds
     kwargs=dict(home_rest=a.home_rest,away_rest=a.away_rest,home_travel=a.home_travel,away_travel=a.away_travel,
                 home_injury_points=a.home_injury_points,away_injury_points=a.away_injury_points)
-    schedule_context=None
-    injury_context=None
+    schedule_context=None; injury_context=None
     if a.game_date:
         from datetime import date
         from nba.schedule import build_context
@@ -337,54 +283,41 @@ def main():
         kwargs["neutral_site"]=schedule_context["event"]["neutral_site"]
     if a.espn_bet_odds:
         from nba.espn_odds import fetch_espn_bet_odds
-        try:
-            odds_context=fetch_espn_bet_odds(schedule_context["event"]["event_id"])
-        except (RuntimeError, OSError, ValueError) as exc:
+        try: odds_context=fetch_espn_bet_odds(schedule_context["event"]["event_id"])
+        except (RuntimeError,OSError,ValueError) as exc:
             odds_context={"source":"ESPN BET via ESPN Core API","status":"unavailable","error":str(exc),"provider_id":68}
-            print(f"WARNING: {exc}", file=sys.stderr)
-            print("Continuing with the NBA model only. No sportsbook edge or expected value will be reported without verified ESPN BET lines.", file=sys.stderr)
-        if odds_context.get("home_spread") is not None:
-            a.spread=odds_context["home_spread"]
-        if odds_context.get("total") is not None:
-            a.total=odds_context["total"]
+            print(f"WARNING: {exc}",file=sys.stderr)
+            print("Continuing with the NBA model only. No sportsbook edge or expected value will be reported without verified ESPN BET lines.",file=sys.stderr)
+        if odds_context.get("home_spread") is not None: a.spread=odds_context["home_spread"]
+        if odds_context.get("total") is not None: a.total=odds_context["total"]
         if odds_context.get("home_ml_odds") is not None and odds_context.get("away_ml_odds") is not None:
-            a.home_ml_odds=odds_context["home_ml_odds"]
-            a.away_ml_odds=odds_context["away_ml_odds"]
-        if odds_context.get("home_spread_odds") is not None:
-            a.home_spread_odds=odds_context["home_spread_odds"]
-        if odds_context.get("away_spread_odds") is not None:
-            a.away_spread_odds=odds_context["away_spread_odds"]
-        if odds_context.get("over_odds") is not None:
-            a.over_odds=odds_context["over_odds"]
-        if odds_context.get("under_odds") is not None:
-            a.under_odds=odds_context["under_odds"]
+            a.home_ml_odds=odds_context["home_ml_odds"]; a.away_ml_odds=odds_context["away_ml_odds"]
+        if odds_context.get("home_spread_odds") is not None: a.home_spread_odds=odds_context["home_spread_odds"]
+        if odds_context.get("away_spread_odds") is not None: a.away_spread_odds=odds_context["away_spread_odds"]
+        if odds_context.get("over_odds") is not None: a.over_odds=odds_context["over_odds"]
+        if odds_context.get("under_odds") is not None: a.under_odds=odds_context["under_odds"]
     if a.auto_injuries:
         if not a.game_date: ap.error("--auto-injuries requires --game-date")
         from datetime import date
         from nba.injuries import fetch_official_injuries
-        try:
-            injury_context=fetch_official_injuries(date.fromisoformat(a.game_date),a.home,a.away,meta.get("season",2027))
-        except (RuntimeError, OSError, ValueError) as exc:
+        try: injury_context=fetch_official_injuries(date.fromisoformat(a.game_date),a.home,a.away,meta.get("season",2027))
+        except (RuntimeError,OSError,ValueError) as exc:
             injury_context={"source":"NBA official injury report","status":"unavailable","error":str(exc),"warnings":["Official injury data could not be retrieved; no automatic player availability or injury-point adjustment was applied. Verify injuries independently before betting."]}
             print(f"INJURY DATA WARNING: official report unavailable: {exc}")
     r=simulate(h,w,a.trials,a.seed,a.spread,a.total,**kwargs)
-    close=abs(r["home_margin"]+ (a.spread or 0))<=3
+    close=abs(r["home_margin"]+(a.spread or 0))<=3
     if a.spread is not None: close=close or 47<=r["home_cover"]<=53
     if a.total is not None: close=close or 47<=r["over"]<=53
-    if close and not a.no_auto_refine and a.max_trials>a.trials:
-        r=simulate(h,w,a.max_trials,a.seed,a.spread,a.total,**kwargs)
+    if close and not a.no_auto_refine and a.max_trials>a.trials: r=simulate(h,w,a.max_trials,a.seed,a.spread,a.total,**kwargs)
     print("\nDOUG'S ELITE NBA SIMULATOR\n========================="); print(f"{w.name} at {h.name}")
-    for t in (h,w):
-        print(f"{t.name}: GP {t.games_played} | Pace {t.pace:.1f} | ORtg {t.off_rating:.1f} | DRtg {t.def_rating:.1f} | eFG {t.efg_pct:.3f} | TOV {t.tov_pct:.3f} | ORB {t.orb_pct:.3f} | FT rate {t.ft_rate:.3f} | 3PA rate {t.three_pa_rate if t.three_pa_rate is not None else float('nan'):.3f}")
+    for t in (h,w): print(f"{t.name}: GP {t.games_played} | Pace {t.pace:.1f} | ORtg {t.off_rating:.1f} | DRtg {t.def_rating:.1f} | eFG {t.efg_pct:.3f} | TOV {t.tov_pct:.3f} | ORB {t.orb_pct:.3f} | FT rate {t.ft_rate:.3f} | 3PA rate {t.three_pa_rate if t.three_pa_rate is not None else float('nan'):.3f}")
     print(f"Projected pace {r['pace']:.1f} | Score {h.name} {r['home_points']:.1f} - {w.name} {r['away_points']:.1f}")
     print(f"Projected total {r['total_points']:.1f} | Home margin {r['home_margin']:+.1f}")
     print(f"Trials {r['trials']:,} | Seed {r['seed']} | Margin SD {r['margin_sd']:.1f}")
     print(f"Schedule adjustments: home {r['home_rest_adjustment']:+.2f} pts | away {r['away_rest_adjustment']:+.2f} pts | home court {r['home_court_points']:+.2f} pts")
-    if schedule_context:
-        print(f"ESPN schedule: event {schedule_context['event']['event_id']} | {schedule_context['event']['date']} | neutral site {schedule_context['event']['neutral_site']}")
-    if odds_context and odds_context.get("status") == "unavailable":
-        print("ESPN BET comparison: UNAVAILABLE — no verified ESPN BET market was posted; model-only probabilities follow.")
-    if odds_context and odds_context.get("source") == "ESPN BET via ESPN Core API" and odds_context.get("status") != "unavailable":
+    if schedule_context: print(f"ESPN schedule: event {schedule_context['event']['event_id']} | {schedule_context['event']['date']} | neutral site {schedule_context['event']['neutral_site']}")
+    if odds_context and odds_context.get("status")=="unavailable": print("ESPN BET comparison: UNAVAILABLE — no verified ESPN BET market was posted; model-only probabilities follow.")
+    if odds_context and odds_context.get("source")=="ESPN BET via ESPN Core API" and odds_context.get("status")!="unavailable":
         print(f"ESPN BET odds snapshot: {odds_context.get('retrieved_at')} | provider {odds_context.get('provider_name')} ({odds_context.get('provider_id')})")
         print(f"ESPN BET opening lines: home spread {odds_context.get('opening_home_spread')} | total {odds_context.get('opening_total')} | home ML {odds_context.get('opening_home_ml_odds')} | away ML {odds_context.get('opening_away_ml_odds')}")
         print(f"ESPN BET current lines: home spread {odds_context.get('home_spread')} | total {odds_context.get('total')} | home ML {odds_context.get('home_ml_odds')} | away ML {odds_context.get('away_ml_odds')}")
@@ -393,15 +326,12 @@ def main():
     if injury_context and injury_context.get("report_url"):
         print(f"Official NBA injury report: {injury_context['report_url']}")
         for team_code in injury_context["teams"]:
-            listed=[row for row in injury_context["player_statuses"] if row["team"]==team_code]
-            counts={}
+            listed=[row for row in injury_context["player_statuses"] if row["team"]==team_code]; counts={}
             for row in listed: counts[row["status"]]=counts.get(row["status"],0)+1
             print(f"Injury report {team_code}: {len(listed)} player rows | {counts or 'no player rows listed'}")
-        for team_code,status in injury_context["team_submission"].items():
-            print(f"INJURY WARNING: {team_code} report status: {status}")
+        for team_code,status in injury_context["team_submission"].items(): print(f"INJURY WARNING: {team_code} report status: {status}")
         for row in injury_context["player_statuses"]:
-            if row["status"] in ("Questionable","Doubtful"):
-                print(f"AVAILABILITY WARNING: {row['team']} {row['player']} — {row['status']} ({row['reason']})")
+            if row["status"] in ("Questionable","Doubtful"): print(f"AVAILABILITY WARNING: {row['team']} {row['player']} — {row['status']} ({row['reason']})")
         for warning in injury_context["warnings"]: print(f"INJURY NOTE: {warning}")
     ml_pick=h.name if r["home_win"]>=55 else (w.name if r["away_win"]>=55 else "PASS — no 55% win-probability edge")
     print(f"\nMONEYLINE: {h.name} win {r['home_win']:.2f}% | {w.name} win {r['away_win']:.2f}% | tie after OT {r['win_tie']:.2f}%")
@@ -413,8 +343,7 @@ def main():
         print("Model minus ESPN BET no-vig edge: home {0:+.2f} pp | away {1:+.2f} pp".format(r["home_win"]-market["home"]*100,r["away_win"]-market["away"]*100))
         print("Moneyline EV per $100 risked: home {0:+.2f} | away {1:+.2f}".format(expected_value_per_100(r["home_win"]/100,a.home_ml_odds),expected_value_per_100(r["away_win"]/100,a.away_ml_odds)))
     if a.spread is not None:
-        hp=_decision(r["home_cover"],r["spread_edge_points"])
-        apick=_decision(r["away_cover"],-r["spread_edge_points"])
+        hp=_decision(r["home_cover"],r["spread_edge_points"]); apick=_decision(r["away_cover"],-r["spread_edge_points"])
         print(f"\nSPREAD {a.spread:+.1f}: {h.name} cover {r['home_cover']:.2f}% | {w.name} cover {r['away_cover']:.2f}% | push {r['spread_push']:.2f}%")
         print(f"Home spread edge {r['spread_edge_points']:+.1f} pts | {h.name}: {hp} | {w.name}: {apick}")
         print(f"95% Monte Carlo interval: home {r['home_cover_ci'][0]:.2f}-{r['home_cover_ci'][1]:.2f}% | away {r['away_cover_ci'][0]:.2f}-{r['away_cover_ci'][1]:.2f}%")
@@ -423,8 +352,7 @@ def main():
         print("Model minus ESPN BET no-vig edge: home {0:+.2f} pp | away {1:+.2f} pp".format(r["home_cover"]-spread_market["home"]*100,r["away_cover"]-spread_market["away"]*100))
         print("Spread EV per $100 risked: home {0:+.2f} | away {1:+.2f}".format(expected_value_per_100(r["home_cover"]/100,home_spread_price,r["spread_push"]/100),expected_value_per_100(r["away_cover"]/100,away_spread_price,r["spread_push"]/100)))
     if a.total is not None:
-        over_dec=_decision(r["over"],r["total_edge_points"])
-        under_dec=_decision(r["under"],-r["total_edge_points"])
+        over_dec=_decision(r["over"],r["total_edge_points"]); under_dec=_decision(r["under"],-r["total_edge_points"])
         print(f"\nTOTAL {a.total:.1f}: Over {r['over']:.2f}% | Under {r['under']:.2f}% | push {r['total_push']:.2f}%")
         print(f"Model total edge {r['total_edge_points']:+.1f} pts | Over: {over_dec} | Under: {under_dec}")
         print(f"95% Monte Carlo interval: over {r['over_ci'][0]:.2f}-{r['over_ci'][1]:.2f}% | under {r['under_ci'][0]:.2f}-{r['under_ci'][1]:.2f}%")
