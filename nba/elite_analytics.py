@@ -40,10 +40,12 @@ class PlayerInput:
         missing = [key for key in required if key not in raw or raw[key] is None]
         if missing:
             raise ValueError("Missing player inputs: " + ", ".join(missing))
+        if not isinstance(raw["lineup_confirmed"], bool):
+            raise ValueError("lineup_confirmed must be a JSON boolean")
         p = cls(
             player=str(raw["player"]).strip(), team=str(raw["team"]).upper(),
             status=str(raw["status"]).strip().lower(),
-            lineup_confirmed=bool(raw["lineup_confirmed"]),
+            lineup_confirmed=raw["lineup_confirmed"],
             minutes=float(raw["minutes"]), minutes_sd=float(raw["minutes_sd"]),
             points_per_minute=float(raw["points_per_minute"]),
             rebounds_per_minute=float(raw["rebounds_per_minute"]),
