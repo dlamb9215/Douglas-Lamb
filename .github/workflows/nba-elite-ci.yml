@@ -1,0 +1,52 @@
+name: NBA Elite Simulator CI
+
+on:
+  push:
+    branches: [main, nba-simulator, upgrade/dougs-elite-nba-v3]
+    paths:
+      - "nba/**"
+      - ".github/workflows/nba-elite-ci.yml"
+  pull_request:
+    paths:
+      - "nba/**"
+      - ".github/workflows/nba-elite-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip numpy
+      - name: Run NBA unit tests
+        run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_elite_analytics
+      - name: Validate all 30 NBA teams
+        run: |
+          python - <<'PY'
+          from nba.simulator import load_team_stats
+          teams, meta = load_team_stats("nba/team_stats.json")
+          assert len(teams) >= 30, f"Expected 30 teams, found {len(teams)}"
+          assert meta.get("season"), "Season metadata missing"
+          assert meta.get("updated_at"), "Data timestamp missing"
+          print(f"Validated {len(teams)} teams for season {meta['season']}; updated {meta['updated_at']}")
+          PY
+      - name: Run reproducible 1M-trial smoke simulation
+        run: python -m nba.simulator --home BOS --away NYK --spread -2.5 --total 220.5 --trials 1000000 --no-auto-refine --json-output nba-smoke-results.json
+      - name: Upload smoke report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nba-elite-ci-report
+          path: nba-smoke-results.json
+          if-no-files-found: warn
