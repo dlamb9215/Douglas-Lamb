@@ -406,6 +406,7 @@ def main():
     if a.home_ml_odds is not None:
         market=no_vig_probabilities(a.home_ml_odds,a.away_ml_odds)
         print("No-vig moneyline market: home {0:.2f}% | away {1:.2f}% | hold {2:.2f}%".format(market["home"]*100,market["away"]*100,market["market_hold"]*100))
+        print("Model minus ESPN BET no-vig edge: home {0:+.2f} pp | away {1:+.2f} pp".format(r["home_win"]-market["home"]*100,r["away_win"]-market["away"]*100))
         print("Moneyline EV per $100 risked: home {0:+.2f} | away {1:+.2f}".format(expected_value_per_100(r["home_win"]/100,a.home_ml_odds),expected_value_per_100(r["away_win"]/100,a.away_ml_odds)))
     if a.spread is not None:
         hp=_decision(r["home_cover"],r["spread_edge_points"])
@@ -415,6 +416,7 @@ def main():
         print(f"95% Monte Carlo interval: home {r['home_cover_ci'][0]:.2f}-{r['home_cover_ci'][1]:.2f}% | away {r['away_cover_ci'][0]:.2f}-{r['away_cover_ci'][1]:.2f}%")
         spread_market=no_vig_probabilities(home_spread_price,away_spread_price)
         print("No-vig spread market: home {0:.2f}% | away {1:.2f}% | hold {2:.2f}%".format(spread_market["home"]*100,spread_market["away"]*100,spread_market["market_hold"]*100))
+        print("Model minus ESPN BET no-vig edge: home {0:+.2f} pp | away {1:+.2f} pp".format(r["home_cover"]-spread_market["home"]*100,r["away_cover"]-spread_market["away"]*100))
         print("Spread EV per $100 risked: home {0:+.2f} | away {1:+.2f}".format(expected_value_per_100(r["home_cover"]/100,home_spread_price,r["spread_push"]/100),expected_value_per_100(r["away_cover"]/100,away_spread_price,r["spread_push"]/100)))
     if a.total is not None:
         over_dec=_decision(r["over"],r["total_edge_points"])
@@ -424,6 +426,7 @@ def main():
         print(f"95% Monte Carlo interval: over {r['over_ci'][0]:.2f}-{r['over_ci'][1]:.2f}% | under {r['under_ci'][0]:.2f}-{r['under_ci'][1]:.2f}%")
         total_market=no_vig_probabilities(over_price,under_price)
         print("No-vig total market: over {0:.2f}% | under {1:.2f}% | hold {2:.2f}%".format(total_market["home"]*100,total_market["away"]*100,total_market["market_hold"]*100))
+        print("Model minus ESPN BET no-vig edge: over {0:+.2f} pp | under {1:+.2f} pp".format(r["over"]-total_market["home"]*100,r["under"]-total_market["away"]*100))
         print("Total EV per $100 risked: over {0:+.2f} | under {1:+.2f}".format(expected_value_per_100(r["over"]/100,over_price,r["total_push"]/100),expected_value_per_100(r["under"]/100,under_price,r["total_push"]/100)))
     f=r["first_half"]
     print(f"\nFIRST HALF projected score: {h.name} {f['home_avg']:.1f} - {w.name} {f['away_avg']:.1f} | Total {f['total_avg']:.1f}")
