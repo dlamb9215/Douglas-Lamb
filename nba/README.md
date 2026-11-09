@@ -105,3 +105,11 @@ Do not call the model calibrated until it has enough chronologically separated o
 ## Data-readiness gate
 
 `python -m nba.data_quality --data nba/team_stats.json --max-age-hours 72` is run by the CI, statistics-refresh and matchup workflows. It blocks incomplete, malformed, future-dated or stale team data and reports warnings for small current-season samples and provider fields that are unavailable. Passing this gate means the input file is structurally ready; it does not establish predictive calibration or a profitable betting edge.
+
+
+## ESPN BET line comparison (new)
+The matchup workflow now enables the ESPN BET odds adapter by default. It uses ESPN's public Core API event-odds collection and selects ESPN BET by provider ID 68. It does not silently replace ESPN BET with FanDuel, DraftKings, a consensus line, or another sportsbook. If ESPN BET has not posted a market or ESPN's feed is unavailable, the matchup workflow stops with an explicit error so the user does not mistake another book's price for ESPN BET.
+
+For each event, the adapter records the retrieval timestamp and provider, normalizes current moneyline/spread/total prices, and captures opening spread, total and moneyline fields when ESPN supplies them. The simulator compares full-game Monte Carlo probabilities with two-way no-vig ESPN BET probabilities, reports probability edge in percentage points, and calculates expected net value per $100 risked. Spread/total expected value includes push handling. Opening-to-current line differences are included in the JSON artifact and printed for audit. Markets ESPN BET has not posted remain unavailable; the engine does not invent a line.
+
+ESPN's public Core API is an undocumented public feed and can change or omit markets. The feed's provider ID and field names are validated in tests, but availability and prices must be checked at run time. ESPN BET prices are snapshots, not guaranteed executable offers. The model's probability edge is not proof of profitability; retain out-of-sample calibration and closing-line-value tracking before increasing stakes.
