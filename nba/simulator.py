@@ -396,6 +396,7 @@ def main():
         print("Total EV per $100 risked: over {0:+.2f} | under {1:+.2f}".format(expected_value_per_100(r["over"]/100,over_price,r["total_push"]/100),expected_value_per_100(r["under"]/100,under_price,r["total_push"]/100)))
     f=r["first_half"]
     print(f"\nFIRST HALF projected score: {h.name} {f['home_avg']:.1f} - {w.name} {f['away_avg']:.1f} | Total {f['total_avg']:.1f}")
+    print(f"First-half moneyline: {h.name} {f['home_win']:.2f}% | {w.name} {f['away_win']:.2f}% | tie {f['tie']:.2f}%")
     if a.spread is not None: print(f"First-half spread cover: home {f['home_cover']:.2f}% | away {f['away_cover']:.2f}% | push {f['spread_push']:.2f}%")
     if a.total is not None: print(f"First-half total: over {f['over']:.2f}% | under {f['under']:.2f}% | push {f['total_push']:.2f}%")
     print(f"\nDATA: {meta.get('season','unknown')} | updated {meta.get('updated_at','unknown')}")
