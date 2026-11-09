@@ -340,7 +340,9 @@ def main():
         try:
             odds_context=fetch_espn_bet_odds(schedule_context["event"]["event_id"])
         except (RuntimeError, OSError, ValueError) as exc:
-            ap.error(f"ESPN BET odds unavailable: {exc}")
+            odds_context={"source":"ESPN BET via ESPN Core API","status":"unavailable","error":str(exc),"provider_id":68}
+            print(f"WARNING: {exc}", file=sys.stderr)
+            print("Continuing with the NBA model only. No sportsbook edge or expected value will be reported without verified ESPN BET lines.", file=sys.stderr)
         if odds_context.get("home_spread") is not None:
             a.spread=odds_context["home_spread"]
         if odds_context.get("total") is not None:
@@ -380,7 +382,9 @@ def main():
     print(f"Schedule adjustments: home {r['home_rest_adjustment']:+.2f} pts | away {r['away_rest_adjustment']:+.2f} pts | home court {r['home_court_points']:+.2f} pts")
     if schedule_context:
         print(f"ESPN schedule: event {schedule_context['event']['event_id']} | {schedule_context['event']['date']} | neutral site {schedule_context['event']['neutral_site']}")
-    if odds_context and odds_context.get("source") == "ESPN BET via ESPN Core API":
+    if odds_context and odds_context.get("status") == "unavailable":
+        print("ESPN BET comparison: UNAVAILABLE — no verified ESPN BET market was posted; model-only probabilities follow.")
+    if odds_context and odds_context.get("source") == "ESPN BET via ESPN Core API" and odds_context.get("status") != "unavailable":
         print(f"ESPN BET odds snapshot: {odds_context.get('retrieved_at')} | provider {odds_context.get('provider_name')} ({odds_context.get('provider_id')})")
         print(f"ESPN BET opening lines: home spread {odds_context.get('opening_home_spread')} | total {odds_context.get('opening_total')} | home ML {odds_context.get('opening_home_ml_odds')} | away ML {odds_context.get('opening_away_ml_odds')}")
         print(f"ESPN BET current lines: home spread {odds_context.get('home_spread')} | total {odds_context.get('total')} | home ML {odds_context.get('home_ml_odds')} | away ML {odds_context.get('away_ml_odds')}")
