@@ -229,7 +229,8 @@ def project_player(player: dict[str, Any], games: list[dict[str, Any]], injury_s
         rate_draw = 0.5 * sampled_rate + 0.5 * shrunk_rate
         distribution = np.maximum(0, rate_draw * minute_draw)
         draws[stat] = distribution
-        line = (lines or {}).get(stat)
+        line_spec = (lines or {}).get(stat)
+        line, market = _market_line(line_spec)
         projections[stat] = {
             "mean": float(np.mean(distribution)),
             "median": float(np.percentile(distribution, 50)),
@@ -238,9 +239,10 @@ def project_player(player: dict[str, Any], games: list[dict[str, Any]], injury_s
             "over_probability": float(np.mean(distribution > line) * 100) if line is not None else None,
             "under_probability": float(np.mean(distribution < line) * 100) if line is not None else None,
             "push_probability": float(np.mean(distribution == line) * 100) if line is not None else None,
+            "market": market,
         }
     pra_distribution = draws["points"] + draws["rebounds"] + draws["assists"]
-    pra_line = (lines or {}).get("pra")
+    pra_line, pra_market = _market_line((lines or {}).get("pra"))
     projections["pra"] = {
         "mean": float(np.mean(pra_distribution)),
         "median": float(np.percentile(pra_distribution, 50)),
@@ -249,6 +251,7 @@ def project_player(player: dict[str, Any], games: list[dict[str, Any]], injury_s
         "over_probability": float(np.mean(pra_distribution > pra_line) * 100) if pra_line is not None else None,
         "under_probability": float(np.mean(pra_distribution < pra_line) * 100) if pra_line is not None else None,
         "push_probability": float(np.mean(pra_distribution == pra_line) * 100) if pra_line is not None else None,
+        "market": pra_market,
     }
     return {
         "player_id": player["id"], "player": player["name"], "position": player.get("position"),
@@ -261,6 +264,72 @@ def project_player(player: dict[str, Any], games: list[dict[str, Any]], injury_s
         "projections": projections,
         "warnings": ["Projected minutes are a recent/season statistical blend, not a confirmed rotation or starting-lineup projection."],
     }
+
+
+def _market_line(spec):
+    if isinstance(spec, dict):
+        try:
+            line = float(spec["line"])
+        except (KeyError, TypeError, ValueError):
+            return None, {}
+        return line, {key: spec.get(key) for key in ("over_odds", "under_odds", "book", "source")}
+    try:
+        return (float(spec), {}) if spec is not None else (None, {})
+    except (TypeError, ValueError):
+        return None, {}
+
+
+def _implied_probability(american):
+    try:
+        odds = float(american)
+    except (TypeError, ValueError):
+        return None
+    if odds == 0:
+        return None
+    return (-odds / (-odds + 100)) if odds < 0 else (100 / (odds + 100))
+
+
+def _prop_edge(model_probability, chosen_odds, over_odds, under_odds):
+    over_imp, under_imp = _implied_probability(over_odds), _implied_probability(under_odds)
+    if over_imp is None or under_imp is None or chosen_odds is None:
+        return {"no_vig_probability": None, "edge_percentage_points": None, "ev_per_100": None}
+    over_nv = over_imp / (over_imp + under_imp)
+    under_nv = under_imp / (over_imp + under_imp)
+    no_vig = over_nv if str(chosen_odds) == str(over_odds) else under_nv
+    odds = float(chosen_odds)
+    profit = 100 * (odds / 100 if odds > 0 else 100 / abs(odds))
+    p = model_probability / 100
+    return {"no_vig_probability": no_vig * 100,
+            "edge_percentage_points": model_probability - no_vig * 100,
+            "ev_per_100": p * profit - (1 - p) * 100}
+
+
+def select_best_two_props(teams):
+    selected = {}
+    for team, players in teams.items():
+        candidates = []
+        for player in players:
+            for stat, projection in player.get("projections", {}).items():
+                line = projection.get("line")
+                over_p, under_p = projection.get("over_probability"), projection.get("under_probability")
+                if line is None or over_p is None or under_p is None:
+                    continue
+                market = projection.get("market") or {}
+                for side, probability, odds_key in (("OVER", over_p, "over_odds"), ("UNDER", under_p, "under_odds")):
+                    odds = market.get(odds_key)
+                    edge = _prop_edge(probability, odds, market.get("over_odds"), market.get("under_odds"))
+                    candidates.append({
+                        "team": team, "player": player["player"], "stat": stat.upper(),
+                        "side": side, "line": line, "model_probability": probability,
+                        "odds": odds, "book": market.get("book"), **edge,
+                        "ranking_basis": "no-vig edge" if edge["edge_percentage_points"] is not None else "model probability only; no verified two-way market"
+                    })
+        candidates.sort(key=lambda row: (
+            row["edge_percentage_points"] if row["edge_percentage_points"] is not None else -999,
+            row["model_probability"]), reverse=True)
+        selected[team] = candidates[:2]
+    return selected
+
 
 def build_matchup_player_projections(home: str, away: str, game_date: date, season: int = 2027,
                                      trials: int = 50000, seed: int = 42,
@@ -334,7 +403,10 @@ def build_matchup_player_projections(home: str, away: str, game_date: date, seas
         "confirmed_lineup_source": confirmed_lineups.get("source", "user-supplied confirmed lineup"),
         "confirmed_lineup_timestamp": confirmed_lineups.get("confirmed_at"),
         "retrieved_at": datetime.now(timezone.utc).isoformat(),
-        "teams": teams, "warnings": warnings,
+        "teams": teams,
+        "best_two_props_by_team": select_best_two_props(teams),
+        "prop_ranking_note": "Ranks at most two props per team. No-vig edge and EV require both over and under prices from a verified market; otherwise ranking is model-probability-only.",
+        "warnings": warnings,
         "limitations": [
             "Only players explicitly present in the supplied confirmed lineup/minutes file are projected.",
             "Historical per-minute rates remain a statistical baseline; usage, matchup-position defense, role changes and teammate-absence impact are not automatically inferred.",
