@@ -42,32 +42,50 @@ Spread convention: enter the home team's sportsbook line (for example, -4.5 when
 ## Run locally
 ```bash
 python -m pip install numpy
-python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule nba.test_odds nba.test_injuries nba.test_player_props nba.test_elite_analytics nba.test_player_props_backtest
+python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule nba.test_odds nba.test_injuries nba.test_player_props nba.test_player_props_backtest
 python -m nba.simulator --home BOS --away NYK --spread -3.5 --total 221.5 --trials 1000000
 ```
 
 ## Automated code checks
 The `NBA Simulator CI` workflow runs unit tests, backtest tests, 30-team data validation, and a command-line smoke test on relevant code changes. Passing CI validates software behavior, not predictive accuracy.
 
-## Player-prop analytics and validation
-For a manually verified player profile, create a JSON input with the fields `player`, `team`, `status`, `lineup_confirmed`, `minutes`, `minutes_sd`, `points_per_minute`, `rebounds_per_minute` and `assists_per_minute`. Optional inputs include usage, pace and stat-specific matchup multipliers. Example:
+## Confirmed player props and validation
+
+The experimental player-prop workflow requires a fresh, timezone-aware lineup JSON input. The top-level object must include `source`, `confirmed_at` and `teams`. The timestamp must be no more than 12 hours old. Team keys must match the provider codes (for example, `BOS`, `NYK`, `GS`, `NO`).
+
+Example:
 ```json
 {
-  "player": "Example Player",
-  "team": "BOS",
-  "status": "available",
-  "lineup_confirmed": true,
-  "minutes": 34,
-  "minutes_sd": 2.5,
-  "points_per_minute": 0.72,
-  "rebounds_per_minute": 0.18,
-  "assists_per_minute": 0.20,
-  "lines": {"points": 24.5, "rebounds": 6.5, "assists": 5.5, "pra": 36.5}
+  "source": "Official team lineup report",
+  "confirmed_at": "2026-11-09T18:30:00-05:00",
+  "teams": {
+    "BOS": {
+      "Player Name": {
+        "confirmed": true,
+        "status": "available",
+        "minutes": 34,
+        "minutes_sd": 2.5
+      }
+    },
+    "NYK": {
+      "Another Player": {
+        "confirmed": true,
+        "status": "probable",
+        "minutes": 32,
+        "minutes_sd": 3
+      }
+    }
+  }
 }
 ```
-Run `python -m nba.player_props_cli --input player-profile.json --trials 200000`. The eligibility gate excludes Out, Doubtful, Questionable, Inactive, Suspended and unknown players, and requires an explicitly confirmed lineup and stable minutes estimate. This manual profile path never guesses availability or minutes. Its distributions are experimental and must be evaluated against archived pregame predictions and actual results before use as betting edges.
 
-For player props, archive rows with `player,stat,projection,actual,line,over_probability` in a CSV and run `python -m nba.player_props_backtest --csv nba/player_props_history.csv`. The report excludes pushes from binary over/under calibration and summarizes sample size, error and probability calibration by stat. Never tune and evaluate on the same games.
+Each projected player must be explicitly confirmed, available/probable, and have a bounded game-specific minutes estimate. Players absent from the supplied lineup, questionable/doubtful/out, or with uncertain minutes are withheld. The official NBA injury report is also checked. If the lineup input is missing, stale, incomplete or untrusted, the player-prop artifact reports that props were withheld instead of generating picks. The player-prop model remains experimental: usage changes, matchup-position defense and teammate-absence impact are not automatically modeled.
+
+Archive player-prop rows with `player,stat,projection,actual,line,over_probability` in a CSV and run:
+```bash
+python -m nba.player_props_backtest --csv nba/player_prop_history.csv
+```
+This reports projection MAE, Brier score, log loss, hit rate and probability calibration by points/rebounds/assists/PRA. Pushes are excluded from binary over/under scoring; keep all non-push wins and losses. Never tune and evaluate on the same games.
 
 ## Historical validation
 Build a CSV of archived pregame predictions and final scores with the columns described in `nba/backtest.py`. Run:
