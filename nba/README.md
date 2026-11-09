@@ -20,8 +20,8 @@ A team-level NBA forecasting and betting-analysis engine. It is separate from th
 - Optional The Odds API v4 integration retrieves current NBA moneyline, spread and total markets across US books, selects best prices at the selected consensus line, reports no-vig market probabilities and calculates expected net value per $100 risked. Manual odds remain supported. Spread/total EV accounts for pushes as stake refunds; moneyline ties are split evenly between teams in the model estimate.
 - A shared data-quality gate validates all 30 expected teams, metric ranges, season metadata, timezone-aware timestamps and 72-hour freshness; it reports early-season sample-size and unavailable-feature warnings without inventing values.
 
-## User-specific output scope
-This is team-level only: it provides team moneyline probabilities plus spread and game-total analysis, full game and first half. It has no player-prop projections or player-prop data pipeline. No alternate spreads are created.
+## Output scope
+The team engine provides moneyline probabilities plus spread and game-total analysis for full game and first half. No alternate spreads are created. Two separate experimental player-prop paths are also available: `nba.player_props` builds roster/game-log-based projections from ESPN feeds, while `nba.player_props_cli` simulates points, rebounds, assists and PRA from explicitly supplied, verified player inputs. These player-prop paths are separate from the team score model and are not yet calibrated betting models.
 
 ## Refresh data
 Run the **Update NBA Statistics** workflow. It requests current and prior-season ESPN-derived team aggregates through DunkAPI. The updater validates all 30 teams and writes only after both season requests and data checks succeed. It preserves the last good file if a refresh fails.
@@ -48,6 +48,26 @@ python -m nba.simulator --home BOS --away NYK --spread -3.5 --total 221.5 --tria
 ## Automated code checks
 The `NBA Simulator CI` workflow runs unit tests, backtest tests, 30-team data validation, and a command-line smoke test on relevant code changes. Passing CI validates software behavior, not predictive accuracy.
 
+## Player-prop analytics and validation
+For a manually verified player profile, create a JSON input with the fields `player`, `team`, `status`, `lineup_confirmed`, `minutes`, `minutes_sd`, `points_per_minute`, `rebounds_per_minute` and `assists_per_minute`. Optional inputs include usage, pace and stat-specific matchup multipliers. Example:
+```json
+{
+  "player": "Example Player",
+  "team": "BOS",
+  "status": "available",
+  "lineup_confirmed": true,
+  "minutes": 34,
+  "minutes_sd": 2.5,
+  "points_per_minute": 0.72,
+  "rebounds_per_minute": 0.18,
+  "assists_per_minute": 0.20,
+  "lines": {"points": 24.5, "rebounds": 6.5, "assists": 5.5, "pra": 36.5}
+}
+```
+Run `python -m nba.player_props_cli --input player-profile.json --trials 200000`. The eligibility gate excludes Out, Doubtful, Questionable, Inactive, Suspended and unknown players, and requires an explicitly confirmed lineup and stable minutes estimate. This manual profile path never guesses availability or minutes. Its distributions are experimental and must be evaluated against archived pregame predictions and actual results before use as betting edges.
+
+For player props, archive rows with `player,stat,projection,actual,line,over_probability` in a CSV and run `python -m nba.player_props_backtest --csv nba/player_props_history.csv`. The report excludes pushes from binary over/under calibration and summarizes sample size, error and probability calibration by stat. Never tune and evaluate on the same games.
+
 ## Historical validation
 Build a CSV of archived pregame predictions and final scores with the columns described in `nba/backtest.py`. Run:
 ```bash
@@ -58,7 +78,7 @@ Do not call the model calibrated until it has enough chronologically separated o
 ## Known limitations
 - Team-level injury point adjustments are manual. No official inactive/lineup feed is currently integrated.
 - Rest days and neutral-site status can be fetched from ESPN's public scoreboard when a game date is supplied. Travel miles are not auto-computed. ESPN's feed is undocumented and may change; schedule lookup failure blocks the requested auto-context run.
-- Official NBA injury designations and experimental player prop projections can be ingested/generated, but confirmed starting lineups, verified minutes/rotations, player-level impact estimates and a calibrated player-prop probability model are not implemented. Automatic travel-mile calculation and play-by-play possession simulation are also not implemented. Live featured odds require the user to add an Odds API key and enable the workflow input.
+- Official NBA injury designations and experimental player-prop projections can be ingested/generated, but confirmed starting lineups, verified minutes/rotations, player-level impact estimates and a calibrated player-prop probability model are not implemented. The manual player-prop simulator requires user-supplied, verified player inputs and does not fetch or confirm those inputs. Automatic travel-mile calculation and play-by-play possession simulation are also not implemented. Live featured odds require the user to add an Odds API key and enable the workflow input.
 - The score distribution is a transparent approximation pending fitting against historical game residuals. One million trials reduce Monte Carlo sampling noise; they do not correct bad inputs or model misspecification.
 - Probabilities are estimates, not guaranteed outcomes or proof of a profitable betting edge.
 
