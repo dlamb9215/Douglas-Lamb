@@ -11,7 +11,8 @@ A team-level NBA forecasting and betting-analysis engine. It is separate from th
 - Team scoring variance currently uses a fixed fallback because the connected team-stat provider does not supply team game-log residuals.
 - Schedule adjustments for rest, back-to-backs and travel distance. When `--game-date` is supplied, the simulator checks ESPN's public scoreboard for the matchup, derives each team's days of rest from the prior 10 calendar days, and removes home-court advantage for a neutral-site event. Travel distance remains unset unless verified itinerary/venue coordinates are available.
 - Optional official NBA injury-report PDF ingestion by game date, including player status rows and team-submission warnings. It reports Out/Questionable/Doubtful/Probable/Available designations but does not invent player-minute or team-point impacts; those still require player-level modeling.
-- Correlated full-game and first-half Monte Carlo score distributions.
+- Correlated full-game and first-half Monte Carlo score distributions. Regulation ties are resolved with stochastic five-minute overtime periods so NBA moneyline probabilities do not split regulation ties as half-wins.
+- Full-game moneyline confidence intervals plus first-half moneyline win/tie probabilities.
 - Spread and total probabilities, pushes, projected score, projected margin, projected total, and model-vs-line edge.
 - 1,000,000 baseline trials; borderline matchups refine to 5,000,000 trials.
 - Fixed seeds and machine-readable JSON output for auditability.
@@ -32,7 +33,7 @@ To fetch the official injury report, supply `game_date` and enable `auto_injurie
 1. Open Actions.
 2. Run **Update NBA Statistics** and confirm it completes successfully.
 3. Run **Run Doug's Elite NBA Simulator**.
-4. Enter home/away abbreviations and manual team-level injury point adjustments. Optionally enable `player_props` to fetch both rosters, player game logs and official injury designations and generate experimental points/rebounds/assists/PRA projections. For manual prop lines, provide a JSON file to the player-prop CLI using `--lines-json`. Either select `auto_odds` (after adding `ODDS_API_KEY`) or enter the actual sportsbook home spread, total and prices manually. Supply the game date for ESPN schedule/rest/neutral-site context; enable `auto_injuries` to fetch the NBA's official injury report.
+4. Enter home/away abbreviations and manual team-level injury point adjustments. The optional `player_props` stage fetches rosters, game logs and the official injury report, but **withholds every player prop unless you also supply a fresh `confirmed_lineups_json` input** with confirmed players, availability and projected minutes/uncertainty. This prevents roster membership from being mistaken for a confirmed game lineup. For manual prop lines, provide a JSON file to the player-prop CLI using `--lines-json`. Either select `auto_odds` (after adding `ODDS_API_KEY`) or enter actual sportsbook lines and prices manually. Supply the game date for ESPN schedule/rest/neutral-site context; enable `auto_injuries` to fetch the NBA's official injury report.
 5. Keep the default 1,000,000 trials. The engine increases borderline runs to 5,000,000.
 6. Download the text and JSON results artifact.
 
@@ -74,6 +75,12 @@ Build a CSV of archived pregame predictions and final scores with the columns de
 python -m nba.backtest --csv nba/historical_predictions.csv
 ```
 Do not call the model calibrated until it has enough chronologically separated out-of-sample games and its calibration, Brier score, log loss, MAE and closing-line value have been reviewed. The backtest script evaluates data supplied to it; it does not fabricate historical predictions or results.
+
+Player props can be evaluated separately with a CSV containing `player, stat, projection, actual, line, over_probability`:
+```bash
+python -m nba.player_props_backtest --csv nba/player_prop_history.csv
+```
+This reports projection MAE, Brier score, log loss, hit rate and probability calibration by points/rebounds/assists/PRA. Exclude only pushes from binary over/under scoring, not losing or winning picks.
 
 ## Known limitations
 - Team-level injury point adjustments are manual. No official inactive/lineup feed is currently integrated.
