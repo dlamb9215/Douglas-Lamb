@@ -1,8 +1,7 @@
-"""Experimental NBA player prop projections from ESPN game logs.
+"""Experimental NBA player prop projections with strict game-day lineup gating.
 
-This module uses roster membership and recent player game logs. It excludes players
-listed Out, Doubtful or Questionable in the official NBA report. It does NOT confirm
-starters or predict role changes; projected minutes are statistical baselines only.
+Official injury designations and ESPN game logs are combined with a fresh, explicit
+confirmed-lineup/minutes input. Without that input, no player props are emitted.
 """
 from __future__ import annotations
 
@@ -13,7 +12,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timezone, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -43,6 +42,28 @@ def confirmed_minutes(entry: dict[str, Any] | None) -> tuple[float | None, float
     if not 8 <= minutes <= 48 or not 0 <= minutes_sd <= 8:
         return None, None, "minutes projection outside safe range"
     return minutes, minutes_sd, None
+
+def validate_lineup_context(payload: dict[str, Any] | None, required_teams: list[str],
+                            now: datetime | None = None) -> tuple[bool, str]:
+    if not isinstance(payload, dict) or not isinstance(payload.get("teams"), dict):
+        return False, "missing confirmed lineup teams object"
+    if not str(payload.get("source", "")).strip():
+        return False, "confirmed lineup source is missing"
+    try:
+        timestamp = datetime.fromisoformat(str(payload["confirmed_at"]).replace("Z", "+00:00"))
+    except (KeyError, TypeError, ValueError):
+        return False, "confirmed_at must be an ISO-8601 timestamp"
+    if timestamp.tzinfo is None:
+        return False, "confirmed_at must include a timezone"
+    current = now or datetime.now(timezone.utc)
+    age = current - timestamp.astimezone(timezone.utc)
+    if age < -timedelta(minutes=5) or age > timedelta(hours=12):
+        return False, "confirmed lineup timestamp is future-dated or older than 12 hours"
+    missing = [team for team in required_teams if not isinstance(payload["teams"].get(team), dict)]
+    if missing:
+        return False, "confirmed lineup missing team(s): " + ", ".join(missing)
+    return True, "confirmed lineup input validated"
+
 
 def _get_json(url: str, timeout: int = 20) -> dict[str, Any]:
     request = urllib.request.Request(url, headers={"Accept": "application/json"})
@@ -245,13 +266,14 @@ def build_matchup_player_projections(home: str, away: str, game_date: date, seas
                                      confirmed_lineups: dict[str, Any] | None = None) -> dict[str, Any]:
     aliases = {"GSW": "GS", "NOP": "NO", "NYK": "NY", "SAS": "SA", "UTA": "UTAH", "WAS": "WSH"}
     team_codes = [aliases.get(home.upper(), home.upper()), aliases.get(away.upper(), away.upper())]
-    if not isinstance(confirmed_lineups, dict) or not isinstance(confirmed_lineups.get("teams"), dict):
+    lineup_ok, lineup_reason = validate_lineup_context(confirmed_lineups, team_codes)
+    if not lineup_ok:
         return {
             "game_date": game_date.isoformat(), "home": team_codes[0], "away": team_codes[1],
             "season": season, "trials_per_player": trials, "teams": {team: [] for team in team_codes},
             "source": "NBA official injury report plus ESPN historical game logs",
-            "warnings": ["Player props withheld: no game-specific confirmed lineup and minutes file was supplied."],
-            "limitations": ["No player props are released until each included player has confirmed available/probable status, confirmed lineup inclusion, and a bounded minutes projection."],
+            "warnings": [f"Player props withheld: {lineup_reason}."],
+            "limitations": ["No player props are released until each included player has a fresh confirmed lineup, available/probable status, and a bounded minutes projection."],
         }
     try:
         injury = fetch_official_injuries(game_date, home, away, season)
