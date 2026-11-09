@@ -94,5 +94,35 @@ class TestNBAPlayerProps(unittest.TestCase):
         self.assertIsNone(project_player(player, games))
         self.assertIsNone(project_player(player, games[:4]))
 
+
+    def test_best_two_props_per_team_rank_by_no_vig_edge(self):
+        from nba.player_props import select_best_two_props
+        teams = {"BOS": [
+            {"player": "A", "projections": {
+                "points": {"line": 20.5, "over_probability": 65.0, "under_probability": 35.0,
+                           "market": {"over_odds": -110, "under_odds": -110, "book": "ESPN BET"}},
+                "rebounds": {"line": 8.5, "over_probability": 55.0, "under_probability": 45.0,
+                             "market": {"over_odds": -110, "under_odds": -110, "book": "ESPN BET"}},
+                "assists": {"line": None, "over_probability": None, "under_probability": None},
+            }},
+            {"player": "B", "projections": {
+                "pra": {"line": 30.5, "over_probability": 62.0, "under_probability": 38.0,
+                        "market": {"over_odds": -110, "under_odds": -110, "book": "ESPN BET"}},
+            }},
+        ]}
+        result = select_best_two_props(teams)["BOS"]
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]["player"], "A")
+        self.assertEqual(result[0]["stat"], "POINTS")
+        self.assertGreater(result[0]["edge_percentage_points"], 0)
+        self.assertIsNotNone(result[0]["ev_per_100"])
+
+    def test_numeric_and_structured_market_lines_are_supported(self):
+        from nba.player_props import _market_line
+        self.assertEqual(_market_line(22.5), (22.5, {}))
+        line, market = _market_line({"line": 22.5, "over_odds": -110, "under_odds": -110, "book": "ESPN BET"})
+        self.assertEqual(line, 22.5)
+        self.assertEqual(market["book"], "ESPN BET")
+
 if __name__ == "__main__":
     unittest.main()
