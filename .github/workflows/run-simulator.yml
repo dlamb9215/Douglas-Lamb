@@ -35,22 +35,22 @@ on:
       home:
         description: Home team
         required: true
-        default: WAS
+        default: MIN
         type: string
       away:
         description: Away team
         required: true
-        default: LAR
+        default: BUF
         type: string
       home_qb_confirmed:
         description: Officially confirmed home-team starting QB
         required: false
-        default: "Jayden Daniels"
+        default: "Carson Wentz"
         type: string
       away_qb_confirmed:
         description: Officially confirmed away-team starting QB
         required: false
-        default: "Matthew Stafford"
+        default: "Josh Allen"
         type: string
       trials:
         description: Simulation trials
@@ -145,7 +145,7 @@ jobs:
 
       - name: Validate fresh pregame context with weather
         if: github.event_name == 'workflow_dispatch'
-        run: python pregame_context.py --home "${{ inputs.home || 'WAS' }}" --away "${{ inputs.away || 'LAR' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "${{ inputs.home_qb_confirmed || 'Jayden Daniels' }}" --away-qb-confirmed "${{ inputs.away_qb_confirmed || 'Matthew Stafford' }}" --home-qb-source "https://www.commanders.com/team/depth-chart/" --away-qb-source "https://www.therams.com/team/depth-chart/" --output pregame-context.json
+        run: python pregame_context.py --home "${{ inputs.home || 'WAS' }}" --away "${{ inputs.away || 'LAR' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "${{ inputs.home_qb_confirmed || 'Jayden Daniels' }}" --away-qb-confirmed "${{ inputs.away_qb_confirmed || 'Matthew Stafford' }}" --home-qb-source "https://www.vikings.com/team/depth-chart/" --away-qb-source "https://www.buffalobills.com/team/depth-chart/" --output pregame-context.json
 
       - name: Validate fresh pregame context
         if: github.event_name != 'workflow_dispatch'
