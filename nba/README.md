@@ -33,7 +33,7 @@ To fetch the official injury report, supply `game_date` and enable `auto_injurie
 1. Open Actions.
 2. Run **Update NBA Statistics** and confirm it completes successfully.
 3. Run **Run Doug's Elite NBA Simulator**.
-4. Enter home/away abbreviations and manual team-level injury point adjustments. The optional `player_props` stage fetches rosters, game logs and the official injury report, but **withholds every player prop unless you also supply a fresh `confirmed_lineups_json` input** with confirmed players, availability and projected minutes/uncertainty. This prevents roster membership from being mistaken for a confirmed game lineup. For manual prop lines, provide a JSON file to the player-prop CLI using `--lines-json`. Either select `auto_odds` (after adding `ODDS_API_KEY`) or enter actual sportsbook lines and prices manually. Supply the game date for ESPN schedule/rest/neutral-site context; enable `auto_injuries` to fetch the NBA's official injury report.
+4. Enter home/away abbreviations and manual team-level injury point adjustments. The optional `player_props` stage fetches rosters, game logs and the official injury report, but **withholds every player prop unless you also supply a fresh `confirmed_lineups_json` input** with confirmed players, availability and projected minutes/uncertainty. This prevents roster membership from being mistaken for a confirmed game lineup. For manual player-prop lines, provide a JSON mapping of player names to stat lines using `--lines-json`. Either select `auto_odds` (after adding `ODDS_API_KEY`) or enter actual sportsbook lines and prices manually. Supply the game date for ESPN schedule/rest/neutral-site context; enable `auto_injuries` to fetch the NBA's official injury report.
 5. Keep the default 1,000,000 trials. The engine increases borderline runs to 5,000,000.
 6. Download the text and JSON results artifact.
 
@@ -51,7 +51,7 @@ The `NBA Simulator CI` workflow runs unit tests, backtest tests, 30-team data va
 
 ## Confirmed player props and validation
 
-The experimental player-prop workflow requires a fresh, timezone-aware lineup JSON input. The top-level object must include `source`, `confirmed_at` and `teams`. The timestamp must be no more than 12 hours old. Team keys must match the provider codes (for example, `BOS`, `NYK`, `GS`, `NO`).
+The experimental player-prop workflow requires a fresh, timezone-aware lineup JSON input. The top-level object must include `source`, `confirmed_at` and `teams`. The timestamp must be no more than 12 hours old. Team keys must match the provider codes (for example, `BOS`, `NY`, `GS`, `NO`; `NYK` is normalized to `NY`).
 
 Example:
 ```json
@@ -67,7 +67,7 @@ Example:
         "minutes_sd": 2.5
       }
     },
-    "NYK": {
+    "NY": {
       "Another Player": {
         "confirmed": true,
         "status": "probable",
@@ -93,12 +93,6 @@ Build a CSV of archived pregame predictions and final scores with the columns de
 python -m nba.backtest --csv nba/historical_predictions.csv
 ```
 Do not call the model calibrated until it has enough chronologically separated out-of-sample games and its calibration, Brier score, log loss, MAE and closing-line value have been reviewed. The backtest script evaluates data supplied to it; it does not fabricate historical predictions or results.
-
-Player props can be evaluated separately with a CSV containing `player, stat, projection, actual, line, over_probability`:
-```bash
-python -m nba.player_props_backtest --csv nba/player_prop_history.csv
-```
-This reports projection MAE, Brier score, log loss, hit rate and probability calibration by points/rebounds/assists/PRA. Exclude only pushes from binary over/under scoring, not losing or winning picks.
 
 ## Known limitations
 - Team-level injury point adjustments are manual. No official inactive/lineup feed is currently integrated.
