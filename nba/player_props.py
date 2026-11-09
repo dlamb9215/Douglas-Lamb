@@ -209,6 +209,14 @@ def project_player(player: dict[str, Any], games: list[dict[str, Any]], injury_s
     rng = np.random.default_rng(seed)
     projections = {}
     draws = {}
+    # Reuse the same sampled game and minutes for every stat in a trial. This
+    # preserves empirical cross-stat and minutes covariance in PRA outcomes.
+    shared_idx = rng.integers(0, len(recent), size=trials)
+    sampled_minutes = np.asarray([recent[i]["minutes"] for i in shared_idx], dtype=float)
+    if confirmed_minutes is not None:
+        minute_draw = np.clip(rng.normal(confirmed_minutes, confirmed_minutes_sd, trials), 0, 48)
+    else:
+        minute_draw = 0.5 * sampled_minutes + 0.5 * projected_minutes
     for stat in ("points", "rebounds", "assists"):
         season_total = sum(float(g[stat]) for g in games)
         season_rate = season_total / max(1e-9, sum(float(g["minutes"]) for g in games))
@@ -216,15 +224,9 @@ def project_player(player: dict[str, Any], games: list[dict[str, Any]], injury_s
         recent_mins = sum(float(g["minutes"]) for g in last5)
         recent_rate = recent_total / max(1e-9, recent_mins)
         shrunk_rate = (season_rate * 8 + recent_rate * len(last5)) / (8 + len(last5))
-        idx = rng.integers(0, len(recent), size=trials)
-        sampled_minutes = np.asarray([recent[i]["minutes"] for i in idx], dtype=float)
-        sampled_values = np.asarray([recent[i][stat] for i in idx], dtype=float)
+        sampled_values = np.asarray([recent[i][stat] for i in shared_idx], dtype=float)
         sampled_rate = sampled_values / np.maximum(sampled_minutes, 1e-9)
         rate_draw = 0.5 * sampled_rate + 0.5 * shrunk_rate
-        if confirmed_minutes is not None:
-            minute_draw = np.clip(rng.normal(confirmed_minutes, confirmed_minutes_sd, trials), 0, 48)
-        else:
-            minute_draw = 0.5 * sampled_minutes + 0.5 * projected_minutes
         distribution = np.maximum(0, rate_draw * minute_draw)
         draws[stat] = distribution
         line = (lines or {}).get(stat)
