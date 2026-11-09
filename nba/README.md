@@ -39,6 +39,12 @@ Example input schema:
 ```
 These player distributions are an experimental baseline, not yet a calibrated betting model. Do not use them as recommendations until the player game-log pipeline, rotation/minutes projections, injury/lineup feed, and out-of-sample prop backtests have been completed.
 
+Archive pregame prop projections and final player stats in a CSV with columns `player, stat, projection, actual, line, over_probability`. Evaluate it with:
+```bash
+python -m nba.player_props_backtest --csv nba/player_prop_history.csv
+```
+This reports projection MAE, Brier score, log loss, hit rate and calibration buckets. Keep a chronological holdout and include all eligible selections, not only winning picks.
+
 ## Data pipeline and freshness
 Run **Update NBA Statistics** before a slate. The updater requests NBA.com Stats current/prior season advanced and Four Factors data, recent form, venue splits and game-log variance; it validates all teams before replacing the last-good file. NBA.com Stats can rate-limit hosted runners. A successful data refresh does not itself prove model accuracy.
 
