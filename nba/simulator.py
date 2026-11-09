@@ -226,7 +226,9 @@ def simulate(home,away,trials=1_000_000,seed=42,spread=None,total=None,
                      "total_avg":float(np.mean(ht)),
                      "home_win":float(np.mean(hm>0)*100),
                      "away_win":float(np.mean(hm<0)*100),
-                     "tie":float(np.mean(hm==0)*100)}
+                     "tie":float(np.mean(hm==0)*100),
+                     "home_win_ci":_wilson_interval(float(np.mean(hm>0)),trials),
+                     "away_win_ci":_wilson_interval(float(np.mean(hm<0)),trials)}
     if spread is not None:
         first_line=spread/2; fm=hm+first_line
         r["first_half"].update({"home_cover":float(np.mean(fm>0)*100),
@@ -397,7 +399,7 @@ def main():
         print("Total EV per $100 risked: over {0:+.2f} | under {1:+.2f}".format(expected_value_per_100(r["over"]/100,over_price,r["total_push"]/100),expected_value_per_100(r["under"]/100,under_price,r["total_push"]/100)))
     f=r["first_half"]
     print(f"\nFIRST HALF projected score: {h.name} {f['home_avg']:.1f} - {w.name} {f['away_avg']:.1f} | Total {f['total_avg']:.1f}")
-    print(f"First-half moneyline: {h.name} {f['home_win']:.2f}% | {w.name} {f['away_win']:.2f}% | tie {f['tie']:.2f}%")
+    print(f"First-half moneyline: {h.name} {f['home_win']:.2f}% (95% CI {f['home_win_ci'][0]:.2f}-{f['home_win_ci'][1]:.2f}%) | {w.name} {f['away_win']:.2f}% (95% CI {f['away_win_ci'][0]:.2f}-{f['away_win_ci'][1]:.2f}%) | tie {f['tie']:.2f}%")
     if a.spread is not None: print(f"First-half spread cover: home {f['home_cover']:.2f}% | away {f['away_cover']:.2f}% | push {f['spread_push']:.2f}%")
     if a.total is not None: print(f"First-half total: over {f['over']:.2f}% | under {f['under']:.2f}% | push {f['total_push']:.2f}%")
     print(f"\nDATA: {meta.get('season','unknown')} | updated {meta.get('updated_at','unknown')}")
