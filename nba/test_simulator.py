@@ -13,13 +13,13 @@ class TestNBAEngine(unittest.TestCase):
         r=matchup_projection(team("BOS"),team("NYK"))
         self.assertGreater(r["home_points"],0)
         self.assertGreater(r["total_points"],r["home_points"])
-    def test_market_probabilities(self):
+    def test_moneyline_and_overtime_resolve_all_games(self):\n        r=simulate(team("BOS"),team("NYK"),50000,17)\n        self.assertGreaterEqual(r["home_win"],0)\n        self.assertLessEqual(r["home_win"],100)\n        self.assertAlmostEqual(r["home_win"]+r["away_win"],100,places=8)\n        self.assertEqual(r["home_win_ci"][0] <= r["home_win"] <= r["home_win_ci"][1], True)\n\n    def test_market_probabilities(self):
         r=simulate(team("BOS"),team("NYK"),25000,7,-2.5,220.5)
         for k in ("home_cover","away_cover","over","under"):
             self.assertGreaterEqual(r[k],0); self.assertLessEqual(r[k],100)
         self.assertAlmostEqual(r["home_cover"]+r["away_cover"]+r["spread_push"],100,places=6)
         self.assertAlmostEqual(r["over"]+r["under"]+r["total_push"],100,places=6)
-        self.assertNotIn("home_win",r)
+        self.assertIn("home_win",r)\n        self.assertAlmostEqual(r["home_win"]+r["away_win"],100,places=8)\n        self.assertEqual(r["win_tie"] if "win_tie" in r else 0,0)
     def test_seed_reproducible(self):
         self.assertEqual(simulate(team("BOS"),team("NYK"),5000,123),simulate(team("BOS"),team("NYK"),5000,123))
     def test_different_seed(self):
