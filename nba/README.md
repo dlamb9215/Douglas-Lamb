@@ -42,7 +42,7 @@ Spread convention: enter the home team's sportsbook line (for example, -4.5 when
 ## Run locally
 ```bash
 python -m pip install numpy
-python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule nba.test_odds
+python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule nba.test_odds nba.test_injuries nba.test_player_props nba.test_elite_analytics nba.test_player_props_backtest
 python -m nba.simulator --home BOS --away NYK --spread -3.5 --total 221.5 --trials 1000000
 ```
 
@@ -85,7 +85,7 @@ This reports projection MAE, Brier score, log loss, hit rate and probability cal
 ## Known limitations
 - Team-level injury point adjustments are manual. No official inactive/lineup feed is currently integrated.
 - Rest days and neutral-site status can be fetched from ESPN's public scoreboard when a game date is supplied. Travel miles are not auto-computed. ESPN's feed is undocumented and may change; schedule lookup failure blocks the requested auto-context run.
-- Official NBA injury designations and experimental player-prop projections can be ingested/generated, but confirmed starting lineups, verified minutes/rotations, player-level impact estimates and a calibrated player-prop probability model are not implemented. The manual player-prop simulator requires user-supplied, verified player inputs and does not fetch or confirm those inputs. Automatic travel-mile calculation and play-by-play possession simulation are also not implemented. Live featured odds require the user to add an Odds API key and enable the workflow input.
+- Official NBA injury designations are ingested, but the system does not automatically verify starting lineups or player rotations. Player props require a fresh, user-supplied confirmed lineup and game-specific minutes file; missing, stale or uncertain entries are withheld. Player-level impact estimates and a calibrated player-prop probability model are not implemented. The separate manual player-prop simulator also requires verified user-supplied inputs. Automatic travel-mile calculation and play-by-play possession simulation are also not implemented. Live featured odds require the user to add an Odds API key and enable the workflow input.
 - The score distribution is a transparent approximation pending fitting against historical game residuals. One million trials reduce Monte Carlo sampling noise; they do not correct bad inputs or model misspecification.
 - Probabilities are estimates, not guaranteed outcomes or proof of a profitable betting edge.
 
