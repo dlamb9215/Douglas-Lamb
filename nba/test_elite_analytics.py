@@ -53,6 +53,10 @@ class TestEliteAnalytics(unittest.TestCase):
         with self.assertRaises(ValueError):
             scenario_grid({"home":110},{"bad":{"away":-2}})
 
+    def test_rejects_ambiguous_lineup_confirmation(self):
+        with self.assertRaises(ValueError):
+            PlayerInput.from_dict(profile(lineup_confirmed="false"))
+
     def test_rejects_non_finite_player_inputs_and_lines(self):
         for field in ("minutes", "minutes_sd", "points_per_minute", "usage_multiplier"):
             with self.subTest(field=field):
