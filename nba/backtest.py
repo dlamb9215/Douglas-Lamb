@@ -36,6 +36,10 @@ def evaluate(path):
         for key in ("home_win_probability","spread","total","home_cover_probability","over_probability","closing_spread","closing_total"):
             try: item[key]=float(r[key]) if r.get(key,"").strip() else None
             except ValueError: item[key]=None
+        for probability_key in ("home_win_probability", "home_cover_probability", "over_probability"):
+            probability = item.get(probability_key)
+            if probability is not None and not 0 <= probability <= 100:
+                raise ValueError(f"{probability_key} outside 0-100 on CSV row {i}")
         item["home_win"] = (1 if item["actual_home"] > item["actual_away"] else 0) if item["actual_home"] != item["actual_away"] else None
         if item["spread"] is not None:
             item["home_cover"] = 1 if item["actual_margin"]+item["spread"]>0 else 0 if item["actual_margin"]+item["spread"]<0 else None
