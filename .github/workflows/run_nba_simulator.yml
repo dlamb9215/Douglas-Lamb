@@ -72,8 +72,13 @@ on:
         required: false
         default: ""
         type: string
+      player_prop_lines_json:
+        description: Optional JSON with player stat lines and ESPN BET over_odds/under_odds, keyed by lowercase player name
+        required: false
+        default: ""
+        type: string
       player_props:
-        description: Generate experimental player points/rebounds/assists/PRA projections (requires confirmed_lineups_json)
+        description: Generate experimental player points/rebounds/assists/PRA projections and rank top two per team
         required: true
         default: true
         type: boolean
@@ -172,6 +177,7 @@ jobs:
           AWAY_TEAM: ${{ inputs.away }}
           GAME_DATE: ${{ inputs.game_date }}
           LINEUPS_JSON: ${{ inputs.confirmed_lineups_json }}
+          PROP_LINES_JSON: ${{ inputs.player_prop_lines_json }}
         run: |
           if [ -z "$GAME_DATE" ]; then GAME_DATE="$(TZ=America/New_York date +%F)"; fi
           echo "Player-prop matchup date: $GAME_DATE (America/New_York)"
@@ -179,6 +185,10 @@ jobs:
           if [ -n "$LINEUPS_JSON" ]; then
             python -c 'import json,os; json.loads(os.environ["LINEUPS_JSON"]); open("confirmed-lineups.json","w").write(os.environ["LINEUPS_JSON"])'
             args+=(--lineups-json confirmed-lineups.json)
+          fi
+          if [ -n "$PROP_LINES_JSON" ]; then
+            python -c 'import json,os; json.loads(os.environ["PROP_LINES_JSON"]); open("player-prop-lines.json","w").write(os.environ["PROP_LINES_JSON"])'
+            args+=(--lines-json player-prop-lines.json)
           fi
           python -m nba.player_props "${args[@]}"
       - uses: actions/upload-artifact@v4
