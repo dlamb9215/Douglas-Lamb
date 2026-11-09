@@ -27,6 +27,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+          cache-dependency-path: requirements-nba.txt
       - name: Install dependencies
         run: python -m pip install --upgrade pip numpy
       - name: Run NBA unit tests
