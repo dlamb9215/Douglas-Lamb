@@ -26,6 +26,24 @@ EXCLUDED_STATUSES = {"Out", "Doubtful", "Questionable"}
 MIN_GAMES = 5
 MIN_AVERAGE_MINUTES = 10.0
 
+def confirmed_minutes(entry: dict[str, Any] | None) -> tuple[float | None, float | None, str | None]:
+    """Validate explicit game-specific availability and minutes confirmation."""
+    if not isinstance(entry, dict):
+        return None, None, "not listed in confirmed lineup input"
+    if entry.get("confirmed") is not True:
+        return None, None, "lineup status not explicitly confirmed"
+    status = str(entry.get("status", "")).strip().casefold()
+    if status not in {"available", "probable"}:
+        return None, None, f"lineup availability status is {status or 'missing'}"
+    try:
+        minutes = float(entry["minutes"])
+        minutes_sd = float(entry["minutes_sd"])
+    except (KeyError, TypeError, ValueError):
+        return None, None, "confirmed minutes and minutes_sd are required"
+    if not 8 <= minutes <= 48 or not 0 <= minutes_sd <= 8:
+        return None, None, "minutes projection outside safe range"
+    return minutes, minutes_sd, None
+
 def _get_json(url: str, timeout: int = 20) -> dict[str, Any]:
     request = urllib.request.Request(url, headers={"Accept": "application/json"})
     try:
@@ -147,7 +165,9 @@ def fetch_player_gamelog(player_id: str, season: int, cutoff: date | None = None
     return parse_gamelog(payload, {"id": player_id}, cutoff)
 
 def project_player(player: dict[str, Any], games: list[dict[str, Any]], injury_status: str | None = None,
-                   trials: int = 50000, seed: int = 42, lines: dict[str, float] | None = None) -> dict[str, Any] | None:
+                   trials: int = 50000, seed: int = 42, lines: dict[str, float] | None = None,
+                   confirmed_minutes: float | None = None,
+                   confirmed_minutes_sd: float | None = None) -> dict[str, Any] | None:
     import numpy as np
     if injury_status in EXCLUDED_STATUSES:
         return None
@@ -161,6 +181,10 @@ def project_player(player: dict[str, Any], games: list[dict[str, Any]], injury_s
     season_minutes = float(np.mean(minutes))
     recent_minutes = float(np.mean([g["minutes"] for g in last5]))
     projected_minutes = 0.65 * season_minutes + 0.35 * recent_minutes
+    if confirmed_minutes is not None:
+        if confirmed_minutes_sd is None or not 8 <= confirmed_minutes <= 48 or not 0 <= confirmed_minutes_sd <= 8:
+            raise ValueError("Confirmed minutes require minutes_sd and must be within safe limits")
+        projected_minutes = float(confirmed_minutes)
     rng = np.random.default_rng(seed)
     projections = {}
     draws = {}
@@ -176,7 +200,10 @@ def project_player(player: dict[str, Any], games: list[dict[str, Any]], injury_s
         sampled_values = np.asarray([recent[i][stat] for i in idx], dtype=float)
         sampled_rate = sampled_values / np.maximum(sampled_minutes, 1e-9)
         rate_draw = 0.5 * sampled_rate + 0.5 * shrunk_rate
-        minute_draw = 0.5 * sampled_minutes + 0.5 * projected_minutes
+        if confirmed_minutes is not None:
+            minute_draw = np.clip(rng.normal(confirmed_minutes, confirmed_minutes_sd, trials), 0, 48)
+        else:
+            minute_draw = 0.5 * sampled_minutes + 0.5 * projected_minutes
         distribution = np.maximum(0, rate_draw * minute_draw)
         draws[stat] = distribution
         line = (lines or {}).get(stat)
@@ -204,14 +231,28 @@ def project_player(player: dict[str, Any], games: list[dict[str, Any]], injury_s
         "player_id": player["id"], "player": player["name"], "position": player.get("position"),
         "games_used": len(games), "recent_games_used": len(recent),
         "season_minutes_avg": season_minutes, "recent5_minutes_avg": recent_minutes,
-        "projected_minutes": projected_minutes, "injury_status": injury_status or "No designation in official report",
+        "projected_minutes": projected_minutes,
+        "minutes_source": "confirmed game-specific input" if confirmed_minutes is not None else "unconfirmed historical baseline",
+        "confirmed_minutes_sd": confirmed_minutes_sd,
+        "injury_status": injury_status or "No designation in official report",
         "projections": projections,
         "warnings": ["Projected minutes are a recent/season statistical blend, not a confirmed rotation or starting-lineup projection."],
     }
 
 def build_matchup_player_projections(home: str, away: str, game_date: date, season: int = 2027,
                                      trials: int = 50000, seed: int = 42,
-                                     lines_by_player: dict[str, dict[str, float]] | None = None) -> dict[str, Any]:
+                                     lines_by_player: dict[str, dict[str, float]] | None = None,
+                                     confirmed_lineups: dict[str, Any] | None = None) -> dict[str, Any]:
+    aliases = {"GSW": "GS", "NOP": "NO", "NYK": "NY", "SAS": "SA", "UTA": "UTAH", "WAS": "WSH"}
+    team_codes = [aliases.get(home.upper(), home.upper()), aliases.get(away.upper(), away.upper())]
+    if not isinstance(confirmed_lineups, dict) or not isinstance(confirmed_lineups.get("teams"), dict):
+        return {
+            "game_date": game_date.isoformat(), "home": team_codes[0], "away": team_codes[1],
+            "season": season, "trials_per_player": trials, "teams": {team: [] for team in team_codes},
+            "source": "NBA official injury report plus ESPN historical game logs",
+            "warnings": ["Player props withheld: no game-specific confirmed lineup and minutes file was supplied."],
+            "limitations": ["No player props are released until each included player has confirmed available/probable status, confirmed lineup inclusion, and a bounded minutes projection."],
+        }
     try:
         injury = fetch_official_injuries(game_date, home, away, season)
     except (RuntimeError, OSError, ValueError) as exc:
@@ -226,8 +267,6 @@ def build_matchup_player_projections(home: str, away: str, game_date: date, seas
             ],
         }
     status_map = {(row["team"], row["player"].casefold()): row["status"] for row in injury["player_statuses"]}
-    aliases = {"GSW": "GS", "NOP": "NO", "NYK": "NY", "SAS": "SA", "UTA": "UTAH", "WAS": "WSH"}
-    team_codes = [aliases.get(home.upper(), home.upper()), aliases.get(away.upper(), away.upper())]
     teams = {}
     warnings = list(injury["warnings"])
     for team_code in team_codes:
@@ -237,17 +276,25 @@ def build_matchup_player_projections(home: str, away: str, game_date: date, seas
             continue
         roster = fetch_roster(team_code)
         projections = []
+        lineup = confirmed_lineups["teams"].get(team_code, {})
         for player in roster:
             if not player["active"]:
                 continue
             status = status_map.get((team_code, player["name"].casefold()))
             if status in EXCLUDED_STATUSES:
                 continue
+            lineup_entry = next((value for name, value in lineup.items()
+                                 if str(name).casefold() == player["name"].casefold()), None)
+            minutes, minutes_sd, lineup_error = confirmed_minutes(lineup_entry)
+            if lineup_error:
+                warnings.append(f"Withheld {player['name']} ({team_code}): {lineup_error}.")
+                continue
             try:
                 time.sleep(0.25)
                 games = fetch_player_gamelog(player["id"], season, game_date)
                 player_lines = (lines_by_player or {}).get(player["name"].casefold())
-                projection = project_player(player, games, status, trials, seed + int(player["id"]) % 100000, player_lines)
+                projection = project_player(player, games, status, trials,
+                    seed + int(player["id"]) % 100000, player_lines, minutes, minutes_sd)
                 if projection:
                     projections.append(projection)
             except (RuntimeError, ValueError) as exc:
@@ -260,11 +307,13 @@ def build_matchup_player_projections(home: str, away: str, game_date: date, seas
         "season": season, "trials_per_player": trials,
         "source": "ESPN public roster and player game logs plus NBA official injury report",
         "injury_report_url": injury["report_url"],
+        "confirmed_lineup_source": confirmed_lineups.get("source", "user-supplied confirmed lineup"),
+        "confirmed_lineup_timestamp": confirmed_lineups.get("confirmed_at"),
         "retrieved_at": datetime.now(timezone.utc).isoformat(),
         "teams": teams, "warnings": warnings,
         "limitations": [
-            "This is a statistical baseline, not a confirmed starting lineup or minutes/rotation model.",
-            "No player usage, matchup-position defense, role change or teammate-absence impact is automatically inferred.",
+            "Only players explicitly present in the supplied confirmed lineup/minutes file are projected.",
+            "Historical per-minute rates remain a statistical baseline; usage, matchup-position defense, role changes and teammate-absence impact are not automatically inferred.",
             "Questionable, Doubtful and Out players are excluded; players absent from the report are not guaranteed to play.",
             "No sportsbook player-prop lines are included unless supplied separately.",
         ],
@@ -280,6 +329,7 @@ def main():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--output", default="nba-player-projections.json")
     parser.add_argument("--lines-json", default="", help="Optional JSON mapping lowercase player names to points/rebounds/assists/pra lines")
+    parser.add_argument("--lineups-json", default="", help="Required for player props: JSON with confirmed game-specific lineups and minutes")
     args = parser.parse_args()
     lines = {}
     if args.lines_json:
@@ -287,7 +337,12 @@ def main():
         if not isinstance(raw_lines, dict):
             parser.error("--lines-json must contain an object keyed by player name")
         lines = {str(name).casefold(): values for name, values in raw_lines.items() if isinstance(values, dict)}
-    result = build_matchup_player_projections(args.home, args.away, date.fromisoformat(args.date), args.season, args.trials, args.seed, lines)
+    lineups = None
+    if args.lineups_json:
+        lineups = json.loads(Path(args.lineups_json).read_text(encoding="utf-8"))
+        if not isinstance(lineups, dict):
+            parser.error("--lineups-json must contain an object with source, confirmed_at and teams")
+    result = build_matchup_player_projections(args.home, args.away, date.fromisoformat(args.date), args.season, args.trials, args.seed, lines, lineups)
     Path(args.output).write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(result, indent=2))
 
