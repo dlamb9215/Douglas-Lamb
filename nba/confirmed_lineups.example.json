@@ -1,0 +1,22 @@
+{
+  "source": "Official team lineup confirmation",
+  "confirmed_at": "2026-11-08T23:30:00-06:00",
+  "teams": {
+    "BOS": {
+      "Example Home Player": {
+        "confirmed": true,
+        "status": "available",
+        "minutes": 34,
+        "minutes_sd": 2.5
+      }
+    },
+    "NY": {
+      "Example Away Player": {
+        "confirmed": true,
+        "status": "probable",
+        "minutes": 31,
+        "minutes_sd": 3
+      }
+    }
+  }
+}
