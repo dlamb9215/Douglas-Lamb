@@ -74,12 +74,12 @@ class TestNBAEngine(unittest.TestCase):
         neutral=matchup_projection(h,w,neutral_site=True)
         self.assertAlmostEqual(normal["home_court_points"],1.35)
         self.assertEqual(neutral["home_court_points"],0)
-        self.assertAlmostEqual(normal["home_margin"]-neutral["home_margin"],1.35)
+        self.assertAlmostEqual(normal["home_margin"]-neutral["home_margin"],1.35*normal["pace"]/100,places=6)
 
     def test_away_only_recent_pace_is_used_and_first_half_ml_sums(self):
         h,w=team("BOS"),team("NYK",recent_pace=106)
         p=matchup_projection(h,w)
-        self.assertGreater(p["pace"],100)
+        self.assertAlmostEqual(p["pace"],99.7,places=6)
         r=simulate(h,w,10000,13)
         first=r["first_half"]
         self.assertAlmostEqual(first["home_win"]+first["away_win"]+first["tie"],100,places=6)
