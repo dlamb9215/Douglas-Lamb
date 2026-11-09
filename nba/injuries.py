@@ -52,7 +52,7 @@ class _Links(HTMLParser):
                 self.hrefs.append(href)
 
 def _get(url: str, timeout: int = 30) -> bytes:
-    request = urllib.request.Request(url, headers={"Accept": "text/html,application/pdf,*/*"})
+    request = urllib.request.Request(url, headers={"Accept": "text/html,application/pdf,*/*", "User-Agent": "Mozilla/5.0 (compatible; DougsEliteNBASimulator/1.0)", "Referer": "https://www.nba.com/", "Accept-Language": "en-US,en;q=0.9"})
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:
             if response.status != 200:
@@ -137,27 +137,90 @@ def parse_report_text(text: str, teams: set[str] | None = None) -> dict[str, Any
         team_submission = {key: value for key, value in team_submission.items() if key in teams}
     return {"players": rows, "team_submission": team_submission}
 
+def _espn_injury_fallback(game_date: date, target_teams: set[str]) -> dict[str, Any]:
+    """Third-party fallback used only when the NBA-hosted report is inaccessible."""
+    url = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/injuries"
+    payload = json.loads(_get(url).decode("utf-8", errors="replace"))
+    entries = payload.get("injuries")
+    if not isinstance(entries, list):
+        raise RuntimeError("ESPN injury feed returned no recognizable injuries array")
+    aliases = {"GSW": "GS", "NOP": "NO", "NYK": "NY", "SAS": "SA", "UTA": "UTAH", "WAS": "WSH"}
+    rows = []
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        team = entry.get("team") or {}
+        athlete = entry.get("athlete") or {}
+        injury = entry.get("injury") or entry
+        code = str(team.get("abbreviation") or "").upper()
+        code = aliases.get(code, code)
+        if code not in target_teams:
+            continue
+        name = athlete.get("displayName") or athlete.get("fullName") or athlete.get("name")
+        status = injury.get("status") or injury.get("type") or entry.get("status")
+        if not name or not status:
+            continue
+        folded = str(status).strip().casefold()
+        if "out" in folded:
+            normalized = "Out"
+        elif "doubt" in folded:
+            normalized = "Doubtful"
+        elif "question" in folded or "day-to-day" in folded:
+            normalized = "Questionable"
+        elif "probab" in folded:
+            normalized = "Probable"
+        elif "avail" in folded or "active" in folded:
+            normalized = "Available"
+        else:
+            normalized = str(status).strip()
+        rows.append({"team": code, "player": str(name), "status": normalized,
+                     "reason": str(injury.get("details") or injury.get("shortComment") or "")})
+    return {
+        "game_date": game_date.isoformat(), "teams": sorted(target_teams),
+        "report_url": url, "retrieved_at": datetime.now(timezone.utc).isoformat(),
+        "player_statuses": rows, "team_submission": {},
+        "source": "ESPN public injury feed (third-party fallback; not the official NBA report)",
+        "warnings": [
+            "NBA official injury-report PDF was inaccessible; ESPN third-party injury feed used instead.",
+            "ESPN injury feed may differ from the latest team-submitted NBA report; verify late changes.",
+            "This feed does not confirm starters or minutes projections.",
+            "Unknown statuses are not treated as Available.",
+        ],
+    }
+
+
 def fetch_official_injuries(game_date: date, home: str, away: str, season: int = 2027) -> dict[str, Any]:
     aliases = {"GSW": "GS", "NOP": "NO", "NYK": "NY", "SAS": "SA", "UTA": "UTAH", "WAS": "WSH"}
     target_teams = {aliases.get(home.upper(), home.upper()), aliases.get(away.upper(), away.upper())}
-    report_url = latest_report_url(game_date, season)
-    pdf = _get(report_url)
-    reader = PdfReader(io.BytesIO(pdf))
-    text = "\n".join(page.extract_text() or "" for page in reader.pages)
-    parsed = parse_report_text(text, target_teams)
-    if not parsed["players"] and not parsed["team_submission"]:
-        raise RuntimeError("Official injury report was downloaded but no rows for the requested teams could be parsed.")
-    return {
-        "game_date": game_date.isoformat(), "teams": sorted(target_teams),
-        "report_url": report_url, "retrieved_at": datetime.now(timezone.utc).isoformat(),
-        "player_statuses": parsed["players"], "team_submission": parsed["team_submission"],
-        "source": "NBA official injury report",
-        "warnings": [
-            "Questionable and Doubtful players are not treated as confirmed active.",
-            "This report does not confirm starters or minutes projections.",
-            "Team point adjustments are not inferred from status labels; player impact must be modeled separately.",
-        ],
-    }
+    try:
+        report_url = latest_report_url(game_date, season)
+        pdf = _get(report_url)
+        reader = PdfReader(io.BytesIO(pdf))
+        report_text = "\\n".join(page.extract_text() or "" for page in reader.pages)
+        parsed = parse_report_text(report_text, target_teams)
+        if not parsed["players"] and not parsed["team_submission"]:
+            raise RuntimeError("Official injury report downloaded but requested teams could not be parsed")
+        return {
+            "game_date": game_date.isoformat(), "teams": sorted(target_teams),
+            "report_url": report_url, "retrieved_at": datetime.now(timezone.utc).isoformat(),
+            "player_statuses": parsed["players"], "team_submission": parsed["team_submission"],
+            "source": "NBA official injury report",
+            "warnings": [
+                "Questionable and Doubtful players are not treated as confirmed active.",
+                "This report does not confirm starters or minutes projections.",
+                "Team point adjustments are not inferred from status labels; player impact must be modeled separately.",
+            ],
+        }
+    except (RuntimeError, OSError, ValueError, urllib.error.URLError) as official_error:
+        try:
+            fallback = _espn_injury_fallback(game_date, target_teams)
+            fallback["warnings"].insert(0, f"Official NBA injury source unavailable: {official_error}")
+            return fallback
+        except Exception as fallback_error:
+            raise RuntimeError(
+                f"NBA official injury source unavailable ({official_error}); "
+                f"ESPN fallback also failed ({fallback_error}). Injury status remains unknown."
+            ) from fallback_error
 
 def main():
     parser = argparse.ArgumentParser(description="Fetch the NBA official injury report for a matchup")
