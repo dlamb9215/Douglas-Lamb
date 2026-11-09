@@ -279,7 +279,8 @@ def main():
     ap.add_argument("--away-spread-odds",type=float)
     ap.add_argument("--over-odds",type=float)
     ap.add_argument("--under-odds",type=float)
-    ap.add_argument("--auto-odds",action="store_true",help="Fetch current NBA moneyline, spread and total from The Odds API using ODDS_API_KEY")
+    ap.add_argument("--auto-odds",action="store_true",help="Fetch consensus NBA odds from The Odds API using ODDS_API_KEY")
+    ap.add_argument("--espn-bet-odds",action="store_true",help="Fetch ESPN BET current and opening NBA lines from ESPN Core API (provider 68)")
     ap.add_argument("--home-rest",type=float,default=2); ap.add_argument("--away-rest",type=float,default=2)
     ap.add_argument("--home-travel",type=float,default=0); ap.add_argument("--away-travel",type=float,default=0)
     ap.add_argument("--home-injury-points",type=float,default=0,help="Manual estimated team points lost to unavailable players")
@@ -292,6 +293,8 @@ def main():
     if a.trials<1 or a.max_trials<a.trials: ap.error("Invalid trial counts")
     if a.home.upper()==a.away.upper(): ap.error("Home and away teams must differ")
     if (a.home_ml_odds is None) != (a.away_ml_odds is None): ap.error("Supply both moneyline prices or neither")
+    if a.auto_odds and a.espn_bet_odds: ap.error("Choose ESPN BET odds or The Odds API, not both")
+    if a.espn_bet_odds and not a.game_date: ap.error("--espn-bet-odds requires --game-date")
     supplied_prices=[a.spread_odds,a.total_odds,a.home_spread_odds,a.away_spread_odds,a.over_odds,a.under_odds,a.home_ml_odds,a.away_ml_odds]
     if any(price==0 for price in supplied_prices if price is not None): ap.error("American odds cannot be zero")
     teams,meta=load_team_stats(a.data)
@@ -332,6 +335,27 @@ def main():
         if schedule_context["home_rest_days"] is not None: kwargs["home_rest"]=schedule_context["home_rest_days"]
         if schedule_context["away_rest_days"] is not None: kwargs["away_rest"]=schedule_context["away_rest_days"]
         kwargs["neutral_site"]=schedule_context["event"]["neutral_site"]
+    if a.espn_bet_odds:
+        from nba.espn_odds import fetch_espn_bet_odds
+        try:
+            odds_context=fetch_espn_bet_odds(schedule_context["event"]["event_id"])
+        except (RuntimeError, OSError, ValueError) as exc:
+            ap.error(f"ESPN BET odds unavailable: {exc}")
+        if odds_context.get("home_spread") is not None:
+            a.spread=odds_context["home_spread"]
+        if odds_context.get("total") is not None:
+            a.total=odds_context["total"]
+        if odds_context.get("home_ml_odds") is not None and odds_context.get("away_ml_odds") is not None:
+            a.home_ml_odds=odds_context["home_ml_odds"]
+            a.away_ml_odds=odds_context["away_ml_odds"]
+        if odds_context.get("home_spread_odds") is not None:
+            a.home_spread_odds=odds_context["home_spread_odds"]
+        if odds_context.get("away_spread_odds") is not None:
+            a.away_spread_odds=odds_context["away_spread_odds"]
+        if odds_context.get("over_odds") is not None:
+            a.over_odds=odds_context["over_odds"]
+        if odds_context.get("under_odds") is not None:
+            a.under_odds=odds_context["under_odds"]
     if a.auto_injuries:
         if not a.game_date: ap.error("--auto-injuries requires --game-date")
         from datetime import date
@@ -356,6 +380,10 @@ def main():
     print(f"Schedule adjustments: home {r['home_rest_adjustment']:+.2f} pts | away {r['away_rest_adjustment']:+.2f} pts | home court {r['home_court_points']:+.2f} pts")
     if schedule_context:
         print(f"ESPN schedule: event {schedule_context['event']['event_id']} | {schedule_context['event']['date']} | neutral site {schedule_context['event']['neutral_site']}")
+    if odds_context and odds_context.get("source") == "ESPN BET via ESPN Core API":
+        print(f"ESPN BET odds snapshot: {odds_context.get('retrieved_at')} | provider {odds_context.get('provider_name')} ({odds_context.get('provider_id')})")
+        print(f"ESPN BET opening lines: home spread {odds_context.get('opening_home_spread')} | total {odds_context.get('opening_total')} | home ML {odds_context.get('opening_home_ml_odds')} | away ML {odds_context.get('opening_away_ml_odds')}")
+        print(f"ESPN BET current lines: home spread {odds_context.get('home_spread')} | total {odds_context.get('total')} | home ML {odds_context.get('home_ml_odds')} | away ML {odds_context.get('away_ml_odds')}")
         print(f"Automatic rest: home {schedule_context['home_rest_days']} days | away {schedule_context['away_rest_days']} days")
         for warning in schedule_context["warnings"]: print(f"DATA WARNING: {warning}")
     if injury_context and injury_context.get("report_url"):
