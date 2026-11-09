@@ -82,8 +82,13 @@ on:
         required: true
         default: true
         type: boolean
+      espn_bet_odds:
+        description: Compare model against ESPN BET current and opening lines (provider 68)
+        required: true
+        default: true
+        type: boolean
       auto_odds:
-        description: Fetch current moneyline, spread and total from The Odds API (requires ODDS_API_KEY secret)
+        description: Optional consensus odds from The Odds API (requires ODDS_API_KEY secret; do not enable with ESPN BET)
         required: true
         default: false
         type: boolean
@@ -118,7 +123,7 @@ jobs:
       - name: Install dependencies
         run: python -m pip install --upgrade pip -r requirements-nba.txt
       - name: Run NBA tests
-        run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule nba.test_odds nba.test_injuries nba.test_player_props nba.test_player_props_backtest
+        run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule nba.test_odds nba.test_espn_odds nba.test_injuries nba.test_player_props nba.test_player_props_backtest
       - name: Require refreshed NBA data
         run: |
           test -s nba/team_stats.json
@@ -142,6 +147,7 @@ jobs:
           GAME_DATE: ${{ inputs.game_date }}
           AUTO_INJURIES: ${{ inputs.auto_injuries }}
           AUTO_ODDS: ${{ inputs.auto_odds }}
+          ESPN_BET_ODDS: ${{ inputs.espn_bet_odds }}
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
           HOME_INJURY: ${{ inputs.home_injury_points }}
           AWAY_INJURY: ${{ inputs.away_injury_points }}
@@ -156,6 +162,7 @@ jobs:
           args+=(--game-date "$GAME_DATE")
           if [ "$AUTO_INJURIES" = "true" ]; then args+=(--auto-injuries); fi
           if [ "$AUTO_ODDS" = "true" ]; then args+=(--auto-odds); fi
+          if [ "$ESPN_BET_ODDS" = "true" ]; then args+=(--espn-bet-odds); fi
           python -m nba.simulator "${args[@]}" | tee nba-simulation-results.txt
       - name: Run experimental player prop projections
         if: ${{ inputs.player_props }}
