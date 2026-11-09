@@ -22,7 +22,7 @@ A team-level NBA forecasting and betting-analysis engine. It is separate from th
 - A shared data-quality gate validates all 30 expected teams, metric ranges, season metadata, timezone-aware timestamps and 72-hour freshness; it reports early-season sample-size and unavailable-feature warnings without inventing values.
 
 ## Output scope
-The team engine provides moneyline probabilities plus spread and game-total analysis for full game and first half. No alternate spreads are created. Two separate experimental player-prop paths are also available: `nba.player_props` builds roster/game-log-based projections from ESPN feeds, while `nba.player_props_cli` simulates points, rebounds, assists and PRA from explicitly supplied, verified player inputs. These player-prop paths are separate from the team score model and are not yet calibrated betting models.
+The team engine provides moneyline probabilities plus spread and game-total analysis for full game and first half. No alternate spreads are created. The experimental `nba.player_props` pipeline builds player points/rebounds/assists/PRA projections from ESPN feeds, but only after a fresh confirmed-lineup/minutes input is supplied. Player props are separate from the team score model and are not yet calibrated betting recommendations.
 
 ## Refresh data
 Run the **Update NBA Statistics** workflow. It requests current and prior-season ESPN-derived team aggregates through DunkAPI. The updater validates all 30 teams and writes only after both season requests and data checks succeed. It preserves the last good file if a refresh fails.
