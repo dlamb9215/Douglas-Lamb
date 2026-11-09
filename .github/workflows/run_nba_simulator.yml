@@ -67,8 +67,13 @@ on:
         required: true
         default: "0"
         type: string
+      confirmed_lineups_json:
+        description: Optional JSON string with confirmed team lineups, availability and projected minutes; props are withheld if absent
+        required: false
+        default: ""
+        type: string
       player_props:
-        description: Generate experimental player points/rebounds/assists/PRA projections (requires game_date)
+        description: Generate experimental player points/rebounds/assists/PRA projections (requires confirmed_lineups_json)
         required: true
         default: true
         type: boolean
@@ -157,9 +162,15 @@ jobs:
           HOME_TEAM: ${{ inputs.home }}
           AWAY_TEAM: ${{ inputs.away }}
           GAME_DATE: ${{ inputs.game_date }}
+          LINEUPS_JSON: ${{ inputs.confirmed_lineups_json }}
         run: |
           test -n "$GAME_DATE" || { echo "game_date is required when player_props is enabled"; exit 1; }
-          python -m nba.player_props --home "$HOME_TEAM" --away "$AWAY_TEAM" --date "$GAME_DATE" --season 2027 --trials 50000 --output nba-player-projections.json
+          args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --date "$GAME_DATE" --season 2027 --trials 50000 --output nba-player-projections.json)
+          if [ -n "$LINEUPS_JSON" ]; then
+            python -c 'import json,os; json.loads(os.environ["LINEUPS_JSON"]); open("confirmed-lineups.json","w").write(os.environ["LINEUPS_JSON"])'
+            args+=(--lineups-json confirmed-lineups.json)
+          fi
+          python -m nba.player_props "${args[@]}"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
