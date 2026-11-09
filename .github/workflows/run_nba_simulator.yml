@@ -90,7 +90,7 @@ on:
       game_date:
         description: Optional matchup date YYYY-MM-DD; blank uses today's NBA date in America/New_York
         required: false
-        default: "2026-11-10"
+        default: "2026-11-09"
         type: string
       home_injury_points:
         description: Manual home team points adjustment for unavailable players
