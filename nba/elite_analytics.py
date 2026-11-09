@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any
+import math
 import numpy as np
 
 VALID_STAT_KEYS = ("points", "rebounds", "assists")
@@ -55,6 +56,13 @@ class PlayerInput:
         )
         if not p.player or not p.team:
             raise ValueError("Player name and team are required")
+        numeric = (p.minutes, p.minutes_sd, p.points_per_minute,
+                   p.rebounds_per_minute, p.assists_per_minute,
+                   p.usage_multiplier, p.pace_multiplier,
+                   p.points_matchup_multiplier, p.rebounds_matchup_multiplier,
+                   p.assists_matchup_multiplier)
+        if not all(math.isfinite(value) for value in numeric):
+            raise ValueError("All numeric player inputs must be finite")
         if p.minutes <= 0 or p.minutes > 48 or p.minutes_sd < 0 or p.minutes_sd > 15:
             raise ValueError("Minutes must be 0-48 and minutes_sd 0-15")
         for key in ("points_per_minute", "rebounds_per_minute", "assists_per_minute"):
@@ -97,6 +105,11 @@ def simulate_player_props(raw: dict[str, Any] | PlayerInput, trials: int = 200_0
                 "reason": reason, "projections": {}}
     if trials < 1:
         raise ValueError("trials must be positive")
+    for stat, line in (lines or {}).items():
+        if stat not in {"points", "rebounds", "assists", "pra"}:
+            raise ValueError(f"Unsupported prop line: {stat}")
+        if not math.isfinite(float(line)):
+            raise ValueError(f"{stat} line must be finite")
     rng = np.random.default_rng(seed)
     minutes = np.clip(rng.normal(player.minutes, player.minutes_sd, trials), 0, 48)
     shared = rng.normal(0, 0.035, trials)
@@ -131,6 +144,8 @@ def simulate_player_props(raw: dict[str, Any] | PlayerInput, trials: int = 200_0
 
 def american_implied_probability(odds: int | float) -> float:
     odds = float(odds)
+    if not math.isfinite(odds):
+        raise ValueError("American odds must be finite")
     if odds == 0:
         raise ValueError("American odds cannot be zero")
     return 100 / (odds + 100) if odds > 0 else abs(odds) / (abs(odds) + 100)
@@ -150,6 +165,8 @@ def expected_value_per_100(probability_pct: float, american_odds: int | float) -
     if not 0 <= p <= 1:
         raise ValueError("probability_pct must be 0-100")
     odds = float(american_odds)
+    if not math.isfinite(odds):
+        raise ValueError("American odds must be finite")
     if odds == 0:
         raise ValueError("American odds cannot be zero")
     profit = odds if odds > 0 else 10000 / abs(odds)
@@ -165,6 +182,9 @@ def scenario_grid(base: dict[str, float], scenarios: dict[str, dict[str, float]]
         unknown = set(changes) - set(base)
         if unknown:
             raise ValueError(f"Unknown scenario fields: {', '.join(sorted(unknown))}")
-        result[name] = {key: float(value) + float(changes.get(key, 0))
-                        for key, value in base.items()}
+        values = {key: float(value) + float(changes.get(key, 0))
+                  for key, value in base.items()}
+        if not all(math.isfinite(value) for value in values.values()):
+            raise ValueError(f"Scenario {name} contains non-finite values")
+        result[name] = values
     return result
