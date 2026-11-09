@@ -39,5 +39,33 @@ Cleveland Cavaliers Allen, Jarrett Out Injury/Illness - Right Knee Contusion
             with self.assertRaisesRegex(RuntimeError, "No NBA official injury-report PDF"):
                 latest_report_url(date(2026, 11, 8), 2027)
 
+    def test_uses_labeled_espn_fallback_when_official_site_is_blocked(self):
+        import json
+        payload = {"injuries": [{
+            "team": {"abbreviation": "LAL"},
+            "athlete": {"displayName": "Example Player"},
+            "injury": {"status": "Out", "details": "ankle"}
+        }]}
+        with patch("nba.injuries.latest_report_url", side_effect=RuntimeError("HTTP 403")), \\
+             patch("nba.injuries._get", return_value=json.dumps(payload).encode()):
+            from nba.injuries import fetch_official_injuries
+            result = fetch_official_injuries(date(2026, 11, 9), "ATL", "LAL", 2027)
+        self.assertIn("third-party fallback", result["source"])
+        self.assertEqual(result["player_statuses"][0]["status"], "Out")
+        self.assertEqual(result["player_statuses"][0]["team"], "LAL")
+        self.assertTrue(any("Official NBA injury source unavailable" in w for w in result["warnings"]))
+
+    def test_espn_fallback_does_not_treat_unknown_status_as_available(self):
+        import json
+        from nba.injuries import _espn_injury_fallback
+        payload = {"injuries": [{
+            "team": {"abbreviation": "ATL"},
+            "athlete": {"displayName": "Example Player"},
+            "injury": {"status": "Limited"}
+        }]}
+        with patch("nba.injuries._get", return_value=json.dumps(payload).encode()):
+            result = _espn_injury_fallback(date(2026, 11, 9), {"ATL"})
+        self.assertEqual(result["player_statuses"][0]["status"], "Limited")
+
 if __name__ == "__main__":
     unittest.main()
