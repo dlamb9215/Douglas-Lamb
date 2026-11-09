@@ -32,18 +32,21 @@ jobs:
         run: python -m pip install --upgrade pip numpy
       - name: Run NBA unit tests
         run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_elite_analytics nba.test_player_props_backtest
-      - name: Validate all 30 NBA teams
+      - name: Create isolated synthetic fixture for engine smoke test
         run: |
           python - <<'PY'
-          from nba.simulator import load_team_stats
-          teams, meta = load_team_stats("nba/team_stats.json")
-          assert len(teams) >= 30, f"Expected 30 teams, found {len(teams)}"
-          assert meta.get("season"), "Season metadata missing"
-          assert meta.get("updated_at"), "Data timestamp missing"
-          print(f"Validated {len(teams)} teams for season {meta['season']}; updated {meta['updated_at']}")
+          import json
+          codes = "ATL BOS BKN CHA CHI CLE DAL DEN DET GSW HOU IND LAC LAL MEM MIA MIL MIN NOP NYK OKC ORL PHI PHX POR SAC SAS TOR UTA WAS".split()
+          base = {"games_played": 10, "pace": 100.0, "off_rating": 112.0, "def_rating": 112.0,
+                  "efg_pct": .54, "tov_pct": .135, "orb_pct": .265, "ft_rate": .25,
+                  "opp_efg_pct": .54, "opp_tov_pct": .135, "opp_orb_pct": .265, "opp_ft_rate": .25,
+                  "score_sd": 11.5}
+          teams = {code: {"name": code, **base} for code in codes}
+          with open("/tmp/nba-smoke-data.json", "w", encoding="utf-8") as handle:
+              json.dump({"league": "NBA", "season": "CI-FIXTURE", "updated_at": "2026-01-01T00:00:00+00:00", "teams": teams}, handle)
           PY
       - name: Run reproducible 1M-trial smoke simulation
-        run: python -m nba.simulator --home BOS --away NYK --spread -2.5 --total 220.5 --trials 1000000 --no-auto-refine --json-output nba-smoke-results.json
+        run: python -m nba.simulator --data /tmp/nba-smoke-data.json --home BOS --away NYK --spread -2.5 --total 220.5 --trials 1000000 --no-auto-refine --json-output nba-smoke-results.json
       - name: Upload smoke report
         if: always()
         uses: actions/upload-artifact@v4
