@@ -370,7 +370,8 @@ def main():
                 print(f"AVAILABILITY WARNING: {row['team']} {row['player']} — {row['status']} ({row['reason']})")
         for warning in injury_context["warnings"]: print(f"INJURY NOTE: {warning}")
     ml_pick=h.name if r["home_win"]>=55 else (w.name if r["away_win"]>=55 else "PASS — no 55% win-probability edge")
-    print(f"\nMONEYLINE: {h.name} win {r['home_win']:.2f}% | {w.name} win {r['away_win']:.2f}% | tie {r['win_tie']:.2f}%")
+    print(f"\nMONEYLINE: {h.name} win {r['home_win']:.2f}% | {w.name} win {r['away_win']:.2f}% | tie after OT {r['win_tie']:.2f}%")
+    print(f"95% Monte Carlo interval: home {r['home_win_ci'][0]:.2f}-{r['home_win_ci'][1]:.2f}% | away {r['away_win_ci'][0]:.2f}-{r['away_win_ci'][1]:.2f}%")
     print(f"Moneyline pick: {ml_pick}")
     if a.home_ml_odds is not None:
         market=no_vig_probabilities(a.home_ml_odds,a.away_ml_odds)
