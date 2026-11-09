@@ -2,7 +2,7 @@
   "league": "NBA",
   "season": 2027,
   "prior_season": 2026,
-  "updated_at": "2026-11-08T11:04:32.542189+00:00",
+  "updated_at": "2026-11-09T06:11:29.086526+00:00",
   "source": "DunkAPI get_team_stats (ESPN-derived)",
   "methods": {
     "prior_season_weight_games": 8,
