@@ -1,0 +1,11 @@
+{
+  "provider": "CollegeFootballData",
+  "year": 2026,
+  "season_type": "regular",
+  "classification": "fbs",
+  "retrieved_at": "2026-11-10T11:10:56.501243+00:00",
+  "stats_available": true,
+  "usage_available": true,
+  "roster_available": true,
+  "warnings": []
+}
