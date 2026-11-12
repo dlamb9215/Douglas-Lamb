@@ -81,7 +81,7 @@ def build_row(payload: dict[str, Any], run_id: str, git_sha: str,
 def append_forecast(payload_path: str, ledger_path: str, run_id: str, git_sha: str) -> dict[str, Any]:
     raw_payload = Path(payload_path).read_text(encoding="utf-8").strip()
     # Accept the legacy literal backslash-n terminator from earlier simulator runs.
-    if raw_payload.endswith("\\\\n"):
+    if raw_payload.endswith("\\n"):
         raw_payload = raw_payload[:-2].rstrip()
     payload = json.loads(raw_payload)
     row = build_row(payload, run_id, git_sha)
