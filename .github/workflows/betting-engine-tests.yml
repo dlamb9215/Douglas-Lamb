@@ -2,10 +2,14 @@ name: Betting Engine Tests
 
 on:
   push:
-    branches: [main, "upgrade/**"]
+    branches: [main, "upgrade/**", "integration/**"]
     paths:
       - "betting_engine/**"
       - "BETTING_ENGINE_UPGRADE.md"
+      - "main.py"
+      - "market_data.py"
+      - "matchup_player_pipeline.py"
+      - "nba/**"
       - ".github/workflows/betting-engine-tests.yml"
   pull_request:
     paths:
@@ -23,4 +27,4 @@ jobs:
         with:
           python-version: "3.12"
       - name: Run betting decision tests
-        run: python -m unittest -v betting_engine.test_decision
+        run: python -m unittest -v betting_engine.test_decision betting_engine.test_integrations
