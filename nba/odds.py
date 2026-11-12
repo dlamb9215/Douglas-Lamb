@@ -141,7 +141,7 @@ def matchup_odds(home_name: str, away_name: str, api_key: str | None = None) -> 
         })
     if total_rows:
         line, at_line = _consensus_rows(total_rows)
-        pair = _lowest_hold_pair([(row[1], row[2], row[3]) for row in at_line])
+        pair = _lowest_hold_pair([(row[1], row[2], row[3], row[4]) for row in at_line])
         result.update({
             "total": line,
             "over_odds": pair[0] if pair else None,
