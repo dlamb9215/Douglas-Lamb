@@ -35,6 +35,12 @@ class TestSettleLedger(unittest.TestCase):
             }],
         }
 
+    def test_missing_ledger_is_a_safe_noop(self):
+        with tempfile.TemporaryDirectory() as folder:
+            result = settle_ledger(str(Path(folder) / "not-created.csv"), lambda day: [])
+        self.assertEqual(result["status"], "ledger_not_created_yet")
+        self.assertEqual(result["settled"], 0)
+
     def test_settles_only_completed_matching_event(self):
         with tempfile.TemporaryDirectory() as folder:
             path = self.write_ledger(folder)
