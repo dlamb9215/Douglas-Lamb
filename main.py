@@ -517,6 +517,7 @@ def main():
             selection_a=f"{home_code} moneyline", probability_a=result["home_win"] / 100,
             odds_a=args.home_odds, selection_b=f"{away_code} moneyline",
             probability_b=result["away_win"] / 100, odds_b=args.away_odds,
+            push_probability=result["tie"] / 100,
             sportsbook=quote_source, quoted_at=quote_time, data_ready=decision_data_ready,
             availability_confirmed=team_availability_confirmed, calibration_ready=summary.get("calibrated") is True,
             notes=team_availability_reason,
