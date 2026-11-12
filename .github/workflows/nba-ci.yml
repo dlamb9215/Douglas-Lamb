@@ -6,6 +6,7 @@ on:
       - "betting_engine/**"
       - ".github/workflows/run_nba_simulator.yml"
       - ".github/workflows/update_nba_stats.yml"
+      - ".github/workflows/settle-nba-ledger.yml"
       - ".github/workflows/nba-ci.yml"
   pull_request:
     paths:
@@ -27,7 +28,7 @@ jobs:
       - name: Lint NBA simulator workflow expressions
         uses: rhysd/actionlint@v1.7.7
         with:
-          args: .github/workflows/run_nba_simulator.yml .github/workflows/nfl_validation.yml
+          args: .github/workflows/run_nba_simulator.yml .github/workflows/settle-nba-ledger.yml .github/workflows/nfl_validation.yml
       - name: Validate NBA workflow YAML structure
         run: |
           python - <<'PY'
