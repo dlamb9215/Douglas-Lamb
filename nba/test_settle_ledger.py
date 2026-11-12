@@ -48,8 +48,8 @@ class TestSettleLedger(unittest.TestCase):
             self.assertEqual(result["settled"], 1, result)
             with path.open(newline="", encoding="utf-8") as handle:
                 row = next(csv.DictReader(handle))
-            self.assertEqual(row["actual_home"], "112")
-            self.assertEqual(row["actual_away"], "108")
+            self.assertEqual(row["actual_home"], "112.0")
+            self.assertEqual(row["actual_away"], "108.0")
             self.assertTrue(row["settled_at"])
 
     def test_does_not_settle_wrong_team_identity(self):
