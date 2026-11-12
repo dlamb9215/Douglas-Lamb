@@ -32,7 +32,7 @@ class TestPredictionLedger(unittest.TestCase):
     def test_build_row_preserves_prediction_and_quote_provenance(self):
         row = build_row(fixture(), "123", "abc", "2026-11-12T18:00:00Z")
         self.assertEqual(row["forecast_id"], "123:evt-1:BOS:NYK")
-        self.assertEqual(row["projected_margin"], 4.3)
+        self.assertAlmostEqual(row["projected_margin"], 4.3)
         self.assertEqual(row["spread_bookmaker"], "book-b")
         self.assertEqual(row["spread_quote_at"], "2026-11-12T17:01:00Z")
         self.assertEqual(row["actual_home"], "")
