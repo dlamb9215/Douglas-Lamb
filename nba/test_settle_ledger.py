@@ -45,7 +45,7 @@ class TestSettleLedger(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             path = self.write_ledger(folder)
             result = settle_ledger(str(path), lambda day: [self.event()])
-            self.assertEqual(result["settled"], 1)
+            self.assertEqual(result["settled"], 1, result)
             with path.open(newline="", encoding="utf-8") as handle:
                 row = next(csv.DictReader(handle))
             self.assertEqual(row["actual_home"], "112")
