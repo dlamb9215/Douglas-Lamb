@@ -1,5 +1,16 @@
 name: Run Doug's Elite NBA Simulator
 on:
+  push:
+    branches: [main, "integration/**"]
+    paths:
+      - "nba/**"
+      - "betting_engine/**"
+      - ".github/workflows/run_nba_simulator.yml"
+  pull_request:
+    paths:
+      - "nba/**"
+      - "betting_engine/**"
+      - ".github/workflows/run_nba_simulator.yml"
   workflow_dispatch:
     inputs:
       home:
@@ -154,6 +165,7 @@ jobs:
           test -s nba/team_stats.json
           python -m nba.data_quality --data nba/team_stats.json --max-age-hours 72
       - name: Run matchup
+        if: github.event_name == 'workflow_dispatch'
         env:
           HOME_TEAM: ${{ inputs.home }}
           AWAY_TEAM: ${{ inputs.away }}
@@ -202,7 +214,7 @@ jobs:
           if [ "$ESPN_BET_ODDS" = "true" ]; then args+=(--espn-bet-odds); fi
           python -m nba.simulator "${args[@]}" | tee nba-simulation-results.txt
       - name: Run experimental player prop projections
-        if: ${{ inputs.player_props }}
+        if: github.event_name == 'workflow_dispatch' && inputs.player_props
         env:
           HOME_TEAM: ${{ inputs.home }}
           AWAY_TEAM: ${{ inputs.away }}
