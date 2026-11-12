@@ -22,7 +22,7 @@ class TestSettleLedger(unittest.TestCase):
             writer.writerow(row)
         return path
 
-    def event(self, home="BOS", away="NYK", completed=True):
+    def event(self, home="BOS", away="NY", completed=True):
         return {
             "id": "event-1", "date": "2026-11-13T01:00:00Z",
             "status": {"type": {"state": "post" if completed else "in", "completed": completed}},
