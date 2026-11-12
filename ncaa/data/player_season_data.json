@@ -4,7 +4,7 @@
     "year": 2026,
     "season_type": "regular",
     "classification": "fbs",
-    "retrieved_at": "2026-11-11T11:16:35.708536+00:00",
+    "retrieved_at": "2026-11-12T11:21:34.873739+00:00",
     "stats_available": true,
     "usage_available": true,
     "roster_available": true,
@@ -21261,7 +21261,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "PD",
-      "stat": "5"
+      "stat": "6"
     },
     {
       "season": 2026,
@@ -21294,7 +21294,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "25"
+      "stat": "26"
     },
     {
       "season": 2026,
@@ -21316,7 +21316,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "2.5"
+      "stat": "3.0"
     },
     {
       "season": 2026,
@@ -21327,7 +21327,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "59"
+      "stat": "62"
     },
     {
       "season": 2026,
@@ -25826,7 +25826,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "7"
+      "stat": "8"
     },
     {
       "season": 2026,
@@ -25848,7 +25848,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "1"
+      "stat": "2"
     },
     {
       "season": 2026,
@@ -25859,7 +25859,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "10"
+      "stat": "11"
     },
     {
       "season": 2026,
@@ -35407,7 +35407,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "21"
+      "stat": "24"
     },
     {
       "season": 2026,
@@ -35440,7 +35440,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "52"
+      "stat": "57"
     },
     {
       "season": 2026,
@@ -46209,7 +46209,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "19"
+      "stat": "24"
     },
     {
       "season": 2026,
@@ -46231,7 +46231,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "176"
+      "stat": "209"
     },
     {
       "season": 2026,
@@ -46242,7 +46242,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "9.3"
+      "stat": "8.7"
     },
     {
       "season": 2026,
@@ -54239,7 +54239,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "PD",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -54272,7 +54272,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "36"
+      "stat": "38"
     },
     {
       "season": 2026,
@@ -54305,7 +54305,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "78"
+      "stat": "89"
     },
     {
       "season": 2026,
@@ -58650,7 +58650,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SACKS",
-      "stat": "1"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -58661,7 +58661,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "3"
+      "stat": "6"
     },
     {
       "season": 2026,
@@ -58683,7 +58683,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "1.5"
+      "stat": "3.5"
     },
     {
       "season": 2026,
@@ -58694,7 +58694,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "9"
+      "stat": "13"
     },
     {
       "season": 2026,
@@ -60245,7 +60245,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "19"
+      "stat": "22"
     },
     {
       "season": 2026,
@@ -60267,7 +60267,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "1.5"
+      "stat": "2.5"
     },
     {
       "season": 2026,
@@ -60278,7 +60278,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "35"
+      "stat": "38"
     },
     {
       "season": 2026,
@@ -60487,7 +60487,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "8"
+      "stat": "11"
     },
     {
       "season": 2026,
@@ -60509,7 +60509,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "2.0"
+      "stat": "3.0"
     },
     {
       "season": 2026,
@@ -60520,7 +60520,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "20"
+      "stat": "24"
     },
     {
       "season": 2026,
@@ -65030,7 +65030,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "5"
+      "stat": "6"
     },
     {
       "season": 2026,
@@ -65063,7 +65063,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "18"
+      "stat": "20"
     },
     {
       "season": 2026,
@@ -73071,7 +73071,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "16"
+      "stat": "19"
     },
     {
       "season": 2026,
@@ -73104,7 +73104,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "43"
+      "stat": "50"
     },
     {
       "season": 2026,
@@ -78718,6 +78718,61 @@
     },
     {
       "season": 2026,
+      "playerId": "4826574",
+      "player": "Owen Anderson",
+      "position": "TE",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "kickReturns",
+      "statType": "AVG",
+      "stat": "7.0"
+    },
+    {
+      "season": 2026,
+      "playerId": "4826574",
+      "player": "Owen Anderson",
+      "position": "TE",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "kickReturns",
+      "statType": "LONG",
+      "stat": "7"
+    },
+    {
+      "season": 2026,
+      "playerId": "4826574",
+      "player": "Owen Anderson",
+      "position": "TE",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "kickReturns",
+      "statType": "NO",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "4826574",
+      "player": "Owen Anderson",
+      "position": "TE",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "kickReturns",
+      "statType": "TD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "4826574",
+      "player": "Owen Anderson",
+      "position": "TE",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "kickReturns",
+      "statType": "YDS",
+      "stat": "7"
+    },
+    {
+      "season": 2026,
       "playerId": "4826575",
       "player": "Saco Alofipo",
       "position": "S",
@@ -79539,7 +79594,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "PD",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -79550,7 +79605,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "1"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -79572,7 +79627,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "43"
+      "stat": "46"
     },
     {
       "season": 2026,
@@ -79605,7 +79660,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "75"
+      "stat": "84"
     },
     {
       "season": 2026,
@@ -86370,7 +86425,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "10"
+      "stat": "11"
     },
     {
       "season": 2026,
@@ -86392,7 +86447,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "169"
+      "stat": "174"
     },
     {
       "season": 2026,
@@ -86403,7 +86458,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "16.9"
+      "stat": "15.8"
     },
     {
       "season": 2026,
@@ -92552,7 +92607,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "16"
+      "stat": "17"
     },
     {
       "season": 2026,
@@ -92585,7 +92640,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "34"
+      "stat": "35"
     },
     {
       "season": 2026,
@@ -100868,7 +100923,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "53"
+      "stat": "54"
     },
     {
       "season": 2026,
@@ -100879,7 +100934,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "TD",
-      "stat": "8"
+      "stat": "9"
     },
     {
       "season": 2026,
@@ -100890,7 +100945,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "682"
+      "stat": "696"
     },
     {
       "season": 2026,
@@ -111593,7 +111648,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SACKS",
-      "stat": "0.5"
+      "stat": "1.5"
     },
     {
       "season": 2026,
@@ -111604,7 +111659,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "6"
+      "stat": "8"
     },
     {
       "season": 2026,
@@ -111626,7 +111681,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "1.5"
+      "stat": "2.5"
     },
     {
       "season": 2026,
@@ -111637,7 +111692,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "21"
+      "stat": "24"
     },
     {
       "season": 2026,
@@ -130590,7 +130645,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -130623,7 +130678,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "14"
+      "stat": "17"
     },
     {
       "season": 2026,
@@ -131591,7 +131646,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "20"
+      "stat": "23"
     },
     {
       "season": 2026,
@@ -146232,7 +146287,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "8"
+      "stat": "10"
     },
     {
       "season": 2026,
@@ -153690,7 +153745,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "5"
+      "stat": "6"
     },
     {
       "season": 2026,
@@ -153723,7 +153778,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "11"
+      "stat": "12"
     },
     {
       "season": 2026,
@@ -154009,7 +154064,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "5"
+      "stat": "7"
     },
     {
       "season": 2026,
@@ -154031,7 +154086,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "14"
+      "stat": "20"
     },
     {
       "season": 2026,
@@ -154053,7 +154108,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "3.5"
+      "stat": "4.5"
     },
     {
       "season": 2026,
@@ -154064,7 +154119,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "34"
+      "stat": "43"
     },
     {
       "season": 2026,
@@ -155956,7 +156011,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "9"
+      "stat": "10"
     },
     {
       "season": 2026,
@@ -155978,7 +156033,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "52"
+      "stat": "58"
     },
     {
       "season": 2026,
@@ -161126,7 +161181,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "10"
+      "stat": "12"
     },
     {
       "season": 2026,
@@ -161148,7 +161203,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "3.0"
+      "stat": "3.5"
     },
     {
       "season": 2026,
@@ -161159,7 +161214,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "18"
+      "stat": "21"
     },
     {
       "season": 2026,
@@ -164052,7 +164107,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "AVG",
-      "stat": "23.0"
+      "stat": "20.0"
     },
     {
       "season": 2026,
@@ -164074,7 +164129,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "NO",
-      "stat": "1"
+      "stat": "2"
     },
     {
       "season": 2026,
@@ -164096,7 +164151,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "YDS",
-      "stat": "23"
+      "stat": "40"
     },
     {
       "season": 2026,
@@ -164118,7 +164173,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "11"
+      "stat": "12"
     },
     {
       "season": 2026,
@@ -164140,7 +164195,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "75"
+      "stat": "78"
     },
     {
       "season": 2026,
@@ -164151,7 +164206,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "6.8"
+      "stat": "6.5"
     },
     {
       "season": 2026,
@@ -164162,7 +164217,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "35"
+      "stat": "38"
     },
     {
       "season": 2026,
@@ -164195,7 +164250,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "86"
+      "stat": "90"
     },
     {
       "season": 2026,
@@ -164206,7 +164261,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "2.5"
+      "stat": "2.4"
     },
     {
       "season": 2026,
@@ -166901,7 +166956,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "6"
+      "stat": "8"
     },
     {
       "season": 2026,
@@ -184072,7 +184127,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "7"
+      "stat": "8"
     },
     {
       "season": 2026,
@@ -184105,7 +184160,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "15"
+      "stat": "19"
     },
     {
       "season": 2026,
@@ -198317,7 +198372,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "ATT",
-      "stat": "163"
+      "stat": "167"
     },
     {
       "season": 2026,
@@ -198328,7 +198383,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "COMPLETIONS",
-      "stat": "113"
+      "stat": "115"
     },
     {
       "season": 2026,
@@ -198350,7 +198405,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "PCT",
-      "stat": "0.693"
+      "stat": "0.689"
     },
     {
       "season": 2026,
@@ -198372,7 +198427,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "YDS",
-      "stat": "1327"
+      "stat": "1349"
     },
     {
       "season": 2026,
@@ -198394,7 +198449,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "45"
+      "stat": "46"
     },
     {
       "season": 2026,
@@ -198427,7 +198482,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "218"
+      "stat": "209"
     },
     {
       "season": 2026,
@@ -198438,7 +198493,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "4.8"
+      "stat": "4.5"
     },
     {
       "season": 2026,
@@ -202080,6 +202135,83 @@
       "category": "interceptions",
       "statType": "YDS",
       "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "4921153",
+      "player": "Sam Smith Jr.",
+      "position": "LB",
+      "team": "Toledo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "PD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "4921153",
+      "player": "Sam Smith Jr.",
+      "position": "LB",
+      "team": "Toledo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "QB HUR",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "4921153",
+      "player": "Sam Smith Jr.",
+      "position": "LB",
+      "team": "Toledo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SACKS",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "4921153",
+      "player": "Sam Smith Jr.",
+      "position": "LB",
+      "team": "Toledo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SOLO",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "4921153",
+      "player": "Sam Smith Jr.",
+      "position": "LB",
+      "team": "Toledo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "4921153",
+      "player": "Sam Smith Jr.",
+      "position": "LB",
+      "team": "Toledo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TFL",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "4921153",
+      "player": "Sam Smith Jr.",
+      "position": "LB",
+      "team": "Toledo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TOT",
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -216698,7 +216830,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "12"
+      "stat": "13"
     },
     {
       "season": 2026,
@@ -218150,7 +218282,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "0"
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -218172,7 +218304,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "12"
+      "stat": "13"
     },
     {
       "season": 2026,
@@ -218205,7 +218337,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "25"
+      "stat": "26"
     },
     {
       "season": 2026,
@@ -225685,7 +225817,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "21"
+      "stat": "22"
     },
     {
       "season": 2026,
@@ -225718,7 +225850,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "45"
+      "stat": "47"
     },
     {
       "season": 2026,
@@ -225729,7 +225861,7 @@
       "conference": "Mid-American",
       "category": "interceptions",
       "statType": "AVG",
-      "stat": "21.3"
+      "stat": "16.5"
     },
     {
       "season": 2026,
@@ -225740,7 +225872,7 @@
       "conference": "Mid-American",
       "category": "interceptions",
       "statType": "INT",
-      "stat": "3"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -225762,7 +225894,7 @@
       "conference": "Mid-American",
       "category": "interceptions",
       "statType": "YDS",
-      "stat": "64"
+      "stat": "66"
     },
     {
       "season": 2026,
@@ -226345,7 +226477,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "ATT",
-      "stat": "238"
+      "stat": "277"
     },
     {
       "season": 2026,
@@ -226356,7 +226488,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "COMPLETIONS",
-      "stat": "150"
+      "stat": "170"
     },
     {
       "season": 2026,
@@ -226378,7 +226510,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "PCT",
-      "stat": "0.630"
+      "stat": "0.614"
     },
     {
       "season": 2026,
@@ -226400,7 +226532,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "YDS",
-      "stat": "1482"
+      "stat": "1618"
     },
     {
       "season": 2026,
@@ -226411,7 +226543,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "YPA",
-      "stat": "6.2"
+      "stat": "5.8"
     },
     {
       "season": 2026,
@@ -226422,7 +226554,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "82"
+      "stat": "89"
     },
     {
       "season": 2026,
@@ -226455,7 +226587,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "278"
+      "stat": "312"
     },
     {
       "season": 2026,
@@ -226466,7 +226598,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "3.4"
+      "stat": "3.5"
     },
     {
       "season": 2026,
@@ -229535,7 +229667,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "PD",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -229568,7 +229700,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "21"
+      "stat": "24"
     },
     {
       "season": 2026,
@@ -229579,7 +229711,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TD",
-      "stat": "0"
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -229601,7 +229733,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "36"
+      "stat": "41"
     },
     {
       "season": 2026,
@@ -229645,7 +229777,7 @@
       "conference": "Mid-American",
       "category": "interceptions",
       "statType": "AVG",
-      "stat": "5.0"
+      "stat": "33.5"
     },
     {
       "season": 2026,
@@ -229656,7 +229788,7 @@
       "conference": "Mid-American",
       "category": "interceptions",
       "statType": "INT",
-      "stat": "1"
+      "stat": "2"
     },
     {
       "season": 2026,
@@ -229667,7 +229799,7 @@
       "conference": "Mid-American",
       "category": "interceptions",
       "statType": "TD",
-      "stat": "0"
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -229678,7 +229810,7 @@
       "conference": "Mid-American",
       "category": "interceptions",
       "statType": "YDS",
-      "stat": "5"
+      "stat": "67"
     },
     {
       "season": 2026,
@@ -235475,7 +235607,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "PD",
-      "stat": "0"
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -237059,7 +237191,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "6"
+      "stat": "7"
     },
     {
       "season": 2026,
@@ -237092,7 +237224,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "10"
+      "stat": "12"
     },
     {
       "season": 2026,
@@ -238379,7 +238511,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "PD",
-      "stat": "0"
+      "stat": "2"
     },
     {
       "season": 2026,
@@ -238412,7 +238544,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "8"
+      "stat": "9"
     },
     {
       "season": 2026,
@@ -238445,7 +238577,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "10"
+      "stat": "13"
     },
     {
       "season": 2026,
@@ -238830,7 +238962,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "21"
+      "stat": "23"
     },
     {
       "season": 2026,
@@ -239006,7 +239138,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "AVG",
-      "stat": "22.2"
+      "stat": "22.4"
     },
     {
       "season": 2026,
@@ -239028,7 +239160,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "NO",
-      "stat": "14"
+      "stat": "16"
     },
     {
       "season": 2026,
@@ -239050,7 +239182,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "YDS",
-      "stat": "311"
+      "stat": "359"
     },
     {
       "season": 2026,
@@ -239072,7 +239204,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "14"
+      "stat": "16"
     },
     {
       "season": 2026,
@@ -239105,7 +239237,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "2.4"
+      "stat": "2.1"
     },
     {
       "season": 2026,
@@ -239116,7 +239248,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "72"
+      "stat": "83"
     },
     {
       "season": 2026,
@@ -239149,7 +239281,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "437"
+      "stat": "529"
     },
     {
       "season": 2026,
@@ -239160,7 +239292,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "6.1"
+      "stat": "6.4"
     },
     {
       "season": 2026,
@@ -241283,7 +241415,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "2"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -241294,7 +241426,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "LONG",
-      "stat": "5"
+      "stat": "8"
     },
     {
       "season": 2026,
@@ -241316,7 +241448,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "7"
+      "stat": "21"
     },
     {
       "season": 2026,
@@ -241327,7 +241459,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "3.5"
+      "stat": "5.3"
     },
     {
       "season": 2026,
@@ -241690,7 +241822,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "LONG",
-      "stat": "18"
+      "stat": "20"
     },
     {
       "season": 2026,
@@ -241701,7 +241833,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "12"
+      "stat": "15"
     },
     {
       "season": 2026,
@@ -241712,7 +241844,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "TD",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -241723,7 +241855,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "75"
+      "stat": "116"
     },
     {
       "season": 2026,
@@ -241734,7 +241866,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "6.3"
+      "stat": "7.7"
     },
     {
       "season": 2026,
@@ -241745,7 +241877,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "73"
+      "stat": "87"
     },
     {
       "season": 2026,
@@ -241767,7 +241899,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "TD",
-      "stat": "7"
+      "stat": "8"
     },
     {
       "season": 2026,
@@ -241778,7 +241910,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "424"
+      "stat": "541"
     },
     {
       "season": 2026,
@@ -241789,7 +241921,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "5.8"
+      "stat": "6.2"
     },
     {
       "season": 2026,
@@ -247465,7 +247597,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "1"
+      "stat": "2"
     },
     {
       "season": 2026,
@@ -247498,7 +247630,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "8"
+      "stat": "16"
     },
     {
       "season": 2026,
@@ -274063,7 +274195,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "10"
+      "stat": "12"
     },
     {
       "season": 2026,
@@ -274096,7 +274228,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "19"
+      "stat": "22"
     },
     {
       "season": 2026,
@@ -282729,6 +282861,61 @@
       "position": "TE",
       "team": "Sacramento State",
       "conference": "Mid-American",
+      "category": "kickReturns",
+      "statType": "AVG",
+      "stat": "0.0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5080786",
+      "player": "Cedric Anton",
+      "position": "TE",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "kickReturns",
+      "statType": "LONG",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5080786",
+      "player": "Cedric Anton",
+      "position": "TE",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "kickReturns",
+      "statType": "NO",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5080786",
+      "player": "Cedric Anton",
+      "position": "TE",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "kickReturns",
+      "statType": "TD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5080786",
+      "player": "Cedric Anton",
+      "position": "TE",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "kickReturns",
+      "statType": "YDS",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5080786",
+      "player": "Cedric Anton",
+      "position": "TE",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
       "category": "receiving",
       "statType": "LONG",
       "stat": "11"
@@ -286350,7 +286537,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "9"
+      "stat": "13"
     },
     {
       "season": 2026,
@@ -286394,7 +286581,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "3.9"
+      "stat": "2.7"
     },
     {
       "season": 2026,
@@ -291300,7 +291487,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "18"
+      "stat": "20"
     },
     {
       "season": 2026,
@@ -291333,7 +291520,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "40"
+      "stat": "42"
     },
     {
       "season": 2026,
@@ -294787,7 +294974,7 @@
       "conference": "Mid-American",
       "category": "fumbles",
       "statType": "FUM",
-      "stat": "4"
+      "stat": "5"
     },
     {
       "season": 2026,
@@ -294820,7 +295007,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "ATT",
-      "stat": "276"
+      "stat": "298"
     },
     {
       "season": 2026,
@@ -294831,7 +295018,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "COMPLETIONS",
-      "stat": "182"
+      "stat": "195"
     },
     {
       "season": 2026,
@@ -294853,7 +295040,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "PCT",
-      "stat": "0.659"
+      "stat": "0.654"
     },
     {
       "season": 2026,
@@ -294864,7 +295051,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "TD",
-      "stat": "18"
+      "stat": "19"
     },
     {
       "season": 2026,
@@ -294875,7 +295062,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "YDS",
-      "stat": "2304"
+      "stat": "2501"
     },
     {
       "season": 2026,
@@ -294886,7 +295073,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "YPA",
-      "stat": "8.3"
+      "stat": "8.4"
     },
     {
       "season": 2026,
@@ -294897,7 +295084,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "24"
+      "stat": "30"
     },
     {
       "season": 2026,
@@ -294930,7 +295117,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "-6"
+      "stat": "0"
     },
     {
       "season": 2026,
@@ -294941,7 +295128,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "-0.3"
+      "stat": "0.0"
     },
     {
       "season": 2026,
@@ -297680,7 +297867,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "46"
+      "stat": "47"
     },
     {
       "season": 2026,
@@ -297702,7 +297889,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "538"
+      "stat": "545"
     },
     {
       "season": 2026,
@@ -297713,7 +297900,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "11.7"
+      "stat": "11.6"
     },
     {
       "season": 2026,
@@ -310792,7 +310979,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "12"
+      "stat": "13"
     },
     {
       "season": 2026,
@@ -310825,7 +311012,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "32"
+      "stat": "33"
     },
     {
       "season": 2026,
@@ -324157,7 +324344,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "3"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -324179,7 +324366,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "9"
+      "stat": "13"
     },
     {
       "season": 2026,
@@ -324190,7 +324377,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "3.0"
+      "stat": "3.3"
     },
     {
       "season": 2026,
@@ -327424,7 +327611,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "10"
+      "stat": "11"
     },
     {
       "season": 2026,
@@ -327457,7 +327644,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "13.1"
+      "stat": "11.9"
     },
     {
       "season": 2026,
@@ -331825,6 +332012,83 @@
       "category": "defensive",
       "statType": "TOT",
       "stat": "34"
+    },
+    {
+      "season": 2026,
+      "playerId": "5085066",
+      "player": "Mason Cumbie",
+      "position": "QB",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "PD",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5085066",
+      "player": "Mason Cumbie",
+      "position": "QB",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "QB HUR",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5085066",
+      "player": "Mason Cumbie",
+      "position": "QB",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SACKS",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5085066",
+      "player": "Mason Cumbie",
+      "position": "QB",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SOLO",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5085066",
+      "player": "Mason Cumbie",
+      "position": "QB",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5085066",
+      "player": "Mason Cumbie",
+      "position": "QB",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TFL",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5085066",
+      "player": "Mason Cumbie",
+      "position": "QB",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TOT",
+      "stat": "0"
     },
     {
       "season": 2026,
@@ -340283,7 +340547,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "18"
+      "stat": "21"
     },
     {
       "season": 2026,
@@ -340316,7 +340580,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "29"
+      "stat": "33"
     },
     {
       "season": 2026,
@@ -340404,7 +340668,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "AVG",
-      "stat": "22.5"
+      "stat": "22.7"
     },
     {
       "season": 2026,
@@ -340426,7 +340690,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "NO",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -340448,7 +340712,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "YDS",
-      "stat": "45"
+      "stat": "68"
     },
     {
       "season": 2026,
@@ -347301,7 +347565,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "22"
+      "stat": "26"
     },
     {
       "season": 2026,
@@ -359390,7 +359654,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -371402,7 +371666,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "3"
+      "stat": "6"
     },
     {
       "season": 2026,
@@ -371435,7 +371699,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "14"
+      "stat": "18"
     },
     {
       "season": 2026,
@@ -372722,7 +372986,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "0"
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -390047,7 +390311,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "In 20",
-      "stat": "11"
+      "stat": "13"
     },
     {
       "season": 2026,
@@ -390069,7 +390333,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "NO",
-      "stat": "38"
+      "stat": "40"
     },
     {
       "season": 2026,
@@ -390091,7 +390355,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "YDS",
-      "stat": "1655"
+      "stat": "1725"
     },
     {
       "season": 2026,
@@ -390102,7 +390366,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "YPP",
-      "stat": "43.6"
+      "stat": "43.1"
     },
     {
       "season": 2026,
@@ -392269,7 +392533,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "16"
+      "stat": "22"
     },
     {
       "season": 2026,
@@ -392291,7 +392555,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "5.5"
+      "stat": "6.5"
     },
     {
       "season": 2026,
@@ -392302,7 +392566,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "58"
+      "stat": "70"
     },
     {
       "season": 2026,
@@ -395151,7 +395415,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "9"
+      "stat": "10"
     },
     {
       "season": 2026,
@@ -395173,7 +395437,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "67"
+      "stat": "69"
     },
     {
       "season": 2026,
@@ -395184,7 +395448,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "7.4"
+      "stat": "6.9"
     },
     {
       "season": 2026,
@@ -395195,7 +395459,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "136"
+      "stat": "151"
     },
     {
       "season": 2026,
@@ -395228,7 +395492,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "744"
+      "stat": "827"
     },
     {
       "season": 2026,
@@ -395371,7 +395635,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "0"
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -395426,7 +395690,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "22"
+      "stat": "23"
     },
     {
       "season": 2026,
@@ -395558,17 +395822,6 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "1"
-    },
-    {
-      "season": 2026,
-      "playerId": "5092826",
-      "player": "Caden Camese",
-      "position": "DT",
-      "team": "Toledo",
-      "conference": "Mid-American",
-      "category": "defensive",
-      "statType": "SACKS",
       "stat": "2"
     },
     {
@@ -395579,8 +395832,19 @@
       "team": "Toledo",
       "conference": "Mid-American",
       "category": "defensive",
-      "statType": "SOLO",
+      "statType": "SACKS",
       "stat": "3"
+    },
+    {
+      "season": 2026,
+      "playerId": "5092826",
+      "player": "Caden Camese",
+      "position": "DT",
+      "team": "Toledo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SOLO",
+      "stat": "5"
     },
     {
       "season": 2026,
@@ -395602,7 +395866,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "2"
+      "stat": "4.5"
     },
     {
       "season": 2026,
@@ -395613,7 +395877,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "11"
+      "stat": "14"
     },
     {
       "season": 2026,
@@ -395712,7 +395976,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "16"
+      "stat": "17"
     },
     {
       "season": 2026,
@@ -395734,7 +395998,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "129"
+      "stat": "138"
     },
     {
       "season": 2026,
@@ -448732,7 +448996,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "6"
+      "stat": "10"
     },
     {
       "season": 2026,
@@ -448754,7 +449018,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "32"
+      "stat": "51"
     },
     {
       "season": 2026,
@@ -448765,7 +449029,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "5.3"
+      "stat": "5.1"
     },
     {
       "season": 2026,
@@ -448776,7 +449040,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "50"
+      "stat": "53"
     },
     {
       "season": 2026,
@@ -448798,7 +449062,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "TD",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -448809,7 +449073,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "206"
+      "stat": "215"
     },
     {
       "season": 2026,
@@ -459545,7 +459809,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "6"
+      "stat": "8"
     },
     {
       "season": 2026,
@@ -459578,7 +459842,40 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "10"
+      "stat": "19"
+    },
+    {
+      "season": 2026,
+      "playerId": "5125803",
+      "player": "Miles Tucker",
+      "position": "S",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "fumbles",
+      "statType": "FUM",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5125803",
+      "player": "Miles Tucker",
+      "position": "S",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "fumbles",
+      "statType": "LOST",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5125803",
+      "player": "Miles Tucker",
+      "position": "S",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "fumbles",
+      "statType": "REC",
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -471601,7 +471898,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "18"
+      "stat": "20"
     },
     {
       "season": 2026,
@@ -471634,7 +471931,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "39"
+      "stat": "42"
     },
     {
       "season": 2026,
@@ -473273,7 +473570,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "PD",
-      "stat": "7"
+      "stat": "8"
     },
     {
       "season": 2026,
@@ -473295,7 +473592,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SACKS",
-      "stat": "1.5"
+      "stat": "2.5"
     },
     {
       "season": 2026,
@@ -473306,7 +473603,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "13"
+      "stat": "16"
     },
     {
       "season": 2026,
@@ -473328,7 +473625,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "3.0"
+      "stat": "4.0"
     },
     {
       "season": 2026,
@@ -473339,7 +473636,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "33"
+      "stat": "38"
     },
     {
       "season": 2026,
@@ -494635,7 +494932,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "24"
+      "stat": "26"
     },
     {
       "season": 2026,
@@ -494668,7 +494965,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "47"
+      "stat": "50"
     },
     {
       "season": 2026,
@@ -499926,7 +500223,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "10"
+      "stat": "11"
     },
     {
       "season": 2026,
@@ -499959,7 +500256,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "22"
+      "stat": "23"
     },
     {
       "season": 2026,
@@ -508099,7 +508396,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SACKS",
-      "stat": "3"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -508110,7 +508407,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "7"
+      "stat": "8"
     },
     {
       "season": 2026,
@@ -508132,7 +508429,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "3.5"
+      "stat": "4.5"
     },
     {
       "season": 2026,
@@ -508143,7 +508440,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "13"
+      "stat": "15"
     },
     {
       "season": 2026,
@@ -513489,7 +513786,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "AVG",
-      "stat": "13.0"
+      "stat": "19.0"
     },
     {
       "season": 2026,
@@ -513500,7 +513797,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "LONG",
-      "stat": "13"
+      "stat": "25"
     },
     {
       "season": 2026,
@@ -513511,7 +513808,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "NO",
-      "stat": "1"
+      "stat": "2"
     },
     {
       "season": 2026,
@@ -513533,7 +513830,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "YDS",
-      "stat": "13"
+      "stat": "38"
     },
     {
       "season": 2026,
@@ -513599,7 +513896,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "21"
+      "stat": "26"
     },
     {
       "season": 2026,
@@ -513610,7 +513907,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "LONG",
-      "stat": "38"
+      "stat": "40"
     },
     {
       "season": 2026,
@@ -513621,7 +513918,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "TD",
-      "stat": "2"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -513632,7 +513929,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "145"
+      "stat": "203"
     },
     {
       "season": 2026,
@@ -513643,7 +513940,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "6.9"
+      "stat": "7.8"
     },
     {
       "season": 2026,
@@ -515909,7 +516206,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "AVG",
-      "stat": "19.4"
+      "stat": "19.0"
     },
     {
       "season": 2026,
@@ -515931,7 +516228,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "NO",
-      "stat": "7"
+      "stat": "8"
     },
     {
       "season": 2026,
@@ -515953,7 +516250,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "YDS",
-      "stat": "136"
+      "stat": "152"
     },
     {
       "season": 2026,
@@ -515975,7 +516272,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "16"
+      "stat": "17"
     },
     {
       "season": 2026,
@@ -515997,7 +516294,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "237"
+      "stat": "240"
     },
     {
       "season": 2026,
@@ -516008,7 +516305,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "14.8"
+      "stat": "14.1"
     },
     {
       "season": 2026,
@@ -522069,7 +522366,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "3"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -522091,7 +522388,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "11"
+      "stat": "13"
     },
     {
       "season": 2026,
@@ -522124,7 +522421,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "35"
+      "stat": "37"
     },
     {
       "season": 2026,
@@ -548403,7 +548700,7 @@
       "conference": "Mid-American",
       "category": "fumbles",
       "statType": "FUM",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -548436,7 +548733,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "ATT",
-      "stat": "93"
+      "stat": "112"
     },
     {
       "season": 2026,
@@ -548447,7 +548744,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "COMPLETIONS",
-      "stat": "56"
+      "stat": "67"
     },
     {
       "season": 2026,
@@ -548469,7 +548766,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "PCT",
-      "stat": "0.602"
+      "stat": "0.598"
     },
     {
       "season": 2026,
@@ -548491,7 +548788,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "YDS",
-      "stat": "638"
+      "stat": "743"
     },
     {
       "season": 2026,
@@ -548502,7 +548799,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "YPA",
-      "stat": "6.9"
+      "stat": "6.6"
     },
     {
       "season": 2026,
@@ -548513,7 +548810,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "30"
+      "stat": "36"
     },
     {
       "season": 2026,
@@ -548524,7 +548821,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "LONG",
-      "stat": "13"
+      "stat": "27"
     },
     {
       "season": 2026,
@@ -548546,7 +548843,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "11"
+      "stat": "44"
     },
     {
       "season": 2026,
@@ -548557,7 +548854,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "0.4"
+      "stat": "1.2"
     },
     {
       "season": 2026,
@@ -552154,7 +552451,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "35"
+      "stat": "45"
     },
     {
       "season": 2026,
@@ -552165,7 +552462,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "LONG",
-      "stat": "17"
+      "stat": "29"
     },
     {
       "season": 2026,
@@ -552176,7 +552473,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "TD",
-      "stat": "0"
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -552187,7 +552484,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "121"
+      "stat": "213"
     },
     {
       "season": 2026,
@@ -552198,7 +552495,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "3.5"
+      "stat": "4.7"
     },
     {
       "season": 2026,
@@ -554695,7 +554992,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "9"
+      "stat": "11"
     },
     {
       "season": 2026,
@@ -554717,7 +555014,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "1.5"
+      "stat": "2.5"
     },
     {
       "season": 2026,
@@ -554728,7 +555025,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "27"
+      "stat": "29"
     },
     {
       "season": 2026,
@@ -563385,7 +563682,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "4"
+      "stat": "6"
     },
     {
       "season": 2026,
@@ -563407,7 +563704,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "27"
+      "stat": "28"
     },
     {
       "season": 2026,
@@ -563418,7 +563715,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "6.8"
+      "stat": "4.7"
     },
     {
       "season": 2026,
@@ -563429,7 +563726,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "8"
+      "stat": "16"
     },
     {
       "season": 2026,
@@ -563462,7 +563759,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "34"
+      "stat": "66"
     },
     {
       "season": 2026,
@@ -563473,7 +563770,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "4.3"
+      "stat": "4.1"
     },
     {
       "season": 2026,
@@ -572524,6 +572821,39 @@
       "position": "RB",
       "team": "Buffalo",
       "conference": "Mid-American",
+      "category": "fumbles",
+      "statType": "FUM",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5151369",
+      "player": "Messiah Burch",
+      "position": "RB",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "fumbles",
+      "statType": "LOST",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5151369",
+      "player": "Messiah Burch",
+      "position": "RB",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "fumbles",
+      "statType": "REC",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5151369",
+      "player": "Messiah Burch",
+      "position": "RB",
+      "team": "Buffalo",
+      "conference": "Mid-American",
       "category": "receiving",
       "statType": "LONG",
       "stat": "9"
@@ -572581,7 +572911,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "165"
+      "stat": "196"
     },
     {
       "season": 2026,
@@ -572603,7 +572933,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "TD",
-      "stat": "5"
+      "stat": "7"
     },
     {
       "season": 2026,
@@ -572614,7 +572944,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "901"
+      "stat": "1110"
     },
     {
       "season": 2026,
@@ -572625,7 +572955,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "5.5"
+      "stat": "5.7"
     },
     {
       "season": 2026,
@@ -596671,7 +597001,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "25"
+      "stat": "26"
     },
     {
       "season": 2026,
@@ -596704,7 +597034,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "49"
+      "stat": "53"
     },
     {
       "season": 2026,
@@ -600851,7 +601181,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "37"
+      "stat": "41"
     },
     {
       "season": 2026,
@@ -600873,7 +601203,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "413"
+      "stat": "460"
     },
     {
       "season": 2026,
@@ -601005,7 +601335,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "19"
+      "stat": "24"
     },
     {
       "season": 2026,
@@ -601027,7 +601357,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "2.5"
+      "stat": "3.5"
     },
     {
       "season": 2026,
@@ -601038,7 +601368,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "41"
+      "stat": "49"
     },
     {
       "season": 2026,
@@ -605152,7 +605482,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "3"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -605207,7 +605537,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "13"
+      "stat": "15"
     },
     {
       "season": 2026,
@@ -608056,7 +608386,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "40"
+      "stat": "47"
     },
     {
       "season": 2026,
@@ -608078,7 +608408,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "592"
+      "stat": "736"
     },
     {
       "season": 2026,
@@ -608089,7 +608419,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "14.8"
+      "stat": "15.7"
     },
     {
       "season": 2026,
@@ -608419,7 +608749,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "PD",
-      "stat": "3"
+      "stat": "5"
     },
     {
       "season": 2026,
@@ -608452,7 +608782,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "17"
+      "stat": "19"
     },
     {
       "season": 2026,
@@ -608485,7 +608815,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "32"
+      "stat": "36"
     },
     {
       "season": 2026,
@@ -608496,7 +608826,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "PD",
-      "stat": "1"
+      "stat": "2"
     },
     {
       "season": 2026,
@@ -608507,7 +608837,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -608529,7 +608859,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "33"
+      "stat": "39"
     },
     {
       "season": 2026,
@@ -608551,7 +608881,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "4"
+      "stat": "7"
     },
     {
       "season": 2026,
@@ -608562,7 +608892,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "70"
+      "stat": "78"
     },
     {
       "season": 2026,
@@ -609068,7 +609398,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "FGA",
-      "stat": "14"
+      "stat": "15"
     },
     {
       "season": 2026,
@@ -609079,7 +609409,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "FGM",
-      "stat": "10"
+      "stat": "11"
     },
     {
       "season": 2026,
@@ -609101,7 +609431,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "PCT",
-      "stat": "0.714"
+      "stat": "0.733"
     },
     {
       "season": 2026,
@@ -609112,7 +609442,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "PTS",
-      "stat": "69"
+      "stat": "75"
     },
     {
       "season": 2026,
@@ -609123,7 +609453,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "XPA",
-      "stat": "39"
+      "stat": "42"
     },
     {
       "season": 2026,
@@ -609134,7 +609464,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "XPM",
-      "stat": "39"
+      "stat": "42"
     },
     {
       "season": 2026,
@@ -613589,7 +613919,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "PD",
-      "stat": "0"
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -613622,7 +613952,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "18"
+      "stat": "20"
     },
     {
       "season": 2026,
@@ -613655,7 +613985,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "68"
+      "stat": "72"
     },
     {
       "season": 2026,
@@ -682240,7 +682570,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "12"
+      "stat": "13"
     },
     {
       "season": 2026,
@@ -689137,7 +689467,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "11"
+      "stat": "12"
     },
     {
       "season": 2026,
@@ -689170,7 +689500,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "19"
+      "stat": "20"
     },
     {
       "season": 2026,
@@ -689214,7 +689544,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "24"
+      "stat": "29"
     },
     {
       "season": 2026,
@@ -689247,7 +689577,40 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "45"
+      "stat": "55"
+    },
+    {
+      "season": 2026,
+      "playerId": "5157391",
+      "player": "Jayden Clerveaux",
+      "position": "RB",
+      "team": "Central Michigan",
+      "conference": "Mid-American",
+      "category": "fumbles",
+      "statType": "FUM",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5157391",
+      "player": "Jayden Clerveaux",
+      "position": "RB",
+      "team": "Central Michigan",
+      "conference": "Mid-American",
+      "category": "fumbles",
+      "statType": "LOST",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5157391",
+      "player": "Jayden Clerveaux",
+      "position": "RB",
+      "team": "Central Michigan",
+      "conference": "Mid-American",
+      "category": "fumbles",
+      "statType": "REC",
+      "stat": "0"
     },
     {
       "season": 2026,
@@ -689269,7 +689632,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "4"
+      "stat": "5"
     },
     {
       "season": 2026,
@@ -689291,7 +689654,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "26"
+      "stat": "27"
     },
     {
       "season": 2026,
@@ -689302,7 +689665,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "6.5"
+      "stat": "5.4"
     },
     {
       "season": 2026,
@@ -689313,7 +689676,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "59"
+      "stat": "78"
     },
     {
       "season": 2026,
@@ -689324,7 +689687,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "LONG",
-      "stat": "23"
+      "stat": "27"
     },
     {
       "season": 2026,
@@ -689335,7 +689698,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "TD",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -689346,7 +689709,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "291"
+      "stat": "391"
     },
     {
       "season": 2026,
@@ -689357,7 +689720,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "4.9"
+      "stat": "5.0"
     },
     {
       "season": 2026,
@@ -700302,7 +700665,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "29"
+      "stat": "31"
     },
     {
       "season": 2026,
@@ -700324,7 +700687,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "326"
+      "stat": "347"
     },
     {
       "season": 2026,
@@ -731641,7 +732004,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SACKS",
-      "stat": "0"
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -731652,7 +732015,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "5"
+      "stat": "6"
     },
     {
       "season": 2026,
@@ -731674,7 +732037,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "0.5"
+      "stat": "1.5"
     },
     {
       "season": 2026,
@@ -731685,7 +732048,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "15"
+      "stat": "20"
     },
     {
       "season": 2026,
@@ -741585,7 +741948,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "15"
+      "stat": "17"
     },
     {
       "season": 2026,
@@ -741607,7 +741970,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "98"
+      "stat": "112"
     },
     {
       "season": 2026,
@@ -741618,7 +741981,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "6.5"
+      "stat": "6.6"
     },
     {
       "season": 2026,
@@ -741629,7 +741992,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "89"
+      "stat": "97"
     },
     {
       "season": 2026,
@@ -741651,7 +742014,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "TD",
-      "stat": "3"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -741662,7 +742025,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "411"
+      "stat": "478"
     },
     {
       "season": 2026,
@@ -741673,7 +742036,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "4.6"
+      "stat": "4.9"
     },
     {
       "season": 2026,
@@ -745857,6 +746220,61 @@
     },
     {
       "season": 2026,
+      "playerId": "5162685",
+      "player": "Leo Collins",
+      "position": "TE",
+      "team": "Ball State",
+      "conference": "Mid-American",
+      "category": "puntReturns",
+      "statType": "AVG",
+      "stat": "36.0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5162685",
+      "player": "Leo Collins",
+      "position": "TE",
+      "team": "Ball State",
+      "conference": "Mid-American",
+      "category": "puntReturns",
+      "statType": "LONG",
+      "stat": "36"
+    },
+    {
+      "season": 2026,
+      "playerId": "5162685",
+      "player": "Leo Collins",
+      "position": "TE",
+      "team": "Ball State",
+      "conference": "Mid-American",
+      "category": "puntReturns",
+      "statType": "NO",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5162685",
+      "player": "Leo Collins",
+      "position": "TE",
+      "team": "Ball State",
+      "conference": "Mid-American",
+      "category": "puntReturns",
+      "statType": "TD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5162685",
+      "player": "Leo Collins",
+      "position": "TE",
+      "team": "Ball State",
+      "conference": "Mid-American",
+      "category": "puntReturns",
+      "statType": "YDS",
+      "stat": "36"
+    },
+    {
+      "season": 2026,
       "playerId": "5162686",
       "player": "Jackson Courville",
       "position": "PK",
@@ -746865,7 +747283,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "AVG",
-      "stat": "22.0"
+      "stat": "22.9"
     },
     {
       "season": 2026,
@@ -746887,7 +747305,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "NO",
-      "stat": "8"
+      "stat": "9"
     },
     {
       "season": 2026,
@@ -746909,7 +747327,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "YDS",
-      "stat": "176"
+      "stat": "206"
     },
     {
       "season": 2026,
@@ -746920,7 +747338,7 @@
       "conference": "Mid-American",
       "category": "puntReturns",
       "statType": "AVG",
-      "stat": "9.0"
+      "stat": "9.2"
     },
     {
       "season": 2026,
@@ -746942,7 +747360,7 @@
       "conference": "Mid-American",
       "category": "puntReturns",
       "statType": "NO",
-      "stat": "7"
+      "stat": "9"
     },
     {
       "season": 2026,
@@ -746964,7 +747382,7 @@
       "conference": "Mid-American",
       "category": "puntReturns",
       "statType": "YDS",
-      "stat": "63"
+      "stat": "83"
     },
     {
       "season": 2026,
@@ -746986,7 +747404,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "30"
+      "stat": "31"
     },
     {
       "season": 2026,
@@ -747008,7 +747426,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "511"
+      "stat": "515"
     },
     {
       "season": 2026,
@@ -747019,7 +747437,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "17.0"
+      "stat": "16.6"
     },
     {
       "season": 2026,
@@ -756127,7 +756545,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "15"
+      "stat": "17"
     },
     {
       "season": 2026,
@@ -756160,7 +756578,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "38"
+      "stat": "40"
     },
     {
       "season": 2026,
@@ -758602,7 +759020,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "82"
+      "stat": "90"
     },
     {
       "season": 2026,
@@ -758635,7 +759053,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "424"
+      "stat": "445"
     },
     {
       "season": 2026,
@@ -758646,7 +759064,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "5.2"
+      "stat": "4.9"
     },
     {
       "season": 2026,
@@ -760186,7 +760604,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "3"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -760241,7 +760659,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "61"
+      "stat": "64"
     },
     {
       "season": 2026,
@@ -768986,7 +769404,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "1"
+      "stat": "2"
     },
     {
       "season": 2026,
@@ -769008,7 +769426,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "7"
+      "stat": "9"
     },
     {
       "season": 2026,
@@ -769041,7 +769459,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "19"
+      "stat": "21"
     },
     {
       "season": 2026,
@@ -787400,7 +787818,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "PD",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -787433,7 +787851,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "17"
+      "stat": "19"
     },
     {
       "season": 2026,
@@ -787466,7 +787884,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "23"
+      "stat": "25"
     },
     {
       "season": 2026,
@@ -796354,7 +796772,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "3"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -796409,7 +796827,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "12"
+      "stat": "15"
     },
     {
       "season": 2026,
@@ -797421,7 +797839,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "5"
+      "stat": "6"
     },
     {
       "season": 2026,
@@ -797454,7 +797872,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "8"
+      "stat": "9"
     },
     {
       "season": 2026,
@@ -802789,7 +803207,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "28"
+      "stat": "39"
     },
     {
       "season": 2026,
@@ -802811,7 +803229,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "354"
+      "stat": "458"
     },
     {
       "season": 2026,
@@ -802822,7 +803240,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "12.6"
+      "stat": "11.7"
     },
     {
       "season": 2026,
@@ -808003,7 +808421,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "29"
+      "stat": "33"
     },
     {
       "season": 2026,
@@ -808036,7 +808454,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "50"
+      "stat": "55"
     },
     {
       "season": 2026,
@@ -810192,7 +810610,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "LONG",
-      "stat": "38"
+      "stat": "52"
     },
     {
       "season": 2026,
@@ -810203,7 +810621,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "11"
+      "stat": "14"
     },
     {
       "season": 2026,
@@ -810225,7 +810643,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "117"
+      "stat": "174"
     },
     {
       "season": 2026,
@@ -810236,7 +810654,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "10.6"
+      "stat": "12.4"
     },
     {
       "season": 2026,
@@ -818222,7 +818640,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "4"
+      "stat": "5"
     },
     {
       "season": 2026,
@@ -818244,7 +818662,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "14"
+      "stat": "15"
     },
     {
       "season": 2026,
@@ -818266,7 +818684,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "3.5"
+      "stat": "4.0"
     },
     {
       "season": 2026,
@@ -818277,7 +818695,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "21"
+      "stat": "24"
     },
     {
       "season": 2026,
@@ -818387,7 +818805,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SACKS",
-      "stat": "0"
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -818398,7 +818816,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "4"
+      "stat": "5"
     },
     {
       "season": 2026,
@@ -818420,7 +818838,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "0"
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -818431,7 +818849,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "7"
+      "stat": "8"
     },
     {
       "season": 2026,
@@ -818519,7 +818937,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "PD",
-      "stat": "4"
+      "stat": "5"
     },
     {
       "season": 2026,
@@ -818552,7 +818970,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "28"
+      "stat": "32"
     },
     {
       "season": 2026,
@@ -818585,7 +819003,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "48"
+      "stat": "54"
     },
     {
       "season": 2026,
@@ -826747,7 +827165,7 @@
       "conference": "Mid-American",
       "category": "puntReturns",
       "statType": "AVG",
-      "stat": "16.0"
+      "stat": "11.0"
     },
     {
       "season": 2026,
@@ -826769,7 +827187,7 @@
       "conference": "Mid-American",
       "category": "puntReturns",
       "statType": "NO",
-      "stat": "2"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -826791,7 +827209,7 @@
       "conference": "Mid-American",
       "category": "puntReturns",
       "statType": "YDS",
-      "stat": "32"
+      "stat": "44"
     },
     {
       "season": 2026,
@@ -827462,7 +827880,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "17"
+      "stat": "23"
     },
     {
       "season": 2026,
@@ -827495,7 +827913,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "30"
+      "stat": "38"
     },
     {
       "season": 2026,
@@ -846897,6 +847315,83 @@
       "position": "TE",
       "team": "Massachusetts",
       "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "PD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5209127",
+      "player": "Jax Markovich",
+      "position": "TE",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "QB HUR",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5209127",
+      "player": "Jax Markovich",
+      "position": "TE",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SACKS",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5209127",
+      "player": "Jax Markovich",
+      "position": "TE",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SOLO",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5209127",
+      "player": "Jax Markovich",
+      "position": "TE",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5209127",
+      "player": "Jax Markovich",
+      "position": "TE",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TFL",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5209127",
+      "player": "Jax Markovich",
+      "position": "TE",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TOT",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5209127",
+      "player": "Jax Markovich",
+      "position": "TE",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
       "category": "receiving",
       "statType": "LONG",
       "stat": "8"
@@ -858867,7 +859362,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "15"
+      "stat": "17"
     },
     {
       "season": 2026,
@@ -858900,7 +859395,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "28"
+      "stat": "32"
     },
     {
       "season": 2026,
@@ -867194,7 +867689,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "8"
+      "stat": "10"
     },
     {
       "season": 2026,
@@ -867216,7 +867711,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "3.0"
+      "stat": "4.0"
     },
     {
       "season": 2026,
@@ -867227,7 +867722,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "22"
+      "stat": "24"
     },
     {
       "season": 2026,
@@ -883056,7 +883551,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "6"
+      "stat": "8"
     },
     {
       "season": 2026,
@@ -883067,7 +883562,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TD",
-      "stat": "0"
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -883089,7 +883584,62 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "7"
+      "stat": "9"
+    },
+    {
+      "season": 2026,
+      "playerId": "5216498",
+      "player": "Gabe Aramboles",
+      "position": "DB",
+      "team": "Ball State",
+      "conference": "Mid-American",
+      "category": "puntReturns",
+      "statType": "AVG",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5216498",
+      "player": "Gabe Aramboles",
+      "position": "DB",
+      "team": "Ball State",
+      "conference": "Mid-American",
+      "category": "puntReturns",
+      "statType": "LONG",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5216498",
+      "player": "Gabe Aramboles",
+      "position": "DB",
+      "team": "Ball State",
+      "conference": "Mid-American",
+      "category": "puntReturns",
+      "statType": "NO",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5216498",
+      "player": "Gabe Aramboles",
+      "position": "DB",
+      "team": "Ball State",
+      "conference": "Mid-American",
+      "category": "puntReturns",
+      "statType": "TD",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5216498",
+      "player": "Gabe Aramboles",
+      "position": "DB",
+      "team": "Ball State",
+      "conference": "Mid-American",
+      "category": "puntReturns",
+      "statType": "YDS",
+      "stat": "0"
     },
     {
       "season": 2026,
@@ -885201,7 +885751,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "11"
+      "stat": "13"
     },
     {
       "season": 2026,
@@ -885223,7 +885773,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "100"
+      "stat": "116"
     },
     {
       "season": 2026,
@@ -885234,7 +885784,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "9.1"
+      "stat": "8.9"
     },
     {
       "season": 2026,
@@ -892868,7 +893418,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "24"
+      "stat": "25"
     },
     {
       "season": 2026,
@@ -897343,6 +897893,83 @@
       "position": "PK",
       "team": "Massachusetts",
       "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "PD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218751",
+      "player": "Derek Morris",
+      "position": "PK",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "QB HUR",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218751",
+      "player": "Derek Morris",
+      "position": "PK",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SACKS",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218751",
+      "player": "Derek Morris",
+      "position": "PK",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SOLO",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218751",
+      "player": "Derek Morris",
+      "position": "PK",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218751",
+      "player": "Derek Morris",
+      "position": "PK",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TFL",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218751",
+      "player": "Derek Morris",
+      "position": "PK",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TOT",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218751",
+      "player": "Derek Morris",
+      "position": "PK",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
       "category": "kicking",
       "statType": "FGA",
       "stat": "18"
@@ -898775,7 +899402,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "FGA",
-      "stat": "9"
+      "stat": "12"
     },
     {
       "season": 2026,
@@ -898808,7 +899435,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "PCT",
-      "stat": "0.667"
+      "stat": "0.500"
     },
     {
       "season": 2026,
@@ -898819,7 +899446,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "PTS",
-      "stat": "40"
+      "stat": "41"
     },
     {
       "season": 2026,
@@ -898830,7 +899457,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "XPA",
-      "stat": "24"
+      "stat": "25"
     },
     {
       "season": 2026,
@@ -898841,7 +899468,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "XPM",
-      "stat": "22"
+      "stat": "23"
     },
     {
       "season": 2026,
@@ -901848,6 +902475,160 @@
     },
     {
       "season": 2026,
+      "playerId": "5218977",
+      "player": "James Horton",
+      "position": "LS",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "PD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218977",
+      "player": "James Horton",
+      "position": "LS",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "QB HUR",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218977",
+      "player": "James Horton",
+      "position": "LS",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SACKS",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218977",
+      "player": "James Horton",
+      "position": "LS",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SOLO",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218977",
+      "player": "James Horton",
+      "position": "LS",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218977",
+      "player": "James Horton",
+      "position": "LS",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TFL",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218977",
+      "player": "James Horton",
+      "position": "LS",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TOT",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218982",
+      "player": "Jose Touron",
+      "position": "S",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "PD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218982",
+      "player": "Jose Touron",
+      "position": "S",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "QB HUR",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218982",
+      "player": "Jose Touron",
+      "position": "S",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SACKS",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218982",
+      "player": "Jose Touron",
+      "position": "S",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SOLO",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218982",
+      "player": "Jose Touron",
+      "position": "S",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218982",
+      "player": "Jose Touron",
+      "position": "S",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TFL",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5218982",
+      "player": "Jose Touron",
+      "position": "S",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TOT",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
       "playerId": "5218987",
       "player": "M.J. Campbell",
       "position": "DL",
@@ -903505,7 +904286,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "3"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -903527,7 +904308,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "5"
+      "stat": "6"
     },
     {
       "season": 2026,
@@ -903560,7 +904341,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "11"
+      "stat": "14"
     },
     {
       "season": 2026,
@@ -914549,7 +915330,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "0"
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -914582,7 +915363,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "3"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -925747,7 +926528,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "33"
+      "stat": "35"
     },
     {
       "season": 2026,
@@ -925780,7 +926561,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "71"
+      "stat": "74"
     },
     {
       "season": 2026,
@@ -942401,7 +943182,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "0"
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -942434,7 +943215,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "3"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -951333,7 +952114,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SACKS",
-      "stat": "0"
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -951344,7 +952125,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "21"
+      "stat": "23"
     },
     {
       "season": 2026,
@@ -951366,7 +952147,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "4.0"
+      "stat": "5.0"
     },
     {
       "season": 2026,
@@ -951377,7 +952158,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "33"
+      "stat": "38"
     },
     {
       "season": 2026,
@@ -951608,7 +952389,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "ATT",
-      "stat": "231"
+      "stat": "245"
     },
     {
       "season": 2026,
@@ -951619,7 +952400,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "COMPLETIONS",
-      "stat": "114"
+      "stat": "119"
     },
     {
       "season": 2026,
@@ -951641,7 +952422,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "PCT",
-      "stat": "0.494"
+      "stat": "0.486"
     },
     {
       "season": 2026,
@@ -951652,7 +952433,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "TD",
-      "stat": "9"
+      "stat": "10"
     },
     {
       "season": 2026,
@@ -951663,7 +952444,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "YDS",
-      "stat": "1345"
+      "stat": "1393"
     },
     {
       "season": 2026,
@@ -951674,7 +952455,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "YPA",
-      "stat": "5.8"
+      "stat": "5.7"
     },
     {
       "season": 2026,
@@ -951685,7 +952466,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "65"
+      "stat": "75"
     },
     {
       "season": 2026,
@@ -951718,7 +952499,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "162"
+      "stat": "163"
     },
     {
       "season": 2026,
@@ -951729,7 +952510,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "2.5"
+      "stat": "2.2"
     },
     {
       "season": 2026,
@@ -952279,7 +953060,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "14"
+      "stat": "15"
     },
     {
       "season": 2026,
@@ -955458,7 +956239,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "25"
+      "stat": "27"
     },
     {
       "season": 2026,
@@ -955480,7 +956261,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "298"
+      "stat": "315"
     },
     {
       "season": 2026,
@@ -955491,7 +956272,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "11.9"
+      "stat": "11.7"
     },
     {
       "season": 2026,
@@ -955502,7 +956283,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -955535,7 +956316,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "15"
+      "stat": "20"
     },
     {
       "season": 2026,
@@ -955546,7 +956327,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "7.5"
+      "stat": "6.7"
     },
     {
       "season": 2026,
@@ -955711,7 +956492,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "In 20",
-      "stat": "20"
+      "stat": "21"
     },
     {
       "season": 2026,
@@ -955733,7 +956514,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "NO",
-      "stat": "44"
+      "stat": "48"
     },
     {
       "season": 2026,
@@ -955744,7 +956525,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "TB",
-      "stat": "2"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -955755,7 +956536,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "YDS",
-      "stat": "1926"
+      "stat": "2126"
     },
     {
       "season": 2026,
@@ -955766,7 +956547,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "YPP",
-      "stat": "43.8"
+      "stat": "44.3"
     },
     {
       "season": 2026,
@@ -957658,7 +958439,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "6"
+      "stat": "7"
     },
     {
       "season": 2026,
@@ -957691,7 +958472,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "12"
+      "stat": "13"
     },
     {
       "season": 2026,
@@ -972519,7 +973300,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "17"
+      "stat": "19"
     },
     {
       "season": 2026,
@@ -972530,7 +973311,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SACKS",
-      "stat": "9.0"
+      "stat": "11.0"
     },
     {
       "season": 2026,
@@ -972541,7 +973322,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "26"
+      "stat": "30"
     },
     {
       "season": 2026,
@@ -972563,7 +973344,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "13.0"
+      "stat": "16.0"
     },
     {
       "season": 2026,
@@ -972574,7 +973355,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "49"
+      "stat": "55"
     },
     {
       "season": 2026,
@@ -1021722,7 +1022503,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "5"
+      "stat": "6"
     },
     {
       "season": 2026,
@@ -1021744,7 +1022525,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "0"
+      "stat": "1.5"
     },
     {
       "season": 2026,
@@ -1021755,7 +1022536,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "6"
+      "stat": "9"
     },
     {
       "season": 2026,
@@ -1021766,7 +1022547,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "AVG",
-      "stat": "17.6"
+      "stat": "16.7"
     },
     {
       "season": 2026,
@@ -1021788,7 +1022569,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "NO",
-      "stat": "8"
+      "stat": "10"
     },
     {
       "season": 2026,
@@ -1021810,7 +1022591,7 @@
       "conference": "Mid-American",
       "category": "kickReturns",
       "statType": "YDS",
-      "stat": "141"
+      "stat": "167"
     },
     {
       "season": 2026,
@@ -1030236,7 +1031017,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "In 20",
-      "stat": "18"
+      "stat": "19"
     },
     {
       "season": 2026,
@@ -1030258,7 +1031039,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "NO",
-      "stat": "50"
+      "stat": "56"
     },
     {
       "season": 2026,
@@ -1030269,7 +1031050,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "TB",
-      "stat": "6"
+      "stat": "7"
     },
     {
       "season": 2026,
@@ -1030280,7 +1031061,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "YDS",
-      "stat": "2256"
+      "stat": "2500"
     },
     {
       "season": 2026,
@@ -1030291,7 +1031072,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "YPP",
-      "stat": "45.1"
+      "stat": "44.6"
     },
     {
       "season": 2026,
@@ -1064963,7 +1065744,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "25"
+      "stat": "26"
     },
     {
       "season": 2026,
@@ -1069033,7 +1069814,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "PD",
-      "stat": "7"
+      "stat": "8"
     },
     {
       "season": 2026,
@@ -1069066,7 +1069847,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "24"
+      "stat": "27"
     },
     {
       "season": 2026,
@@ -1069099,7 +1069880,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "34"
+      "stat": "37"
     },
     {
       "season": 2026,
@@ -1072102,7 +1072883,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "PD",
-      "stat": "6"
+      "stat": "7"
     },
     {
       "season": 2026,
@@ -1072135,7 +1072916,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "4"
+      "stat": "6"
     },
     {
       "season": 2026,
@@ -1072168,7 +1072949,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "7"
+      "stat": "10"
     },
     {
       "season": 2026,
@@ -1105894,7 +1106675,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -1105927,7 +1106708,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "19"
+      "stat": "23"
     },
     {
       "season": 2026,
@@ -1113231,7 +1114012,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "10"
+      "stat": "13"
     },
     {
       "season": 2026,
@@ -1113264,7 +1114045,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "19"
+      "stat": "23"
     },
     {
       "season": 2026,
@@ -1114824,9 +1115605,64 @@
       "position": "RB",
       "team": "Sacramento State",
       "conference": "Mid-American",
+      "category": "kickReturns",
+      "statType": "AVG",
+      "stat": "11.0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5229947",
+      "player": "Davion Godley",
+      "position": "RB",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "kickReturns",
+      "statType": "LONG",
+      "stat": "11"
+    },
+    {
+      "season": 2026,
+      "playerId": "5229947",
+      "player": "Davion Godley",
+      "position": "RB",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "kickReturns",
+      "statType": "NO",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5229947",
+      "player": "Davion Godley",
+      "position": "RB",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "kickReturns",
+      "statType": "TD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5229947",
+      "player": "Davion Godley",
+      "position": "RB",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "kickReturns",
+      "statType": "YDS",
+      "stat": "11"
+    },
+    {
+      "season": 2026,
+      "playerId": "5229947",
+      "player": "Davion Godley",
+      "position": "RB",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "5"
+      "stat": "7"
     },
     {
       "season": 2026,
@@ -1114837,7 +1115673,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "LONG",
-      "stat": "4"
+      "stat": "23"
     },
     {
       "season": 2026,
@@ -1114859,7 +1115695,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "3"
+      "stat": "31"
     },
     {
       "season": 2026,
@@ -1114870,7 +1115706,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "0.6"
+      "stat": "4.4"
     },
     {
       "season": 2026,
@@ -1115937,7 +1116773,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "26"
+      "stat": "27"
     },
     {
       "season": 2026,
@@ -1115970,7 +1116806,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "52"
+      "stat": "54"
     },
     {
       "season": 2026,
@@ -1143019,7 +1143855,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "7"
+      "stat": "9"
     },
     {
       "season": 2026,
@@ -1143052,7 +1143888,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "13"
+      "stat": "16"
     },
     {
       "season": 2026,
@@ -1155053,7 +1155889,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "FGA",
-      "stat": "7"
+      "stat": "8"
     },
     {
       "season": 2026,
@@ -1155086,7 +1155922,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "PCT",
-      "stat": "0.571"
+      "stat": "0.500"
     },
     {
       "season": 2026,
@@ -1155097,7 +1155933,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "PTS",
-      "stat": "34"
+      "stat": "38"
     },
     {
       "season": 2026,
@@ -1155108,7 +1155944,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "XPA",
-      "stat": "24"
+      "stat": "28"
     },
     {
       "season": 2026,
@@ -1155119,7 +1155955,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "XPM",
-      "stat": "22"
+      "stat": "26"
     },
     {
       "season": 2026,
@@ -1155482,7 +1156318,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "5"
+      "stat": "6"
     },
     {
       "season": 2026,
@@ -1155504,7 +1156340,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "9"
+      "stat": "11"
     },
     {
       "season": 2026,
@@ -1155526,7 +1156362,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "7.0"
+      "stat": "8.0"
     },
     {
       "season": 2026,
@@ -1155537,7 +1156373,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "27"
+      "stat": "30"
     },
     {
       "season": 2026,
@@ -1170717,7 +1171553,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "99"
+      "stat": "101"
     },
     {
       "season": 2026,
@@ -1170750,7 +1171586,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "400"
+      "stat": "403"
     },
     {
       "season": 2026,
@@ -1171817,7 +1172653,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "6"
+      "stat": "7"
     },
     {
       "season": 2026,
@@ -1174259,7 +1175095,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "11"
+      "stat": "13"
     },
     {
       "season": 2026,
@@ -1174292,7 +1175128,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "28"
+      "stat": "31"
     },
     {
       "season": 2026,
@@ -1195559,6 +1196395,61 @@
     },
     {
       "season": 2026,
+      "playerId": "5281382",
+      "player": "Kai Owens",
+      "position": "WR",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "receiving",
+      "statType": "LONG",
+      "stat": "13"
+    },
+    {
+      "season": 2026,
+      "playerId": "5281382",
+      "player": "Kai Owens",
+      "position": "WR",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "receiving",
+      "statType": "REC",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5281382",
+      "player": "Kai Owens",
+      "position": "WR",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "receiving",
+      "statType": "TD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5281382",
+      "player": "Kai Owens",
+      "position": "WR",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "receiving",
+      "statType": "YDS",
+      "stat": "13"
+    },
+    {
+      "season": 2026,
+      "playerId": "5281382",
+      "player": "Kai Owens",
+      "position": "WR",
+      "team": "Massachusetts",
+      "conference": "Mid-American",
+      "category": "receiving",
+      "statType": "YPR",
+      "stat": "13.0"
+    },
+    {
+      "season": 2026,
       "playerId": "5281454",
       "player": "Colton Benaitis",
       "position": "DB",
@@ -1195599,7 +1196490,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "3"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -1195632,7 +1196523,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "6"
+      "stat": "7"
     },
     {
       "season": 2026,
@@ -1197579,7 +1198470,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "2"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -1197612,7 +1198503,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "14"
+      "stat": "16"
     },
     {
       "season": 2026,
@@ -1203365,7 +1204256,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "1"
+      "stat": "2"
     },
     {
       "season": 2026,
@@ -1203387,7 +1204278,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "12"
+      "stat": "16"
     },
     {
       "season": 2026,
@@ -1203409,7 +1204300,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "2.0"
+      "stat": "2.5"
     },
     {
       "season": 2026,
@@ -1203420,7 +1204311,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "34"
+      "stat": "48"
     },
     {
       "season": 2026,
@@ -1209815,6 +1210706,83 @@
     },
     {
       "season": 2026,
+      "playerId": "5291754",
+      "player": "Daniel Mataele",
+      "position": "OL",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "PD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5291754",
+      "player": "Daniel Mataele",
+      "position": "OL",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "QB HUR",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5291754",
+      "player": "Daniel Mataele",
+      "position": "OL",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SACKS",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5291754",
+      "player": "Daniel Mataele",
+      "position": "OL",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SOLO",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5291754",
+      "player": "Daniel Mataele",
+      "position": "OL",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5291754",
+      "player": "Daniel Mataele",
+      "position": "OL",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TFL",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5291754",
+      "player": "Daniel Mataele",
+      "position": "OL",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TOT",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
       "playerId": "5291769",
       "player": "Syncere Berry",
       "position": "DB",
@@ -1210251,7 +1211219,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "0"
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -1210273,7 +1211241,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "1"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -1210306,7 +1211274,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "2"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -1210615,6 +1211583,83 @@
       "category": "receiving",
       "statType": "YPR",
       "stat": "9.0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5291797",
+      "player": "Preston Lunsford",
+      "position": "EDGE",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "PD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5291797",
+      "player": "Preston Lunsford",
+      "position": "EDGE",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "QB HUR",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5291797",
+      "player": "Preston Lunsford",
+      "position": "EDGE",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SACKS",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5291797",
+      "player": "Preston Lunsford",
+      "position": "EDGE",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SOLO",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5291797",
+      "player": "Preston Lunsford",
+      "position": "EDGE",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5291797",
+      "player": "Preston Lunsford",
+      "position": "EDGE",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TFL",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5291797",
+      "player": "Preston Lunsford",
+      "position": "EDGE",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TOT",
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -1225750,7 +1226795,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "11"
+      "stat": "13"
     },
     {
       "season": 2026,
@@ -1225772,7 +1226817,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "91"
+      "stat": "102"
     },
     {
       "season": 2026,
@@ -1225783,7 +1226828,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "8.3"
+      "stat": "7.8"
     },
     {
       "season": 2026,
@@ -1229996,7 +1231041,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "PD",
-      "stat": "5"
+      "stat": "6"
     },
     {
       "season": 2026,
@@ -1230029,7 +1231074,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "32"
+      "stat": "35"
     },
     {
       "season": 2026,
@@ -1230051,7 +1231096,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "4.0"
+      "stat": "5.0"
     },
     {
       "season": 2026,
@@ -1230062,7 +1231107,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "57"
+      "stat": "65"
     },
     {
       "season": 2026,
@@ -1230203,6 +1231248,83 @@
       "position": "WR",
       "team": "Buffalo",
       "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "PD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5295436",
+      "player": "Dwayne Early Jr.",
+      "position": "WR",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "QB HUR",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5295436",
+      "player": "Dwayne Early Jr.",
+      "position": "WR",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SACKS",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5295436",
+      "player": "Dwayne Early Jr.",
+      "position": "WR",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SOLO",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5295436",
+      "player": "Dwayne Early Jr.",
+      "position": "WR",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5295436",
+      "player": "Dwayne Early Jr.",
+      "position": "WR",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TFL",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5295436",
+      "player": "Dwayne Early Jr.",
+      "position": "WR",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TOT",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5295436",
+      "player": "Dwayne Early Jr.",
+      "position": "WR",
+      "team": "Buffalo",
+      "conference": "Mid-American",
       "category": "receiving",
       "statType": "LONG",
       "stat": "37"
@@ -1230216,7 +1231338,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "19"
+      "stat": "20"
     },
     {
       "season": 2026,
@@ -1230238,7 +1231360,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "272"
+      "stat": "277"
     },
     {
       "season": 2026,
@@ -1230249,7 +1231371,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "14.3"
+      "stat": "13.9"
     },
     {
       "season": 2026,
@@ -1230304,7 +1231426,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "PTS",
-      "stat": "65"
+      "stat": "69"
     },
     {
       "season": 2026,
@@ -1230315,7 +1231437,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "XPA",
-      "stat": "21"
+      "stat": "25"
     },
     {
       "season": 2026,
@@ -1230326,7 +1231448,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "XPM",
-      "stat": "20"
+      "stat": "24"
     },
     {
       "season": 2026,
@@ -1232009,7 +1233131,7 @@
       "conference": "Mid-American",
       "category": "puntReturns",
       "statType": "AVG",
-      "stat": "5.6"
+      "stat": "4.9"
     },
     {
       "season": 2026,
@@ -1232031,7 +1233153,7 @@
       "conference": "Mid-American",
       "category": "puntReturns",
       "statType": "NO",
-      "stat": "7"
+      "stat": "8"
     },
     {
       "season": 2026,
@@ -1235716,7 +1236838,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "4"
+      "stat": "9"
     },
     {
       "season": 2026,
@@ -1236035,7 +1237157,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "PD",
-      "stat": "3"
+      "stat": "5"
     },
     {
       "season": 2026,
@@ -1259652,7 +1260774,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "27"
+      "stat": "32"
     },
     {
       "season": 2026,
@@ -1259685,7 +1260807,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "57"
+      "stat": "65"
     },
     {
       "season": 2026,
@@ -1259971,7 +1261093,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "In 20",
-      "stat": "14"
+      "stat": "16"
     },
     {
       "season": 2026,
@@ -1259993,7 +1261115,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "NO",
-      "stat": "36"
+      "stat": "44"
     },
     {
       "season": 2026,
@@ -1260004,7 +1261126,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "TB",
-      "stat": "3"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -1260015,7 +1261137,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "YDS",
-      "stat": "1626"
+      "stat": "2006"
     },
     {
       "season": 2026,
@@ -1260026,7 +1261148,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "YPP",
-      "stat": "45.2"
+      "stat": "45.6"
     },
     {
       "season": 2026,
@@ -1301991,7 +1303113,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "ATT",
-      "stat": "37"
+      "stat": "64"
     },
     {
       "season": 2026,
@@ -1302002,7 +1303124,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "COMPLETIONS",
-      "stat": "24"
+      "stat": "34"
     },
     {
       "season": 2026,
@@ -1302013,7 +1303135,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "INT",
-      "stat": "1"
+      "stat": "2"
     },
     {
       "season": 2026,
@@ -1302024,7 +1303146,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "PCT",
-      "stat": "0.649"
+      "stat": "0.531"
     },
     {
       "season": 2026,
@@ -1302046,7 +1303168,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "YDS",
-      "stat": "296"
+      "stat": "395"
     },
     {
       "season": 2026,
@@ -1302057,7 +1303179,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "YPA",
-      "stat": "8.0"
+      "stat": "6.2"
     },
     {
       "season": 2026,
@@ -1302123,7 +1303245,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "25"
+      "stat": "35"
     },
     {
       "season": 2026,
@@ -1302156,7 +1303278,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "75"
+      "stat": "115"
     },
     {
       "season": 2026,
@@ -1302167,7 +1303289,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "3.0"
+      "stat": "3.3"
     },
     {
       "season": 2026,
@@ -1356991,7 +1358113,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "In 20",
-      "stat": "14"
+      "stat": "16"
     },
     {
       "season": 2026,
@@ -1357013,7 +1358135,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "NO",
-      "stat": "31"
+      "stat": "36"
     },
     {
       "season": 2026,
@@ -1357024,7 +1358146,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "TB",
-      "stat": "1"
+      "stat": "2"
     },
     {
       "season": 2026,
@@ -1357035,7 +1358157,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "YDS",
-      "stat": "1304"
+      "stat": "1508"
     },
     {
       "season": 2026,
@@ -1357046,7 +1358168,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "YPP",
-      "stat": "42.1"
+      "stat": "41.9"
     },
     {
       "season": 2026,
@@ -1357244,7 +1358366,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "5"
+      "stat": "6"
     },
     {
       "season": 2026,
@@ -1357277,7 +1358399,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "7"
+      "stat": "8"
     },
     {
       "season": 2026,
@@ -1384500,6 +1385622,83 @@
       "position": "TE",
       "team": "Sacramento State",
       "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "PD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5301047",
+      "player": "Elijah Huddle",
+      "position": "TE",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "QB HUR",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5301047",
+      "player": "Elijah Huddle",
+      "position": "TE",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SACKS",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5301047",
+      "player": "Elijah Huddle",
+      "position": "TE",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SOLO",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5301047",
+      "player": "Elijah Huddle",
+      "position": "TE",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5301047",
+      "player": "Elijah Huddle",
+      "position": "TE",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TFL",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5301047",
+      "player": "Elijah Huddle",
+      "position": "TE",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TOT",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5301047",
+      "player": "Elijah Huddle",
+      "position": "TE",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
       "category": "receiving",
       "statType": "LONG",
       "stat": "9"
@@ -1384513,7 +1385712,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "3"
+      "stat": "5"
     },
     {
       "season": 2026,
@@ -1384535,7 +1385734,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "18"
+      "stat": "23"
     },
     {
       "season": 2026,
@@ -1384546,7 +1385745,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "6.0"
+      "stat": "4.6"
     },
     {
       "season": 2026,
@@ -1384623,7 +1385822,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "19"
+      "stat": "21"
     },
     {
       "season": 2026,
@@ -1384634,7 +1385833,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "In 20",
-      "stat": "23"
+      "stat": "25"
     },
     {
       "season": 2026,
@@ -1384645,7 +1385844,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "LONG",
-      "stat": "59"
+      "stat": "62"
     },
     {
       "season": 2026,
@@ -1384656,7 +1385855,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "NO",
-      "stat": "54"
+      "stat": "59"
     },
     {
       "season": 2026,
@@ -1384667,7 +1385866,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "TB",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -1384678,7 +1385877,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "YDS",
-      "stat": "2274"
+      "stat": "2510"
     },
     {
       "season": 2026,
@@ -1384689,7 +1385888,7 @@
       "conference": "Mid-American",
       "category": "punting",
       "statType": "YPP",
-      "stat": "42.1"
+      "stat": "42.5"
     },
     {
       "season": 2026,
@@ -1436283,6 +1437482,83 @@
     },
     {
       "season": 2026,
+      "playerId": "5302823",
+      "player": "Matthew Heininger",
+      "position": "LB",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "PD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5302823",
+      "player": "Matthew Heininger",
+      "position": "LB",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "QB HUR",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5302823",
+      "player": "Matthew Heininger",
+      "position": "LB",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SACKS",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5302823",
+      "player": "Matthew Heininger",
+      "position": "LB",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SOLO",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
+      "playerId": "5302823",
+      "player": "Matthew Heininger",
+      "position": "LB",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5302823",
+      "player": "Matthew Heininger",
+      "position": "LB",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TFL",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5302823",
+      "player": "Matthew Heininger",
+      "position": "LB",
+      "team": "Buffalo",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TOT",
+      "stat": "1"
+    },
+    {
+      "season": 2026,
       "playerId": "5302825",
       "player": "Deshon Jenkins",
       "position": "RB",
@@ -1436565,7 +1437841,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "1"
+      "stat": "2"
     },
     {
       "season": 2026,
@@ -1436598,7 +1437874,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "1"
+      "stat": "2"
     },
     {
       "season": 2026,
@@ -1437666,6 +1438942,83 @@
       "category": "defensive",
       "statType": "TOT",
       "stat": "3"
+    },
+    {
+      "season": 2026,
+      "playerId": "5302897",
+      "player": "Peyton McCutcheon",
+      "position": "DL",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "PD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5302897",
+      "player": "Peyton McCutcheon",
+      "position": "DL",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "QB HUR",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5302897",
+      "player": "Peyton McCutcheon",
+      "position": "DL",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SACKS",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5302897",
+      "player": "Peyton McCutcheon",
+      "position": "DL",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "SOLO",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5302897",
+      "player": "Peyton McCutcheon",
+      "position": "DL",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TD",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5302897",
+      "player": "Peyton McCutcheon",
+      "position": "DL",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TFL",
+      "stat": "0"
+    },
+    {
+      "season": 2026,
+      "playerId": "5302897",
+      "player": "Peyton McCutcheon",
+      "position": "DL",
+      "team": "Sacramento State",
+      "conference": "Mid-American",
+      "category": "defensive",
+      "statType": "TOT",
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -1465583,7 +1466936,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "46"
+      "stat": "69"
     },
     {
       "season": 2026,
@@ -1465616,7 +1466969,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "258"
+      "stat": "377"
     },
     {
       "season": 2026,
@@ -1465627,7 +1466980,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "5.6"
+      "stat": "5.5"
     },
     {
       "season": 2026,
@@ -1472920,7 +1474273,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "29"
+      "stat": "31"
     },
     {
       "season": 2026,
@@ -1473965,7 +1475318,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "55"
+      "stat": "57"
     },
     {
       "season": 2026,
@@ -1473998,7 +1475351,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "289"
+      "stat": "295"
     },
     {
       "season": 2026,
@@ -1474009,7 +1475362,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "5.3"
+      "stat": "5.2"
     },
     {
       "season": 2026,
@@ -1482160,7 +1483513,7 @@
       "conference": "Mid-American",
       "category": "puntReturns",
       "statType": "AVG",
-      "stat": "2.5"
+      "stat": "1.7"
     },
     {
       "season": 2026,
@@ -1482182,7 +1483535,7 @@
       "conference": "Mid-American",
       "category": "puntReturns",
       "statType": "NO",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -1482226,7 +1483579,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "3"
+      "stat": "5"
     },
     {
       "season": 2026,
@@ -1482248,7 +1483601,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "37"
+      "stat": "72"
     },
     {
       "season": 2026,
@@ -1482259,7 +1483612,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "12.3"
+      "stat": "14.4"
     },
     {
       "season": 2026,
@@ -1502587,7 +1503940,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "4"
+      "stat": "6"
     },
     {
       "season": 2026,
@@ -1502620,7 +1503973,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "5"
+      "stat": "7"
     },
     {
       "season": 2026,
@@ -1502664,7 +1504017,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "3"
+      "stat": "5"
     },
     {
       "season": 2026,
@@ -1502697,7 +1504050,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "4"
+      "stat": "6"
     },
     {
       "season": 2026,
@@ -1503071,7 +1504424,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "21"
+      "stat": "22"
     },
     {
       "season": 2026,
@@ -1503093,7 +1504446,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "188"
+      "stat": "187"
     },
     {
       "season": 2026,
@@ -1503104,7 +1504457,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "9.0"
+      "stat": "8.5"
     },
     {
       "season": 2026,
@@ -1503280,7 +1504633,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "LONG",
-      "stat": "26"
+      "stat": "30"
     },
     {
       "season": 2026,
@@ -1503291,7 +1504644,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "22"
+      "stat": "23"
     },
     {
       "season": 2026,
@@ -1503313,7 +1504666,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "195"
+      "stat": "225"
     },
     {
       "season": 2026,
@@ -1503324,7 +1504677,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "8.9"
+      "stat": "9.8"
     },
     {
       "season": 2026,
@@ -1503335,7 +1504688,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "PD",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -1503368,7 +1504721,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "11"
+      "stat": "12"
     },
     {
       "season": 2026,
@@ -1503390,7 +1504743,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "6.0"
+      "stat": "6.5"
     },
     {
       "season": 2026,
@@ -1503401,7 +1504754,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "21"
+      "stat": "25"
     },
     {
       "season": 2026,
@@ -1503489,7 +1504842,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "13"
+      "stat": "14"
     },
     {
       "season": 2026,
@@ -1503522,7 +1504875,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "22"
+      "stat": "23"
     },
     {
       "season": 2026,
@@ -1503599,7 +1504952,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "12"
+      "stat": "14"
     },
     {
       "season": 2026,
@@ -1503621,7 +1504974,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TFL",
-      "stat": "1"
+      "stat": "1.5"
     },
     {
       "season": 2026,
@@ -1503632,7 +1504985,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "34"
+      "stat": "43"
     },
     {
       "season": 2026,
@@ -1503786,7 +1505139,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "PD",
-      "stat": "1"
+      "stat": "2"
     },
     {
       "season": 2026,
@@ -1503819,7 +1505172,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "SOLO",
-      "stat": "12"
+      "stat": "14"
     },
     {
       "season": 2026,
@@ -1503852,7 +1505205,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "22"
+      "stat": "25"
     },
     {
       "season": 2026,
@@ -1504039,7 +1505392,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "2"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -1504347,7 +1505700,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "LONG",
-      "stat": "8"
+      "stat": "12"
     },
     {
       "season": 2026,
@@ -1504358,7 +1505711,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "1"
+      "stat": "2"
     },
     {
       "season": 2026,
@@ -1504380,7 +1505733,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "8"
+      "stat": "20"
     },
     {
       "season": 2026,
@@ -1504391,7 +1505744,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "8.0"
+      "stat": "10.0"
     },
     {
       "season": 2026,
@@ -1504413,7 +1505766,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "QB HUR",
-      "stat": "5"
+      "stat": "6"
     },
     {
       "season": 2026,
@@ -1504468,7 +1505821,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "30"
+      "stat": "32"
     },
     {
       "season": 2026,
@@ -1505656,7 +1507009,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "74"
+      "stat": "85"
     },
     {
       "season": 2026,
@@ -1505689,7 +1507042,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "393"
+      "stat": "426"
     },
     {
       "season": 2026,
@@ -1505700,7 +1507053,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "5.3"
+      "stat": "5.0"
     },
     {
       "season": 2026,
@@ -1505722,7 +1507075,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "REC",
-      "stat": "22"
+      "stat": "24"
     },
     {
       "season": 2026,
@@ -1505744,7 +1507097,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YDS",
-      "stat": "362"
+      "stat": "390"
     },
     {
       "season": 2026,
@@ -1505755,7 +1507108,7 @@
       "conference": "Mid-American",
       "category": "receiving",
       "statType": "YPR",
-      "stat": "16.5"
+      "stat": "16.3"
     },
     {
       "season": 2026,
@@ -1516117,7 +1517470,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "4"
+      "stat": "5"
     },
     {
       "season": 2026,
@@ -1516150,7 +1517503,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "56"
+      "stat": "69"
     },
     {
       "season": 2026,
@@ -1516161,7 +1517514,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "14.0"
+      "stat": "13.8"
     },
     {
       "season": 2026,
@@ -1521089,7 +1522442,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "3"
+      "stat": "4"
     },
     {
       "season": 2026,
@@ -1521188,7 +1522541,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "ATT",
-      "stat": "28"
+      "stat": "56"
     },
     {
       "season": 2026,
@@ -1521199,7 +1522552,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "COMPLETIONS",
-      "stat": "19"
+      "stat": "32"
     },
     {
       "season": 2026,
@@ -1521210,7 +1522563,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "INT",
-      "stat": "0"
+      "stat": "1"
     },
     {
       "season": 2026,
@@ -1521221,7 +1522574,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "PCT",
-      "stat": "0.679"
+      "stat": "0.571"
     },
     {
       "season": 2026,
@@ -1521243,7 +1522596,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "YDS",
-      "stat": "202"
+      "stat": "305"
     },
     {
       "season": 2026,
@@ -1521254,7 +1522607,7 @@
       "conference": "Mid-American",
       "category": "passing",
       "statType": "YPA",
-      "stat": "7.2"
+      "stat": "5.4"
     },
     {
       "season": 2026,
@@ -1521265,7 +1522618,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "CAR",
-      "stat": "12"
+      "stat": "16"
     },
     {
       "season": 2026,
@@ -1521276,7 +1522629,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "LONG",
-      "stat": "5"
+      "stat": "9"
     },
     {
       "season": 2026,
@@ -1521298,7 +1522651,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YDS",
-      "stat": "-27"
+      "stat": "-18"
     },
     {
       "season": 2026,
@@ -1521309,7 +1522662,7 @@
       "conference": "Mid-American",
       "category": "rushing",
       "statType": "YPC",
-      "stat": "-2.3"
+      "stat": "-1.1"
     },
     {
       "season": 2026,
@@ -1521386,7 +1522739,7 @@
       "conference": "Mid-American",
       "category": "defensive",
       "statType": "TOT",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -1521518,7 +1522871,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "PTS",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -1521529,7 +1522882,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "XPA",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -1521540,7 +1522893,7 @@
       "conference": "Mid-American",
       "category": "kicking",
       "statType": "XPM",
-      "stat": "2"
+      "stat": "3"
     },
     {
       "season": 2026,
@@ -1698481,14 +1699834,14 @@
       "team": "Massachusetts",
       "conference": "MAC",
       "usage": {
-        "overall": 0.058,
-        "pass": 0.11,
-        "rush": 0.015,
+        "overall": 0.057,
+        "pass": 0.107,
+        "rush": 0.014,
         "firstDown": 0.053,
-        "secondDown": 0.042,
-        "thirdDown": 0.071,
-        "standardDowns": 0.054,
-        "passingDowns": 0.065
+        "secondDown": 0.038,
+        "thirdDown": 0.073,
+        "standardDowns": 0.053,
+        "passingDowns": 0.064
       }
     },
     {
@@ -1700245,14 +1701598,14 @@
       "team": "Toledo",
       "conference": "MAC",
       "usage": {
-        "overall": 0.074,
-        "pass": 0.138,
-        "rush": 0.013,
-        "firstDown": 0.064,
-        "secondDown": 0.087,
-        "thirdDown": 0.079,
-        "standardDowns": 0.067,
-        "passingDowns": 0.092
+        "overall": 0.068,
+        "pass": 0.129,
+        "rush": 0.011,
+        "firstDown": 0.058,
+        "secondDown": 0.077,
+        "thirdDown": 0.069,
+        "standardDowns": 0.063,
+        "passingDowns": 0.079
       }
     },
     {
@@ -1700965,14 +1702318,14 @@
       "team": "Sacramento State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.045,
-        "pass": 0.083,
+        "overall": 0.051,
+        "pass": 0.091,
         "rush": 0,
-        "firstDown": 0.025,
-        "secondDown": 0.052,
-        "thirdDown": 0.075,
-        "standardDowns": 0.033,
-        "passingDowns": 0.065
+        "firstDown": 0.051,
+        "secondDown": 0.045,
+        "thirdDown": 0.065,
+        "standardDowns": 0.048,
+        "passingDowns": 0.056
       }
     },
     {
@@ -1701757,14 +1703110,14 @@
       "team": "Buffalo",
       "conference": "MAC",
       "usage": {
-        "overall": 0.151,
-        "pass": 0.33,
+        "overall": 0.141,
+        "pass": 0.321,
         "rush": 0,
-        "firstDown": 0.144,
-        "secondDown": 0.135,
-        "thirdDown": 0.19,
-        "standardDowns": 0.138,
-        "passingDowns": 0.182
+        "firstDown": 0.133,
+        "secondDown": 0.122,
+        "thirdDown": 0.186,
+        "standardDowns": 0.127,
+        "passingDowns": 0.173
       }
     },
     {
@@ -1704079,14 +1705432,14 @@
       "team": "Central Michigan",
       "conference": "MAC",
       "usage": {
-        "overall": 0.048,
-        "pass": 0.112,
+        "overall": 0.043,
+        "pass": 0.111,
         "rush": 0,
-        "firstDown": 0.075,
-        "secondDown": 0.028,
-        "thirdDown": 0.02,
-        "standardDowns": 0.052,
-        "passingDowns": 0.041
+        "firstDown": 0.057,
+        "secondDown": 0.042,
+        "thirdDown": 0.014,
+        "standardDowns": 0.048,
+        "passingDowns": 0.032
       }
     },
     {
@@ -1704817,14 +1706170,14 @@
       "team": "Toledo",
       "conference": "MAC",
       "usage": {
-        "overall": 0.032,
-        "pass": 0.071,
+        "overall": 0.03,
+        "pass": 0.068,
         "rush": 0,
-        "firstDown": 0.018,
-        "secondDown": 0.016,
-        "thirdDown": 0.1,
-        "standardDowns": 0.03,
-        "passingDowns": 0.037
+        "firstDown": 0.016,
+        "secondDown": 0.014,
+        "thirdDown": 0.098,
+        "standardDowns": 0.027,
+        "passingDowns": 0.039
       }
     },
     {
@@ -1705375,14 +1706728,14 @@
       "team": "Ball State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.09,
-        "pass": 0.046,
-        "rush": 0.142,
-        "firstDown": 0.116,
+        "overall": 0.086,
+        "pass": 0.043,
+        "rush": 0.135,
+        "firstDown": 0.101,
         "secondDown": 0.085,
-        "thirdDown": 0.056,
-        "standardDowns": 0.105,
-        "passingDowns": 0.057
+        "thirdDown": 0.058,
+        "standardDowns": 0.1,
+        "passingDowns": 0.055
       }
     },
     {
@@ -1707211,14 +1708564,14 @@
       "team": "Massachusetts",
       "conference": "MAC",
       "usage": {
-        "overall": 0.548,
-        "pass": 0.994,
-        "rush": 0.189,
-        "firstDown": 0.482,
-        "secondDown": 0.508,
-        "thirdDown": 0.791,
-        "standardDowns": 0.482,
-        "passingDowns": 0.7
+        "overall": 0.5,
+        "pass": 0.889,
+        "rush": 0.172,
+        "firstDown": 0.449,
+        "secondDown": 0.46,
+        "thirdDown": 0.696,
+        "standardDowns": 0.452,
+        "passingDowns": 0.605
       }
     },
     {
@@ -1708651,14 +1710004,14 @@
       "team": "Ball State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.603,
-        "pass": 0.991,
-        "rush": 0.259,
-        "firstDown": 0.507,
-        "secondDown": 0.606,
-        "thirdDown": 0.802,
-        "standardDowns": 0.549,
-        "passingDowns": 0.732
+        "overall": 0.608,
+        "pass": 0.992,
+        "rush": 0.253,
+        "firstDown": 0.508,
+        "secondDown": 0.603,
+        "thirdDown": 0.821,
+        "standardDowns": 0.543,
+        "passingDowns": 0.759
       }
     },
     {
@@ -1709102,13 +1710455,13 @@
       "conference": "MAC",
       "usage": {
         "overall": 0.021,
-        "pass": 0.04,
+        "pass": 0.039,
         "rush": 0,
         "firstDown": 0,
-        "secondDown": 0.016,
-        "thirdDown": 0.064,
-        "standardDowns": 0.008,
-        "passingDowns": 0.043
+        "secondDown": 0.013,
+        "thirdDown": 0.053,
+        "standardDowns": 0.006,
+        "passingDowns": 0.047
       }
     },
     {
@@ -1709317,14 +1710670,14 @@
       "team": "Ball State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.162,
-        "pass": 0.069,
-        "rush": 0.265,
-        "firstDown": 0.176,
-        "secondDown": 0.201,
-        "thirdDown": 0.086,
-        "standardDowns": 0.169,
-        "passingDowns": 0.146
+        "overall": 0.164,
+        "pass": 0.066,
+        "rush": 0.273,
+        "firstDown": 0.184,
+        "secondDown": 0.202,
+        "thirdDown": 0.083,
+        "standardDowns": 0.176,
+        "passingDowns": 0.138
       }
     },
     {
@@ -1709443,14 +1710796,14 @@
       "team": "Ball State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.066,
-        "pass": 0.142,
-        "rush": 0.005,
-        "firstDown": 0.044,
-        "secondDown": 0.059,
-        "thirdDown": 0.123,
-        "standardDowns": 0.058,
-        "passingDowns": 0.084
+        "overall": 0.065,
+        "pass": 0.126,
+        "rush": 0.012,
+        "firstDown": 0.048,
+        "secondDown": 0.063,
+        "thirdDown": 0.104,
+        "standardDowns": 0.062,
+        "passingDowns": 0.071
       }
     },
     {
@@ -1709461,14 +1710814,14 @@
       "team": "Toledo",
       "conference": "MAC",
       "usage": {
-        "overall": 0.198,
-        "pass": 0.07,
-        "rush": 0.335,
-        "firstDown": 0.223,
-        "secondDown": 0.144,
-        "thirdDown": 0.2,
-        "standardDowns": 0.214,
-        "passingDowns": 0.157
+        "overall": 0.195,
+        "pass": 0.076,
+        "rush": 0.319,
+        "firstDown": 0.208,
+        "secondDown": 0.146,
+        "thirdDown": 0.227,
+        "standardDowns": 0.206,
+        "passingDowns": 0.17
       }
     },
     {
@@ -1709803,14 +1711156,14 @@
       "team": "Ball State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.078,
-        "pass": 0.155,
-        "rush": 0.006,
-        "firstDown": 0.062,
-        "secondDown": 0.075,
-        "thirdDown": 0.127,
-        "standardDowns": 0.056,
-        "passingDowns": 0.13
+        "overall": 0.074,
+        "pass": 0.141,
+        "rush": 0.01,
+        "firstDown": 0.058,
+        "secondDown": 0.063,
+        "thirdDown": 0.128,
+        "standardDowns": 0.053,
+        "passingDowns": 0.121
       }
     },
     {
@@ -1712413,14 +1713766,14 @@
       "team": "Massachusetts",
       "conference": "MAC",
       "usage": {
-        "overall": 0.017,
+        "overall": 0.023,
         "pass": 0,
-        "rush": 0.038,
-        "firstDown": 0.014,
-        "secondDown": 0.034,
+        "rush": 0.051,
+        "firstDown": 0.022,
+        "secondDown": 0.041,
         "thirdDown": 0,
-        "standardDowns": 0.018,
-        "passingDowns": 0.017
+        "standardDowns": 0.029,
+        "passingDowns": 0.013
       }
     },
     {
@@ -1712791,14 +1714144,14 @@
       "team": "Ball State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.032,
-        "pass": 0.066,
+        "overall": 0.029,
+        "pass": 0.059,
         "rush": 0,
-        "firstDown": 0.032,
-        "secondDown": 0.04,
-        "thirdDown": 0.013,
-        "standardDowns": 0.039,
-        "passingDowns": 0.017
+        "firstDown": 0.027,
+        "secondDown": 0.034,
+        "thirdDown": 0.022,
+        "standardDowns": 0.036,
+        "passingDowns": 0.014
       }
     },
     {
@@ -1712845,14 +1714198,14 @@
       "team": "Toledo",
       "conference": "MAC",
       "usage": {
-        "overall": 0.499,
+        "overall": 0.496,
         "pass": 1,
-        "rush": 0.051,
-        "firstDown": 0.413,
-        "secondDown": 0.508,
-        "thirdDown": 0.661,
-        "standardDowns": 0.433,
-        "passingDowns": 0.659
+        "rush": 0.055,
+        "firstDown": 0.418,
+        "secondDown": 0.481,
+        "thirdDown": 0.669,
+        "standardDowns": 0.432,
+        "passingDowns": 0.647
       }
     },
     {
@@ -1712953,14 +1714306,14 @@
       "team": "Sacramento State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.138,
-        "pass": 0.241,
-        "rush": 0.005,
-        "firstDown": 0.117,
-        "secondDown": 0.101,
-        "thirdDown": 0.239,
-        "standardDowns": 0.118,
-        "passingDowns": 0.178
+        "overall": 0.136,
+        "pass": 0.235,
+        "rush": 0.004,
+        "firstDown": 0.108,
+        "secondDown": 0.103,
+        "thirdDown": 0.244,
+        "standardDowns": 0.117,
+        "passingDowns": 0.174
       }
     },
     {
@@ -1714231,14 +1715584,14 @@
       "team": "Sacramento State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.08,
-        "pass": 0.013,
-        "rush": 0.164,
-        "firstDown": 0.073,
-        "secondDown": 0.086,
-        "thirdDown": 0.083,
-        "standardDowns": 0.091,
-        "passingDowns": 0.058
+        "overall": 0.075,
+        "pass": 0.016,
+        "rush": 0.151,
+        "firstDown": 0.067,
+        "secondDown": 0.084,
+        "thirdDown": 0.075,
+        "standardDowns": 0.086,
+        "passingDowns": 0.052
       }
     },
     {
@@ -1714430,13 +1715783,13 @@
       "conference": "MAC",
       "usage": {
         "overall": 0.047,
-        "pass": 0.101,
+        "pass": 0.105,
         "rush": 0,
-        "firstDown": 0.035,
+        "firstDown": 0.039,
         "secondDown": 0.039,
-        "thirdDown": 0.085,
-        "standardDowns": 0.031,
-        "passingDowns": 0.084
+        "thirdDown": 0.077,
+        "standardDowns": 0.035,
+        "passingDowns": 0.074
       }
     },
     {
@@ -1716097,6 +1717450,24 @@
     },
     {
       "season": 2026,
+      "id": "5087060",
+      "name": "Ethan Malafa",
+      "position": "TE",
+      "team": "Toledo",
+      "conference": "MAC",
+      "usage": {
+        "overall": 0.018,
+        "pass": 0.043,
+        "rush": 0,
+        "firstDown": 0,
+        "secondDown": 0,
+        "thirdDown": 0,
+        "standardDowns": 0.028,
+        "passingDowns": 0
+      }
+    },
+    {
+      "season": 2026,
       "id": "5087069",
       "name": "Max Mosey",
       "position": "WR",
@@ -1716967,14 +1718338,14 @@
       "team": "Ball State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.046,
-        "pass": 0.086,
-        "rush": 0.01,
-        "firstDown": 0.039,
-        "secondDown": 0.065,
-        "thirdDown": 0.024,
-        "standardDowns": 0.053,
-        "passingDowns": 0.03
+        "overall": 0.045,
+        "pass": 0.085,
+        "rush": 0.008,
+        "firstDown": 0.038,
+        "secondDown": 0.067,
+        "thirdDown": 0.02,
+        "standardDowns": 0.051,
+        "passingDowns": 0.032
       }
     },
     {
@@ -1717867,14 +1719238,14 @@
       "team": "Toledo",
       "conference": "MAC",
       "usage": {
-        "overall": 0.248,
-        "pass": 0.051,
-        "rush": 0.438,
-        "firstDown": 0.28,
-        "secondDown": 0.283,
-        "thirdDown": 0.152,
-        "standardDowns": 0.273,
-        "passingDowns": 0.188
+        "overall": 0.253,
+        "pass": 0.054,
+        "rush": 0.441,
+        "firstDown": 0.282,
+        "secondDown": 0.306,
+        "thirdDown": 0.137,
+        "standardDowns": 0.277,
+        "passingDowns": 0.195
       }
     },
     {
@@ -1717885,14 +1719256,14 @@
       "team": "Massachusetts",
       "conference": "MAC",
       "usage": {
-        "overall": 0.053,
-        "pass": 0.115,
+        "overall": 0.052,
+        "pass": 0.112,
         "rush": 0,
-        "firstDown": 0.038,
-        "secondDown": 0.062,
-        "thirdDown": 0.075,
+        "firstDown": 0.039,
+        "secondDown": 0.063,
+        "thirdDown": 0.067,
         "standardDowns": 0.031,
-        "passingDowns": 0.102
+        "passingDowns": 0.096
       }
     },
     {
@@ -1718353,14 +1719724,14 @@
       "team": "Buffalo",
       "conference": "MAC",
       "usage": {
-        "overall": 0.033,
-        "pass": 0.068,
+        "overall": 0.029,
+        "pass": 0.067,
         "rush": 0,
-        "firstDown": 0.021,
-        "secondDown": 0.037,
-        "thirdDown": 0.049,
-        "standardDowns": 0.036,
-        "passingDowns": 0.026
+        "firstDown": 0.016,
+        "secondDown": 0.029,
+        "thirdDown": 0.053,
+        "standardDowns": 0.033,
+        "passingDowns": 0.02
       }
     },
     {
@@ -1721000,13 +1722371,13 @@
       "conference": "MAC",
       "usage": {
         "overall": 0.108,
-        "pass": 0.053,
-        "rush": 0.144,
-        "firstDown": 0.138,
-        "secondDown": 0.143,
-        "thirdDown": 0.022,
-        "standardDowns": 0.135,
-        "passingDowns": 0.046
+        "pass": 0.076,
+        "rush": 0.128,
+        "firstDown": 0.133,
+        "secondDown": 0.14,
+        "thirdDown": 0.036,
+        "standardDowns": 0.125,
+        "passingDowns": 0.066
       }
     },
     {
@@ -1722745,14 +1724116,14 @@
       "team": "Ball State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.015,
-        "pass": 0.034,
+        "overall": 0.019,
+        "pass": 0.039,
         "rush": 0,
-        "firstDown": 0.012,
-        "secondDown": 0.015,
-        "thirdDown": 0.027,
-        "standardDowns": 0.008,
-        "passingDowns": 0.032
+        "firstDown": 0.009,
+        "secondDown": 0.022,
+        "thirdDown": 0.019,
+        "standardDowns": 0.006,
+        "passingDowns": 0.047
       }
     },
     {
@@ -1724726,13 +1726097,13 @@
       "conference": "MAC",
       "usage": {
         "overall": 0.061,
-        "pass": 0.056,
-        "rush": 0.067,
-        "firstDown": 0.078,
-        "secondDown": 0.041,
-        "thirdDown": 0.07,
-        "standardDowns": 0.059,
-        "passingDowns": 0.065
+        "pass": 0.05,
+        "rush": 0.071,
+        "firstDown": 0.072,
+        "secondDown": 0.047,
+        "thirdDown": 0.076,
+        "standardDowns": 0.058,
+        "passingDowns": 0.069
       }
     },
     {
@@ -1725013,14 +1726384,14 @@
       "team": "Massachusetts",
       "conference": "MAC",
       "usage": {
-        "overall": 0.05,
-        "pass": 0.083,
-        "rush": 0.025,
-        "firstDown": 0.048,
-        "secondDown": 0.052,
-        "thirdDown": 0.044,
-        "standardDowns": 0.044,
-        "passingDowns": 0.064
+        "overall": 0.055,
+        "pass": 0.096,
+        "rush": 0.023,
+        "firstDown": 0.054,
+        "secondDown": 0.053,
+        "thirdDown": 0.059,
+        "standardDowns": 0.049,
+        "passingDowns": 0.069
       }
     },
     {
@@ -1726291,14 +1727662,14 @@
       "team": "Central Michigan",
       "conference": "MAC",
       "usage": {
-        "overall": 0.269,
-        "pass": 0.53,
-        "rush": 0.081,
-        "firstDown": 0.25,
-        "secondDown": 0.255,
-        "thirdDown": 0.307,
-        "standardDowns": 0.231,
-        "passingDowns": 0.346
+        "overall": 0.281,
+        "pass": 0.589,
+        "rush": 0.088,
+        "firstDown": 0.261,
+        "secondDown": 0.262,
+        "thirdDown": 0.319,
+        "standardDowns": 0.243,
+        "passingDowns": 0.363
       }
     },
     {
@@ -1726489,14 +1727860,14 @@
       "team": "Buffalo",
       "conference": "MAC",
       "usage": {
-        "overall": 0.026,
-        "pass": 0.044,
-        "rush": 0,
-        "firstDown": 0.051,
+        "overall": 0.023,
+        "pass": 0.037,
+        "rush": 0.009,
+        "firstDown": 0.045,
         "secondDown": 0,
-        "thirdDown": 0.024,
-        "standardDowns": 0.032,
-        "passingDowns": 0.017
+        "thirdDown": 0.018,
+        "standardDowns": 0.029,
+        "passingDowns": 0.012
       }
     },
     {
@@ -1727245,14 +1728616,14 @@
       "team": "Ball State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.057,
-        "pass": 0.038,
-        "rush": 0.071,
-        "firstDown": 0.059,
-        "secondDown": 0.043,
-        "thirdDown": 0.077,
-        "standardDowns": 0.075,
-        "passingDowns": 0
+        "overall": 0.099,
+        "pass": 0.046,
+        "rush": 0.147,
+        "firstDown": 0.095,
+        "secondDown": 0.128,
+        "thirdDown": 0.071,
+        "standardDowns": 0.109,
+        "passingDowns": 0.073
       }
     },
     {
@@ -1727731,14 +1729102,14 @@
       "team": "Buffalo",
       "conference": "MAC",
       "usage": {
-        "overall": 0.266,
-        "pass": 0.037,
-        "rush": 0.484,
-        "firstDown": 0.337,
-        "secondDown": 0.316,
-        "thirdDown": 0.092,
-        "standardDowns": 0.295,
-        "passingDowns": 0.197
+        "overall": 0.283,
+        "pass": 0.035,
+        "rush": 0.504,
+        "firstDown": 0.35,
+        "secondDown": 0.345,
+        "thirdDown": 0.102,
+        "standardDowns": 0.312,
+        "passingDowns": 0.218
       }
     },
     {
@@ -1729099,14 +1730470,14 @@
       "team": "Sacramento State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.115,
-        "pass": 0.203,
+        "overall": 0.116,
+        "pass": 0.204,
         "rush": 0,
-        "firstDown": 0.103,
-        "secondDown": 0.112,
-        "thirdDown": 0.128,
-        "standardDowns": 0.1,
-        "passingDowns": 0.144
+        "firstDown": 0.108,
+        "secondDown": 0.12,
+        "thirdDown": 0.118,
+        "standardDowns": 0.103,
+        "passingDowns": 0.142
       }
     },
     {
@@ -1729459,14 +1730830,14 @@
       "team": "Toledo",
       "conference": "MAC",
       "usage": {
-        "overall": 0.119,
-        "pass": 0.251,
+        "overall": 0.121,
+        "pass": 0.258,
         "rush": 0,
-        "firstDown": 0.098,
-        "secondDown": 0.118,
-        "thirdDown": 0.134,
-        "standardDowns": 0.105,
-        "passingDowns": 0.153
+        "firstDown": 0.111,
+        "secondDown": 0.117,
+        "thirdDown": 0.121,
+        "standardDowns": 0.11,
+        "passingDowns": 0.147
       }
     },
     {
@@ -1733725,14 +1735096,14 @@
       "team": "Central Michigan",
       "conference": "MAC",
       "usage": {
-        "overall": 0.155,
-        "pass": 0.024,
-        "rush": 0.231,
-        "firstDown": 0.196,
-        "secondDown": 0.129,
-        "thirdDown": 0.143,
-        "standardDowns": 0.192,
-        "passingDowns": 0.07
+        "overall": 0.173,
+        "pass": 0.027,
+        "rush": 0.251,
+        "firstDown": 0.203,
+        "secondDown": 0.142,
+        "thirdDown": 0.165,
+        "standardDowns": 0.208,
+        "passingDowns": 0.089
       }
     },
     {
@@ -1734355,14 +1735726,14 @@
       "team": "Sacramento State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.086,
-        "pass": 0.148,
-        "rush": 0.005,
-        "firstDown": 0.061,
-        "secondDown": 0.13,
-        "thirdDown": 0.068,
-        "standardDowns": 0.08,
-        "passingDowns": 0.098
+        "overall": 0.084,
+        "pass": 0.144,
+        "rush": 0.004,
+        "firstDown": 0.056,
+        "secondDown": 0.125,
+        "thirdDown": 0.079,
+        "standardDowns": 0.073,
+        "passingDowns": 0.105
       }
     },
     {
@@ -1736479,14 +1737850,14 @@
       "team": "Sacramento State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.179,
-        "pass": 0.048,
-        "rush": 0.371,
-        "firstDown": 0.215,
-        "secondDown": 0.201,
-        "thirdDown": 0.085,
-        "standardDowns": 0.215,
-        "passingDowns": 0.109
+        "overall": 0.186,
+        "pass": 0.056,
+        "rush": 0.381,
+        "firstDown": 0.228,
+        "secondDown": 0.207,
+        "thirdDown": 0.087,
+        "standardDowns": 0.226,
+        "passingDowns": 0.111
       }
     },
     {
@@ -1736803,14 +1738174,14 @@
       "team": "Ball State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.025,
-        "pass": 0.054,
+        "overall": 0.021,
+        "pass": 0.042,
         "rush": 0,
-        "firstDown": 0.02,
-        "secondDown": 0.051,
+        "firstDown": 0.013,
+        "secondDown": 0.048,
         "thirdDown": 0,
-        "standardDowns": 0.011,
-        "passingDowns": 0.065
+        "standardDowns": 0.007,
+        "passingDowns": 0.055
       }
     },
     {
@@ -1736821,14 +1738192,14 @@
       "team": "Toledo",
       "conference": "MAC",
       "usage": {
-        "overall": 0.065,
-        "pass": 0.142,
+        "overall": 0.061,
+        "pass": 0.134,
         "rush": 0,
-        "firstDown": 0.059,
-        "secondDown": 0.047,
-        "thirdDown": 0.102,
-        "standardDowns": 0.061,
-        "passingDowns": 0.076
+        "firstDown": 0.058,
+        "secondDown": 0.043,
+        "thirdDown": 0.091,
+        "standardDowns": 0.058,
+        "passingDowns": 0.067
       }
     },
     {
@@ -1737631,14 +1739002,14 @@
       "team": "Toledo",
       "conference": "MAC",
       "usage": {
-        "overall": 0.136,
-        "pass": 0.022,
-        "rush": 0.246,
-        "firstDown": 0.133,
-        "secondDown": 0.166,
-        "thirdDown": 0.098,
-        "standardDowns": 0.153,
-        "passingDowns": 0.094
+        "overall": 0.133,
+        "pass": 0.02,
+        "rush": 0.24,
+        "firstDown": 0.136,
+        "secondDown": 0.16,
+        "thirdDown": 0.089,
+        "standardDowns": 0.152,
+        "passingDowns": 0.089
       }
     },
     {
@@ -1739395,14 +1740766,14 @@
       "team": "Ball State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.091,
-        "pass": 0.183,
+        "overall": 0.099,
+        "pass": 0.198,
         "rush": 0,
-        "firstDown": 0.056,
-        "secondDown": 0.079,
-        "thirdDown": 0.172,
-        "standardDowns": 0.066,
-        "passingDowns": 0.14
+        "firstDown": 0.071,
+        "secondDown": 0.074,
+        "thirdDown": 0.185,
+        "standardDowns": 0.074,
+        "passingDowns": 0.149
       }
     },
     {
@@ -1739773,14 +1741144,14 @@
       "team": "Central Michigan",
       "conference": "MAC",
       "usage": {
-        "overall": 0.038,
-        "pass": 0.09,
+        "overall": 0.041,
+        "pass": 0.105,
         "rush": 0,
-        "firstDown": 0.028,
-        "secondDown": 0.028,
-        "thirdDown": 0.081,
-        "standardDowns": 0.021,
-        "passingDowns": 0.075
+        "firstDown": 0.029,
+        "secondDown": 0.038,
+        "thirdDown": 0.075,
+        "standardDowns": 0.02,
+        "passingDowns": 0.087
       }
     },
     {
@@ -1744111,14 +1745482,14 @@
       "team": "Central Michigan",
       "conference": "MAC",
       "usage": {
-        "overall": 0.037,
-        "pass": 0.106,
+        "overall": 0.041,
+        "pass": 0.124,
         "rush": 0,
-        "firstDown": 0.055,
-        "secondDown": 0.021,
-        "thirdDown": 0.032,
-        "standardDowns": 0.036,
-        "passingDowns": 0.038
+        "firstDown": 0.067,
+        "secondDown": 0.024,
+        "thirdDown": 0.027,
+        "standardDowns": 0.042,
+        "passingDowns": 0.04
       }
     },
     {
@@ -1747243,14 +1748614,14 @@
       "team": "Buffalo",
       "conference": "MAC",
       "usage": {
-        "overall": 0.495,
-        "pass": 0.929,
-        "rush": 0.151,
-        "firstDown": 0.453,
-        "secondDown": 0.457,
-        "thirdDown": 0.603,
-        "standardDowns": 0.451,
-        "passingDowns": 0.596
+        "overall": 0.479,
+        "pass": 0.934,
+        "rush": 0.148,
+        "firstDown": 0.44,
+        "secondDown": 0.427,
+        "thirdDown": 0.607,
+        "standardDowns": 0.44,
+        "passingDowns": 0.57
       }
     },
     {
@@ -1747459,14 +1748830,14 @@
       "team": "Ball State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.087,
-        "pass": 0.173,
-        "rush": 0.008,
-        "firstDown": 0.079,
-        "secondDown": 0.098,
-        "thirdDown": 0.086,
-        "standardDowns": 0.09,
-        "passingDowns": 0.079
+        "overall": 0.091,
+        "pass": 0.178,
+        "rush": 0.01,
+        "firstDown": 0.082,
+        "secondDown": 0.106,
+        "thirdDown": 0.092,
+        "standardDowns": 0.094,
+        "passingDowns": 0.085
       }
     },
     {
@@ -1755307,14 +1756678,14 @@
       "team": "Sacramento State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.031,
+        "overall": 0.035,
         "pass": 0,
-        "rush": 0.063,
-        "firstDown": 0.036,
-        "secondDown": 0.024,
-        "thirdDown": 0.036,
-        "standardDowns": 0.052,
-        "passingDowns": 0
+        "rush": 0.075,
+        "firstDown": 0.027,
+        "secondDown": 0.018,
+        "thirdDown": 0.053,
+        "standardDowns": 0.038,
+        "passingDowns": 0.03
       }
     },
     {
@@ -1755829,14 +1757200,14 @@
       "team": "Toledo",
       "conference": "MAC",
       "usage": {
-        "overall": 0.048,
-        "pass": 0.102,
+        "overall": 0.047,
+        "pass": 0.101,
         "rush": 0,
         "firstDown": 0.038,
-        "secondDown": 0.064,
-        "thirdDown": 0.045,
-        "standardDowns": 0.029,
-        "passingDowns": 0.094
+        "secondDown": 0.063,
+        "thirdDown": 0.04,
+        "standardDowns": 0.031,
+        "passingDowns": 0.084
       }
     },
     {
@@ -1757719,14 +1759090,14 @@
       "team": "Massachusetts",
       "conference": "MAC",
       "usage": {
-        "overall": 0.219,
-        "pass": 0.062,
-        "rush": 0.368,
-        "firstDown": 0.265,
-        "secondDown": 0.214,
-        "thirdDown": 0.122,
-        "standardDowns": 0.258,
-        "passingDowns": 0.131
+        "overall": 0.207,
+        "pass": 0.063,
+        "rush": 0.346,
+        "firstDown": 0.251,
+        "secondDown": 0.202,
+        "thirdDown": 0.118,
+        "standardDowns": 0.243,
+        "passingDowns": 0.128
       }
     },
     {
@@ -1760167,14 +1761538,14 @@
       "team": "Ball State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.033,
-        "pass": 0.063,
-        "rush": 0.005,
+        "overall": 0.032,
+        "pass": 0.061,
+        "rush": 0.004,
         "firstDown": 0.031,
-        "secondDown": 0.039,
-        "thirdDown": 0.022,
-        "standardDowns": 0.036,
-        "passingDowns": 0.027
+        "secondDown": 0.034,
+        "thirdDown": 0.028,
+        "standardDowns": 0.034,
+        "passingDowns": 0.029
       }
     },
     {
@@ -1760365,14 +1761736,14 @@
       "team": "Buffalo",
       "conference": "MAC",
       "usage": {
-        "overall": 0.061,
-        "pass": 0.129,
+        "overall": 0.058,
+        "pass": 0.128,
         "rush": 0,
         "firstDown": 0.074,
-        "secondDown": 0.052,
-        "thirdDown": 0.058,
-        "standardDowns": 0.062,
-        "passingDowns": 0.06
+        "secondDown": 0.047,
+        "thirdDown": 0.052,
+        "standardDowns": 0.06,
+        "passingDowns": 0.054
       }
     },
     {
@@ -1763389,14 +1764760,14 @@
       "team": "Massachusetts",
       "conference": "MAC",
       "usage": {
-        "overall": 0.317,
-        "pass": 0.452,
-        "rush": 0.213,
-        "firstDown": 0.26,
-        "secondDown": 0.321,
-        "thirdDown": 0.417,
-        "standardDowns": 0.288,
-        "passingDowns": 0.388
+        "overall": 0.377,
+        "pass": 0.541,
+        "rush": 0.241,
+        "firstDown": 0.3,
+        "secondDown": 0.382,
+        "thirdDown": 0.5,
+        "standardDowns": 0.326,
+        "passingDowns": 0.485
       }
     },
     {
@@ -1767259,14 +1768630,14 @@
       "team": "Sacramento State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.02,
-        "pass": 0.036,
+        "overall": 0.025,
+        "pass": 0.043,
         "rush": 0,
-        "firstDown": 0.012,
-        "secondDown": 0.03,
-        "thirdDown": 0.021,
-        "standardDowns": 0.025,
-        "passingDowns": 0.013
+        "firstDown": 0.01,
+        "secondDown": 0.037,
+        "thirdDown": 0.035,
+        "standardDowns": 0.02,
+        "passingDowns": 0.031
       }
     },
     {
@@ -1770787,14 +1772158,14 @@
       "team": "Central Michigan",
       "conference": "MAC",
       "usage": {
-        "overall": 0.108,
+        "overall": 0.143,
         "pass": 0.048,
-        "rush": 0.146,
-        "firstDown": 0.114,
-        "secondDown": 0.15,
-        "thirdDown": 0.026,
-        "standardDowns": 0.123,
-        "passingDowns": 0.068
+        "rush": 0.197,
+        "firstDown": 0.155,
+        "secondDown": 0.188,
+        "thirdDown": 0.063,
+        "standardDowns": 0.163,
+        "passingDowns": 0.089
       }
     },
     {
@@ -1771093,14 +1772464,14 @@
       "team": "Sacramento State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.078,
-        "pass": 0.005,
-        "rush": 0.176,
-        "firstDown": 0.105,
-        "secondDown": 0.067,
-        "thirdDown": 0.043,
-        "standardDowns": 0.092,
-        "passingDowns": 0.051
+        "overall": 0.075,
+        "pass": 0.004,
+        "rush": 0.172,
+        "firstDown": 0.106,
+        "secondDown": 0.06,
+        "thirdDown": 0.039,
+        "standardDowns": 0.09,
+        "passingDowns": 0.046
       }
     },
     {
@@ -1771381,14 +1772752,14 @@
       "team": "Massachusetts",
       "conference": "MAC",
       "usage": {
-        "overall": 0.024,
-        "pass": 0.039,
+        "overall": 0.047,
+        "pass": 0.078,
         "rush": 0,
-        "firstDown": 0.02,
-        "secondDown": 0.023,
-        "thirdDown": 0.036,
-        "standardDowns": 0.026,
-        "passingDowns": 0.021
+        "firstDown": 0.06,
+        "secondDown": 0.034,
+        "thirdDown": 0.05,
+        "standardDowns": 0.058,
+        "passingDowns": 0.03
       }
     },
     {
@@ -1772137,14 +1773508,14 @@
       "team": "Buffalo",
       "conference": "MAC",
       "usage": {
-        "overall": 0.054,
+        "overall": 0.051,
         "pass": 0.118,
         "rush": 0,
-        "firstDown": 0.047,
-        "secondDown": 0.064,
-        "thirdDown": 0.056,
-        "standardDowns": 0.041,
-        "passingDowns": 0.082
+        "firstDown": 0.046,
+        "secondDown": 0.058,
+        "thirdDown": 0.057,
+        "standardDowns": 0.042,
+        "passingDowns": 0.074
       }
     },
     {
@@ -1772155,14 +1773526,14 @@
       "team": "Buffalo",
       "conference": "MAC",
       "usage": {
-        "overall": 0.056,
-        "pass": 0.12,
+        "overall": 0.055,
+        "pass": 0.123,
         "rush": 0,
-        "firstDown": 0.041,
-        "secondDown": 0.056,
-        "thirdDown": 0.078,
-        "standardDowns": 0.05,
-        "passingDowns": 0.071
+        "firstDown": 0.043,
+        "secondDown": 0.055,
+        "thirdDown": 0.072,
+        "standardDowns": 0.052,
+        "passingDowns": 0.064
       }
     },
     {
@@ -1772181,6 +1773552,24 @@
         "thirdDown": 0.014,
         "standardDowns": 0.013,
         "passingDowns": 0.039
+      }
+    },
+    {
+      "season": 2026,
+      "id": "5387647",
+      "name": "Gavin Spillers",
+      "position": "TE",
+      "team": "Central Michigan",
+      "conference": "MAC",
+      "usage": {
+        "overall": 0.013,
+        "pass": 0.053,
+        "rush": 0,
+        "firstDown": 0,
+        "secondDown": 0,
+        "thirdDown": 0.053,
+        "standardDowns": 0.018,
+        "passingDowns": 0
       }
     },
     {
@@ -1772245,14 +1773634,14 @@
       "team": "Massachusetts",
       "conference": "MAC",
       "usage": {
-        "overall": 0.159,
-        "pass": 0.053,
-        "rush": 0.261,
-        "firstDown": 0.168,
-        "secondDown": 0.179,
-        "thirdDown": 0.122,
-        "standardDowns": 0.172,
-        "passingDowns": 0.131
+        "overall": 0.163,
+        "pass": 0.048,
+        "rush": 0.275,
+        "firstDown": 0.177,
+        "secondDown": 0.18,
+        "thirdDown": 0.118,
+        "standardDowns": 0.176,
+        "passingDowns": 0.134
       }
     },
     {
@@ -1772263,14 +1773652,14 @@
       "team": "Massachusetts",
       "conference": "MAC",
       "usage": {
-        "overall": 0.078,
-        "pass": 0.165,
+        "overall": 0.081,
+        "pass": 0.169,
         "rush": 0,
-        "firstDown": 0.072,
-        "secondDown": 0.065,
-        "thirdDown": 0.098,
-        "standardDowns": 0.061,
-        "passingDowns": 0.115
+        "firstDown": 0.066,
+        "secondDown": 0.059,
+        "thirdDown": 0.128,
+        "standardDowns": 0.062,
+        "passingDowns": 0.121
       }
     },
     {
@@ -1772965,14 +1774354,14 @@
       "team": "Sacramento State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.025,
-        "pass": 0.043,
+        "overall": 0.024,
+        "pass": 0.041,
         "rush": 0,
         "firstDown": 0,
-        "secondDown": 0.022,
-        "thirdDown": 0.077,
-        "standardDowns": 0.012,
-        "passingDowns": 0.045
+        "secondDown": 0.028,
+        "thirdDown": 0.067,
+        "standardDowns": 0.015,
+        "passingDowns": 0.039
       }
     },
     {
@@ -1772983,14 +1774372,14 @@
       "team": "Sacramento State",
       "conference": "MAC",
       "usage": {
-        "overall": 0.226,
-        "pass": 0.371,
-        "rush": 0.039,
-        "firstDown": 0.192,
-        "secondDown": 0.195,
-        "thirdDown": 0.259,
-        "standardDowns": 0.2,
-        "passingDowns": 0.265
+        "overall": 0.355,
+        "pass": 0.556,
+        "rush": 0.075,
+        "firstDown": 0.3,
+        "secondDown": 0.357,
+        "thirdDown": 0.405,
+        "standardDowns": 0.327,
+        "passingDowns": 0.4
       }
     },
     {
