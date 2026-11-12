@@ -1,0 +1,26 @@
+name: Betting Engine Tests
+
+on:
+  push:
+    branches: [main, "upgrade/**"]
+    paths:
+      - "betting_engine/**"
+      - "BETTING_ENGINE_UPGRADE.md"
+      - ".github/workflows/betting-engine-tests.yml"
+  pull_request:
+    paths:
+      - "betting_engine/**"
+      - "BETTING_ENGINE_UPGRADE.md"
+      - ".github/workflows/betting-engine-tests.yml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run betting decision tests
+        run: python -m unittest -v betting_engine.test_decision
