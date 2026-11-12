@@ -374,7 +374,7 @@ def main():
             calibration_ready=calibration_ready,notes=availability_reason,
         ) if a.total is not None else None,
     ])
-    print("\\nSHARED BETTING ENGINE — NBA BET/PASS GATES")
+    print("\nSHARED BETTING ENGINE — NBA BET/PASS GATES")
     print(json.dumps(shared_decisions,indent=2))
 
     print("\nDOUG'S ELITE NBA SIMULATOR\n========================="); print(f"{w.name} at {h.name}")
