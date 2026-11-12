@@ -8,6 +8,8 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import urllib.parse
+import urllib.request
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -36,6 +38,49 @@ TEAM_NAMES = {
     "WAS": "Washington Wizards",
 }
 
+
+
+def fetch_sportradar_injuries(api_key: str) -> dict[str, Any]:
+    """Fetch the licensed Sportradar injury feed as an independent cross-check.
+
+    The NBA official report remains authoritative for official team submissions.
+    Sportradar status is retained as corroborating provider data only.
+    """
+    key = (api_key or "").strip()
+    if not key:
+        raise RuntimeError("SPORTRADAR_API_KEY is not configured")
+    url = "https://api.sportradar.com/nba/trial/v8/en/league/injuries.json?" + urllib.parse.urlencode({"api_key": key})
+    request = urllib.request.Request(url, headers={"Accept": "application/json"})
+    try:
+        with urllib.request.urlopen(request, timeout=25) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except Exception as exc:
+        raise RuntimeError(f"Sportradar NBA injury feed request failed: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise RuntimeError("Sportradar NBA injury response was not a JSON object")
+    teams = payload.get("teams", [])
+    if not isinstance(teams, list):
+        raise RuntimeError("Sportradar NBA injury response has no teams array")
+    player_count = injury_count = 0
+    for team in teams:
+        if not isinstance(team, dict):
+            continue
+        players = team.get("players", [])
+        if not isinstance(players, list):
+            continue
+        player_count += len(players)
+        for player in players:
+            if isinstance(player, dict):
+                injuries = player.get("injuries", [])
+                if isinstance(injuries, list):
+                    injury_count += len(injuries)
+    return {
+        "status": "available", "provider": "Sportradar NBA API v8",
+        "retrieved_at": datetime.now(timezone.utc).isoformat(),
+        "team_count": len(teams), "player_count": player_count,
+        "injury_record_count": injury_count,
+        "note": "Independent cross-check only; does not replace the NBA official injury report or confirm starters/minutes.",
+    }
 
 def build_report(home: str, away: str, game_date: date, team_stats_path: str = "nba/team_stats.json",
                  lineup_path: str = "", season: int = 2027) -> dict[str, Any]:
@@ -142,6 +187,21 @@ def build_report(home: str, away: str, game_date: date, team_stats_path: str = "
             "note": "Add ODDS_API_KEY in GitHub Actions secrets to retrieve multi-book prices.",
         }
         report["readiness"]["two_sided_odds"] = False
+
+    sportradar_key = os.getenv("SPORTRADAR_API_KEY", "").strip()
+    if sportradar_key:
+        try:
+            report["sources"]["sportradar_injuries"] = fetch_sportradar_injuries(sportradar_key)
+        except Exception as exc:
+            report["sources"]["sportradar_injuries"] = {
+                "status": "unavailable", "provider": "Sportradar NBA API v8", "error": str(exc)
+            }
+            report["warnings"].append("Sportradar cross-check failed; NBA official injury report remains the primary source.")
+    else:
+        report["sources"]["sportradar_injuries"] = {
+            "status": "not_configured", "provider": "Sportradar NBA API v8",
+            "note": "Optional licensed provider cross-check; add SPORTRADAR_API_KEY to GitHub Actions secrets."
+        }
 
     event = (context.get("event") or {})
     event_id = event.get("event_id")
