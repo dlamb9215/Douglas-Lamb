@@ -50,6 +50,16 @@ class TestNBAOdds(unittest.TestCase):
         self.assertEqual(result["total_last_updated"], "2026-11-08T18:00:00Z")
         self.assertEqual(result["bookmaker_count"], 2)
 
+    def test_market_timestamp_is_from_selected_bookmaker_not_event_max(self):
+        sample = json.loads(json.dumps(SAMPLE))
+        sample[0]["bookmakers"][0]["last_update"] = "2026-11-08T18:05:00Z"
+        sample[0]["bookmakers"][1]["last_update"] = "2026-11-08T17:55:00Z"
+        with patch("nba.odds.fetch_events", return_value=(sample, {})):
+            result = matchup_odds("Boston Celtics", "New York Knicks", "fake-key")
+        self.assertEqual(result["moneyline_bookmaker"], "book_b")
+        self.assertEqual(result["moneyline_last_updated"], "2026-11-08T17:55:00Z")
+        self.assertEqual(result["last_updated"], "2026-11-08T18:05:00Z")
+
     def test_requires_key(self):
         with self.assertRaisesRegex(RuntimeError, "ODDS_API_KEY"):
             fetch_events("")
