@@ -341,9 +341,19 @@ def main():
         data_ready=False
     quote_source=a.odds_source
     quote_time=a.odds_checked_at
+    ml_source=spread_source=total_source=quote_source
+    ml_time=spread_time=total_time=quote_time
     if odds_context and odds_context.get("status")!="unavailable":
-        quote_source=odds_context.get("source") or odds_context.get("provider_name") or quote_source
-        quote_time=odds_context.get("last_updated") or odds_context.get("retrieved_at") or quote_time
+        provider=odds_context.get("source") or odds_context.get("provider_name") or quote_source
+        ml_book=odds_context.get("moneyline_bookmaker")
+        spread_book=odds_context.get("spread_bookmaker")
+        total_book=odds_context.get("total_bookmaker")
+        ml_source=f"{provider} ({ml_book})" if ml_book else provider
+        spread_source=f"{provider} ({spread_book})" if spread_book else provider
+        total_source=f"{provider} ({total_book})" if total_book else provider
+        ml_time=odds_context.get("moneyline_last_updated") or odds_context.get("retrieved_at") or quote_time
+        spread_time=odds_context.get("spread_last_updated") or odds_context.get("retrieved_at") or quote_time
+        total_time=odds_context.get("total_last_updated") or odds_context.get("retrieved_at") or quote_time
     from betting_engine.integrations import evaluate_two_way_market,evaluate_market_set
     calibration_ready=False  # No qualified, time-ordered NBA market calibration ledger is currently certified.
     shared_decisions=evaluate_market_set([
@@ -351,7 +361,7 @@ def main():
             sport="NBA",event=f"{w.name} at {h.name}",market="moneyline",line=None,
             selection_a=f"{h.name} moneyline",probability_a=r["home_win"]/100,odds_a=a.home_ml_odds,
             selection_b=f"{w.name} moneyline",probability_b=r["away_win"]/100,odds_b=a.away_ml_odds,
-            sportsbook=quote_source,quoted_at=quote_time,data_ready=data_ready,
+            sportsbook=ml_source,quoted_at=ml_time,data_ready=data_ready,
             availability_confirmed=availability_confirmed,calibration_ready=calibration_ready,
             notes=availability_reason,
         ),
@@ -361,7 +371,7 @@ def main():
             probability_a=r["home_cover"]/100,odds_a=home_spread_price,
             selection_b=f"{w.name} {-a.spread:+g}" if a.spread is not None else f"{w.name} spread",
             probability_b=r["away_cover"]/100,odds_b=away_spread_price,
-            push_probability=r["spread_push"]/100,sportsbook=quote_source,quoted_at=quote_time,
+            push_probability=r["spread_push"]/100,sportsbook=spread_source,quoted_at=spread_time,
             data_ready=data_ready,availability_confirmed=availability_confirmed,
             calibration_ready=calibration_ready,notes=availability_reason,
         ) if a.spread is not None else None,
@@ -369,7 +379,7 @@ def main():
             sport="NBA",event=f"{w.name} at {h.name}",market="total",line=a.total,
             selection_a="Over",probability_a=r["over"]/100,odds_a=over_price,
             selection_b="Under",probability_b=r["under"]/100,odds_b=under_price,
-            push_probability=r["total_push"]/100,sportsbook=quote_source,quoted_at=quote_time,
+            push_probability=r["total_push"]/100,sportsbook=total_source,quoted_at=total_time,
             data_ready=data_ready,availability_confirmed=availability_confirmed,
             calibration_ready=calibration_ready,notes=availability_reason,
         ) if a.total is not None else None,
