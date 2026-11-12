@@ -1,6 +1,6 @@
 import unittest
 from datetime import date, datetime, timezone, timedelta
-from nba.player_props import parse_gamelog, project_player, _walk_players, confirmed_minutes, build_matchup_player_projections, validate_lineup_context
+from nba.player_props import parse_gamelog, project_player, _walk_players, confirmed_minutes, build_matchup_player_projections, validate_lineup_context, validate_game_availability
 
 class TestNBAPlayerProps(unittest.TestCase):
     def test_roster_walker_ignores_team_objects(self):
@@ -74,6 +74,28 @@ class TestNBAPlayerProps(unittest.TestCase):
         self.assertFalse(validate_lineup_context(missing_source, ["BOS", "NYK"], now)[0])
         missing_team = dict(valid, teams={"BOS": {}})
         self.assertFalse(validate_lineup_context(missing_team, ["BOS", "NYK"], now)[0])
+
+    def test_team_market_availability_requires_five_confirmed_starters_per_team(self):
+        now = datetime(2026, 11, 9, 18, 0, tzinfo=timezone.utc)
+        teams = {}
+        for team in ("BOS", "NYK"):
+            teams[team] = {
+                "Player " + str(i): {
+                    "confirmed": True, "status": "available", "starter": True,
+                    "minutes": 30, "minutes_sd": 2,
+                }
+                for i in range(5)
+            }
+        payload = {
+            "source": "official team lineup",
+            "confirmed_at": "2026-11-09T17:30:00+00:00",
+            "teams": teams,
+        }
+        self.assertTrue(validate_game_availability(payload, ["BOS", "NYK"], now)[0])
+        payload["teams"]["BOS"].pop("Player 4")
+        valid, reason = validate_game_availability(payload, ["BOS", "NYK"], now)
+        self.assertFalse(valid)
+        self.assertIn("five are required", reason)
 
     def test_player_props_withheld_without_confirmed_lineups(self):
         result = build_matchup_player_projections("BOS", "NYK", date(2026, 11, 9))
