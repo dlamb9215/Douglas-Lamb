@@ -125,6 +125,7 @@ def main():
     parser.add_argument("--odds-checked-at")
     parser.add_argument("--trials", type=int, default=100000)
     parser.add_argument("--pregame-report", help="Fresh pregame context JSON")
+    parser.add_argument("--game-day-confirmations", default="game_day_confirmations.json", help="Official game-day active starter and full inactive review JSON")
     parser.add_argument(
         "--neutral-site",
         action="store_true",
@@ -278,6 +279,18 @@ def main():
     data_check = check_matchup_data(
         database, home_code, away_code
     )
+
+    team_availability_confirmed = False
+    team_availability_reason = "official team game-day confirmation file not supplied"
+    try:
+        with open(args.game_day_confirmations, encoding="utf-8") as confirmation_handle:
+            confirmation_payload = json.load(confirmation_handle)
+        from game_day_confirmations import validate_team_market_confirmation
+        team_availability_confirmed, team_availability_reason = validate_team_market_confirmation(
+            confirmation_payload, home_code, away_code
+        )
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        team_availability_reason = f"official team game-day confirmation invalid or missing: {exc}"
 
     if not data_check["ready"]:
 
@@ -505,8 +518,8 @@ def main():
             odds_a=args.home_odds, selection_b=f"{away_code} moneyline",
             probability_b=result["away_win"] / 100, odds_b=args.away_odds,
             sportsbook=quote_source, quoted_at=quote_time, data_ready=decision_data_ready,
-            availability_confirmed=False, calibration_ready=summary.get("calibrated") is True,
-            notes="Final official inactive/starter confirmation is not independently attested in this team-market workflow.",
+            availability_confirmed=team_availability_confirmed, calibration_ready=summary.get("calibrated") is True,
+            notes=team_availability_reason,
         ),
         evaluate_two_way_market(
             sport="NFL", event=f"{away_code} at {home_code}", market="spread", line=args.spread,
@@ -514,21 +527,22 @@ def main():
             odds_a=args.home_spread_odds, selection_b=f"{away_code} {-args.spread:+g}",
             probability_b=result["away_cover"] / 100, odds_b=args.away_spread_odds,
             push_probability=result["spread_push"] / 100, sportsbook=quote_source,
-            quoted_at=quote_time, data_ready=decision_data_ready, availability_confirmed=False,
+            quoted_at=quote_time, data_ready=decision_data_ready, availability_confirmed=team_availability_confirmed,
             calibration_ready=summary.get("calibrated") is True,
-            notes="Spread-side prices must be entered from the same current sportsbook snapshot.",
+            notes=team_availability_reason,
         ) if args.spread is not None else None,
         evaluate_two_way_market(
             sport="NFL", event=f"{away_code} at {home_code}", market="total", line=args.total,
             selection_a="Over", probability_a=result["over"] / 100, odds_a=args.over_odds,
             selection_b="Under", probability_b=result["under"] / 100, odds_b=args.under_odds,
             push_probability=result["total_push"] / 100, sportsbook=quote_source,
-            quoted_at=quote_time, data_ready=decision_data_ready, availability_confirmed=False,
+            quoted_at=quote_time, data_ready=decision_data_ready, availability_confirmed=team_availability_confirmed,
             calibration_ready=summary.get("calibrated") is True,
-            notes="Final official inactive/starter confirmation and historical calibration are still required.",
+            notes=team_availability_reason,
         ) if args.total is not None else None,
     ])
     print("\nSHARED BETTING ENGINE — NFL BET/PASS GATES")
+    print(f"Official team availability gate: {team_availability_confirmed} — {team_availability_reason}")
     print(json.dumps(shared_decisions, indent=2))
     print("\nNFL FORECAST TRACKING")
     print("=====================")
