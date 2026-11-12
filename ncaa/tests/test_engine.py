@@ -1,4 +1,5 @@
 import unittest
+from datetime import date
 import json
 import tempfile
 from pathlib import Path
@@ -158,7 +159,7 @@ class SimulatorTests(unittest.TestCase):
     def test_bad_cfbd_profile_is_blocked(self):
         bad = TeamProfile(
             "Bad Data U", plays_per_game=36.9, yards_per_play=11.2,
-            source="CollegeFootballData API", as_of="2026-11-07",
+            source="CollegeFootballData API", as_of=date.today().isoformat(),
             games_sampled=8,
         )
         with self.assertRaisesRegex(ValueError, "invalid plays/game"):
