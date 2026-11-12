@@ -79,6 +79,7 @@ jobs:
           GAME_DATE: ${{ inputs.game_date }}
           GAME_CONFIG_JSON: ${{ inputs.game_config_json }}
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          SPORTRADAR_API_KEY: ${{ secrets.SPORTRADAR_API_KEY }}
         run: |
           set -euo pipefail
           if [ -z "$GAME_DATE" ]; then GAME_DATE="$(TZ=America/New_York date +%F)"; fi
