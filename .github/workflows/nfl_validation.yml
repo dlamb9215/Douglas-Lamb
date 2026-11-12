@@ -15,6 +15,22 @@ on:
       - "nfl_team_stats.json"
       - "player_pool.json"
       - "test_*.py"
+      - "requirements-nba.txt"
+      - ".github/workflows/nfl_validation.yml"
+  pull_request:
+    paths:
+      - "main.py"
+      - "drive_simulator.py"
+      - "nfl_data.py"
+      - "pregame_context.py"
+      - "injury_exposure.py"
+      - "market_data.py"
+      - "betting_engine/**"
+      - "matchup_player_pipeline.py"
+      - "nfl_team_stats.json"
+      - "player_pool.json"
+      - "test_*.py"
+      - "requirements-nba.txt"
       - ".github/workflows/nfl_validation.yml"
   workflow_dispatch:
     inputs:
@@ -92,6 +108,7 @@ jobs:
         run: python -m unittest -v
 
       - name: Fetch matchup kickoff weather context
+        if: github.event_name != 'pull_request'
         continue-on-error: true
         env:
           HOME_TEAM: ${{ github.event.inputs.home || 'ATL' }}
@@ -99,6 +116,7 @@ jobs:
         run: python nfl_weather.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --output kickoff-weather.json
 
       - name: Build fresh matchup pregame gate
+        if: github.event_name != 'pull_request'
         env:
           HOME_TEAM: ${{ github.event.inputs.home || 'ATL' }}
           AWAY_TEAM: ${{ github.event.inputs.away || 'CIN' }}
@@ -110,6 +128,7 @@ jobs:
           fi
 
       - name: Run reproducible 100,000-trial matchup
+        if: github.event_name != 'pull_request'
         env:
           HOME_TEAM: ${{ github.event.inputs.home || 'ATL' }}
           AWAY_TEAM: ${{ github.event.inputs.away || 'CIN' }}
