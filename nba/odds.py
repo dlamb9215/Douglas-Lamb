@@ -26,7 +26,14 @@ def _american(value: Any) -> int:
 def _best(prices: list[int]) -> int | None:
     return max(prices) if prices else None
 
-def _consensus_rows(rows: list[tuple[float, int, int]]) -> tuple[float, list[tuple[float, int, int]]]:
+def _implied_probability(price: int) -> float:
+    return 100 / (price + 100) if price > 0 else (-price) / ((-price) + 100)
+
+def _lowest_hold_pair(rows: list[tuple[int, int, str]]) -> tuple[int, int, str] | None:
+    # Keep both sides from one bookmaker; never mix prices across books.
+    return min(rows, key=lambda row: (_implied_probability(row[0]) + _implied_probability(row[1]), row[2])) if rows else None
+
+def _consensus_rows(rows: list[tuple[float, int, int, str]]) -> tuple[float, list[tuple[float, int, int, str]]]:
     counts = Counter(row[0] for row in rows)
     highest_count = max(counts.values())
     tied_lines = [line for line, count in counts.items() if count == highest_count]
@@ -77,9 +84,9 @@ def matchup_odds(home_name: str, away_name: str, api_key: str | None = None) -> 
             "Check team names and whether bookmakers have posted the game."
         )
     event = matches[0]
-    moneyline = {"home": [], "away": []}
-    spread_rows: list[tuple[float, int, int]] = []
-    total_rows: list[tuple[float, int, int]] = []
+    moneyline_rows: list[tuple[int, int, str]] = []
+    spread_rows: list[tuple[float, int, int, str]] = []
+    total_rows: list[tuple[float, int, int, str]] = []
     books = set()
     last_updates = []
     for book in event.get("bookmakers", []):
@@ -91,27 +98,29 @@ def matchup_odds(home_name: str, away_name: str, api_key: str | None = None) -> 
         for market in book.get("markets", []):
             outcomes = market.get("outcomes", [])
             if market.get("key") == "h2h":
-                for outcome in outcomes:
-                    name = str(outcome.get("name", "")).casefold()
-                    if name == home_name.casefold():
-                        moneyline["home"].append(_american(outcome["price"]))
-                    elif name == away_name.casefold():
-                        moneyline["away"].append(_american(outcome["price"]))
+                by_name = {str(o.get("name", "")).casefold(): o for o in outcomes}
+                h = by_name.get(home_name.casefold())
+                a = by_name.get(away_name.casefold())
+                if h and a:
+                    moneyline_rows.append((_american(h["price"]), _american(a["price"]), str(book_key or "")))
             elif market.get("key") == "spreads":
                 by_name = {str(o.get("name", "")).casefold(): o for o in outcomes}
                 h = by_name.get(home_name.casefold())
                 a = by_name.get(away_name.casefold())
                 if h and a and h.get("point") is not None:
-                    spread_rows.append((float(h["point"]), _american(h["price"]), _american(a["price"])))
+                    spread_rows.append((float(h["point"]), _american(h["price"]), _american(a["price"]), str(book_key or "")))
             elif market.get("key") == "totals":
                 by_name = {str(o.get("name", "")).casefold(): o for o in outcomes}
                 over, under = by_name.get("over"), by_name.get("under")
                 if over and under and over.get("point") is not None:
-                    total_rows.append((float(over["point"]), _american(over["price"]), _american(under["price"])))
+                    total_rows.append((float(over["point"]), _american(over["price"]), _american(under["price"]), str(book_key or "")))
+    ml_pair = _lowest_hold_pair(moneyline_rows)
     result: dict[str, Any] = {
         "home_team": home_name, "away_team": away_name, "event_id": event.get("id"),
         "commence_time": event.get("commence_time"),
-        "home_ml_odds": _best(moneyline["home"]), "away_ml_odds": _best(moneyline["away"]),
+        "home_ml_odds": ml_pair[0] if ml_pair else None,
+        "away_ml_odds": ml_pair[1] if ml_pair else None,
+        "moneyline_bookmaker": ml_pair[2] if ml_pair else None,
         "bookmakers": sorted(books), "bookmaker_count": len(books),
         "last_updated": max(last_updates) if last_updates else None,
         "source": "The Odds API v4", "retrieved_at": datetime.now(timezone.utc).isoformat(),
@@ -119,19 +128,23 @@ def matchup_odds(home_name: str, away_name: str, api_key: str | None = None) -> 
     }
     if spread_rows:
         line, at_line = _consensus_rows(spread_rows)
+        pair = _lowest_hold_pair([(row[1], row[2], row[3]) for row in at_line])
         result.update({
             "home_spread": line,
             "away_spread": -line,
-            "home_spread_odds": _best([row[1] for row in at_line]),
-            "away_spread_odds": _best([row[2] for row in at_line]),
+            "home_spread_odds": pair[0] if pair else None,
+            "away_spread_odds": pair[1] if pair else None,
+            "spread_bookmaker": pair[2] if pair else None,
             "spread_book_count": len(at_line),
         })
     if total_rows:
         line, at_line = _consensus_rows(total_rows)
+        pair = _lowest_hold_pair([(row[1], row[2], row[3]) for row in at_line])
         result.update({
             "total": line,
-            "over_odds": _best([row[1] for row in at_line]),
-            "under_odds": _best([row[2] for row in at_line]),
+            "over_odds": pair[0] if pair else None,
+            "under_odds": pair[1] if pair else None,
+            "total_bookmaker": pair[2] if pair else None,
             "total_book_count": len(at_line),
         })
     return result
