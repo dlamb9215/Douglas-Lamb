@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 FIELDS = [
-    "forecast_id", "forecasted_at", "game_date", "event_id", "home_team", "away_team",
+    "forecast_id", "forecasted_at", "game_date", "game_start_time", "event_id", "home_team", "away_team",
     "git_sha", "workflow_run_id", "model_trials", "data_updated_at",
     "projected_home", "projected_away", "projected_total", "projected_margin",
     "home_win_probability", "away_win_probability",
@@ -49,6 +49,7 @@ def build_row(payload: dict[str, Any], run_id: str, git_sha: str,
         "forecast_id": f"{run_id}:{event.get('event_id') or payload.get('game_date') or ''}:{home}:{away}",
         "forecasted_at": parsed.astimezone(timezone.utc).isoformat(),
         "game_date": payload.get("game_date") or event.get("date") or "",
+        "game_start_time": event.get("start_time") or "",
         "event_id": event.get("event_id") or "",
         "home_team": home, "away_team": away, "git_sha": git_sha,
         "workflow_run_id": str(run_id), "model_trials": result.get("trials", ""),
