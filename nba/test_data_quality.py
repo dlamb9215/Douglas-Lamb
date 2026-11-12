@@ -63,6 +63,12 @@ class TestNBADataQuality(unittest.TestCase):
         self.assertTrue(any("Early-season sample" in warning for warning in report["warnings"]))
         self.assertTrue(any("Unavailable optional team features" in warning for warning in report["warnings"]))
 
+    def test_rejects_invalid_optional_three_point_feature(self):
+        data = payload()
+        data["teams"]["BOS"]["three_pa_rate"] = 1.4
+        with self.assertRaisesRegex(ValueError, "three_pa_rate"):
+            validate_payload(data, 72, self.now)
+
     def test_requires_timezone_aware_timestamp(self):
         data = payload()
         data["updated_at"] = "2026-11-08T05:00:00"
