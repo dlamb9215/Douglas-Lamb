@@ -88,7 +88,7 @@ class TestNBAPlayerProps(unittest.TestCase):
             }
         payload = {
             "source": "official team lineup",
-            "confirmed_at": "2026-11-09T17:30:00+00:00",
+            "confirmed_at": (now - timedelta(minutes=30)).isoformat(),
             "teams": teams,
         }
         self.assertTrue(validate_game_availability(payload, ["BOS", "NYK"], now)[0])
