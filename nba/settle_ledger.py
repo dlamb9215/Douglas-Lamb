@@ -48,7 +48,8 @@ def _score_event(event: dict[str, Any], scoreboard_day: date) -> dict[str, Any] 
 def settle_ledger(ledger_path: str, fetcher: Callable[[date], list[dict[str, Any]]] = fetch_scoreboard) -> dict[str, Any]:
     path = Path(ledger_path)
     if not path.exists():
-        raise FileNotFoundError(f"Prediction ledger not found: {path}")
+        return {"status": "ledger_not_created_yet", "checked": 0, "settled": 0,
+                "pending": 0, "errors": [], "ledger": str(path)}
     with path.open(newline="", encoding="utf-8") as handle:
         reader = csv.DictReader(handle)
         if reader.fieldnames != FIELDS:
