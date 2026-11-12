@@ -29,6 +29,13 @@ class BettingDecisionTests(unittest.TestCase):
         self.assertGreater(result["expected_value_per_unit"], 0)
         self.assertLessEqual(result["capped_kelly_fraction"], 0.05)
 
+    def test_evaluation_attaches_no_vig_market_comparison(self):
+        from dataclasses import replace
+        candidate = replace(self.base, opposite_odds_american=+100)
+        result = evaluate(candidate, now=self.now)
+        self.assertIsNotNone(result["no_vig_market_probability"])
+        self.assertIn("edge_vs_no_vig_market", result)
+
     def test_missing_calibration_blocks_bet(self):
         from dataclasses import replace
         result = evaluate(replace(self.base, calibration_ready=False), now=self.now)
