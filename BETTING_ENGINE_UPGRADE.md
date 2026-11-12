@@ -49,6 +49,32 @@ python -m unittest -v betting_engine.test_decision
 - NBA player props flow through the shared engine only after the existing official injury and confirmed minutes/lineup gates pass.
 - Each market report includes no-vig probability, breakeven probability, expected value, edge, quote age, and explicit blockers.
 
+## NBA player-prop quote format
+
+For `player_prop_lines_json`, each priced player/stat entry should include
+`line`, `over_odds`, `under_odds`, a sportsbook `book` or `source`, and a
+timezone-aware `quoted_at` (or `checked_at_utc`) timestamp. Example:
+
+```json
+{
+  "Example Player": {
+    "points": {
+      "line": 24.5,
+      "over_odds": -115,
+      "under_odds": -105,
+      "book": "Example Sportsbook",
+      "quoted_at": "2026-11-12T18:30:00Z"
+    }
+  }
+}
+```
+
+The NBA lineup JSON must contain each team under `teams`, with at least five
+entries per team explicitly marked `confirmed: true`, `status: available` or
+`probable`, `starter: true`, plus bounded `minutes` and `minutes_sd`.
+The timestamp and source are required. The team-market gate additionally
+requires the official NBA injury report to show both teams submitted.
+
 ## Current limitations and release gates
 The integration is end-to-end at the report/decision layer, but it is **not yet certified to issue BET recommendations**. Calibration remains deliberately false for NBA team markets, NBA player props, NFL team markets, and NFL player props until market-specific, time-ordered out-of-sample ledgers meet the review standard. NFL team markets remain blocked until the team-level confirmation file explicitly attests that the full inactive list was reviewed and includes 22 active starters for each team. Do not manually set calibration flags true or treat green CI as proof of predictive accuracy.
 
