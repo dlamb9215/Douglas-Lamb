@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 
 from nba.injuries import fetch_official_injuries
+from betting_engine.integrations import evaluate_two_way_market
 
 SITE = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba"
 WEB = "https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba"
@@ -63,6 +64,35 @@ def validate_lineup_context(payload: dict[str, Any] | None, required_teams: list
     if missing:
         return False, "confirmed lineup missing team(s): " + ", ".join(missing)
     return True, "confirmed lineup input validated"
+
+
+def validate_game_availability(payload: dict[str, Any] | None, required_teams: list[str],
+                                now: datetime | None = None) -> tuple[bool, str]:
+    """Require five explicitly confirmed available starters for each team."""
+    valid, reason = validate_lineup_context(payload, required_teams, now)
+    if not valid:
+        return False, reason
+    for team in required_teams:
+        lineup = payload["teams"].get(team, {})
+        starters = 0
+        for entry in lineup.values():
+            if not isinstance(entry, dict):
+                continue
+            if entry.get("confirmed") is not True:
+                continue
+            if str(entry.get("status", "")).strip().casefold() not in {"available", "probable"}:
+                continue
+            if entry.get("starter") is True:
+                try:
+                    minutes = float(entry.get("minutes"))
+                    minutes_sd = float(entry.get("minutes_sd"))
+                except (TypeError, ValueError):
+                    continue
+                if 8 <= minutes <= 48 and 0 <= minutes_sd <= 8:
+                    starters += 1
+        if starters < 5:
+            return False, f"{team} has only {starters} explicitly confirmed available starters; five are required"
+    return True, "both teams have five fresh confirmed available starters"
 
 
 def _get_json(url: str, timeout: int = 20) -> dict[str, Any]:
@@ -272,7 +302,7 @@ def _market_line(spec):
             line = float(spec["line"])
         except (KeyError, TypeError, ValueError):
             return None, {}
-        return line, {key: spec.get(key) for key in ("over_odds", "under_odds", "book", "source")}
+        return line, {key: spec.get(key) for key in ("over_odds", "under_odds", "book", "source", "quoted_at", "checked_at_utc")}
     try:
         return (float(spec), {}) if spec is not None else (None, {})
     except (TypeError, ValueError):
@@ -318,10 +348,30 @@ def select_best_two_props(teams):
                 for side, probability, odds_key in (("OVER", over_p, "over_odds"), ("UNDER", under_p, "under_odds")):
                     odds = market.get(odds_key)
                     edge = _prop_edge(probability, odds, market.get("over_odds"), market.get("under_odds"))
+                    shared = evaluate_two_way_market(
+                        sport="NBA", event="NBA matchup", market=f"player_prop:{stat}",
+                        line=float(line),
+                        selection_a=f"{player['player']} {stat.upper()} OVER",
+                        probability_a=float(over_p) / 100,
+                        odds_a=market.get("over_odds"),
+                        selection_b=f"{player['player']} {stat.upper()} UNDER",
+                        probability_b=float(under_p) / 100,
+                        odds_b=market.get("under_odds"),
+                        push_probability=float(projection.get("push_probability") or 0) / 100,
+                        sportsbook=market.get("source") or market.get("book") or "",
+                        quoted_at=market.get("quoted_at") or market.get("checked_at_utc") or "",
+                        data_ready=int(player.get("games_used") or 0) >= MIN_GAMES,
+                        availability_confirmed=True,
+                        calibration_ready=False,
+                        notes="Player passed explicit confirmed-lineup/minutes and official injury-report gates; NBA player-prop dispersion and edge calibration remain experimental.",
+                    )
+                    side_result = next((row for row in shared.get("selections", [])
+                                        if row.get("selection", "").endswith(side)), {})
                     candidates.append({
                         "team": team, "player": player["player"], "stat": stat.upper(),
                         "side": side, "line": line, "model_probability": probability,
                         "odds": odds, "book": market.get("book"), **edge,
+                        "shared_betting_decision": side_result,
                         "ranking_basis": "no-vig edge" if edge["edge_percentage_points"] is not None else "model probability only; no verified two-way market"
                     })
         candidates.sort(key=lambda row: (

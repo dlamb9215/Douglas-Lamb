@@ -1,6 +1,8 @@
 {
   "source": "Official NFL/team game-day inactive and starter report",
+  "source_url": "REPLACE_WITH_OFFICIAL_TEAM_OR_LEAGUE_REPORT_URL",
   "checked_at_utc": "REPLACE_WITH_CURRENT_ISO8601_TIMESTAMP",
+  "all_inactives_reviewed": false,
   "players": [
     {
       "name": "Example Player",

@@ -9,6 +9,7 @@ import json
 from datetime import datetime, timezone, timedelta
 
 from game_day_confirmations import validate_confirmation_file, confirmed_player_copy
+from betting_engine.integrations import evaluate_two_way_market
 
 from player_prop_simulator import (
     project_from_recent_player_data,
@@ -127,7 +128,7 @@ def apply_opponent_adjustment(projection, player, home, away, team_records, shri
 
 def analyze_matchup(home, away, player_pool, prop_lines=None,
                     trials=100000, seed=42, confirmations=None,
-                    team_records=None):
+                    team_records=None, quote_metadata=None):
     home, away = home.upper(), away.upper()
     if home == away:
         raise ValueError("Home and away teams must be different.")
@@ -153,6 +154,14 @@ def analyze_matchup(home, away, player_pool, prop_lines=None,
         eligible.append(confirmed)
 
     reports = []
+    shared_prop_decisions = []
+    retrieved = player_pool.get("retrieved_at_utc", "")
+    try:
+        pool_stamp = datetime.fromisoformat(str(retrieved).replace("Z", "+00:00"))
+        pool_age = datetime.now(timezone.utc) - pool_stamp.astimezone(timezone.utc)
+        player_data_ready = bool(pool_stamp.tzinfo and timedelta(minutes=-5) <= pool_age <= timedelta(hours=36))
+    except (TypeError, ValueError):
+        player_data_ready = False
     for index, player in enumerate(eligible):
         projection = project_from_recent_player_data(player)
         projection = apply_opponent_adjustment(
@@ -181,6 +190,26 @@ def analyze_matchup(home, away, player_pool, prop_lines=None,
                 )
                 item["simulation"] = simulation
                 if over_odds is not None and under_odds is not None:
+                    quote = quote_metadata or {}
+                    decision = evaluate_two_way_market(
+                        sport="NFL", event=f"{away} at {home}",
+                        market=f"player_prop:{stat}", line=line,
+                        selection_a=f"{player['name']} {stat} OVER",
+                        probability_a=simulation["over_probability"] / 100,
+                        odds_a=over_odds,
+                        selection_b=f"{player['name']} {stat} UNDER",
+                        probability_b=simulation["under_probability"] / 100,
+                        odds_b=under_odds,
+                        push_probability=simulation["push_probability"] / 100,
+                        sportsbook=quote.get("source", ""),
+                        quoted_at=quote.get("checked_at_utc", ""),
+                        data_ready=player_data_ready,
+                        availability_confirmed=True,
+                        calibration_ready=False,
+                        notes="Player has fresh explicit active-starter confirmation; player-prop dispersion and edge calibration are not yet certified.",
+                    )
+                    item["shared_betting_decision"] = decision
+                    shared_prop_decisions.append(decision)
                     def implied(odds):
                         odds = float(odds)
                         if odds == 0:
@@ -239,6 +268,16 @@ def analyze_matchup(home, away, player_pool, prop_lines=None,
         "eligible_players": len(reports),
         "blocked_players": blocked,
         "players": reports,
+        "shared_betting_engine": {
+            "status": "PASS_ALL_MARKETS" if not any(
+                side.get("decision") == "BET"
+                for market in shared_prop_decisions
+                for side in market.get("selections", [])
+            ) else "BET_CANDIDATE",
+            "markets": shared_prop_decisions,
+            "calibration_ready": False,
+            "note": "All priced player props are evaluated by the shared engine. Calibration remains blocked until a time-ordered, out-of-sample player-prop ledger is validated.",
+        },
         "warnings": [
             "Only players explicitly confirmed active starters in the fresh game-day confirmation file are projected.",
             "The confirmation file must be sourced from official NFL/team game-day inactive and starter information.",
@@ -275,7 +314,7 @@ def main():
         team_records = json.load(handle)
     report = analyze_matchup(
         args.home, args.away, pool, lines, args.trials, args.seed,
-        confirmations, team_records,
+        confirmations, team_records, line_metadata,
     )
     report["sportsbook_prop_lines"] = line_metadata or {"provided": False}
     with open(args.output, "w", encoding="utf-8") as handle:

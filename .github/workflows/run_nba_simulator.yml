@@ -1,5 +1,17 @@
-name: Run Doug's Elite NBA Simulator
+name: "Run Doug's Elite NBA Simulator"
+
 on:
+  push:
+    branches: [main, "integration/**"]
+    paths:
+      - "nba/**"
+      - "betting_engine/**"
+      - ".github/workflows/run_nba_simulator.yml"
+  pull_request:
+    paths:
+      - "nba/**"
+      - "betting_engine/**"
+      - ".github/workflows/run_nba_simulator.yml"
   workflow_dispatch:
     inputs:
       home:
@@ -22,111 +34,27 @@ on:
         required: false
         default: ""
         type: string
-      home_ml_odds:
-        description: Home moneyline American odds (optional)
-        required: false
-        default: ""
-        type: string
-      away_ml_odds:
-        description: Away moneyline American odds (optional)
-        required: false
-        default: ""
-        type: string
-      spread_odds:
-        description: American odds for spread sides
-        required: true
-        default: "-110"
-        type: string
-      total_odds:
-        description: American odds for total sides
-        required: true
-        default: "-110"
-        type: string
       trials:
-        description: Baseline Monte Carlo trials before automatic close-game refinement
+        description: Baseline Monte Carlo trials
         required: true
         default: "1000000"
         type: string
       max_trials:
-        description: Maximum trials when the matchup is close; set equal to trials to disable refinement
+        description: Maximum trials for close matchups
         required: true
         default: "5000000"
         type: string
-      prop_trials:
-        description: Monte Carlo trials per eligible player projection
-        required: true
-        default: "50000"
-        type: string
-      home_rest:
-        description: Home team days of rest before this game
-        required: true
-        default: "2"
-        type: string
-      away_rest:
-        description: Away team days of rest before this game
-        required: true
-        default: "2"
-        type: string
-      home_travel:
-        description: Home team travel miles since previous game (0 if unknown)
-        required: true
-        default: "0"
-        type: string
-      away_travel:
-        description: Away team travel miles since previous game (0 if unknown)
-        required: true
-        default: "0"
-        type: string
-      confirmed_lineups_json:
-        description: Optional JSON string with confirmed team lineups, availability and projected minutes; props are withheld if absent
-        required: false
-        default: ""
-        type: string
-      player_prop_lines_json:
-        description: Optional JSON with player stat lines and ESPN BET over_odds/under_odds, keyed by lowercase player name
-        required: false
-        default: ""
-        type: string
-      player_props:
-        description: Generate experimental player points/rebounds/assists/PRA projections and rank top two per team
-        required: true
-        default: true
-        type: boolean
-      auto_injuries:
-        description: Fetch official NBA injury report PDF (requires game_date)
-        required: true
-        default: true
-        type: boolean
-      espn_bet_odds:
-        description: Compare model against ESPN BET current and opening lines (provider 68)
-        required: true
-        default: true
-        type: boolean
-      auto_odds:
-        description: Optional consensus odds from The Odds API (requires ODDS_API_KEY secret; do not enable with ESPN BET)
-        required: true
-        default: false
-        type: boolean
       game_date:
-        description: Optional matchup date YYYY-MM-DD; blank uses today's NBA date in America/New_York
+        description: Matchup date YYYY-MM-DD; blank uses today's date in America/New_York
         required: false
-        default: "2026-11-11"
+        default: ""
         type: string
-      home_injury_points:
-        description: Manual home team points adjustment for unavailable players
-        required: true
-        default: "0"
+      game_config_json:
+        description: Optional JSON object for sportsbook prices, source/timestamp, confirmed lineups, player-prop lines, rest/travel and other settings; see BETTING_ENGINE_UPGRADE.md
+        required: false
+        default: ""
         type: string
-      away_injury_points:
-        description: Manual away team points adjustment for unavailable players
-        required: true
-        default: "0"
-        type: string
-      seed:
-        description: Reproducible random seed
-        required: true
-        default: "42"
-        type: string
+
 jobs:
   simulate:
     runs-on: ubuntu-latest
@@ -136,69 +64,106 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install dependencies
-        run: python -m pip install --upgrade pip -r requirements-nba.txt
-      - name: Run NBA tests
-        run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule nba.test_odds nba.test_espn_odds nba.test_injuries nba.test_player_props nba.test_player_props_backtest
+        run: python -m pip install --upgrade pip -r requirements-nba.txt PyYAML
+      - name: Run NBA and shared betting-engine tests
+        run: python -m unittest -v nba.test_simulator nba.test_backtest nba.test_data_quality nba.test_schedule nba.test_odds nba.test_espn_odds nba.test_injuries nba.test_player_props nba.test_player_props_backtest betting_engine.test_decision betting_engine.test_integrations
       - name: Require refreshed NBA data
         run: |
           test -s nba/team_stats.json
           python -m nba.data_quality --data nba/team_stats.json --max-age-hours 72
       - name: Run matchup
+        if: github.event_name == 'workflow_dispatch'
         env:
           HOME_TEAM: ${{ inputs.home }}
           AWAY_TEAM: ${{ inputs.away }}
           SPREAD: ${{ inputs.spread }}
           TOTAL: ${{ inputs.total }}
-          HOME_ML_ODDS: ${{ inputs.home_ml_odds }}
-          AWAY_ML_ODDS: ${{ inputs.away_ml_odds }}
-          SPREAD_ODDS: ${{ inputs.spread_odds }}
-          TOTAL_ODDS: ${{ inputs.total_odds }}
           TRIALS: ${{ inputs.trials }}
           MAX_TRIALS: ${{ inputs.max_trials }}
-          SEED: ${{ inputs.seed }}
-          HOME_REST: ${{ inputs.home_rest }}
-          AWAY_REST: ${{ inputs.away_rest }}
-          HOME_TRAVEL: ${{ inputs.home_travel }}
-          AWAY_TRAVEL: ${{ inputs.away_travel }}
           GAME_DATE: ${{ inputs.game_date }}
-          AUTO_INJURIES: ${{ inputs.auto_injuries }}
-          AUTO_ODDS: ${{ inputs.auto_odds }}
-          ESPN_BET_ODDS: ${{ inputs.espn_bet_odds }}
+          GAME_CONFIG_JSON: ${{ inputs.game_config_json }}
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
-          HOME_INJURY: ${{ inputs.home_injury_points }}
-          AWAY_INJURY: ${{ inputs.away_injury_points }}
         run: |
-          set -o pipefail
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          raw = os.environ.get("GAME_CONFIG_JSON", "").strip()
+          config = json.loads(raw) if raw else {}
+          if not isinstance(config, dict):
+              raise SystemExit("game_config_json must be a JSON object")
+          with open("nba-game-config.json", "w", encoding="utf-8") as handle:
+              json.dump(config, handle, indent=2)
+          PY
+          CONFIG=nba-game-config.json
+          get_config() { jq -r "$1 // empty" "$CONFIG"; }
           if [ -z "$GAME_DATE" ]; then GAME_DATE="$(TZ=America/New_York date +%F)"; fi
-          echo "NBA matchup date: $GAME_DATE (America/New_York)"
-          args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --max-trials "$MAX_TRIALS" --seed "$SEED" --home-rest "$HOME_REST" --away-rest "$AWAY_REST" --home-travel "$HOME_TRAVEL" --away-travel "$AWAY_TRAVEL" --home-injury-points "$HOME_INJURY" --away-injury-points "$AWAY_INJURY" --spread-odds "$SPREAD_ODDS" --total-odds "$TOTAL_ODDS" --json-output nba-simulation-results.json)
-          if [ -n "$HOME_ML_ODDS" ] && [ -n "$AWAY_ML_ODDS" ]; then args+=(--home-ml-odds "$HOME_ML_ODDS" --away-ml-odds "$AWAY_ML_ODDS"); fi
+          HOME_REST="$(jq -r '.home_rest // 2' "$CONFIG")"
+          AWAY_REST="$(jq -r '.away_rest // 2' "$CONFIG")"
+          HOME_TRAVEL="$(jq -r '.home_travel // 0' "$CONFIG")"
+          AWAY_TRAVEL="$(jq -r '.away_travel // 0' "$CONFIG")"
+          HOME_INJURY="$(jq -r '.home_injury_points // 0' "$CONFIG")"
+          AWAY_INJURY="$(jq -r '.away_injury_points // 0' "$CONFIG")"
+          SEED="$(jq -r '.seed // 42' "$CONFIG")"
+          AUTO_INJURIES="$(jq -r '.auto_injuries // true' "$CONFIG")"
+          AUTO_ODDS="$(jq -r '.auto_odds // false' "$CONFIG")"
+          ESPN_BET_ODDS="$(jq -r '.espn_bet_odds // true' "$CONFIG")"
+          if [ "$AUTO_ODDS" = "true" ] && [ "$ESPN_BET_ODDS" = "true" ]; then
+            echo "Enable either ESPN BET or The Odds API, not both."
+            exit 1
+          fi
+          args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --max-trials "$MAX_TRIALS" --seed "$SEED" --home-rest "$HOME_REST" --away-rest "$AWAY_REST" --home-travel "$HOME_TRAVEL" --away-travel "$AWAY_TRAVEL" --home-injury-points "$HOME_INJURY" --away-injury-points "$AWAY_INJURY" --game-date "$GAME_DATE" --json-output nba-simulation-results.json)
           if [ -n "$SPREAD" ]; then args+=(--spread "$SPREAD"); fi
           if [ -n "$TOTAL" ]; then args+=(--total "$TOTAL"); fi
-          args+=(--game-date "$GAME_DATE")
+          HOME_ML="$(jq -r '.home_ml_odds // empty' "$CONFIG")"
+          AWAY_ML="$(jq -r '.away_ml_odds // empty' "$CONFIG")"
+          if [ -n "$HOME_ML" ] && [ -n "$AWAY_ML" ]; then args+=(--home-ml-odds "$HOME_ML" --away-ml-odds "$AWAY_ML"); fi
+          HOME_SPREAD_ODDS="$(jq -r '.home_spread_odds // empty' "$CONFIG")"
+          AWAY_SPREAD_ODDS="$(jq -r '.away_spread_odds // empty' "$CONFIG")"
+          COMMON_SPREAD_ODDS="$(jq -r '.spread_odds // empty' "$CONFIG")"
+          if [ -n "$HOME_SPREAD_ODDS" ] && [ -n "$AWAY_SPREAD_ODDS" ]; then
+            args+=(--home-spread-odds "$HOME_SPREAD_ODDS" --away-spread-odds "$AWAY_SPREAD_ODDS")
+          elif [ -n "$COMMON_SPREAD_ODDS" ]; then
+            args+=(--spread-odds "$COMMON_SPREAD_ODDS")
+          fi
+          OVER_ODDS="$(jq -r '.over_odds // empty' "$CONFIG")"
+          UNDER_ODDS="$(jq -r '.under_odds // empty' "$CONFIG")"
+          COMMON_TOTAL_ODDS="$(jq -r '.total_odds // empty' "$CONFIG")"
+          if [ -n "$OVER_ODDS" ] && [ -n "$UNDER_ODDS" ]; then
+            args+=(--over-odds "$OVER_ODDS" --under-odds "$UNDER_ODDS")
+          elif [ -n "$COMMON_TOTAL_ODDS" ]; then
+            args+=(--total-odds "$COMMON_TOTAL_ODDS")
+          fi
+          ODDS_SOURCE="$(jq -r '.odds_source // empty' "$CONFIG")"
+          ODDS_CHECKED_AT="$(jq -r '.odds_checked_at // empty' "$CONFIG")"
+          if [ -n "$ODDS_SOURCE" ]; then args+=(--odds-source "$ODDS_SOURCE"); fi
+          if [ -n "$ODDS_CHECKED_AT" ]; then args+=(--odds-checked-at "$ODDS_CHECKED_AT"); fi
+          if jq -e '.confirmed_lineups_json != null' "$CONFIG" >/dev/null; then
+            jq -c '.confirmed_lineups_json' "$CONFIG" > confirmed-lineups.json
+            args+=(--lineups-json confirmed-lineups.json)
+          fi
           if [ "$AUTO_INJURIES" = "true" ]; then args+=(--auto-injuries); fi
           if [ "$AUTO_ODDS" = "true" ]; then args+=(--auto-odds); fi
           if [ "$ESPN_BET_ODDS" = "true" ]; then args+=(--espn-bet-odds); fi
           python -m nba.simulator "${args[@]}" | tee nba-simulation-results.txt
       - name: Run experimental player prop projections
-        if: ${{ inputs.player_props }}
+        if: github.event_name == 'workflow_dispatch'
         env:
           HOME_TEAM: ${{ inputs.home }}
           AWAY_TEAM: ${{ inputs.away }}
           GAME_DATE: ${{ inputs.game_date }}
-          PROP_TRIALS: ${{ inputs.prop_trials }}
-          LINEUPS_JSON: ${{ inputs.confirmed_lineups_json }}
-          PROP_LINES_JSON: ${{ inputs.player_prop_lines_json }}
+          TRIALS: ${{ inputs.trials }}
         run: |
+          set -euo pipefail
+          CONFIG=nba-game-config.json
+          if [ ! -s "$CONFIG" ]; then echo "No matchup config was generated; skipping props."; exit 0; fi
+          PLAYER_PROPS="$(jq -r '.player_props // true' "$CONFIG")"
+          if [ "$PLAYER_PROPS" != "true" ]; then echo "Player props disabled by game_config_json."; exit 0; fi
           if [ -z "$GAME_DATE" ]; then GAME_DATE="$(TZ=America/New_York date +%F)"; fi
-          echo "Player-prop matchup date: $GAME_DATE (America/New_York)"
+          PROP_TRIALS="$(jq -r '.prop_trials // 50000' "$CONFIG")"
           args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --date "$GAME_DATE" --season 2027 --trials "$PROP_TRIALS" --output nba-player-projections.json)
-          if [ -n "$LINEUPS_JSON" ]; then
-            python -c 'import json,os; json.loads(os.environ["LINEUPS_JSON"]); open("confirmed-lineups.json","w").write(os.environ["LINEUPS_JSON"])'
-            args+=(--lineups-json confirmed-lineups.json)
-          fi
-          if [ -n "$PROP_LINES_JSON" ]; then
-            python -c 'import json,os; json.loads(os.environ["PROP_LINES_JSON"]); open("player-prop-lines.json","w").write(os.environ["PROP_LINES_JSON"])'
+          if [ -s confirmed-lineups.json ]; then args+=(--lineups-json confirmed-lineups.json); fi
+          if jq -e '.player_prop_lines_json != null' "$CONFIG" >/dev/null; then
+            jq -c '.player_prop_lines_json' "$CONFIG" > player-prop-lines.json
             args+=(--lines-json player-prop-lines.json)
           fi
           python -m nba.player_props "${args[@]}"

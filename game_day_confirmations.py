@@ -11,8 +11,8 @@ def validate_confirmation_file(data, max_age_hours=24):
         raise ValueError("Confirmation file must contain a players list.")
     checked = data.get("checked_at_utc")
     source = data.get("source")
-    if not checked or not source:
-        raise ValueError("Confirmation file requires source and checked_at_utc.")
+    if not isinstance(checked, str) or not checked or not isinstance(source, str) or not source.strip():
+        raise ValueError("Confirmation file requires a source description and ISO-8601 checked_at_utc.")
     try:
         timestamp = datetime.fromisoformat(checked.replace("Z", "+00:00"))
     except (TypeError, ValueError) as exc:
@@ -29,7 +29,7 @@ def validate_confirmation_file(data, max_age_hours=24):
             raise ValueError("Each confirmation must be an object.")
         name, team = row.get("name"), row.get("team")
         status, starter = row.get("status"), row.get("starter")
-        if not name or not team or status not in {"active", "inactive", "out"}:
+        if not isinstance(name, str) or not name.strip() or not isinstance(team, str) or not team.strip() or status not in {"active", "inactive", "out"}:
             raise ValueError("Each confirmation needs name, team and valid status.")
         if not isinstance(starter, bool):
             raise ValueError("starter must be true or false.")
@@ -42,6 +42,27 @@ def validate_confirmation_file(data, max_age_hours=24):
             "note": row.get("note", ""),
         }
     return normalized
+
+
+def validate_team_market_confirmation(data, home_team, away_team, minimum_starters=22):
+    """Require an explicit full inactive review and 22 confirmed active starters per team."""
+    try:
+        normalized = validate_confirmation_file(data)
+    except ValueError as exc:
+        return False, str(exc)
+    if data.get("all_inactives_reviewed") is not True:
+        return False, "all_inactives_reviewed must be explicitly true"
+    source_url = str(data.get("source_url", "")).strip()
+    if not source_url.startswith("https://"):
+        return False, "official game-day source_url is required"
+    for team in (home_team.upper(), away_team.upper()):
+        starters = [
+            record for (team_code, _), record in normalized.items()
+            if team_code == team and record["status"] == "active" and record["starter"] is True
+        ]
+        if len(starters) < minimum_starters:
+            return False, f"{team} has {len(starters)} confirmed active starters; {minimum_starters} are required"
+    return True, "fresh full inactive review and 22 confirmed active starters per team"
 
 
 def confirmed_player_copy(player, confirmations):

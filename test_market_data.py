@@ -27,6 +27,15 @@ class MarketSnapshotTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"older"):
             validate_market_snapshot({"total":48.5},"Book",old,now=now)
 
+    def test_spread_side_prices_are_validated_as_market_inputs(self):
+        now = datetime.now(timezone.utc)
+        result = validate_market_snapshot(
+            {"spread": -3.5, "home_spread_odds": -115, "away_spread_odds": 105},
+            "Example Sportsbook", now.isoformat(), now=now
+        )
+        self.assertEqual(result["lines"]["home_spread_odds"], -115.0)
+        self.assertEqual(result["lines"]["away_spread_odds"], 105.0)
+
     def test_zero_american_odds_are_rejected(self):
         now = datetime.now(timezone.utc)
         with self.assertRaisesRegex(ValueError,"cannot be zero"):
