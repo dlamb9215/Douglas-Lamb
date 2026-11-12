@@ -108,12 +108,12 @@ def matchup_odds(home_name: str, away_name: str, api_key: str | None = None) -> 
                 h = by_name.get(home_name.casefold())
                 a = by_name.get(away_name.casefold())
                 if h and a and h.get("point") is not None:
-                    spread_rows.append((float(h["point"]), _american(h["price"]), _american(a["price"]), str(book_key or "")))
+                    spread_rows.append((float(h["point"]), _american(h["price"]), _american(a["price"]), str(book_key or ""), book.get("last_update")))
             elif market.get("key") == "totals":
                 by_name = {str(o.get("name", "")).casefold(): o for o in outcomes}
                 over, under = by_name.get("over"), by_name.get("under")
                 if over and under and over.get("point") is not None:
-                    total_rows.append((float(over["point"]), _american(over["price"]), _american(under["price"]), str(book_key or "")))
+                    total_rows.append((float(over["point"]), _american(over["price"]), _american(under["price"]), str(book_key or ""), book.get("last_update")))
     ml_pair = _lowest_hold_pair(moneyline_rows)
     result: dict[str, Any] = {
         "home_team": home_name, "away_team": away_name, "event_id": event.get("id"),
