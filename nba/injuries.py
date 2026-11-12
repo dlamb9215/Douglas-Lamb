@@ -113,6 +113,9 @@ def parse_report_text(text: str, teams: set[str] | None = None) -> dict[str, Any
             if teams is not None and current_team not in teams:
                 current_team = None
                 continue
+            # A team heading in the official PDF is evidence that its report
+            # section was submitted; the explicit not-submitted marker overrides it.
+            team_submission.setdefault(found_team, "SUBMITTED")
             if remainder.upper() == "NOT YET SUBMITTED":
                 team_submission[found_team] = "NOT YET SUBMITTED"
                 continue
