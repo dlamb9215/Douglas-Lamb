@@ -45,6 +45,9 @@ class TestNBAOdds(unittest.TestCase):
         self.assertEqual(result["under_odds"], -112)
         self.assertEqual(result["total_bookmaker"], "book_a")
         self.assertEqual(result["moneyline_bookmaker"], "book_b")
+        self.assertEqual(result["moneyline_last_updated"], "2026-11-08T18:01:00Z")
+        self.assertEqual(result["spread_last_updated"], "2026-11-08T18:01:00Z")
+        self.assertEqual(result["total_last_updated"], "2026-11-08T18:00:00Z")
         self.assertEqual(result["bookmaker_count"], 2)
 
     def test_requires_key(self):
