@@ -30,7 +30,18 @@ Copy `game_day_confirmations.example.json` to `game_day_confirmations.json` and 
 
 If the file is absent, the workflow creates an empty placeholder so the game simulation can still complete, but all player props remain blocked.
 
-## Player prop market file
+## Shared NFL BET/PASS engine and team-market confirmation
+
+NFL game markets now pass through the shared `betting_engine` adapter. It requires both prices for a two-way market, a sportsbook/source, and a timezone-aware quote timestamp no older than six hours. Spread markets require separate home-side and away-side American prices; the workflow inputs are **Home spread odds** and **Away spread odds**. Do not enter an assumed -110 price.
+
+To allow the team-market availability gate to pass, `game_day_confirmations.json` must contain:
+- `all_inactives_reviewed: true` after the complete official inactive list has been reviewed.
+- An HTTPS `source_url` for the official league/team game-day report.
+- At least 22 players per team with `status: active` and `starter: true`.
+- A fresh `checked_at_utc` timestamp and source description.
+
+The workflow creates an empty blocked placeholder if this file is absent. That allows the simulation to run but cannot unlock a BET recommendation. NFL team-market calibration remains blocked until the historical ledger is reviewed out of sample.
+
 
 Copy `player_prop_lines.example.json` to `player_prop_lines.json`. Replace the example data with current lines and prices. The quote timestamp must be within six hours. The key format is `TEAM:Player Name:stat`, for example `BUF:Example Receiver:receiving_yards`.
 
