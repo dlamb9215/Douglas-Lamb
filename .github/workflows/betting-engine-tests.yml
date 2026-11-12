@@ -15,6 +15,10 @@ on:
     paths:
       - "betting_engine/**"
       - "BETTING_ENGINE_UPGRADE.md"
+      - "main.py"
+      - "market_data.py"
+      - "matchup_player_pipeline.py"
+      - "nba/**"
       - ".github/workflows/betting-engine-tests.yml"
   workflow_dispatch:
 
