@@ -35,12 +35,22 @@ on:
       spread_odds:
         description: American odds for spread sides
         required: true
-        default: "-110"
+        default: ""
         type: string
       total_odds:
-        description: American odds for total sides
-        required: true
-        default: "-110"
+        description: American odds for total sides; blank unless an actual price is supplied
+        required: false
+        default: ""
+        type: string
+      odds_source:
+        description: Sportsbook/provider for manually entered market prices
+        required: false
+        default: ""
+        type: string
+      odds_checked_at:
+        description: ISO-8601 timestamp with timezone for manually entered market prices
+        required: false
+        default: ""
         type: string
       trials:
         description: Baseline Monte Carlo trials before automatic close-game refinement
@@ -153,6 +163,9 @@ jobs:
           AWAY_ML_ODDS: ${{ inputs.away_ml_odds }}
           SPREAD_ODDS: ${{ inputs.spread_odds }}
           TOTAL_ODDS: ${{ inputs.total_odds }}
+          ODDS_SOURCE: ${{ inputs.odds_source }}
+          ODDS_CHECKED_AT: ${{ inputs.odds_checked_at }}
+          LINEUPS_JSON: ${{ inputs.confirmed_lineups_json }}
           TRIALS: ${{ inputs.trials }}
           MAX_TRIALS: ${{ inputs.max_trials }}
           SEED: ${{ inputs.seed }}
@@ -175,6 +188,14 @@ jobs:
           if [ -n "$HOME_ML_ODDS" ] && [ -n "$AWAY_ML_ODDS" ]; then args+=(--home-ml-odds "$HOME_ML_ODDS" --away-ml-odds "$AWAY_ML_ODDS"); fi
           if [ -n "$SPREAD" ]; then args+=(--spread "$SPREAD"); fi
           if [ -n "$TOTAL" ]; then args+=(--total "$TOTAL"); fi
+          if [ -n "$SPREAD_ODDS" ]; then args+=(--spread-odds "$SPREAD_ODDS"); fi
+          if [ -n "$TOTAL_ODDS" ]; then args+=(--total-odds "$TOTAL_ODDS"); fi
+          if [ -n "$ODDS_SOURCE" ]; then args+=(--odds-source "$ODDS_SOURCE"); fi
+          if [ -n "$ODDS_CHECKED_AT" ]; then args+=(--odds-checked-at "$ODDS_CHECKED_AT"); fi
+          if [ -n "$LINEUPS_JSON" ]; then
+            python -c 'import json,os; json.loads(os.environ["LINEUPS_JSON"]); open("confirmed-lineups.json","w").write(os.environ["LINEUPS_JSON"])'
+            args+=(--lineups-json confirmed-lineups.json)
+          fi
           args+=(--game-date "$GAME_DATE")
           if [ "$AUTO_INJURIES" = "true" ]; then args+=(--auto-injuries); fi
           if [ "$AUTO_ODDS" = "true" ]; then args+=(--auto-odds); fi
