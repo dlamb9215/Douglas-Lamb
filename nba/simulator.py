@@ -5,6 +5,7 @@ No player-prop projections.
 """
 from __future__ import annotations
 import argparse, json, sys
+from datetime import datetime, timezone, timedelta
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -228,7 +229,9 @@ def main():
     ap.add_argument("--home",required=True); ap.add_argument("--away",required=True); ap.add_argument("--data",default="nba/team_stats.json")
     ap.add_argument("--spread",type=float,help="Home spread, e.g. -4.5"); ap.add_argument("--total",type=float)
     ap.add_argument("--home-ml-odds",type=float); ap.add_argument("--away-ml-odds",type=float)
-    ap.add_argument("--spread-odds",type=float,default=-110); ap.add_argument("--total-odds",type=float,default=-110)
+    ap.add_argument("--spread-odds",type=float); ap.add_argument("--total-odds",type=float)
+    ap.add_argument("--odds-source",default=""); ap.add_argument("--odds-checked-at",default="")
+    ap.add_argument("--lineups-json",default="",help="Fresh confirmed lineups; requires five confirmed available starters per team")
     ap.add_argument("--home-spread-odds",type=float); ap.add_argument("--away-spread-odds",type=float)
     ap.add_argument("--over-odds",type=float); ap.add_argument("--under-odds",type=float)
     ap.add_argument("--auto-odds",action="store_true",help="Fetch consensus NBA odds from The Odds API using ODDS_API_KEY")
@@ -304,6 +307,69 @@ def main():
         except (RuntimeError,OSError,ValueError) as exc:
             injury_context={"source":"NBA official injury report","status":"unavailable","error":str(exc),"warnings":["Official injury data could not be retrieved; no automatic player availability or injury-point adjustment was applied. Verify injuries independently before betting."]}
             print(f"INJURY DATA WARNING: official report unavailable: {exc}")
+    lineup_context=None
+    availability_confirmed=False
+    availability_reason="no fresh five-starter confirmation supplied"
+    if a.lineups_json:
+        try:
+            lineup_context=json.loads(Path(a.lineups_json).read_text(encoding="utf-8"))
+            from nba.player_props import validate_game_availability
+            team_codes=[{"GSW":"GS","NOP":"NO","NYK":"NY","SAS":"SA","UTA":"UTAH","WAS":"WSH"}.get(code.upper(),code.upper()) for code in (a.home,a.away)]
+            availability_confirmed,availability_reason=validate_game_availability(lineup_context,team_codes)
+        except (OSError,ValueError,json.JSONDecodeError) as exc:
+            availability_reason=f"confirmed lineup file invalid: {exc}"
+    official_injury_ready=bool(
+        injury_context and injury_context.get("report_url")
+        and all(injury_context.get("team_submission",{}).get(code) not in (None,"NOT YET SUBMITTED","UNAVAILABLE")
+                for code in (a.home.upper(),a.away.upper()))
+    )
+    availability_confirmed=bool(availability_confirmed and official_injury_ready)
+    if not official_injury_ready:
+        availability_reason += "; current official injury report/submission is not verified for both teams"
+    try:
+        refreshed=datetime.fromisoformat(str(meta.get("updated_at","")).replace("Z","+00:00"))
+        data_age=datetime.now(timezone.utc)-refreshed.astimezone(timezone.utc)
+        data_ready=bool(refreshed.tzinfo and timedelta(minutes=-5)<=data_age<=timedelta(hours=72)
+                        and h.games_played>=5 and w.games_played>=5)
+    except (TypeError,ValueError):
+        data_ready=False
+    quote_source=a.odds_source
+    quote_time=a.odds_checked_at
+    if odds_context and odds_context.get("status")!="unavailable":
+        quote_source=odds_context.get("source") or odds_context.get("provider_name") or quote_source
+        quote_time=odds_context.get("last_updated") or odds_context.get("retrieved_at") or quote_time
+    from betting_engine.integrations import evaluate_two_way_market,evaluate_market_set
+    calibration_ready=False  # No qualified, time-ordered NBA market calibration ledger is currently certified.
+    shared_decisions=evaluate_market_set([
+        evaluate_two_way_market(
+            sport="NBA",event=f"{w.name} at {h.name}",market="moneyline",line=None,
+            selection_a=f"{h.name} moneyline",probability_a=r["home_win"]/100,odds_a=a.home_ml_odds,
+            selection_b=f"{w.name} moneyline",probability_b=r["away_win"]/100,odds_b=a.away_ml_odds,
+            sportsbook=quote_source,quoted_at=quote_time,data_ready=data_ready,
+            availability_confirmed=availability_confirmed,calibration_ready=calibration_ready,
+            notes=availability_reason,
+        ),
+        evaluate_two_way_market(
+            sport="NBA",event=f"{w.name} at {h.name}",market="spread",line=a.spread,
+            selection_a=f"{h.name} {a.spread:+g}" if a.spread is not None else f"{h.name} spread",
+            probability_a=r["home_cover"]/100,odds_a=home_spread_price,
+            selection_b=f"{w.name} {-a.spread:+g}" if a.spread is not None else f"{w.name} spread",
+            probability_b=r["away_cover"]/100,odds_b=away_spread_price,
+            push_probability=r["spread_push"]/100,sportsbook=quote_source,quoted_at=quote_time,
+            data_ready=data_ready,availability_confirmed=availability_confirmed,
+            calibration_ready=calibration_ready,notes=availability_reason,
+        ) if a.spread is not None else None,
+        evaluate_two_way_market(
+            sport="NBA",event=f"{w.name} at {h.name}",market="total",line=a.total,
+            selection_a="Over",probability_a=r["over"]/100,odds_a=over_price,
+            selection_b="Under",probability_b=r["under"]/100,odds_b=under_price,
+            push_probability=r["total_push"]/100,sportsbook=quote_source,quoted_at=quote_time,
+            data_ready=data_ready,availability_confirmed=availability_confirmed,
+            calibration_ready=calibration_ready,notes=availability_reason,
+        ) if a.total is not None else None,
+    ])
+    print("\\nSHARED BETTING ENGINE — NBA BET/PASS GATES")
+    print(json.dumps(shared_decisions,indent=2))
     r=simulate(h,w,a.trials,a.seed,a.spread,a.total,**kwargs)
     close=abs(r["home_margin"]+(a.spread or 0))<=3
     if a.spread is not None: close=close or 47<=r["home_cover"]<=53
@@ -347,19 +413,25 @@ def main():
         print(f"\nSPREAD {a.spread:+.1f}: {h.name} cover {r['home_cover']:.2f}% | {w.name} cover {r['away_cover']:.2f}% | push {r['spread_push']:.2f}%")
         print(f"Home spread edge {r['spread_edge_points']:+.1f} pts | {h.name}: {hp} | {w.name}: {apick}")
         print(f"95% Monte Carlo interval: home {r['home_cover_ci'][0]:.2f}-{r['home_cover_ci'][1]:.2f}% | away {r['away_cover_ci'][0]:.2f}-{r['away_cover_ci'][1]:.2f}%")
-        spread_market=no_vig_probabilities(home_spread_price,away_spread_price)
-        print("No-vig spread market: home {0:.2f}% | away {1:.2f}% | hold {2:.2f}%".format(spread_market["home"]*100,spread_market["away"]*100,spread_market["market_hold"]*100))
-        print("Model minus ESPN BET no-vig edge: home {0:+.2f} pp | away {1:+.2f} pp".format(r["home_cover"]-spread_market["home"]*100,r["away_cover"]-spread_market["away"]*100))
-        print("Spread EV per $100 risked: home {0:+.2f} | away {1:+.2f}".format(expected_value_per_100(r["home_cover"]/100,home_spread_price,r["spread_push"]/100),expected_value_per_100(r["away_cover"]/100,away_spread_price,r["spread_push"]/100)))
+        if home_spread_price is not None and away_spread_price is not None:
+            spread_market=no_vig_probabilities(home_spread_price,away_spread_price)
+            print("No-vig spread market: home {0:.2f}% | away {1:.2f}% | hold {2:.2f}%".format(spread_market["home"]*100,spread_market["away"]*100,spread_market["market_hold"]*100))
+            print("Model minus sportsbook no-vig edge: home {0:+.2f} pp | away {1:+.2f} pp".format(r["home_cover"]-spread_market["home"]*100,r["away_cover"]-spread_market["away"]*100))
+            print("Spread EV per $100 risked: home {0:+.2f} | away {1:+.2f}".format(expected_value_per_100(r["home_cover"]/100,home_spread_price,r["spread_push"]/100),expected_value_per_100(r["away_cover"]/100,away_spread_price,r["spread_push"]/100)))
+        else:
+            print("Spread price comparison: unavailable — enter or fetch both current side prices.")
     if a.total is not None:
         over_dec=_decision(r["over"],r["total_edge_points"]); under_dec=_decision(r["under"],-r["total_edge_points"])
         print(f"\nTOTAL {a.total:.1f}: Over {r['over']:.2f}% | Under {r['under']:.2f}% | push {r['total_push']:.2f}%")
         print(f"Model total edge {r['total_edge_points']:+.1f} pts | Over: {over_dec} | Under: {under_dec}")
         print(f"95% Monte Carlo interval: over {r['over_ci'][0]:.2f}-{r['over_ci'][1]:.2f}% | under {r['under_ci'][0]:.2f}-{r['under_ci'][1]:.2f}%")
-        total_market=no_vig_probabilities(over_price,under_price)
-        print("No-vig total market: over {0:.2f}% | under {1:.2f}% | hold {2:.2f}%".format(total_market["home"]*100,total_market["away"]*100,total_market["market_hold"]*100))
-        print("Model minus ESPN BET no-vig edge: over {0:+.2f} pp | under {1:+.2f} pp".format(r["over"]-total_market["home"]*100,r["under"]-total_market["away"]*100))
-        print("Total EV per $100 risked: over {0:+.2f} | under {1:+.2f}".format(expected_value_per_100(r["over"]/100,over_price,r["total_push"]/100),expected_value_per_100(r["under"]/100,under_price,r["total_push"]/100)))
+        if over_price is not None and under_price is not None:
+            total_market=no_vig_probabilities(over_price,under_price)
+            print("No-vig total market: over {0:.2f}% | under {1:.2f}% | hold {2:.2f}%".format(total_market["home"]*100,total_market["away"]*100,total_market["market_hold"]*100))
+            print("Model minus sportsbook no-vig edge: over {0:+.2f} pp | under {1:+.2f} pp".format(r["over"]-total_market["home"]*100,r["under"]-total_market["away"]*100))
+            print("Total EV per $100 risked: over {0:+.2f} | under {1:+.2f}".format(expected_value_per_100(r["over"]/100,over_price,r["total_push"]/100),expected_value_per_100(r["under"]/100,under_price,r["total_push"]/100)))
+        else:
+            print("Total price comparison: unavailable — enter or fetch both current side prices.")
     f=r["first_half"]
     print(f"\nFIRST HALF projected score: {h.name} {f['home_avg']:.1f} - {w.name} {f['away_avg']:.1f} | Total {f['total_avg']:.1f}")
     print(f"First-half moneyline: {h.name} {f['home_win']:.2f}% (95% CI {f['home_win_ci'][0]:.2f}-{f['home_win_ci'][1]:.2f}%) | {w.name} {f['away_win']:.2f}% (95% CI {f['away_win_ci'][0]:.2f}-{f['away_win_ci'][1]:.2f}%) | tie {f['tie']:.2f}%")
@@ -369,6 +441,6 @@ def main():
     print("Injury adjustment is manual unless an independently verified report is supplied.")
     print("Model status: estimates require out-of-sample backtesting before being treated as betting edges.")
     if a.json_output:
-        payload={"home_team":h.abbreviation,"away_team":w.abbreviation,"season":meta.get("season"),"data_updated_at":meta.get("updated_at"),"spread_line":a.spread,"total_line":a.total,"home_rest":a.home_rest,"away_rest":a.away_rest,"home_travel_miles":a.home_travel,"away_travel_miles":a.away_travel,"home_injury_points":a.home_injury_points,"away_injury_points":a.away_injury_points,"schedule_context":schedule_context,"injury_context":injury_context,"odds_context":odds_context,"moneyline_pick":ml_pick,"home_ml_odds":a.home_ml_odds,"away_ml_odds":a.away_ml_odds,"spread_odds":a.spread_odds,"total_odds":a.total_odds,"home_spread_odds":home_spread_price,"away_spread_odds":away_spread_price,"over_odds":over_price,"under_odds":under_price,"result":r}
+        payload={"home_team":h.abbreviation,"away_team":w.abbreviation,"season":meta.get("season"),"data_updated_at":meta.get("updated_at"),"spread_line":a.spread,"total_line":a.total,"home_rest":a.home_rest,"away_rest":a.away_rest,"home_travel_miles":a.home_travel,"away_travel_miles":a.away_travel,"home_injury_points":a.home_injury_points,"away_injury_points":a.away_injury_points,"schedule_context":schedule_context,"injury_context":injury_context,"odds_context":odds_context,"moneyline_pick":ml_pick,"home_ml_odds":a.home_ml_odds,"away_ml_odds":a.away_ml_odds,"spread_odds":a.spread_odds,"total_odds":a.total_odds,"home_spread_odds":home_spread_price,"away_spread_odds":away_spread_price,"over_odds":over_price,"under_odds":under_price,"result":r,"shared_betting_engine":shared_decisions,"availability_confirmed":availability_confirmed,"availability_reason":availability_reason,"data_ready":data_ready,"calibration_ready":calibration_ready}
         Path(a.json_output).write_text(json.dumps(payload,indent=2)+"\\n",encoding="utf-8")
 if __name__=="__main__": main()
