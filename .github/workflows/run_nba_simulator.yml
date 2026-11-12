@@ -129,8 +129,8 @@ jobs:
           AWAY_INJURY="$(jq -r '.away_injury_points // 0' "$CONFIG")"
           SEED="$(jq -r '.seed // 42' "$CONFIG")"
           AUTO_INJURIES="$(jq -r '.auto_injuries // true' "$CONFIG")"
-          AUTO_ODDS="$(jq -r '.auto_odds // false' "$CONFIG")"
-          ESPN_BET_ODDS="$(jq -r '.espn_bet_odds // true' "$CONFIG")"
+          AUTO_ODDS="$(jq -r '.auto_odds // true' "$CONFIG")"
+          ESPN_BET_ODDS="$(jq -r '.espn_bet_odds // false' "$CONFIG")"
           if [ "$AUTO_ODDS" = "true" ] && [ "$ESPN_BET_ODDS" = "true" ]; then
             echo "Enable either ESPN BET or The Odds API, not both."
             exit 1
