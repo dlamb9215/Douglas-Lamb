@@ -323,10 +323,11 @@ def main():
             availability_confirmed,availability_reason=validate_game_availability(lineup_context,team_codes)
         except (OSError,ValueError,json.JSONDecodeError) as exc:
             availability_reason=f"confirmed lineup file invalid: {exc}"
+    injury_team_codes=[{"GSW":"GS","NOP":"NO","NYK":"NY","SAS":"SA","UTA":"UTAH","WAS":"WSH"}.get(code.upper(),code.upper()) for code in (a.home,a.away)]
     official_injury_ready=bool(
         injury_context and injury_context.get("report_url")
         and all(injury_context.get("team_submission",{}).get(code) not in (None,"NOT YET SUBMITTED","UNAVAILABLE")
-                for code in (a.home.upper(),a.away.upper()))
+                for code in injury_team_codes)
     )
     availability_confirmed=bool(availability_confirmed and official_injury_ready)
     if not official_injury_ready:
