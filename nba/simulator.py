@@ -351,9 +351,9 @@ def main():
         ml_source=f"{provider} ({ml_book})" if ml_book else provider
         spread_source=f"{provider} ({spread_book})" if spread_book else provider
         total_source=f"{provider} ({total_book})" if total_book else provider
-        ml_time=odds_context.get("moneyline_last_updated") or odds_context.get("retrieved_at") or quote_time
-        spread_time=odds_context.get("spread_last_updated") or odds_context.get("retrieved_at") or quote_time
-        total_time=odds_context.get("total_last_updated") or odds_context.get("retrieved_at") or quote_time
+        ml_time=odds_context.get("moneyline_last_updated")
+        spread_time=odds_context.get("spread_last_updated")
+        total_time=odds_context.get("total_last_updated")
     from betting_engine.integrations import evaluate_two_way_market,evaluate_market_set
     calibration_ready=False  # No qualified, time-ordered NBA market calibration ledger is currently certified.
     shared_decisions=evaluate_market_set([
