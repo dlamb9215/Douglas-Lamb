@@ -65,7 +65,7 @@ class TestNBAPlayerProps(unittest.TestCase):
 
     def test_confirmed_lineup_source_and_freshness_gate(self):
         now = datetime(2026, 11, 9, 18, 0, tzinfo=timezone.utc)
-        valid = {"source": "official team lineup", "confirmed_at": "2026-11-09T17:30:00+00:00",
+        valid = {"source": "official team lineup", "confirmed_at": (now - timedelta(minutes=30)).isoformat(),
                  "teams": {"BOS": {}, "NYK": {}}}
         self.assertTrue(validate_lineup_context(valid, ["BOS", "NYK"], now)[0])
         stale = dict(valid, confirmed_at="2026-11-08T00:00:00+00:00")
@@ -76,7 +76,7 @@ class TestNBAPlayerProps(unittest.TestCase):
         self.assertFalse(validate_lineup_context(missing_team, ["BOS", "NYK"], now)[0])
 
     def test_team_market_availability_requires_five_confirmed_starters_per_team(self):
-        now = datetime(2026, 11, 9, 18, 0, tzinfo=timezone.utc)
+        now = datetime.now(timezone.utc)
         teams = {}
         for team in ("BOS", "NYK"):
             teams[team] = {
