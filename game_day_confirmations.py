@@ -44,6 +44,27 @@ def validate_confirmation_file(data, max_age_hours=24):
     return normalized
 
 
+def validate_team_market_confirmation(data, home_team, away_team, minimum_starters=22):
+    """Require an explicit full inactive review and 22 confirmed active starters per team."""
+    try:
+        normalized = validate_confirmation_file(data)
+    except ValueError as exc:
+        return False, str(exc)
+    if data.get("all_inactives_reviewed") is not True:
+        return False, "all_inactives_reviewed must be explicitly true"
+    source_url = str(data.get("source_url", "")).strip()
+    if not source_url.startswith("https://"):
+        return False, "official game-day source_url is required"
+    for team in (home_team.upper(), away_team.upper()):
+        starters = [
+            record for (team_code, _), record in normalized.items()
+            if team_code == team and record["status"] == "active" and record["starter"] is True
+        ]
+        if len(starters) < minimum_starters:
+            return False, f"{team} has {len(starters)} confirmed active starters; {minimum_starters} are required"
+    return True, "fresh full inactive review and 22 confirmed active starters per team"
+
+
 def confirmed_player_copy(player, confirmations):
     """Return a safe projection copy only for explicitly active starters."""
     key = (str(player.get("team", "")).upper(),
