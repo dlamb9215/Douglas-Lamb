@@ -80,7 +80,7 @@ def settle_ledger(ledger_path: str, fetcher: Callable[[date], list[dict[str, Any
                 continue
             event = matches[0]
             checked += 1
-            if event["home"]["abbreviation"] != row["home_team"] or event["away"]["abbreviation"] != row["away_team"]:
+            if event["home"]["abbreviation"] != normalize_team(row["home_team"]) or event["away"]["abbreviation"] != normalize_team(row["away_team"]):
                 errors.append(f"{row.get('forecast_id')}: event ID team mismatch (scoreboard {event['home']['abbreviation']} vs {event['away']['abbreviation']}; ledger {row['home_team']} vs {row['away_team']}); not settled")
                 continue
             if not event["completed"] or event["home"]["score"] is None or event["away"]["score"] is None:
