@@ -14,8 +14,35 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
-from nba.schedule import fetch_scoreboard, _event_row
+from nba.schedule import fetch_scoreboard, normalize_team
 from nba.prediction_ledger import FIELDS
+
+
+def _score_event(event: dict[str, Any], scoreboard_day: date) -> dict[str, Any] | None:
+    competitions = event.get("competitions") or []
+    if not competitions:
+        return None
+    competition = competitions[0]
+    teams: dict[str, dict[str, Any]] = {}
+    for competitor in competition.get("competitors") or []:
+        side = competitor.get("homeAway")
+        team = competitor.get("team") or {}
+        abbreviation = team.get("abbreviation")
+        if side not in {"home", "away"} or not abbreviation:
+            continue
+        try:
+            score = float(competitor.get("score"))
+        except (TypeError, ValueError):
+            score = None
+        teams[side] = {"abbreviation": normalize_team(abbreviation), "score": score}
+    if set(teams) != {"home", "away"}:
+        return None
+    status_obj = competition.get("status") or event.get("status") or {}
+    status_type = status_obj.get("type") or {}
+    state = str(status_type.get("state", "")).casefold()
+    completed = status_type.get("completed") is True or state in {"post", "final"}
+    return {"event_id": str(event.get("id", "")), "date": scoreboard_day.isoformat(),
+            "home": teams["home"], "away": teams["away"], "completed": completed}
 
 
 def settle_ledger(ledger_path: str, fetcher: Callable[[date], list[dict[str, Any]]] = fetch_scoreboard) -> dict[str, Any]:
@@ -43,7 +70,7 @@ def settle_ledger(ledger_path: str, fetcher: Callable[[date], list[dict[str, Any
         except Exception as exc:
             errors.append(f"{day_text}: scoreboard unavailable: {exc}")
             continue
-        normalized = [_event_row(event, day) for event in events]
+        normalized = [_score_event(event, day) for event in events]
         normalized = [event for event in normalized if event]
         for row in day_rows:
             matches = [event for event in normalized if event["event_id"] == row.get("event_id")]
