@@ -199,15 +199,34 @@ def fetch_official_injuries(game_date: date, home: str, away: str, season: int =
         report_url = latest_report_url(game_date, season)
         pdf = _get(report_url)
         reader = PdfReader(io.BytesIO(pdf))
-        report_text = "\n".join(page.extract_text() or "" for page in reader.pages)
-        parsed = parse_report_text(report_text, target_teams)
-        if not parsed["players"] and not parsed["team_submission"]:
-            raise RuntimeError("Official injury report downloaded but requested teams could not be parsed")
+        # NBA PDFs are laid out in columns. Plain extraction can interleave
+        # columns and detach team headings from player rows; try both reading
+        # orders and keep the parse that identifies the most requested teams
+        # and player rows. This remains a parser only, not a status inference.
+        candidates = []
+        for mode in ("layout", "plain"):
+            pages = []
+            for page in reader.pages:
+                try:
+                    extracted = page.extract_text(extraction_mode=mode) if mode == "layout" else page.extract_text()
+                except TypeError:
+                    extracted = page.extract_text()
+                pages.append(extracted or "")
+            parsed_candidate = parse_report_text("\n".join(pages), target_teams)
+            score = (len(parsed_candidate["team_submission"]), len(parsed_candidate["players"]))
+            candidates.append((score, parsed_candidate, mode))
+        _, parsed, extraction_mode = max(candidates, key=lambda item: item[0])
+        if not parsed["players"] and len(parsed["team_submission"]) != len(target_teams):
+            raise RuntimeError(
+                "Official injury report downloaded but both PDF text layouts failed "
+                f"to identify both requested team sections (found {sorted(parsed['team_submission'])})"
+            )
         return {
             "game_date": game_date.isoformat(), "teams": sorted(target_teams),
             "report_url": report_url, "retrieved_at": datetime.now(timezone.utc).isoformat(),
             "player_statuses": parsed["players"], "team_submission": parsed["team_submission"],
             "source": "NBA official injury report",
+            "pdf_text_extraction": extraction_mode,
             "warnings": [
                 "Questionable and Doubtful players are not treated as confirmed active.",
                 "This report does not confirm starters or minutes projections.",
