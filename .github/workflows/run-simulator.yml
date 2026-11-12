@@ -29,6 +29,7 @@ on:
       - "injury_exposure.py"
       - "nfl_weather.py"
       - "market_data.py"
+      - "betting_engine/**"
       - "test_market_data.py"
   workflow_dispatch:
     inputs:
@@ -64,6 +65,16 @@ on:
         type: string
       total:
         description: Current sportsbook total; leave blank if unavailable
+        required: false
+        default: ""
+        type: string
+      home_spread_odds:
+        description: Current home spread-side American odds
+        required: false
+        default: ""
+        type: string
+      away_spread_odds:
+        description: Current away spread-side American odds
         required: false
         default: ""
         type: string
@@ -168,6 +179,8 @@ jobs:
           INPUT_SPREAD: ${{ inputs.spread }}
           INPUT_TOTAL: ${{ inputs.total }}
           INPUT_HOME_ODDS: ${{ inputs.home_odds }}
+          INPUT_HOME_SPREAD_ODDS: ${{ inputs.home_spread_odds }}
+          INPUT_AWAY_SPREAD_ODDS: ${{ inputs.away_spread_odds }}
           INPUT_AWAY_ODDS: ${{ inputs.away_odds }}
           INPUT_OVER_ODDS: ${{ inputs.over_odds }}
           INPUT_UNDER_ODDS: ${{ inputs.under_odds }}
@@ -176,7 +189,7 @@ jobs:
         run: |
           ARGS=(--home "${{ inputs.home || 'WAS' }}" --away "${{ inputs.away || 'LAR' }}" --trials "${{ inputs.trials || '100000' }}" --pregame-report pregame-context.json)
           HAS_MARKET_LINES=false
-          for value in "$INPUT_SPREAD" "$INPUT_TOTAL" "$INPUT_HOME_ODDS" "$INPUT_AWAY_ODDS" "$INPUT_OVER_ODDS" "$INPUT_UNDER_ODDS"; do
+          for value in "$INPUT_SPREAD" "$INPUT_TOTAL" "$INPUT_HOME_ODDS" "$INPUT_AWAY_ODDS" "$INPUT_HOME_SPREAD_ODDS" "$INPUT_AWAY_SPREAD_ODDS" "$INPUT_OVER_ODDS" "$INPUT_UNDER_ODDS"; do
             if [[ -n "$value" ]]; then HAS_MARKET_LINES=true; fi
           done
           if [[ "$HAS_MARKET_LINES" == "true" && ( -z "$INPUT_ODDS_SOURCE" || -z "$INPUT_ODDS_CHECKED_AT" ) ]]; then
@@ -186,6 +199,8 @@ jobs:
             [[ -n "$INPUT_SPREAD" ]] && ARGS+=(--spread "$INPUT_SPREAD")
             [[ -n "$INPUT_TOTAL" ]] && ARGS+=(--total "$INPUT_TOTAL")
             [[ -n "$INPUT_HOME_ODDS" ]] && ARGS+=(--home-odds "$INPUT_HOME_ODDS")
+            [[ -n "$INPUT_HOME_SPREAD_ODDS" ]] && ARGS+=(--home-spread-odds "$INPUT_HOME_SPREAD_ODDS")
+            [[ -n "$INPUT_AWAY_SPREAD_ODDS" ]] && ARGS+=(--away-spread-odds "$INPUT_AWAY_SPREAD_ODDS")
             [[ -n "$INPUT_AWAY_ODDS" ]] && ARGS+=(--away-odds "$INPUT_AWAY_ODDS")
             [[ -n "$INPUT_OVER_ODDS" ]] && ARGS+=(--over-odds "$INPUT_OVER_ODDS")
             [[ -n "$INPUT_UNDER_ODDS" ]] && ARGS+=(--under-odds "$INPUT_UNDER_ODDS")
