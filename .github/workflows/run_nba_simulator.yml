@@ -12,11 +12,13 @@ on:
     branches: [main, "integration/**"]
     paths:
       - "nba/**"
+      - "!nba/ledger/**"
       - "betting_engine/**"
       - ".github/workflows/run_nba_simulator.yml"
   pull_request:
     paths:
       - "nba/**"
+      - "!nba/ledger/**"
       - "betting_engine/**"
       - ".github/workflows/run_nba_simulator.yml"
   workflow_dispatch:
