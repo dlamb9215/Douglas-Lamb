@@ -18,6 +18,7 @@ on:
       - "test_calibration.py"
       - "test_player_prop_simulator.py"
       - "test_matchup_player_pipeline.py"
+      - "test_game_day_confirmations.py"
       - "player_projections.py"
       - "player_prop_simulator.py"
       - "matchup_player_pipeline.py"
@@ -172,6 +173,26 @@ jobs:
       - name: Run tests
         run: python -m unittest -v
 
+      - name: Prepare official game-day confirmation input
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          if [[ ! -f game_day_confirmations.json ]]; then
+            python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          payload = {
+              "source": "No official confirmation file supplied; placeholder only",
+              "source_url": "",
+              "checked_at_utc": datetime.now(timezone.utc).isoformat(),
+              "all_inactives_reviewed": False,
+              "players": [],
+          }
+          with open("game_day_confirmations.json", "w", encoding="utf-8") as handle:
+              json.dump(payload, handle, indent=2)
+          PY
+          fi
+
       - name: Run matchup
         if: github.event_name == 'workflow_dispatch'
         shell: bash
@@ -187,7 +208,7 @@ jobs:
           INPUT_ODDS_SOURCE: ${{ inputs.odds_source }}
           INPUT_ODDS_CHECKED_AT: ${{ inputs.odds_checked_at }}
         run: |
-          ARGS=(--home "${{ inputs.home || 'WAS' }}" --away "${{ inputs.away || 'LAR' }}" --trials "${{ inputs.trials || '100000' }}" --pregame-report pregame-context.json)
+          ARGS=(--home "${{ inputs.home || 'WAS' }}" --away "${{ inputs.away || 'LAR' }}" --trials "${{ inputs.trials || '100000' }}" --pregame-report pregame-context.json --game-day-confirmations game_day_confirmations.json)
           HAS_MARKET_LINES=false
           for value in "$INPUT_SPREAD" "$INPUT_TOTAL" "$INPUT_HOME_ODDS" "$INPUT_AWAY_ODDS" "$INPUT_HOME_SPREAD_ODDS" "$INPUT_AWAY_SPREAD_ODDS" "$INPUT_OVER_ODDS" "$INPUT_UNDER_ODDS"; do
             if [[ -n "$value" ]]; then HAS_MARKET_LINES=true; fi
