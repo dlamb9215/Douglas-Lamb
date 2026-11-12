@@ -26,7 +26,7 @@ PERCENT_FIELDS = {
 OPTIONAL_FIELDS = (
     "recent_pace", "recent_off_rating", "recent_def_rating",
     "home_off_rating", "home_def_rating", "road_off_rating", "road_def_rating",
-    "fg3_pct", "opp_three_pa_rate", "opp_fg3_pct",
+    "three_pa_rate", "fg3_pct", "opp_three_pa_rate", "opp_fg3_pct", "score_sd",
 )
 
 def _timestamp(value: str) -> datetime:
@@ -109,9 +109,25 @@ def validate_payload(payload: dict, max_age_hours: float = 72, now: datetime | N
             errors.append(f"{code}.games_played must be an integer")
         for field in OPTIONAL_FIELDS:
             value = row.get(field)
+            if value is None:
+                continue
+            try:
+                number = float(value)
+            except (TypeError, ValueError):
+                errors.append(f"{code}.{field} must be numeric when supplied")
+                continue
+            if field in {"recent_pace"} and not 70 <= number <= 115:
+                errors.append(f"{code}.{field} outside 70-115")
+            elif field in {"recent_off_rating", "recent_def_rating", "home_off_rating",
+                           "home_def_rating", "road_off_rating", "road_def_rating"} and not 80 <= number <= 140:
+                errors.append(f"{code}.{field} outside 80-140")
+            elif field in {"three_pa_rate", "fg3_pct", "opp_three_pa_rate", "opp_fg3_pct"} and not 0 <= number <= 1:
+                errors.append(f"{code}.{field} must be stored as a decimal from 0 to 1")
+            elif field == "score_sd" and not 7 <= number <= 18:
+                errors.append(f"{code}.score_sd outside 7-18")
             # Venue fields equal to overall ratings are provider fallbacks, not splits.
             base = "off_rating" if field.endswith("off_rating") else "def_rating"
-            if value is not None and not (field.startswith(("home_", "road_")) and value == row.get(base)):
+            if not (field.startswith(("home_", "road_")) and number == row.get(base)):
                 feature_counts[field] += 1
 
     if low_sample:
