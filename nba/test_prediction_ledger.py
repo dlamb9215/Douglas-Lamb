@@ -53,6 +53,15 @@ class TestPredictionLedger(unittest.TestCase):
             self.assertEqual(len(rows), 1)
             self.assertEqual(len(rows[0]), len(FIELDS))
 
+    def test_append_accepts_legacy_literal_backslash_n_terminator(self):
+        with tempfile.TemporaryDirectory() as folder:
+            payload = Path(folder) / "payload.json"
+            import json
+            payload.write_text(json.dumps(fixture()) + "\\\\n", encoding="utf-8")
+            ledger = Path(folder) / "predictions.csv"
+            result = append_forecast(str(payload), str(ledger), "legacy-123", "abc")
+            self.assertEqual(result["status"], "archived")
+
     def test_rejects_naive_forecast_timestamp(self):
         with self.assertRaisesRegex(ValueError, "timezone-aware"):
             build_row(fixture(), "123", "abc", "2026-11-12T18:00:00")
