@@ -117,3 +117,49 @@ The integration is end-to-end at the report/decision layer, but it is **not yet 
 Automatic sportsbook coverage depends on configured providers/API keys. The NBA Odds API and ESPN BET adapters may return no prices for an event; missing prices remain PASS. NFL market prices are entered as a timestamped two-sided snapshot. Never infer a market price from the usual -110 convention.
 
 Do not describe any output as profitable or validated until the historical ledger has enough settled, chronologically separated observations and calibration/ROI/closing-line-value reviews are satisfactory.
+
+
+## Multi-source NBA data preflight
+
+Every manual NBA simulation now runs `python -m nba.data_hub` before the
+Monte Carlo engine and uploads `nba-data-readiness.json` and
+`nba-data-readiness.txt` with the game artifacts. The report records provider,
+retrieval/update timestamps, source URLs where available, warnings, and
+separate readiness flags. A missing source does not get replaced by invented
+values; it is reported as unavailable and the existing betting gates remain
+fail-closed.
+
+Current integrations:
+- **Team efficiency and Four Factors:** the repository's validated,
+  timestamped `nba/team_stats.json` feed (currently ESPN-derived through the
+  existing DunkAPI data refresh). The preflight checks all 30 teams, required
+  metrics, numeric ranges, sample size, provenance, and freshness.
+- **Schedule/rest context:** ESPN public NBA scoreboard adapter. This is a
+  public, undocumented feed; schedule/rest is contextual and does not prove
+  availability or travel miles.
+- **Injuries:** NBA official injury-report PDF parser first; the existing ESPN
+  injury feed is labeled third-party fallback only. Fallback data never counts
+  as official availability confirmation.
+- **Market odds:** The Odds API v4 when `ODDS_API_KEY` is configured, plus the
+  existing ESPN BET adapter. Actual source and quote update times are retained;
+  absent prices remain missing.
+- **Starting lineups and minutes:** supplied game-specific
+  `confirmed_lineups_json` only. Roster/depth-chart or projected lineup
+  information is not silently promoted to a confirmed starting five.
+
+### Optional API setup
+
+In GitHub, open Settings -> Secrets and variables -> Actions and add
+`ODDS_API_KEY` using a key from The Odds API. The simulator already reads this
+secret. Do not put API keys in workflow JSON, source files, or commits.
+
+Sportradar offers a paid/licensed NBA API with official statistics, injuries,
+depth charts and substitution data; it is not required for this pipeline and
+has not been wired as a live source because it requires a separately provisioned
+account/key and entitlement. A depth chart is not a confirmed game lineup.
+RotoWire lineup pages can be used for human cross-checking, but are not treated
+as a structured official source by the automated gate.
+
+The readiness report is a preflight, not a calibration report. Even when every
+data source is present, the market-specific out-of-sample calibration gate
+must independently pass before a candidate can become BET.
