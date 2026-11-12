@@ -65,6 +65,35 @@ def validate_lineup_context(payload: dict[str, Any] | None, required_teams: list
     return True, "confirmed lineup input validated"
 
 
+def validate_game_availability(payload: dict[str, Any] | None, required_teams: list[str],
+                                now: datetime | None = None) -> tuple[bool, str]:
+    """Require five explicitly confirmed available starters for each team."""
+    valid, reason = validate_lineup_context(payload, required_teams, now)
+    if not valid:
+        return False, reason
+    for team in required_teams:
+        lineup = payload["teams"].get(team, {})
+        starters = 0
+        for entry in lineup.values():
+            if not isinstance(entry, dict):
+                continue
+            if entry.get("confirmed") is not True:
+                continue
+            if str(entry.get("status", "")).strip().casefold() not in {"available", "probable"}:
+                continue
+            if entry.get("starter") is True:
+                try:
+                    minutes = float(entry.get("minutes"))
+                    minutes_sd = float(entry.get("minutes_sd"))
+                except (TypeError, ValueError):
+                    continue
+                if 8 <= minutes <= 48 and 0 <= minutes_sd <= 8:
+                    starters += 1
+        if starters < 5:
+            return False, f"{team} has only {starters} explicitly confirmed available starters; five are required"
+    return True, "both teams have five fresh confirmed available starters"
+
+
 def _get_json(url: str, timeout: int = 20) -> dict[str, Any]:
     request = urllib.request.Request(url, headers={"Accept": "application/json"})
     try:
