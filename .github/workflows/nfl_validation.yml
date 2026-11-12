@@ -15,6 +15,22 @@ on:
       - "nfl_team_stats.json"
       - "player_pool.json"
       - "test_*.py"
+      - "requirements-nba.txt"
+      - ".github/workflows/nfl_validation.yml"
+  pull_request:
+    paths:
+      - "main.py"
+      - "drive_simulator.py"
+      - "nfl_data.py"
+      - "pregame_context.py"
+      - "injury_exposure.py"
+      - "market_data.py"
+      - "betting_engine/**"
+      - "matchup_player_pipeline.py"
+      - "nfl_team_stats.json"
+      - "player_pool.json"
+      - "test_*.py"
+      - "requirements-nba.txt"
       - ".github/workflows/nfl_validation.yml"
   workflow_dispatch:
     inputs:
@@ -57,13 +73,10 @@ on:
         description: Under American odds; blank to skip
         required: false
         type: string
-      odds_source:
-        description: Sportsbook/source name for supplied lines
+      odds_context_json:
+        description: Optional JSON object with source, checked_at_utc, home_spread_odds and away_spread_odds
         required: false
-        type: string
-      odds_checked_at:
-        description: ISO-8601 timestamp with timezone when lines were checked
-        required: false
+        default: ""
         type: string
 
 permissions:
@@ -83,7 +96,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install simulator dependencies
-        run: python -m pip install --upgrade pip numpy
+        run: python -m pip install --upgrade pip -r requirements-nba.txt
 
       - name: Verify NumPy import
         run: python -c "import numpy; print(numpy.__version__)"
@@ -92,6 +105,7 @@ jobs:
         run: python -m unittest -v
 
       - name: Fetch matchup kickoff weather context
+        if: github.event_name != 'pull_request'
         continue-on-error: true
         env:
           HOME_TEAM: ${{ github.event.inputs.home || 'ATL' }}
@@ -99,6 +113,7 @@ jobs:
         run: python nfl_weather.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --output kickoff-weather.json
 
       - name: Build fresh matchup pregame gate
+        if: github.event_name != 'pull_request'
         env:
           HOME_TEAM: ${{ github.event.inputs.home || 'ATL' }}
           AWAY_TEAM: ${{ github.event.inputs.away || 'CIN' }}
@@ -110,6 +125,7 @@ jobs:
           fi
 
       - name: Run reproducible 100,000-trial matchup
+        if: github.event_name != 'pull_request'
         env:
           HOME_TEAM: ${{ github.event.inputs.home || 'ATL' }}
           AWAY_TEAM: ${{ github.event.inputs.away || 'CIN' }}
@@ -120,11 +136,25 @@ jobs:
           AWAY_ODDS: ${{ github.event.inputs.away_odds || '' }}
           OVER_ODDS: ${{ github.event.inputs.over_odds || '' }}
           UNDER_ODDS: ${{ github.event.inputs.under_odds || '' }}
-          ODDS_SOURCE: ${{ github.event.inputs.odds_source || '' }}
-          ODDS_CHECKED_AT: ${{ github.event.inputs.odds_checked_at || '' }}
+          ODDS_CONTEXT_JSON: ${{ github.event.inputs.odds_context_json || '' }}
         run: |
+          python - <<'PY'
+          import json, os
+          raw = os.environ.get("ODDS_CONTEXT_JSON", "").strip()
+          payload = json.loads(raw) if raw else {}
+          if not isinstance(payload, dict):
+              raise SystemExit("odds_context_json must be a JSON object")
+          with open("odds-context.json", "w", encoding="utf-8") as handle:
+              json.dump(payload, handle)
+          PY
+          ODDS_SOURCE="$(jq -r '.source // empty' odds-context.json)"
+          ODDS_CHECKED_AT="$(jq -r '.checked_at_utc // empty' odds-context.json)"
+          HOME_SPREAD_ODDS="$(jq -r '.home_spread_odds // empty' odds-context.json)"
+          AWAY_SPREAD_ODDS="$(jq -r '.away_spread_odds // empty' odds-context.json)"
           args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --pregame-report pregame-context.json --seed 42)
           [ -n "$SPREAD" ] && args+=(--spread "$SPREAD")
+          [ -n "$HOME_SPREAD_ODDS" ] && args+=(--home-spread-odds "$HOME_SPREAD_ODDS")
+          [ -n "$AWAY_SPREAD_ODDS" ] && args+=(--away-spread-odds "$AWAY_SPREAD_ODDS")
           [ -n "$TOTAL" ] && args+=(--total "$TOTAL")
           [ -n "$HOME_ODDS" ] && args+=(--home-odds "$HOME_ODDS")
           [ -n "$AWAY_ODDS" ] && args+=(--away-odds "$AWAY_ODDS")

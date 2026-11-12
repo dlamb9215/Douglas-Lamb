@@ -27,7 +27,7 @@ jobs:
       - name: Lint NBA simulator workflow expressions
         uses: rhysd/actionlint@v1.7.7
         with:
-          args: .github/workflows/run_nba_simulator.yml
+          args: .github/workflows/run_nba_simulator.yml .github/workflows/nfl_validation.yml
       - name: Validate NBA workflow YAML structure
         run: |
           python - <<'PY'
