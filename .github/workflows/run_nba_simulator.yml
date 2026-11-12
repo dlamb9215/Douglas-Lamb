@@ -33,12 +33,12 @@ on:
         default: ""
         type: string
       spread_odds:
-        description: American odds for spread sides
-        required: true
+        description: American odds for spread sides; blank unless actual prices are supplied
+        required: false
         default: ""
         type: string
       total_odds:
-        description: American odds for total sides; blank unless an actual price is supplied
+        description: American odds for total sides; blank unless actual prices are supplied
         required: false
         default: ""
         type: string
@@ -184,7 +184,7 @@ jobs:
           set -o pipefail
           if [ -z "$GAME_DATE" ]; then GAME_DATE="$(TZ=America/New_York date +%F)"; fi
           echo "NBA matchup date: $GAME_DATE (America/New_York)"
-          args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --max-trials "$MAX_TRIALS" --seed "$SEED" --home-rest "$HOME_REST" --away-rest "$AWAY_REST" --home-travel "$HOME_TRAVEL" --away-travel "$AWAY_TRAVEL" --home-injury-points "$HOME_INJURY" --away-injury-points "$AWAY_INJURY" --spread-odds "$SPREAD_ODDS" --total-odds "$TOTAL_ODDS" --json-output nba-simulation-results.json)
+          args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --max-trials "$MAX_TRIALS" --seed "$SEED" --home-rest "$HOME_REST" --away-rest "$AWAY_REST" --home-travel "$HOME_TRAVEL" --away-travel "$AWAY_TRAVEL" --home-injury-points "$HOME_INJURY" --away-injury-points "$AWAY_INJURY" --json-output nba-simulation-results.json)
           if [ -n "$HOME_ML_ODDS" ] && [ -n "$AWAY_ML_ODDS" ]; then args+=(--home-ml-odds "$HOME_ML_ODDS" --away-ml-odds "$AWAY_ML_ODDS"); fi
           if [ -n "$SPREAD" ]; then args+=(--spread "$SPREAD"); fi
           if [ -n "$TOTAL" ]; then args+=(--total "$TOTAL"); fi
