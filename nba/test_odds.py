@@ -37,11 +37,14 @@ class TestNBAOdds(unittest.TestCase):
         self.assertEqual(result["home_ml_odds"], -145)
         self.assertEqual(result["away_ml_odds"], 135)
         self.assertEqual(result["home_spread"], -4.5)
-        self.assertEqual(result["home_spread_odds"], -105)
+        self.assertEqual(result["home_spread_odds"], -110)
         self.assertEqual(result["away_spread_odds"], -110)
+        self.assertEqual(result["spread_bookmaker"], "book_a")
         self.assertEqual(result["total"], 220.5)
         self.assertEqual(result["over_odds"], -108)
         self.assertEqual(result["under_odds"], -112)
+        self.assertEqual(result["total_bookmaker"], "book_a")
+        self.assertEqual(result["moneyline_bookmaker"], "book_b")
         self.assertEqual(result["bookmaker_count"], 2)
 
     def test_requires_key(self):
