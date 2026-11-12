@@ -105,6 +105,7 @@ jobs:
           if [ -s preflight-lineups.json ]; then lineup_args+=(--lineups preflight-lineups.json); fi
           python -m nba.data_hub --home "$HOME_TEAM" --away "$AWAY_TEAM" --date "$GAME_DATE" --output nba-data-readiness.json "${lineup_args[@]}" | tee nba-data-readiness.txt
       - name: Run matchup
+        id: run_matchup
         if: github.event_name == 'workflow_dispatch'
         env:
           HOME_TEAM: ${{ inputs.home }}
@@ -179,7 +180,8 @@ jobs:
           if [ "$ESPN_BET_ODDS" = "true" ]; then args+=(--espn-bet-odds); fi
           python -m nba.simulator "${args[@]}" | tee nba-simulation-results.txt
       - name: Archive pregame forecast to versioned ledger
-        if: github.event_name == 'workflow_dispatch' && success()
+        if: github.event_name == 'workflow_dispatch' && steps.run_matchup.outcome == 'success'
+        continue-on-error: true
         env:
           GITHUB_RUN_ID: ${{ github.run_id }}
           GITHUB_SHA: ${{ github.sha }}
@@ -197,7 +199,7 @@ jobs:
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
       - name: Run experimental player prop projections
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' && steps.run_matchup.outcome == 'success'
         env:
           HOME_TEAM: ${{ inputs.home }}
           AWAY_TEAM: ${{ inputs.away }}
