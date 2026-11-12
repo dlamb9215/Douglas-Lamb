@@ -73,13 +73,10 @@ on:
         description: Under American odds; blank to skip
         required: false
         type: string
-      odds_source:
-        description: Sportsbook/source name for supplied lines
+      odds_context_json:
+        description: Optional JSON object with source, checked_at_utc, home_spread_odds and away_spread_odds
         required: false
-        type: string
-      odds_checked_at:
-        description: ISO-8601 timestamp with timezone when lines were checked
-        required: false
+        default: ""
         type: string
 
 permissions:
@@ -139,11 +136,25 @@ jobs:
           AWAY_ODDS: ${{ github.event.inputs.away_odds || '' }}
           OVER_ODDS: ${{ github.event.inputs.over_odds || '' }}
           UNDER_ODDS: ${{ github.event.inputs.under_odds || '' }}
-          ODDS_SOURCE: ${{ github.event.inputs.odds_source || '' }}
-          ODDS_CHECKED_AT: ${{ github.event.inputs.odds_checked_at || '' }}
+          ODDS_CONTEXT_JSON: ${{ github.event.inputs.odds_context_json || '' }}
         run: |
+          python - <<'PY'
+          import json, os
+          raw = os.environ.get("ODDS_CONTEXT_JSON", "").strip()
+          payload = json.loads(raw) if raw else {}
+          if not isinstance(payload, dict):
+              raise SystemExit("odds_context_json must be a JSON object")
+          with open("odds-context.json", "w", encoding="utf-8") as handle:
+              json.dump(payload, handle)
+          PY
+          ODDS_SOURCE="$(jq -r '.source // empty' odds-context.json)"
+          ODDS_CHECKED_AT="$(jq -r '.checked_at_utc // empty' odds-context.json)"
+          HOME_SPREAD_ODDS="$(jq -r '.home_spread_odds // empty' odds-context.json)"
+          AWAY_SPREAD_ODDS="$(jq -r '.away_spread_odds // empty' odds-context.json)"
           args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --pregame-report pregame-context.json --seed 42)
           [ -n "$SPREAD" ] && args+=(--spread "$SPREAD")
+          [ -n "$HOME_SPREAD_ODDS" ] && args+=(--home-spread-odds "$HOME_SPREAD_ODDS")
+          [ -n "$AWAY_SPREAD_ODDS" ] && args+=(--away-spread-odds "$AWAY_SPREAD_ODDS")
           [ -n "$TOTAL" ] && args+=(--total "$TOTAL")
           [ -n "$HOME_ODDS" ] && args+=(--home-odds "$HOME_ODDS")
           [ -n "$AWAY_ODDS" ] && args+=(--away-odds "$AWAY_ODDS")
