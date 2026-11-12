@@ -85,8 +85,8 @@ def settle_ledger(ledger_path: str, fetcher: Callable[[date], list[dict[str, Any
                 continue
             if not event["completed"] or event["home"]["score"] is None or event["away"]["score"] is None:
                 continue
-            row["actual_home"] = str(event["home"]["score"])
-            row["actual_away"] = str(event["away"]["score"])
+            row["actual_home"] = str(int(event["home"]["score"])) if float(event["home"]["score"]).is_integer() else str(event["home"]["score"])
+            row["actual_away"] = str(int(event["away"]["score"])) if float(event["away"]["score"]).is_integer() else str(event["away"]["score"])
             row["settled_at"] = datetime.now(timezone.utc).isoformat()
             settled += 1
     if settled:
