@@ -26,12 +26,12 @@ on:
       home:
         description: Home team abbreviation
         required: true
-        default: "PHX"
+        default: "IND"
         type: string
       away:
         description: Away team abbreviation
         required: true
-        default: "CHA"
+        default: "NYK"
         type: string
       spread:
         description: Home spread, e.g. -3.5; blank to skip
@@ -56,7 +56,7 @@ on:
       game_date:
         description: Matchup date YYYY-MM-DD
         required: false
-        default: "2026-11-12"
+        default: "2026-11-13"
         type: string
       game_config_json:
         description: Optional JSON object for sportsbook prices, source/timestamp, confirmed lineups, player-prop lines, rest/travel and other settings; see BETTING_ENGINE_UPGRADE.md
