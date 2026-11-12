@@ -19,6 +19,8 @@ Cleveland Cavaliers Allen, Jarrett Out Injury/Illness - Right Knee Contusion
         self.assertEqual(result["players"][0]["player"], "DeMar DeRozan")
         self.assertEqual(result["players"][0]["team"], "DEN")
         self.assertEqual(result["players"][0]["status"], "Available")
+        self.assertEqual(result["team_submission"]["DEN"], "SUBMITTED")
+        self.assertEqual(result["team_submission"]["IND"], "SUBMITTED")
         self.assertEqual(result["players"][1]["status"], "Out")
         self.assertEqual({row["team"] for row in result["players"]}, {"DEN", "IND"})
 
