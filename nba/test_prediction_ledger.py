@@ -57,7 +57,7 @@ class TestPredictionLedger(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             payload = Path(folder) / "payload.json"
             import json
-            payload.write_text(json.dumps(fixture()) + "\\\\n", encoding="utf-8")
+            payload.write_text(json.dumps(fixture()) + chr(92) + "n", encoding="utf-8")
             ledger = Path(folder) / "predictions.csv"
             result = append_forecast(str(payload), str(ledger), "legacy-123", "abc")
             self.assertEqual(result["status"], "archived")
