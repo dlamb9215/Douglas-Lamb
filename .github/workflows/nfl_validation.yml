@@ -10,6 +10,8 @@ on:
       - "pregame_context.py"
       - "injury_exposure.py"
       - "market_data.py"
+      - "betting_engine/**"
+      - "matchup_player_pipeline.py"
       - "nfl_team_stats.json"
       - "player_pool.json"
       - "test_*.py"
