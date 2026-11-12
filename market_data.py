@@ -6,7 +6,7 @@ from datetime import datetime, timezone, timedelta
 def validate_market_snapshot(values, source=None, checked_at=None,
                              max_age_hours=6, now=None):
     market_fields = ("spread", "total", "home_odds", "away_odds",
-                     "over_odds", "under_odds")
+                     "home_spread_odds", "away_spread_odds", "over_odds", "under_odds")
     supplied = {}
     for field in market_fields:
         value = values.get(field)
