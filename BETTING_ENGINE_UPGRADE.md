@@ -163,3 +163,32 @@ as a structured official source by the automated gate.
 The readiness report is a preflight, not a calibration report. Even when every
 data source is present, the market-specific out-of-sample calibration gate
 must independently pass before a candidate can become BET.
+
+
+## Versioned NBA forecast ledger and settlement
+
+Every successful manual NBA matchup run appends a pregame forecast to
+`nba/ledger/predictions.csv` using the workflow run ID, source data timestamp,
+event ID, scheduled tip time, trial count, model probabilities, market lines,
+and per-market bookmaker/quote timestamps. The ledger writer is idempotent and
+refuses schema mismatches rather than overwriting history.
+
+The scheduled workflow `.github/workflows/settle-nba-ledger.yml` checks the
+ESPN public scoreboard daily. It settles a row only when the exact archived
+event ID is found, both team identities match, the event is marked completed,
+and both final scores are present. Unfinished games remain pending; mismatched
+events are reported and never settled.
+
+Run a backtest with:
+
+```bash
+python -m nba.backtest --csv nba/ledger/predictions.csv
+```
+
+The evaluator excludes unsettled rows and forecasts timestamped at/after
+scheduled tip, rejects duplicate forecast IDs, and reports sample counts,
+Brier score, log loss, calibration bins, point errors, and available closing
+line movement. A minimum of 200 settled predictions per market is reported as
+a sample-size checkpoint only. It does not automatically open the betting
+calibration gate. Chronological holdout performance, market-baseline
+comparisons, positive closing-line value, and manual review remain required.
