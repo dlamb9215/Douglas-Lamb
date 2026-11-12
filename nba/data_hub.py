@@ -22,6 +22,8 @@ from nba.odds import matchup_odds
 from nba.espn_odds import fetch_espn_bet_odds
 
 
+TEAM_CODE_ALIASES = {"GSW": "GS", "NOP": "NO", "NYK": "NY", "SAS": "SA", "UTA": "UTAH", "WAS": "WSH"}
+
 TEAM_NAMES = {
     "ATL": "Atlanta Hawks", "BKN": "Brooklyn Nets", "BOS": "Boston Celtics",
     "CHA": "Charlotte Hornets", "CHI": "Chicago Bulls", "CLE": "Cleveland Cavaliers",
@@ -85,7 +87,8 @@ def fetch_sportradar_injuries(api_key: str) -> dict[str, Any]:
 def build_report(home: str, away: str, game_date: date, team_stats_path: str = "nba/team_stats.json",
                  lineup_path: str = "", season: int = 2027) -> dict[str, Any]:
     home, away = home.upper(), away.upper()
-    if home == away or home not in TEAM_NAMES or away not in TEAM_NAMES:
+    home_code, away_code = TEAM_CODE_ALIASES.get(home, home), TEAM_CODE_ALIASES.get(away, away)
+    if home_code == away_code or home not in TEAM_NAMES or away not in TEAM_NAMES:
         raise ValueError("Provide two different recognized NBA team abbreviations")
     report: dict[str, Any] = {
         "game": {"date": game_date.isoformat(), "home": home, "away": away},
@@ -136,7 +139,7 @@ def build_report(home: str, away: str, game_date: date, team_stats_path: str = "
         }
         report["readiness"]["official_injuries"] = official and all(
             injuries.get("team_submission", {}).get(code) == "SUBMITTED"
-            for code in (home, away)
+            for code in (home_code, away_code)
         )
         report["warnings"].extend(injuries.get("warnings", []))
         if not official:
@@ -150,7 +153,7 @@ def build_report(home: str, away: str, game_date: date, team_stats_path: str = "
     if lineup_path:
         try:
             lineup = json.loads(Path(lineup_path).read_text(encoding="utf-8"))
-            valid, reason = validate_game_availability(lineup, [home, away])
+            valid, reason = validate_game_availability(lineup, [home_code, away_code])
             report["sources"]["lineups"] = {
                 "status": "confirmed" if valid else "incomplete",
                 "provider": lineup.get("source"), "confirmed_at": lineup.get("confirmed_at"),
@@ -176,7 +179,7 @@ def build_report(home: str, away: str, game_date: date, team_stats_path: str = "
             report["sources"]["sportsbook_odds"] = odds
             report["readiness"]["two_sided_odds"] = bool(
                 odds.get("home_ml_odds") is not None and odds.get("away_ml_odds") is not None
-                and odds.get("last_updated")
+                and odds.get("moneyline_last_updated")
             )
         except Exception as exc:
             report["sources"]["sportsbook_odds"] = {"status": "unavailable", "provider": "The Odds API v4", "error": str(exc)}
