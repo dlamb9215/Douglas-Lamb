@@ -41,6 +41,27 @@ Cleveland Cavaliers Allen, Jarrett Out Injury/Illness - Right Knee Contusion
             with self.assertRaisesRegex(RuntimeError, "No NBA official injury-report PDF"):
                 latest_report_url(date(2026, 11, 8), 2027)
 
+    def test_prefers_layout_extraction_when_plain_text_misses_team_headings(self):
+        from nba.injuries import fetch_official_injuries
+        class FakePage:
+            def extract_text(self, extraction_mode=None):
+                if extraction_mode == "layout":
+                    return "Philadelphia 76ers\nEmbiid, Joel Available\nToronto Raptors\nBarnes, Scottie Out"
+                return "garbled columns"
+        class FakeReader:
+            def __init__(self, stream):
+                self.pages = [FakePage()]
+        with (
+            patch("nba.injuries.latest_report_url", return_value="https://example.test/report.pdf"),
+            patch("nba.injuries._get", return_value=b"%PDF-test"),
+            patch("nba.injuries.PdfReader", FakeReader),
+        ):
+            result = fetch_official_injuries(date(2026, 11, 12), "PHI", "TOR", 2027)
+        self.assertEqual(result["source"], "NBA official injury report")
+        self.assertEqual(result["pdf_text_extraction"], "layout")
+        self.assertEqual(result["team_submission"], {"PHI": "SUBMITTED", "TOR": "SUBMITTED"})
+        self.assertEqual(len(result["player_statuses"]), 2)
+
     def test_uses_labeled_espn_fallback_when_official_site_is_blocked(self):
         import json
         payload = {"injuries": [{
