@@ -135,7 +135,7 @@ def build_report(home: str, away: str, game_date: date, team_stats_path: str = "
             "official": official, "warnings": injuries.get("warnings", []),
         }
         report["readiness"]["official_injuries"] = official and all(
-            injuries.get("team_submission", {}).get(code) != "NOT YET SUBMITTED"
+            injuries.get("team_submission", {}).get(code) == "SUBMITTED"
             for code in (home, away)
         )
         report["warnings"].extend(injuries.get("warnings", []))
