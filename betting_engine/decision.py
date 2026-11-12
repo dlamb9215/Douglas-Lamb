@@ -64,8 +64,10 @@ def evaluate(candidate: BetCandidate, *, now: datetime | None = None,
              max_quote_age_hours: float = 6.0, min_edge: float = 0.025,
              min_ev_per_unit: float = 0.02, max_kelly_fraction: float = 0.05) -> dict[str, Any]:
     p, push = candidate.model_probability, candidate.push_probability
-    if not 0 <= p <= 1 or not 0 <= push < 1 or p + push > 1:
+    if not isfinite(float(p)) or not isfinite(float(push)) or not 0 <= p <= 1 or not 0 <= push < 1 or p + push > 1:
         raise ValueError("Invalid model or push probability")
+    if isinstance(candidate.odds_american, bool) or not isinstance(candidate.odds_american, (int, float)) or not isfinite(float(candidate.odds_american)) or candidate.odds_american == 0:
+        raise ValueError("American odds must be a finite non-zero number")
     if not candidate.sport or candidate.sport.upper() not in {"NBA", "NFL"}:
         raise ValueError("sport must be NBA or NFL")
     if not candidate.sportsbook:
@@ -92,7 +94,7 @@ def evaluate(candidate: BetCandidate, *, now: datetime | None = None,
     if not candidate.calibration_ready: blockers.append("out-of-sample calibration gate not passed")
     if edge < min_edge: blockers.append("model edge below threshold")
     if ev < min_ev_per_unit: blockers.append("expected value below threshold")
-    return {
+    result = {
         **asdict(candidate),
         "quote_age_hours": round(age, 2),
         "decimal_odds": round(dec, 4),
@@ -106,6 +108,9 @@ def evaluate(candidate: BetCandidate, *, now: datetime | None = None,
         "decision": "BET" if not blockers else "PASS",
         "blockers": blockers,
     }
+    if candidate.opposite_odds_american is not None:
+        result = attach_no_vig_market(result, candidate.opposite_odds_american)
+    return result
 
 
 def rank_candidates(candidates: Iterable[BetCandidate], **kwargs: Any) -> list[dict[str, Any]]:
