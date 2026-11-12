@@ -34,6 +34,31 @@ class TestNBADataHub(unittest.TestCase):
         self.assertFalse(report["readiness"]["two_sided_odds"])
         self.assertFalse(report["readiness"]["bet_eligible_data"])
 
+    def test_standard_team_aliases_normalize_for_official_and_lineup_gates(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            stats = Path(tmp) / "stats.json"
+            stats.write_text(json.dumps({"league": "NBA"}), encoding="utf-8")
+            lineup = Path(tmp) / "lineup.json"
+            lineup.write_text(json.dumps({"teams": {"GS": {}, "TOR": {}}}), encoding="utf-8")
+            with (
+                patch("nba.data_hub.validate_payload", return_value={"ready": True, "warnings": []}),
+                patch("nba.data_hub.build_context", return_value={
+                    "event": {"event_id": "123"}, "source": "ESPN", "retrieved_at": "2026-11-12T12:00:00Z",
+                    "home_rest_days": 2, "away_rest_days": 1, "warnings": []
+                }),
+                patch("nba.data_hub.fetch_official_injuries", return_value={
+                    "source": "NBA official injury report", "retrieved_at": "2026-11-12T12:00:00Z",
+                    "report_url": "https://official.nba.com/report.pdf", "player_statuses": [],
+                    "team_submission": {"GS": "SUBMITTED", "TOR": "SUBMITTED"}, "warnings": []
+                }),
+                patch("nba.data_hub.validate_game_availability", return_value=(True, "valid")),
+                patch("nba.data_hub.fetch_espn_bet_odds", side_effect=RuntimeError("not posted")),
+                patch.dict(os.environ, {"ODDS_API_KEY": ""}),
+            ):
+                report = build_report("GSW", "TOR", date(2026, 11, 12), str(stats), str(lineup))
+        self.assertTrue(report["readiness"]["official_injuries"])
+        self.assertTrue(report["readiness"]["confirmed_lineups"])
+
     def test_bad_team_codes_rejected(self):
         with self.assertRaisesRegex(ValueError, "recognized NBA"):
             build_report("XXX", "DET", date(2026, 11, 12))
