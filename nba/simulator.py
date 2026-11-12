@@ -307,6 +307,11 @@ def main():
         except (RuntimeError,OSError,ValueError) as exc:
             injury_context={"source":"NBA official injury report","status":"unavailable","error":str(exc),"warnings":["Official injury data could not be retrieved; no automatic player availability or injury-point adjustment was applied. Verify injuries independently before betting."]}
             print(f"INJURY DATA WARNING: official report unavailable: {exc}")
+    r=simulate(h,w,a.trials,a.seed,a.spread,a.total,**kwargs)
+    close=abs(r["home_margin"]+(a.spread or 0))<=3
+    if a.spread is not None: close=close or 47<=r["home_cover"]<=53
+    if a.total is not None: close=close or 47<=r["over"]<=53
+    if close and not a.no_auto_refine and a.max_trials>a.trials: r=simulate(h,w,a.max_trials,a.seed,a.spread,a.total,**kwargs)
     lineup_context=None
     availability_confirmed=False
     availability_reason="no fresh five-starter confirmation supplied"
@@ -370,11 +375,7 @@ def main():
     ])
     print("\\nSHARED BETTING ENGINE — NBA BET/PASS GATES")
     print(json.dumps(shared_decisions,indent=2))
-    r=simulate(h,w,a.trials,a.seed,a.spread,a.total,**kwargs)
-    close=abs(r["home_margin"]+(a.spread or 0))<=3
-    if a.spread is not None: close=close or 47<=r["home_cover"]<=53
-    if a.total is not None: close=close or 47<=r["over"]<=53
-    if close and not a.no_auto_refine and a.max_trials>a.trials: r=simulate(h,w,a.max_trials,a.seed,a.spread,a.total,**kwargs)
+
     print("\nDOUG'S ELITE NBA SIMULATOR\n========================="); print(f"{w.name} at {h.name}")
     for t in (h,w): print(f"{t.name}: GP {t.games_played} | Pace {t.pace:.1f} | ORtg {t.off_rating:.1f} | DRtg {t.def_rating:.1f} | eFG {t.efg_pct:.3f} | TOV {t.tov_pct:.3f} | ORB {t.orb_pct:.3f} | FT rate {t.ft_rate:.3f} | 3PA rate {t.three_pa_rate if t.three_pa_rate is not None else float('nan'):.3f}")
     print(f"Projected pace {r['pace']:.1f} | Score {h.name} {r['home_points']:.1f} - {w.name} {r['away_points']:.1f}")
