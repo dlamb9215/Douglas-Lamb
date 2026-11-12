@@ -10,6 +10,7 @@ on:
   pull_request:
     paths:
       - "nba/**"
+      - "betting_engine/**"
       - ".github/workflows/run_nba_simulator.yml"
       - ".github/workflows/update_nba_stats.yml"
       - ".github/workflows/nba-ci.yml"
