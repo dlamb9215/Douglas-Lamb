@@ -29,11 +29,11 @@ def _best(prices: list[int]) -> int | None:
 def _implied_probability(price: int) -> float:
     return 100 / (price + 100) if price > 0 else (-price) / ((-price) + 100)
 
-def _lowest_hold_pair(rows: list[tuple[int, int, str]]) -> tuple[int, int, str] | None:
-    # Keep both sides from one bookmaker; never mix prices across books.
+def _lowest_hold_pair(rows: list[tuple[int, int, str, str | None]]) -> tuple[int, int, str, str | None] | None:
+    # Keep both sides and their timestamp from one bookmaker; never mix books.
     return min(rows, key=lambda row: (_implied_probability(row[0]) + _implied_probability(row[1]), row[2])) if rows else None
 
-def _consensus_rows(rows: list[tuple[float, int, int, str]]) -> tuple[float, list[tuple[float, int, int, str]]]:
+def _consensus_rows(rows: list[tuple[float, int, int, str, str | None]]) -> tuple[float, list[tuple[float, int, int, str, str | None]]]:
     counts = Counter(row[0] for row in rows)
     highest_count = max(counts.values())
     tied_lines = [line for line, count in counts.items() if count == highest_count]
@@ -84,9 +84,9 @@ def matchup_odds(home_name: str, away_name: str, api_key: str | None = None) -> 
             "Check team names and whether bookmakers have posted the game."
         )
     event = matches[0]
-    moneyline_rows: list[tuple[int, int, str]] = []
-    spread_rows: list[tuple[float, int, int, str]] = []
-    total_rows: list[tuple[float, int, int, str]] = []
+    moneyline_rows: list[tuple[int, int, str, str | None]] = []
+    spread_rows: list[tuple[float, int, int, str, str | None]] = []
+    total_rows: list[tuple[float, int, int, str, str | None]] = []
     books = set()
     last_updates = []
     for book in event.get("bookmakers", []):
@@ -102,7 +102,7 @@ def matchup_odds(home_name: str, away_name: str, api_key: str | None = None) -> 
                 h = by_name.get(home_name.casefold())
                 a = by_name.get(away_name.casefold())
                 if h and a:
-                    moneyline_rows.append((_american(h["price"]), _american(a["price"]), str(book_key or "")))
+                    moneyline_rows.append((_american(h["price"]), _american(a["price"]), str(book_key or ""), book.get("last_update")))
             elif market.get("key") == "spreads":
                 by_name = {str(o.get("name", "")).casefold(): o for o in outcomes}
                 h = by_name.get(home_name.casefold())
@@ -121,6 +121,7 @@ def matchup_odds(home_name: str, away_name: str, api_key: str | None = None) -> 
         "home_ml_odds": ml_pair[0] if ml_pair else None,
         "away_ml_odds": ml_pair[1] if ml_pair else None,
         "moneyline_bookmaker": ml_pair[2] if ml_pair else None,
+        "moneyline_last_updated": ml_pair[3] if ml_pair else None,
         "bookmakers": sorted(books), "bookmaker_count": len(books),
         "last_updated": max(last_updates) if last_updates else None,
         "source": "The Odds API v4", "retrieved_at": datetime.now(timezone.utc).isoformat(),
@@ -128,13 +129,14 @@ def matchup_odds(home_name: str, away_name: str, api_key: str | None = None) -> 
     }
     if spread_rows:
         line, at_line = _consensus_rows(spread_rows)
-        pair = _lowest_hold_pair([(row[1], row[2], row[3]) for row in at_line])
+        pair = _lowest_hold_pair([(row[1], row[2], row[3], row[4]) for row in at_line])
         result.update({
             "home_spread": line,
             "away_spread": -line,
             "home_spread_odds": pair[0] if pair else None,
             "away_spread_odds": pair[1] if pair else None,
             "spread_bookmaker": pair[2] if pair else None,
+            "spread_last_updated": pair[3] if pair else None,
             "spread_book_count": len(at_line),
         })
     if total_rows:
@@ -145,6 +147,7 @@ def matchup_odds(home_name: str, away_name: str, api_key: str | None = None) -> 
             "over_odds": pair[0] if pair else None,
             "under_odds": pair[1] if pair else None,
             "total_bookmaker": pair[2] if pair else None,
+            "total_last_updated": pair[3] if pair else None,
             "total_book_count": len(at_line),
         })
     return result
