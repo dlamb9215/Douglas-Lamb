@@ -528,7 +528,7 @@ def main():
             notes="Final official inactive/starter confirmation and historical calibration are still required.",
         ) if args.total is not None else None,
     ])
-    print("\\nSHARED BETTING ENGINE — NFL BET/PASS GATES")
+    print("\nSHARED BETTING ENGINE — NFL BET/PASS GATES")
     print(json.dumps(shared_decisions, indent=2))
     print("\nNFL FORECAST TRACKING")
     print("=====================")
