@@ -4,7 +4,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: nba-simulator-\${{ github.ref }}
+  group: nba-simulator-${{ github.ref }}
   cancel-in-progress: false
 
 on:
@@ -179,8 +179,8 @@ jobs:
       - name: Archive pregame forecast to versioned ledger
         if: github.event_name == 'workflow_dispatch' && success()
         env:
-          GITHUB_RUN_ID: \${{ github.run_id }}
-          GITHUB_SHA: \${{ github.sha }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           python -m nba.prediction_ledger --payload nba-simulation-results.json --ledger nba/ledger/predictions.csv
