@@ -45,11 +45,12 @@ python -m unittest -v betting_engine.test_decision
 - NBA no longer assumes default -110 prices. A market comparison needs two actual prices and a timestamped sportsbook/provider quote.
 - NBA team-market availability requires a fresh confirmed-lineup payload with five available starters per team plus a submitted official injury report for both teams.
 - NFL player props flow through the shared engine only after the existing official active-starter confirmation gate passes.
+- NFL team markets require a fresh `game_day_confirmations.json` with `all_inactives_reviewed: true`, an HTTPS `source_url`, and at least 22 confirmed active starters for each team.
 - NBA player props flow through the shared engine only after the existing official injury and confirmed minutes/lineup gates pass.
 - Each market report includes no-vig probability, breakeven probability, expected value, edge, quote age, and explicit blockers.
 
 ## Current limitations and release gates
-The integration is end-to-end at the report/decision layer, but it is **not yet certified to issue BET recommendations**. Calibration remains deliberately false for NBA team markets, NBA player props, NFL team markets, and NFL player props until market-specific, time-ordered out-of-sample ledgers meet the review standard. NFL team markets also remain blocked until the team-level official inactive/starter confirmation is wired and attested. Do not manually set calibration flags true or treat green CI as proof of predictive accuracy.
+The integration is end-to-end at the report/decision layer, but it is **not yet certified to issue BET recommendations**. Calibration remains deliberately false for NBA team markets, NBA player props, NFL team markets, and NFL player props until market-specific, time-ordered out-of-sample ledgers meet the review standard. NFL team markets remain blocked until the team-level confirmation file explicitly attests that the full inactive list was reviewed and includes 22 active starters for each team. Do not manually set calibration flags true or treat green CI as proof of predictive accuracy.
 
 Automatic sportsbook coverage depends on configured providers/API keys. The NBA Odds API and ESPN BET adapters may return no prices for an event; missing prices remain PASS. NFL market prices are entered as a timestamped two-sided snapshot. Never infer a market price from the usual -110 convention.
 
