@@ -49,6 +49,42 @@ python -m unittest -v betting_engine.test_decision
 - NBA player props flow through the shared engine only after the existing official injury and confirmed minutes/lineup gates pass.
 - Each market report includes no-vig probability, breakeven probability, expected value, edge, quote age, and explicit blockers.
 
+## NBA workflow launch configuration
+
+GitHub allows at most 10 `workflow_dispatch` inputs. The NBA launch form now
+uses eight fields: home, away, spread, total, trials, max trials, game date,
+and `game_config_json`. Optional market and context values go in that final
+JSON object. Supported keys include:
+
+- `home_ml_odds`, `away_ml_odds`, `home_spread_odds`, `away_spread_odds`,
+  `over_odds`, `under_odds` (or shared `spread_odds` / `total_odds`).
+- `odds_source`, `odds_checked_at` for manually supplied prices.
+- `confirmed_lineups_json`, `player_prop_lines_json`.
+- `player_props`, `prop_trials`, `auto_injuries`, `espn_bet_odds`,
+  `auto_odds`, `home_rest`, `away_rest`, `home_travel`, `away_travel`,
+  `home_injury_points`, `away_injury_points`, and `seed`.
+
+Example minimal market config:
+
+```json
+{
+  "home_ml_odds": -145,
+  "away_ml_odds": 125,
+  "home_spread_odds": -110,
+  "away_spread_odds": -110,
+  "over_odds": -108,
+  "under_odds": -112,
+  "odds_source": "Example Sportsbook",
+  "odds_checked_at": "2026-11-12T18:30:00Z",
+  "auto_injuries": true,
+  "espn_bet_odds": false,
+  "auto_odds": false
+}
+```
+
+Do not set both `espn_bet_odds` and `auto_odds` to true. For automatically
+fetched prices, leave manual prices/source/timestamp out of the config.
+
 ## NBA player-prop quote format
 
 For `player_prop_lines_json`, each priced player/stat entry should include
