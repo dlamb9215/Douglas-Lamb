@@ -24,6 +24,12 @@ class EliteNHLTests(unittest.TestCase):
     def test_rejects_invalid_trials(self):
         with self.assertRaises(ValueError):
             simulate("BOS","FLA",self.teams,[],[],self.rosters,trials=10)
+    def test_simulation_returns_bounded_market_probabilities(self):
+        out=simulate("BOS","FLA",self.teams,[],[],self.rosters,trials=1000,seed=5)
+        self.assertEqual(out["trials"],1000)
+        self.assertAlmostEqual(out["moneyline_pct"]["home"]+out["moneyline_pct"]["away"],100.0)
+        self.assertGreaterEqual(out["total_pct"]["over"],0)
+        self.assertLessEqual(out["total_pct"]["over"],100)
     def test_team_rates_not_fabricated(self):
         x=normalize_team({"teamAbbrev":"BOS","gamesPlayed":20})
         self.assertIsNone(x["gf"]); self.assertIsNone(x["ga"])
