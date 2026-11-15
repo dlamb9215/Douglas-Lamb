@@ -190,6 +190,8 @@ def simulate(home_code, away_code, team_stats, skaters, goalies, rosters, trials
     selected = {}
     for code, pool, chosen in ((home_code, hg, home_goalie_id), (away_code, ag, away_goalie_id)):
         found = next((g for g in pool if str(g["id"]) == str(chosen)), None) if chosen else None
+        if chosen and not found:
+            raise ValueError(f"Requested goalie ID {chosen} is not present in the current {code} roster/stat sample.")
         selected[code] = found or (pool[0] if pool else None)
     if selected[away_code]:
         goalie = selected[away_code]
