@@ -1,0 +1,75 @@
+name: Run Doug's Elite NHL Simulator
+
+on:
+  workflow_dispatch:
+    inputs:
+      home:
+        description: Home team
+        required: true
+        type: choice
+        options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
+        default: BOS
+      away:
+        description: Away team
+        required: true
+        type: choice
+        options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
+        default: FLA
+      trials:
+        description: Monte Carlo trials
+        required: true
+        type: choice
+        options: ["100000", "250000", "500000", "1000000", "5000000"]
+        default: "100000"
+      total:
+        description: Game total goals line
+        required: true
+        default: "6.0"
+        type: string
+      seed:
+        description: Reproducible seed
+        required: true
+        default: "20261115"
+        type: string
+      home_goalie_id:
+        description: Optional confirmed home goalie NHL player ID
+        required: false
+        default: ""
+        type: string
+      away_goalie_id:
+        description: Optional confirmed away goalie NHL player ID
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run offline unit tests
+        run: python -m unittest -v nhl.test_elite
+      - name: Run NHL matchup model
+        env:
+          HOME_GOALIE_ID: ${{ inputs.home_goalie_id }}
+          AWAY_GOALIE_ID: ${{ inputs.away_goalie_id }}
+        run: |
+          ARGS=""
+          if [ -n "$HOME_GOALIE_ID" ]; then ARGS="$ARGS --home-goalie-id $HOME_GOALIE_ID"; fi
+          if [ -n "$AWAY_GOALIE_ID" ]; then ARGS="$ARGS --away-goalie-id $AWAY_GOALIE_ID"; fi
+          python -m nhl.elite --home "${{ inputs.home }}" --away "${{ inputs.away }}" --trials "${{ inputs.trials }}" --total "${{ inputs.total }}" --seed "${{ inputs.seed }}" $ARGS | tee nhl-elite-results.txt
+      - name: Upload simulation results
+        uses: actions/upload-artifact@v4
+        with:
+          name: dougs-elite-nhl-results
+          path: |
+            nhl-elite-results.txt
+            nhl-elite-results.json
+          if-no-files-found: error
