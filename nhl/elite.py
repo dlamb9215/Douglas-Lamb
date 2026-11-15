@@ -69,21 +69,20 @@ def poisson(rng, lam):
     return k - 1
 
 def normalize_team(row):
-    gp = first_num(row, ["gamesPlayed","games_played"], 0) or 0
-    if gp <= 0: return None
-    pp=first_num(row,["powerPlayPct","powerPlayPercentage"],None)
-    pk=first_num(row,["penaltyKillPct","penaltyKillPercentage"],None)
-    fo=first_num(row,["faceoffWinPct","faceoffWinPercentage"],None)
-    if pp is not None and pp <= 1: pp *= 100
-    if pk is not None and pk <= 1: pk *= 100
-    if fo is not None and fo <= 1: fo *= 100
+    """Normalize a row from the NHL standings feed (count stats -> per-game rates)."""
+    code = team_code(row)
+    gp = first_num(row, ["gamesPlayed", "games_played"], 0) or 0
+    if not code or gp <= 0:
+        return None
+    gf_total = first_num(row, ["goalsFor", "goals_for"], None)
+    ga_total = first_num(row, ["goalsAgainst", "goals_against"], None)
+    gf = gf_total / gp if gf_total is not None else first_num(row, ["goalsForPerGame"], None)
+    ga = ga_total / gp if ga_total is not None else first_num(row, ["goalsAgainstPerGame"], None)
     return {
-        "team":team_code(row), "games":int(gp),
-        "gf":first_num(row,["goalsForPerGame"],None),
-        "ga":first_num(row,["goalsAgainstPerGame"],None),
-        "sf":first_num(row,["shotsForPerGame"],None),
-        "sa":first_num(row,["shotsAgainstPerGame"],None),
-        "pp":pp, "pk":pk, "fo":fo,
+        "team": code, "games": int(gp), "gf": gf, "ga": ga,
+        "sf": None, "sa": None, "pp": None, "pk": None, "fo": None,
+        "season": row.get("seasonId") or row.get("season"),
+        "source": "NHL standings feed",
     }
 
 
@@ -107,13 +106,17 @@ def attach_team_ranks(team_stats):
 
 
 def load_data(home, away, season):
-    team_rows = stats_report("team", season, 100)
-    team_stats = {t["team"]:t for t in (normalize_team(r) for r in team_rows) if t and t["team"]}
+    # Use the NHL Web API standings feed for current-season GP/GF/GA totals.
+    standings_payload = get_json(f"{WEB}/standings/now")
+    standing_rows = standings_payload.get("standings", [])
+    if not isinstance(standing_rows, list) or not standing_rows:
+        raise RuntimeError("NHL standings feed returned no team rows; refusing to simulate with stale data.")
+    team_stats = {t["team"]: t for t in (normalize_team(r) for r in standing_rows) if t and t["team"]}
     if home not in team_stats or away not in team_stats:
-        raise RuntimeError(f"Missing current-season team stats for {home} or {away}; no fallback data will be substituted.")
+        raise RuntimeError(f"Current NHL standings are missing {home} or {away}; no fallback data will be substituted.")
     for code in (home, away):
         if team_stats[code]["gf"] is None or team_stats[code]["ga"] is None:
-            raise RuntimeError(f"Current-season goals-for/goals-against rates are incomplete for {code}.")
+            raise RuntimeError(f"Current-season goals-for/goals-against totals are incomplete for {code}.")
     attach_team_ranks(team_stats)
     skaters = stats_report("skater", season, 1500)
     goalies = stats_report("goalie", season, 500)
