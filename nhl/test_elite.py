@@ -46,6 +46,11 @@ class EliteNHLTests(unittest.TestCase):
         self.assertEqual(x["team"],"FLA")
         self.assertEqual(x["gf"],3.5)
         self.assertEqual(x["ga"],2.8)
+    def test_nhl_standings_singular_goal_fields(self):
+        x=normalize_team({"teamAbbrev":{"default":"FLA"},"gamesPlayed":10,"goalFor":35,"goalAgainst":28})
+        self.assertEqual(x["team"],"FLA")
+        self.assertEqual(x["gf"],3.5)
+        self.assertEqual(x["ga"],2.8)
     def test_team_rates_not_fabricated(self):
         x=normalize_team({"teamAbbrev":"BOS","gamesPlayed":20})
         self.assertIsNone(x["gf"]); self.assertIsNone(x["ga"])
