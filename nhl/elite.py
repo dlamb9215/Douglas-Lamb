@@ -71,15 +71,19 @@ def poisson(rng, lam):
 def normalize_team(row):
     gp = first_num(row, ["gamesPlayed","games_played"], 0) or 0
     if gp <= 0: return None
+    pp=first_num(row,["powerPlayPct","powerPlayPercentage"],None)
+    pk=first_num(row,["penaltyKillPct","penaltyKillPercentage"],None)
+    fo=first_num(row,["faceoffWinPct","faceoffWinPercentage"],None)
+    if pp is not None and pp <= 1: pp *= 100
+    if pk is not None and pk <= 1: pk *= 100
+    if fo is not None and fo <= 1: fo *= 100
     return {
         "team":team_code(row), "games":int(gp),
         "gf":first_num(row,["goalsForPerGame","goalsFor"],None),
         "ga":first_num(row,["goalsAgainstPerGame","goalsAgainst"],None),
         "sf":first_num(row,["shotsForPerGame","shotsFor"],None),
         "sa":first_num(row,["shotsAgainstPerGame","shotsAgainst"],None),
-        "pp":first_num(row,["powerPlayPct","powerPlayPercentage"],None),
-        "pk":first_num(row,["penaltyKillPct","penaltyKillPercentage"],None),
-        "fo":first_num(row,["faceoffWinPct","faceoffWinPercentage"],None),
+        "pp":pp, "pk":pk, "fo":fo,
     }
 
 def load_data(home, away, season):
@@ -128,10 +132,12 @@ def build_player_pool(code, roster, skater_rows, goalie_rows):
         if team_code(row) != code or not pid or str(pid) not in roster_goalies: continue
         gp = first_num(row,["gamesPlayed"],0) or 0
         if gp < 1: continue
+        save_pct=first_num(row,["savePct","savePercentage"],0.90) or 0.90
+        if save_pct > 1: save_pct /= 100
         goalies.append({
             "id":pid, "name":player_name(row), "games":int(gp),
             "starts":first_num(row,["gamesStarted"],gp) or gp,
-            "save_pct":first_num(row,["savePct","savePercentage"],0.90) or 0.90,
+            "save_pct":save_pct,
             "gaa":first_num(row,["goalsAgainstAverage"],3.0) or 3.0,
         })
     goalies.sort(key=lambda x:(x["starts"],x["games"]),reverse=True)
