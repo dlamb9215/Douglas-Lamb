@@ -45,6 +45,36 @@ on:
         required: false
         default: ""
         type: string
+      home_ml:
+        description: Home moneyline odds (American; 0 skips comparison)
+        required: true
+        default: "0"
+        type: string
+      away_ml:
+        description: Away moneyline odds (American; 0 skips comparison)
+        required: true
+        default: "0"
+        type: string
+      over_odds:
+        description: Over odds (American; 0 skips comparison)
+        required: true
+        default: "0"
+        type: string
+      under_odds:
+        description: Under odds (American; 0 skips comparison)
+        required: true
+        default: "0"
+        type: string
+      home_puck_odds:
+        description: Home -1.5 odds (American; 0 skips comparison)
+        required: true
+        default: "0"
+        type: string
+      away_puck_odds:
+        description: Away +1.5 odds (American; 0 skips comparison)
+        required: true
+        default: "0"
+        type: string
 
 permissions:
   contents: read
@@ -68,7 +98,7 @@ jobs:
           ARGS=""
           if [ -n "$HOME_GOALIE_ID" ]; then ARGS="$ARGS --home-goalie-id $HOME_GOALIE_ID"; fi
           if [ -n "$AWAY_GOALIE_ID" ]; then ARGS="$ARGS --away-goalie-id $AWAY_GOALIE_ID"; fi
-          python -m nhl.elite --home "${{ inputs.home }}" --away "${{ inputs.away }}" --trials "${{ inputs.trials }}" --total "${{ inputs.total }}" --seed "${{ inputs.seed }}" $ARGS | tee nhl-elite-results.txt
+          python -m nhl.elite --home "${{ inputs.home }}" --away "${{ inputs.away }}" --trials "${{ inputs.trials }}" --total "${{ inputs.total }}" --seed "${{ inputs.seed }}" --home-ml "${{ inputs.home_ml }}" --away-ml "${{ inputs.away_ml }}" --over-odds "${{ inputs.over_odds }}" --under-odds "${{ inputs.under_odds }}" --home-puck-odds "${{ inputs.home_puck_odds }}" --away-puck-odds "${{ inputs.away_puck_odds }}" $ARGS | tee nhl-elite-results.txt
       - name: Upload simulation results
         uses: actions/upload-artifact@v4
         with:
