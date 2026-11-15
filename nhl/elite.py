@@ -164,9 +164,15 @@ def simulate(home_code, away_code, team_stats, skaters, goalies, rosters, trials
         found = next((g for g in pool if str(g["id"]) == str(chosen)), None) if chosen else None
         selected[code] = found or (pool[0] if pool else None)
     if selected[away_code]:
-        hm *= max(.88, min(1.12, selected[away_code]["gaa"] / 3.0))
+        goalie = selected[away_code]
+        gaa_factor = goalie["gaa"] / 3.0
+        save_factor = .905 / max(.75, goalie["save_pct"])
+        hm *= max(.88, min(1.12, .5 * gaa_factor + .5 * save_factor))
     if selected[home_code]:
-        am *= max(.88, min(1.12, selected[home_code]["gaa"] / 3.0))
+        goalie = selected[home_code]
+        gaa_factor = goalie["gaa"] / 3.0
+        save_factor = .905 / max(.75, goalie["save_pct"])
+        am *= max(.88, min(1.12, .5 * gaa_factor + .5 * save_factor))
 
     rng = random.Random(seed)
     wins_h = wins_a = tie = over = under = push = cover_h = cover_a = 0
@@ -239,8 +245,11 @@ def simulate(home_code, away_code, team_stats, skaters, goalies, rosters, trials
                 "p_2plus_shots_pct": round(100 * poisson_tail(p["shots_pg"], 2), 2),
                 "p_3plus_shots_pct": round(100 * poisson_tail(p["shots_pg"], 3), 2),
                 "p_1plus_goal_pct": round(100 * poisson_tail(p["goals_pg"], 1), 2),
+                "p_2plus_goals_pct": round(100 * poisson_tail(p["goals_pg"], 2), 2),
                 "p_1plus_point_pct": round(100 * poisson_tail(p["points_pg"], 1), 2),
-                "p_1plus_assist_pct": round(100 * poisson_tail(p["assists_pg"], 1), 2)
+                "p_2plus_points_pct": round(100 * poisson_tail(p["points_pg"], 2), 2),
+                "p_1plus_assist_pct": round(100 * poisson_tail(p["assists_pg"], 1), 2),
+                "p_2plus_assists_pct": round(100 * poisson_tail(p["assists_pg"], 2), 2)
             })
     props.sort(key=lambda x: x["points_pg"], reverse=True)
 
@@ -258,6 +267,24 @@ def simulate(home_code, away_code, team_stats, skaters, goalies, rosters, trials
         "season": h.get("season", season_id()), "home": home_code, "away": away_code,
         "trials": trials, "seed": seed,
         "goal_means": {"home": round(hm, 2), "away": round(am, 2)},
+        "team_goal_markets": {
+            "home_2plus_pct": round(100 * poisson_tail(hm, 2), 2),
+            "home_3plus_pct": round(100 * poisson_tail(hm, 3), 2),
+            "home_4plus_pct": round(100 * poisson_tail(hm, 4), 2),
+            "away_2plus_pct": round(100 * poisson_tail(am, 2), 2),
+            "away_3plus_pct": round(100 * poisson_tail(am, 3), 2),
+            "away_4plus_pct": round(100 * poisson_tail(am, 4), 2)
+        },
+        "standard_total_lines": {
+            str(line): {"over_pct": round(100 * poisson_tail(hm + am, int(line) + 1), 2)}
+            for line in (4.5, 5.5, 6.5)
+        },
+        "team_shot_markets": {
+            "home_25plus_pct": round(100 * poisson_tail(max(18,(h["sf"] or 29)*.55+(a["sa"] or 29)*.45),25),2),
+            "home_30plus_pct": round(100 * poisson_tail(max(18,(h["sf"] or 29)*.55+(a["sa"] or 29)*.45),30),2),
+            "away_25plus_pct": round(100 * poisson_tail(max(18,(a["sf"] or 29)*.55+(h["sa"] or 29)*.45),25),2),
+            "away_30plus_pct": round(100 * poisson_tail(max(18,(a["sf"] or 29)*.55+(h["sa"] or 29)*.45),30),2)
+        },
         "moneyline_pct": {"home": pct(wins_h), "away": pct(wins_a)},
         "regulation_tie_pct": pct(tie),
         "puck_line_pct": {"home_minus_1_5": pct(cover_h), "away_plus_1_5": pct(cover_a)},
