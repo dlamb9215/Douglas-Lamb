@@ -276,8 +276,16 @@ def simulate(home_code, away_code, team_stats, skaters, goalies, rosters, trials
             "away_4plus_pct": round(100 * poisson_tail(am, 4), 2)
         },
         "standard_total_lines": {
-            str(line): {"over_pct": round(100 * poisson_tail(hm + am, int(line) + 1), 2)}
+            str(line): {
+                "over_pct": round(100 * poisson_tail(hm + am, int(line) + 1), 2),
+                "under_pct": round(100 * (1 - poisson_tail(hm + am, int(line) + 1)), 2)
+            }
             for line in (4.5, 5.5, 6.5)
+        },
+        "first_period_total_markets": {
+            "over_0_5_pct": round(100 * poisson_tail((hm + am) / 3, 1), 2),
+            "over_1_5_pct": round(100 * poisson_tail((hm + am) / 3, 2), 2),
+            "over_2_5_pct": round(100 * poisson_tail((hm + am) / 3, 3), 2)
         },
         "team_shot_markets": {
             "home_25plus_pct": round(100 * poisson_tail(max(18,(h["sf"] or 29)*.55+(a["sa"] or 29)*.45),25),2),
