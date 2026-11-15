@@ -86,6 +86,26 @@ def normalize_team(row):
         "pp":pp, "pk":pk, "fo":fo,
     }
 
+
+def attach_team_ranks(team_stats):
+    """Attach league ranks using the season summary rows already fetched."""
+    metrics = {
+        "goals_for_per_game": ("gf", False),
+        "goals_against_per_game": ("ga", True),
+        "shots_for_per_game": ("sf", False),
+        "shots_against_per_game": ("sa", True),
+        "power_play_pct": ("pp", False),
+        "penalty_kill_pct": ("pk", False),
+        "faceoff_win_pct": ("fo", False)
+    }
+    for label, (field, lower_is_better) in metrics.items():
+        ranked = [(code, row[field]) for code, row in team_stats.items() if row.get(field) is not None]
+        ranked.sort(key=lambda item: item[1], reverse=not lower_is_better)
+        for rank, (code, _) in enumerate(ranked, start=1):
+            team_stats[code].setdefault("rankings", {})[label] = rank
+    return team_stats
+
+
 def load_data(home, away, season):
     team_rows = stats_report("team", season, 100)
     team_stats = {t["team"]:t for t in (normalize_team(r) for r in team_rows) if t and t["team"]}
@@ -94,6 +114,7 @@ def load_data(home, away, season):
     for code in (home, away):
         if team_stats[code]["gf"] is None or team_stats[code]["ga"] is None:
             raise RuntimeError(f"Current-season goals-for/goals-against rates are incomplete for {code}.")
+    attach_team_ranks(team_stats)
     skaters = stats_report("skater", season, 1500)
     goalies = stats_report("goalie", season, 500)
     roster_data = {}
