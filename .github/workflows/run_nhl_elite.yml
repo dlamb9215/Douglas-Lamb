@@ -1,10 +1,6 @@
 name: Run Doug's Elite NHL Simulator
 
 on:
-  push:
-    paths:
-      - 'nhl/**'
-      - '.github/workflows/run_nhl_elite.yml'
   workflow_dispatch:
     inputs:
       home:
