@@ -150,95 +150,139 @@ def matchup_means(h, a):
 
 def simulate(home_code, away_code, team_stats, skaters, goalies, rosters, trials=100000,
              total=6.0, puck_line=1.5, seed=20261115, home_goalie_id=None, away_goalie_id=None):
-    if trials < 1000: raise ValueError("Use at least 1,000 trials.")
+    if trials < 1000:
+        raise ValueError("Use at least 1,000 trials.")
     h, a = team_stats[home_code], team_stats[away_code]
-    hm, am, _ = matchup_means(h,a)
-    hp, hg = build_player_pool(home_code,rosters[home_code],skaters,goalies)
-    ap, ag = build_player_pool(away_code,rosters[away_code],skaters,goalies)
+    hm, am, _ = matchup_means(h, a)
+    hp, hg = build_player_pool(home_code, rosters[home_code], skaters, goalies)
+    ap, ag = build_player_pool(away_code, rosters[away_code], skaters, goalies)
     selected = {}
-    for code, pool, chosen in ((home_code,hg,home_goalie_id),(away_code,ag,away_goalie_id)):
-        found = next((g for g in pool if str(g["id"]) == str(chosen)),None) if chosen else None
+    for code, pool, chosen in ((home_code, hg, home_goalie_id), (away_code, ag, away_goalie_id)):
+        found = next((g for g in pool if str(g["id"]) == str(chosen)), None) if chosen else None
         selected[code] = found or (pool[0] if pool else None)
-    # Adjust scoring using the selected goalie's season GAA relative to league baseline.
-    if selected[away_code]: hm *= max(.88,min(1.12,selected[away_code]["gaa"]/3.0))
-    if selected[home_code]: am *= max(.88,min(1.12,selected[home_code]["gaa"]/3.0))
+    if selected[away_code]:
+        hm *= max(.88, min(1.12, selected[away_code]["gaa"] / 3.0))
+    if selected[home_code]:
+        am *= max(.88, min(1.12, selected[home_code]["gaa"] / 3.0))
+
     rng = random.Random(seed)
-    wins_h=wins_a=tie=over=under=push=cover_h=cover_a=0
-    goals_h=goals_a=shots_h=shots_a=0
-    period_h=[0,0,0]; period_a=[0,0,0]
-     goalie_saves={str(g["id"]):0 for g in ([selected[home_code]] if selected[home_code] else [])+([selected[away_code]] if selected[away_code] else [])}
+    wins_h = wins_a = tie = over = under = push = cover_h = cover_a = 0
+    goals_h = goals_a = shots_h = shots_a = 0
+    period_h, period_a = [0, 0, 0], [0, 0, 0]
+    goalie_saves = {
+        str(g["id"]): 0 for g in
+        ([selected[home_code]] if selected[home_code] else []) +
+        ([selected[away_code]] if selected[away_code] else [])
+    }
+
     for _ in range(trials):
-        # Simulate each period separately so period totals reconcile to regulation score.
-        h_period=[poisson(rng,hm/3) for _ in range(3)]
-        a_period=[poisson(rng,am/3) for _ in range(3)]
-        gh,ga=sum(h_period),sum(a_period)
+        # Period-level goals add up exactly to the regulation score.
+        h_period = [poisson(rng, hm / 3) for _ in range(3)]
+        a_period = [poisson(rng, am / 3) for _ in range(3)]
+        gh, ga = sum(h_period), sum(a_period)
         for i in range(3):
-            period_h[i]+=h_period[i]
-            period_a[i]+=a_period[i]
-        sh=max(gh,poisson(rng,max(18,(h["sf"] or 29)*.55+(a["sa"] or 29)*.45)))
-        sa=max(ga,poisson(rng,max(18,(a["sf"] or 29)*.55+(h["sa"] or 29)*.45)))
-        # Tied regulation games are resolved by a 52/48 home-ice OT/shootout proxy.
-        if gh==ga:
-            tie+=1
-            if rng.random()<.52: gh+=1
-            else: ga+=1
-        if gh>ga: wins_h+=1
-        else: wins_a+=1
-        margin=gh-ga
-        if margin>puck_line: cover_h+=1
-        else: cover_a+=1
-        if gh+ga>total: over+=1
-        elif gh+ga<total: under+=1
-        else: push+=1
-        goals_h+=gh; goals_a+=ga; shots_h+=sh; shots_a+=sa
-         if selected[home_code]:
-            gid=str(selected[home_code]["id"])
-            goalie_saves[gid]+=max(0,sa-ga)
+            period_h[i] += h_period[i]
+            period_a[i] += a_period[i]
+
+        sh = max(gh, poisson(rng, max(18, (h["sf"] or 29) * .55 + (a["sa"] or 29) * .45)))
+        sa = max(ga, poisson(rng, max(18, (a["sf"] or 29) * .55 + (h["sa"] or 29) * .45)))
+        # Sudden-death OT/shootout proxy; winner receives one additional goal.
+        if gh == ga:
+            tie += 1
+            if rng.random() < .52:
+                gh += 1
+            else:
+                ga += 1
+        if gh > ga:
+            wins_h += 1
+        else:
+            wins_a += 1
+        margin = gh - ga
+        if margin > puck_line:
+            cover_h += 1
+        else:
+            cover_a += 1
+        game_total = gh + ga
+        if game_total > total:
+            over += 1
+        elif game_total < total:
+            under += 1
+        else:
+            push += 1
+        goals_h += gh
+        goals_a += ga
+        shots_h += sh
+        shots_a += sa
+        if selected[home_code]:
+            gid = str(selected[home_code]["id"])
+            goalie_saves[gid] += max(0, sa - ga)
         if selected[away_code]:
-            gid=str(selected[away_code]["id"])
-            goalie_saves[gid]+=max(0,sh-gh)
-    pct=lambda n:round(100*n/trials,2)
-    props=[]
-    for d in player_counts.values():
-        p=d["player"]
-        props.append({"player":p["name"],"team":d["team"],"position":p["position"],
-          "games_sample":p["games"],"toi_min":round(p["toi_min"],1),
-          "shots_pg":round(p["shots_pg"],2),"goals_pg":round(p["goals_pg"],3),
-          "assists_pg":round(p["assists_pg"],3),"points_pg":round(p["points_pg"],3),
-          "p_1plus_shot_pct":pct(d["shots"]>=trials),"p_2plus_shots_pct":pct(0) if False else None,
-          "p_1plus_goal_pct":pct(sum(1 for _ in [])) if False else None})
-    # Exact threshold probabilities are computed analytically from each player's Poisson rate.
-    def poisson_tail(lam,k):
-        return max(0.0,1-sum(math.exp(-lam)*lam**i/math.factorial(i) for i in range(k)))
-    for item in props:
-        original=next(p for p in hp+ap if str(p["id"])==str(item["player_id"]))
-        item["p_1plus_shot_pct"]=round(100*poisson_tail(original["shots_pg"],1),2)
-        item["p_2plus_shots_pct"]=round(100*poisson_tail(original["shots_pg"],2),2)
-        item["p_3plus_shots_pct"]=round(100*poisson_tail(original["shots_pg"],3),2)
-        item["p_1plus_goal_pct"]=round(100*poisson_tail(original["goals_pg"],1),2)
-        item["p_1plus_point_pct"]=round(100*poisson_tail(original["points_pg"],1),2)
-        item["p_1plus_assist_pct"]=round(100*poisson_tail(original["assists_pg"],1),2)
-    props.sort(key=lambda x:x["points_pg"],reverse=True)
+            gid = str(selected[away_code]["id"])
+            goalie_saves[gid] += max(0, sh - gh)
+
+    pct = lambda n: round(100 * n / trials, 2)
+    def poisson_tail(lam, k):
+        return max(0.0, 1 - sum(math.exp(-lam) * lam**i / math.factorial(i) for i in range(k)))
+
+    props = []
+    for team, pool in ((home_code, hp), (away_code, ap)):
+        for p in pool:
+            props.append({
+                "player_id": p["id"], "player": p["name"], "team": team, "position": p["position"],
+                "games_sample": p["games"], "toi_min": round(p["toi_min"], 1),
+                "shots_pg": round(p["shots_pg"], 2), "goals_pg": round(p["goals_pg"], 3),
+                "assists_pg": round(p["assists_pg"], 3), "points_pg": round(p["points_pg"], 3),
+                "p_1plus_shot_pct": round(100 * poisson_tail(p["shots_pg"], 1), 2),
+                "p_2plus_shots_pct": round(100 * poisson_tail(p["shots_pg"], 2), 2),
+                "p_3plus_shots_pct": round(100 * poisson_tail(p["shots_pg"], 3), 2),
+                "p_1plus_goal_pct": round(100 * poisson_tail(p["goals_pg"], 1), 2),
+                "p_1plus_point_pct": round(100 * poisson_tail(p["points_pg"], 1), 2),
+                "p_1plus_assist_pct": round(100 * poisson_tail(p["assists_pg"], 1), 2)
+            })
+    props.sort(key=lambda x: x["points_pg"], reverse=True)
+
+    goalie_props = []
+    for gid, saves in goalie_saves.items():
+        mean = saves / trials
+        goalie_props.append({
+            "goalie_id": gid, "projected_saves": round(mean, 1),
+            "p_20plus_saves_pct": round(100 * poisson_tail(mean, 20), 2),
+            "p_25plus_saves_pct": round(100 * poisson_tail(mean, 25), 2),
+            "p_30plus_saves_pct": round(100 * poisson_tail(mean, 30), 2)
+        })
+
     return {
-      "season":h.get("season",season_id()),"home":home_code,"away":away_code,"trials":trials,"seed":seed,
-      "goal_means":{"home":round(hm,2),"away":round(am,2)},
-      "moneyline_pct":{"home":pct(wins_h),"away":pct(wins_a)},
-      "regulation_tie_pct":pct(tie),"puck_line_pct":{"home_minus_1_5":pct(cover_h),"away_plus_1_5":pct(cover_a)},
-      "total_line":total,"total_pct":{"over":pct(over),"under":pct(under),"push":pct(push)},
-      "projected_score":{"home":round(goals_h/trials,2),"away":round(goals_a/trials,2)},
-      "projected_shots":{"home":round(shots_h/trials,1),"away":round(shots_a/trials,1)},
-      "period_goals_avg":{"home":[round(x/trials,2) for x in period_h],"away":[round(x/trials,2) for x in period_a]},
-      "goalies":{c:{"selected":selected[c],"status":"projected from season starts; confirm official starter"} for c in (home_code,away_code)},
-      "goalie_save_props":[{"goalie_id":gid,"projected_saves":round(s/trials,1),\n        "p_20plus_saves_pct":round(100*max(0,1-sum(math.exp(-s/trials)*(s/trials)**i/math.factorial(i) for i in range(20))),2),\n        "p_25plus_saves_pct":round(100*max(0,1-sum(math.exp(-s/trials)*(s/trials)**i/math.factorial(i) for i in range(25))),2),\n        "p_30plus_saves_pct":round(100*max(0,1-sum(math.exp(-s/trials)*(s/trials)**i/math.factorial(i) for i in range(30))),2)} for gid,s in goalie_saves.items()],
-      "player_props":props,
-      "data_quality":{"home_games":h["games"],"away_games":a["games"],
-        "injuries":"Not verified by this data endpoint; check official injury report/inactives before betting.",
-        "lineups":"Current roster filtered; game-day scratches and line combinations are not guaranteed.",
-        "goalies":"Top season-start goalie is a projection, not a confirmed starter."},
-      "limitations":["Player prop distributions use independent season per-game Poisson rates; they are not correlated to game outcomes.",
-        "No proprietary expected-goals, shift-level deployment, travel/rest, or confirmed lineup adjustment is claimed.",
-        "OT winner uses a 52/48 proxy; shootout skills are not separately modeled.",
-        "No betting edge is reported without actual sportsbook odds and vig removal."]
+        "season": h.get("season", season_id()), "home": home_code, "away": away_code,
+        "trials": trials, "seed": seed,
+        "goal_means": {"home": round(hm, 2), "away": round(am, 2)},
+        "moneyline_pct": {"home": pct(wins_h), "away": pct(wins_a)},
+        "regulation_tie_pct": pct(tie),
+        "puck_line_pct": {"home_minus_1_5": pct(cover_h), "away_plus_1_5": pct(cover_a)},
+        "total_line": total, "total_pct": {"over": pct(over), "under": pct(under), "push": pct(push)},
+        "projected_score": {"home": round(goals_h / trials, 2), "away": round(goals_a / trials, 2)},
+        "projected_shots": {"home": round(shots_h / trials, 1), "away": round(shots_a / trials, 1)},
+        "period_goals_avg": {
+            "home": [round(x / trials, 2) for x in period_h],
+            "away": [round(x / trials, 2) for x in period_a]
+        },
+        "goalies": {
+            code: {"selected": selected[code], "status": "projected from season starts; confirm official starter"}
+            for code in (home_code, away_code)
+        },
+        "goalie_save_props": goalie_props, "player_props": props,
+        "data_quality": {
+            "home_games": h["games"], "away_games": a["games"],
+            "injuries": "Not verified by this data endpoint; check official injury report/inactives before betting.",
+            "lineups": "Current roster filtered; game-day scratches and line combinations are not guaranteed.",
+            "goalies": "Top season-start goalie is a projection, not a confirmed starter."
+        },
+        "limitations": [
+            "Player prop probabilities use independent Poisson approximations from season per-game rates; they are not correlated to game outcomes.",
+            "Goalie save probabilities use the simulated mean saves and a Poisson tail approximation.",
+            "No shift-level deployment, travel/rest, or confirmed lineup adjustment is claimed.",
+            "Overtime winner uses a 52/48 home-ice proxy; shootout skills are not separately modeled.",
+            "No betting edge is reported without actual sportsbook odds and vig removal."
+        ]
     }
 
 def main():
