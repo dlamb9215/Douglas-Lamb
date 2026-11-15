@@ -166,17 +166,15 @@ def simulate(home_code, away_code, team_stats, skaters, goalies, rosters, trials
     wins_h=wins_a=tie=over=under=push=cover_h=cover_a=0
     goals_h=goals_a=shots_h=shots_a=0
     period_h=[0,0,0]; period_a=[0,0,0]
-    player_counts={}
-    for p in hp+ap:
-        player_counts[str(p["id"])]={"player":p,"team":home_code if p in hp else away_code,
-            "goals":0,"assists":0,"points":0,"shots":0}
-    goalie_saves={str(g["id"]):0 for g in ([selected[home_code]] if selected[home_code] else [])+([selected[away_code]] if selected[away_code] else [])}
+     goalie_saves={str(g["id"]):0 for g in ([selected[home_code]] if selected[home_code] else [])+([selected[away_code]] if selected[away_code] else [])}
     for _ in range(trials):
-        gh,ga=poisson(rng,hm),poisson(rng,am)
-        # NHL regulation goals are allocated to periods with a slight late-period share.
+        # Simulate each period separately so period totals reconcile to regulation score.
+        h_period=[poisson(rng,hm/3) for _ in range(3)]
+        a_period=[poisson(rng,am/3) for _ in range(3)]
+        gh,ga=sum(h_period),sum(a_period)
         for i in range(3):
-            period_h[i]+=poisson(rng,hm/3)
-            period_a[i]+=poisson(rng,am/3)
+            period_h[i]+=h_period[i]
+            period_a[i]+=a_period[i]
         sh=max(gh,poisson(rng,max(18,(h["sf"] or 29)*.55+(a["sa"] or 29)*.45)))
         sa=max(ga,poisson(rng,max(18,(a["sf"] or 29)*.55+(h["sa"] or 29)*.45)))
         # Tied regulation games are resolved by a 52/48 home-ice OT/shootout proxy.
@@ -193,14 +191,7 @@ def simulate(home_code, away_code, team_stats, skaters, goalies, rosters, trials
         elif gh+ga<total: under+=1
         else: push+=1
         goals_h+=gh; goals_a+=ga; shots_h+=sh; shots_a+=sa
-        # Player prop distributions are independent Poisson approximations from season per-game rates.
-        # Workload is softly scaled to team goal/shot environment; no player line is invented.
-        for p in hp+ap:
-            d=player_counts[str(p["id"])]
-            g=poisson(rng,p["goals_pg"]); ast=poisson(rng,p["assists_pg"])
-            sog=poisson(rng,p["shots_pg"])
-            d["goals"]+=g; d["assists"]+=ast; d["points"]+=g+ast; d["shots"]+=sog
-        if selected[home_code]:
+         if selected[home_code]:
             gid=str(selected[home_code]["id"])
             goalie_saves[gid]+=max(0,sa-ga)
         if selected[away_code]:
@@ -220,7 +211,7 @@ def simulate(home_code, away_code, team_stats, skaters, goalies, rosters, trials
     def poisson_tail(lam,k):
         return max(0.0,1-sum(math.exp(-lam)*lam**i/math.factorial(i) for i in range(k)))
     for item in props:
-        original=next(p for p in hp+ap if p["name"]==item["player"] and (home_code if p in hp else away_code)==item["team"])
+        original=next(p for p in hp+ap if str(p["id"])==str(item["player_id"]))
         item["p_1plus_shot_pct"]=round(100*poisson_tail(original["shots_pg"],1),2)
         item["p_2plus_shots_pct"]=round(100*poisson_tail(original["shots_pg"],2),2)
         item["p_3plus_shots_pct"]=round(100*poisson_tail(original["shots_pg"],3),2)
