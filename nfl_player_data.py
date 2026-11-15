@@ -302,6 +302,47 @@ def build_player_pool(stat_rows, roster_rows, depth_rows, injury_rows,
             ),
         })
         pool.append(player)
+
+    # Keep active roster quarterbacks even when they have no current-season
+    # NFL stat rows yet (for example, a newly promoted rookie making a first
+    # start). Their lack of NFL production remains explicit as zero games;
+    # this only lets the pregame gate validate their active roster identity.
+    known_ids = {str(p.get("player_id") or "") for p in pool}
+    for roster in roster_rows:
+        pid = str(_first(roster, "gsis_id", "player_id") or "")
+        position = str(_first(roster, "position", "position_group") or "").upper()
+        roster_status = _norm(_first(roster, "status", "roster_status"))
+        if not pid or pid in known_ids or position != "QB" or roster_status not in {"act", "active", "1"}:
+            continue
+        depth_candidates = depth_by_id.get(pid, [])
+        depth = min(depth_candidates, key=depth_rank, default={})
+        injury = injury_by_id.get(pid, {})
+        injury_status = _status_from_injury(injury) if injury else "active"
+        depth_order = depth_rank(depth) if depth else 99
+        team = str(_first(roster, "team", "team_abbr", "club_code") or
+                   _first(depth, "team", "club_code") or "").upper()
+        name = _first(roster, "full_name", "player_name", "name", "display_name")
+        if not name:
+            continue
+        pool.append({
+            "player_id": pid, "name": name, "team": team, "position": "QB",
+            "games": 0, "weeks_in_sample": [],
+            "passing_attempts": 0.0, "completions": 0.0,
+            "passing_yards": 0.0, "passing_tds": 0.0, "interceptions": 0.0,
+            "carries": 0.0, "rushing_yards": 0.0, "rushing_tds": 0.0,
+            "targets": 0.0, "receptions": 0.0, "receiving_yards": 0.0,
+            "receiving_tds": 0.0,
+            "roster_status": roster_status, "depth_order": depth_order,
+            "depth_position": "QB", "injury_status": injury_status,
+            "injury_week": int(_first(injury, "week") or 0) if injury else None,
+            "injury_report_modified": _first(injury, "date_modified") if injury else None,
+            "practice_status": _first(injury, "practice_status") if injury else None,
+            "reported_injury": _first(injury, "report_primary_injury", "practice_primary_injury") if injury else None,
+            "status": injury_status if injury_status != "active" else "unknown",
+            "starter": False,
+            "eligibility_note": "Active roster QB with no current-season NFL stat rows; official game-day confirmation required.",
+        })
+        known_ids.add(pid)
     return pool
 
 
