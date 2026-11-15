@@ -41,6 +41,11 @@ class EliteNHLTests(unittest.TestCase):
         out=evaluate_two_way_market(60,40,-120,110)
         self.assertIn("no_vig_market_pct",out)
         self.assertGreater(out["no_vig_market_pct"]["side_a"],0)
+    def test_team_rates_from_standings_totals(self):
+        x=normalize_team({"teamAbbrev":"FLA","gamesPlayed":10,"goalsFor":35,"goalsAgainst":28})
+        self.assertEqual(x["team"],"FLA")
+        self.assertEqual(x["gf"],3.5)
+        self.assertEqual(x["ga"],2.8)
     def test_team_rates_not_fabricated(self):
         x=normalize_team({"teamAbbrev":"BOS","gamesPlayed":20})
         self.assertIsNone(x["gf"]); self.assertIsNone(x["ga"])
