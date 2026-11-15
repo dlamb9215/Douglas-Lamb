@@ -79,10 +79,10 @@ def normalize_team(row):
     if fo is not None and fo <= 1: fo *= 100
     return {
         "team":team_code(row), "games":int(gp),
-        "gf":first_num(row,["goalsForPerGame","goalsFor"],None),
-        "ga":first_num(row,["goalsAgainstPerGame","goalsAgainst"],None),
-        "sf":first_num(row,["shotsForPerGame","shotsFor"],None),
-        "sa":first_num(row,["shotsAgainstPerGame","shotsAgainst"],None),
+        "gf":first_num(row,["goalsForPerGame"],None),
+        "ga":first_num(row,["goalsAgainstPerGame"],None),
+        "sf":first_num(row,["shotsForPerGame"],None),
+        "sa":first_num(row,["shotsAgainstPerGame"],None),
         "pp":pp, "pk":pk, "fo":fo,
     }
 
