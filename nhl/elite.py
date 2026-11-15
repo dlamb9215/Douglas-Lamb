@@ -288,18 +288,52 @@ def simulate(home_code, away_code, team_stats, skaters, goalies, rosters, trials
         ]
     }
 
+
+def american_implied_probability(odds):
+    if odds is None or odds == 0:
+        return None
+    odds = float(odds)
+    if odds > 0:
+        return 100.0 / (odds + 100.0)
+    return abs(odds) / (abs(odds) + 100.0)
+
+def evaluate_two_way_market(model_a_pct, model_b_pct, odds_a, odds_b):
+    if not odds_a or not odds_b:
+        return {"status":"odds not supplied"}
+    ia, ib = american_implied_probability(odds_a), american_implied_probability(odds_b)
+    fair_a, fair_b = ia/(ia+ib), ib/(ia+ib)
+    def ev(prob, odds):
+        profit = odds/100.0 if odds > 0 else 100.0/abs(odds)
+        return round((prob*profit - (1-prob))*100, 2)
+    pa, pb = model_a_pct/100.0, model_b_pct/100.0
+    return {
+        "market_implied_pct":{"side_a":round(ia*100,2),"side_b":round(ib*100,2)},
+        "no_vig_market_pct":{"side_a":round(fair_a*100,2),"side_b":round(fair_b*100,2)},
+        "model_edge_vs_no_vig_pct_points":{"side_a":round(pa*100-fair_a*100,2),"side_b":round(pb*100-fair_b*100,2)},
+        "expected_value_per_100_stake":{"side_a":ev(pa,float(odds_a)),"side_b":ev(pb,float(odds_b))}
+    }
+
+
 def main():
     p=argparse.ArgumentParser(description="Doug's Elite NHL Simulator")
     p.add_argument("--home",required=True,choices=TEAMS); p.add_argument("--away",required=True,choices=TEAMS)
     p.add_argument("--trials",type=int,default=100000); p.add_argument("--total",type=float,default=6.0)
     p.add_argument("--puck-line",type=float,default=1.5); p.add_argument("--seed",type=int,default=20261115)
     p.add_argument("--home-goalie-id"); p.add_argument("--away-goalie-id")
+    p.add_argument("--home-ml",type=float,default=0); p.add_argument("--away-ml",type=float,default=0)
+    p.add_argument("--over-odds",type=float,default=0); p.add_argument("--under-odds",type=float,default=0)
+    p.add_argument("--home-puck-odds",type=float,default=0); p.add_argument("--away-puck-odds",type=float,default=0)
     p.add_argument("--season",type=int,default=season_id()); p.add_argument("--output",default="nhl-elite-results.json")
     args=p.parse_args()
     if args.home==args.away: p.error("Home and away must differ.")
     team,skaters,goalies,rosters=load_data(args.home,args.away,args.season)
     result=simulate(args.home,args.away,team,skaters,goalies,rosters,args.trials,args.total,args.puck_line,args.seed,args.home_goalie_id,args.away_goalie_id)
     result["team_stats"]={c:team[c] for c in (args.home,args.away)}
+    result["sportsbook_comparison"]={
+      "moneyline":evaluate_two_way_market(result["moneyline_pct"]["home"],result["moneyline_pct"]["away"],args.home_ml,args.away_ml),
+      "game_total":evaluate_two_way_market(result["total_pct"]["over"]*100/(result["total_pct"]["over"]+result["total_pct"]["under"]) if result["total_pct"]["over"]+result["total_pct"]["under"] else 0,result["total_pct"]["under"]*100/(result["total_pct"]["over"]+result["total_pct"]["under"]) if result["total_pct"]["over"]+result["total_pct"]["under"] else 0,args.over_odds,args.under_odds),
+      "puck_line":evaluate_two_way_market(result["puck_line_pct"]["home_minus_1_5"],result["puck_line_pct"]["away_plus_1_5"],args.home_puck_odds,args.away_puck_odds)
+    }
     with open(args.output,"w",encoding="utf-8") as f: json.dump(result,f,indent=2)
     print(json.dumps(result,indent=2))
 
