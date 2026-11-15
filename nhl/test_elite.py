@@ -1,5 +1,5 @@
 import unittest
-from nhl.elite import season_id, normalize_team, matchup_means, poisson, simulate, TEAMS, evaluate_two_way_market
+from nhl.elite import season_id, normalize_team, matchup_means, poisson, simulate, TEAMS, evaluate_two_way_market, attach_team_ranks
 
 class EliteNHLTests(unittest.TestCase):
     def setUp(self):
@@ -15,6 +15,10 @@ class EliteNHLTests(unittest.TestCase):
     def test_normalize_team(self):
         x=normalize_team({"teamAbbrev":"BOS","gamesPlayed":20,"goalsForPerGame":3.1,"goalsAgainstPerGame":2.8})
         self.assertEqual(x["team"],"BOS"); self.assertEqual(x["games"],20)
+    def test_team_rankings_attach(self):
+        attach_team_ranks(self.teams)
+        self.assertIn("goals_for_per_game",self.teams["BOS"]["rankings"])
+        self.assertEqual(self.teams["BOS"]["rankings"]["goals_for_per_game"],2)
     def test_goal_means_positive(self):
         h,a,_=matchup_means(self.teams["BOS"],self.teams["FLA"])
         self.assertGreater(h,0); self.assertGreater(a,0)
@@ -30,6 +34,9 @@ class EliteNHLTests(unittest.TestCase):
         self.assertAlmostEqual(out["moneyline_pct"]["home"]+out["moneyline_pct"]["away"],100.0)
         self.assertGreaterEqual(out["total_pct"]["over"],0)
         self.assertLessEqual(out["total_pct"]["over"],100)
+    def test_invalid_selected_goalie_rejected(self):
+        with self.assertRaises(ValueError):
+            simulate("BOS","FLA",self.teams,[],[],self.rosters,trials=1000,home_goalie_id="invalid")
     def test_no_vig_odds_comparison(self):
         out=evaluate_two_way_market(60,40,-120,110)
         self.assertIn("no_vig_market_pct",out)
