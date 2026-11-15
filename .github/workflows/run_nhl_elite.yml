@@ -101,11 +101,14 @@ jobs:
           AWAY_GOALIE_ID: ${{ inputs.away_goalie_id }}
           EXCLUDED_PLAYER_IDS: ${{ inputs.excluded_player_ids }}
         run: |
+          set -euo pipefail
           ARGS=""
           if [ -n "$HOME_GOALIE_ID" ]; then ARGS="$ARGS --home-goalie-id $HOME_GOALIE_ID"; fi
           if [ -n "$AWAY_GOALIE_ID" ]; then ARGS="$ARGS --away-goalie-id $AWAY_GOALIE_ID"; fi
           if [ -n "$EXCLUDED_PLAYER_IDS" ]; then ARGS="$ARGS --exclude-player-ids $EXCLUDED_PLAYER_IDS"; fi
           python -m nhl.elite --home "${{ inputs.home }}" --away "${{ inputs.away }}" --trials "${{ inputs.trials }}" --total "${{ inputs.total }}" --seed "${{ inputs.seed }}" --home-ml "${{ inputs.home_ml }}" --away-ml "${{ inputs.away_ml }}" --over-odds "${{ inputs.over_odds }}" --under-odds "${{ inputs.under_odds }}" --home-puck-odds "${{ inputs.home_puck_odds }}" --away-puck-odds "${{ inputs.away_puck_odds }}" $ARGS | tee nhl-elite-results.txt
+          test -s nhl-elite-results.json
+          test -s nhl-elite-results.txt
       - name: Upload simulation results
         uses: actions/upload-artifact@v4
         with:
