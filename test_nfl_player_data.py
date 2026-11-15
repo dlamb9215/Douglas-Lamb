@@ -80,6 +80,24 @@ class TestNFLPlayerData(unittest.TestCase):
         )[0]
         self.assertFalse(player["starter"])
 
+    def test_active_roster_qb_without_current_stats_is_retained(self):
+        rosters = self.rosters + [{
+            "gsis_id": "QB2", "status": "ACT", "position": "QB",
+            "full_name": "Kyle McCord", "team": "MIA",
+        }]
+        depth = self.depth + [{
+            "gsis_id": "QB2", "team": "MIA", "dt": "2026-11-14T12:00:00Z",
+            "pos_abb": "QB", "pos_rank": "1",
+        }]
+        players = build_player_pool(
+            self.stats, rosters, depth, self.injuries, 2026, 5, self.snaps
+        )
+        qb = next(p for p in players if p["name"] == "Kyle McCord")
+        self.assertEqual(qb["team"], "MIA")
+        self.assertEqual(qb["roster_status"], "act")
+        self.assertEqual(qb["games"], 0)
+        self.assertEqual(qb["depth_order"], 1)
+
     def test_non_active_roster_player_is_blocked(self):
         self.rosters[0]["status"] = "RES"
         player = build_player_pool(
