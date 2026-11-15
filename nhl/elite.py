@@ -74,8 +74,8 @@ def normalize_team(row):
     gp = first_num(row, ["gamesPlayed", "games_played"], 0) or 0
     if not code or gp <= 0:
         return None
-    gf_total = first_num(row, ["goalsFor", "goals_for"], None)
-    ga_total = first_num(row, ["goalsAgainst", "goals_against"], None)
+    gf_total = first_num(row, ["goalFor", "goalsFor", "goals_for"], None)
+    ga_total = first_num(row, ["goalAgainst", "goalsAgainst", "goals_against"], None)
     gf = gf_total / gp if gf_total is not None else first_num(row, ["goalsForPerGame"], None)
     ga = ga_total / gp if ga_total is not None else first_num(row, ["goalsAgainstPerGame"], None)
     return {
