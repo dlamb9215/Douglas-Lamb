@@ -78,13 +78,34 @@ def build_pregame_report(pool, home, away, max_age_hours=36, now=None, confirmed
             for p in rows
             if p.get("injury_status", "unknown") in {"out", "doubtful", "questionable"}
         ]
+
         def available(qb):
             return bool(qb and str(qb.get("roster_status", "")).lower() in {"act", "active", "1"} and qb.get("injury_status") == "active")
+
         requested_name = confirmed_qbs.get(team)
         source_url = str(qb_sources.get(team, "")).strip()
         confirmed_qb = next((p for p in qbs if requested_name and canonical_player_name(p.get("name")) == canonical_player_name(requested_name)), None)
+        # A recent trade can make the team field in nflverse lag the official
+        # team depth chart. Permit an explicitly confirmed QB only when that
+        # same player is still marked active on an NFL roster somewhere in the
+        # fresh feed and an HTTPS team source is supplied. Never invent a player
+        # record or accept a player marked inactive/out.
+        confirmation_feed_team = team if confirmed_qb else None
         if requested_name and not available(confirmed_qb):
-            raise ValueError(f"Confirmed starting QB for {team} is not an available active roster QB.")
+            cross_team_match = next(
+                (
+                    p for p in pool["players"]
+                    if p.get("position") == "QB"
+                    and canonical_player_name(p.get("name")) == canonical_player_name(requested_name)
+                    and available(p)
+                ),
+                None,
+            )
+            if cross_team_match:
+                confirmed_qb = cross_team_match
+                confirmation_feed_team = canonical_player_team(cross_team_match.get("team"))
+        if requested_name and not available(confirmed_qb):
+            raise ValueError(f"Confirmed starting QB for {team} is not an available active roster QB in the fresh feed.")
         if requested_name and not source_url.startswith("https://"):
             raise ValueError(f"Confirmed starting QB for {team} requires an HTTPS source.")
         qb1 = confirmed_qb or next((p for p in qbs if p.get("depth_order") == 1), None)
@@ -109,6 +130,7 @@ def build_pregame_report(pool, home, away, max_age_hours=36, now=None, confirmed
             "projected_qb1_available_in_feed": qb1_ready,
             "quarterback_confirmation_method": "official_source_override" if confirmed_qb else "depth_chart_feed",
             "quarterback_confirmation_source": source_url if confirmed_qb else None,
+            "quarterback_confirmation_feed_team": confirmation_feed_team if confirmed_qb else None,
             "reported_injuries": injury_rows,
             "official_game_day_inactives_confirmed": False,
             "official_starting_quarterback_confirmed": bool(confirmed_qb),
@@ -192,6 +214,8 @@ def main():
         print(f"{team}: {details['player_records']} player records; {len(details['reported_injuries'])} reported injury designations")
         print(f"  QB depth chart: {details['quarterback_depth_chart']}")
         print(f"  Selected QB: {details['projected_qb1']} | official confirmation: {details['official_starting_quarterback_confirmed']}")
+        if details.get("quarterback_confirmation_feed_team") not in (None, team):
+            print(f"  NOTE: confirmed QB roster feed still lists {details['quarterback_confirmation_feed_team']}; official team source override applied.")
     print(f"Team simulation ready: {report['team_simulation_ready']}")
     for blocker in report["team_simulation_blockers"]:
         print(f"BLOCKER: {blocker}")
