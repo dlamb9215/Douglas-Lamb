@@ -51,6 +51,13 @@ class PregameContextTests(unittest.TestCase):
         self.assertEqual(report["teams"]["BAL"]["projected_qb1"],"QB Backup")
         self.assertTrue(report["teams"]["BAL"]["official_starting_quarterback_confirmed"])
 
+    def test_official_trade_override_accepts_active_qb_still_tagged_to_previous_team(self):
+        self.pool["players"].append({"team":"LV","name":"Traded QB","position":"QB","depth_order":1,"roster_status":"active","injury_status":"active"})
+        report=build_pregame_report(self.pool,"BAL","JAX",now=self.now,confirmed_qbs={"BAL":"Traded QB"},qb_sources={"BAL":"https://www.example.com/team"})
+        self.assertTrue(report["team_simulation_ready"])
+        self.assertEqual(report["teams"]["BAL"]["projected_qb1"],"Traded QB")
+        self.assertEqual(report["teams"]["BAL"]["quarterback_confirmation_feed_team"],"LV")
+
     def test_official_qb_override_rejects_unavailable_or_unsourced_player(self):
         with self.assertRaisesRegex(ValueError,"available active roster QB"):
             build_pregame_report(self.pool,"BAL","JAX",now=self.now,confirmed_qbs={"BAL":"Not A Player"},qb_sources={"BAL":"https://www.example.com/team"})
@@ -81,5 +88,7 @@ class PregameContextTests(unittest.TestCase):
         report = build_pregame_report(self.pool, "LAR", "JAX", now=self.now)
         self.assertTrue(report["team_simulation_ready"])
         self.assertEqual(report["teams"]["LAR"]["projected_qb1"], "Rams QB")
+
+
 if __name__ == "__main__":
     unittest.main()
