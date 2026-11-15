@@ -87,6 +87,9 @@ def load_data(home, away, season):
     team_stats = {t["team"]:t for t in (normalize_team(r) for r in team_rows) if t and t["team"]}
     if home not in team_stats or away not in team_stats:
         raise RuntimeError(f"Missing current-season team stats for {home} or {away}; no fallback data will be substituted.")
+    for code in (home, away):
+        if team_stats[code]["gf"] is None or team_stats[code]["ga"] is None:
+            raise RuntimeError(f"Current-season goals-for/goals-against rates are incomplete for {code}.")
     skaters = stats_report("skater", season, 1500)
     goalies = stats_report("goalie", season, 500)
     roster_data = {}
@@ -99,7 +102,7 @@ def build_player_pool(code, roster, skater_rows, goalie_rows):
     for group in ("forwards","defensemen"):
         for p in roster.get(group, []) or []:
             pid = player_id(p)
-            if pid: active[str(pid)] = {"id":pid,"name":player_name(p),"position":group[:-1].upper() if group.endswith("s") else group.upper()}
+            if pid: active[str(pid)] = {"id":pid,"name":player_name(p),"position":"F" if group == "forwards" else "D"}
     # API may expose roster group as goalies; goalie props are handled separately.
     skaters = []
     for row in skater_rows:
