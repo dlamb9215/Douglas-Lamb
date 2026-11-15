@@ -8,7 +8,7 @@
 4. Leave trials at 100,000 for the default run, or choose 250,000, 500,000, 1,000,000, or 5,000,000.
 5. Enter the current sportsbook game total and optional American odds. Enter 0 for odds you do not have.
 6. If confirmed starting goalies are known, enter their NHL player IDs. Otherwise the model selects the goalie with the strongest season-start sample and labels it as projected, not confirmed.
-7. Launch the workflow. Download the `dougs-elite-nhl-results" artifact after it completes.
+7. Optionally enter comma-separated player IDs for confirmed scratches/inactives to exclude. Launch the workflow. Download the `dougs-elite-nhl-results" artifact after it completes.
 
 ## Model inputs
 
@@ -27,7 +27,7 @@ The workflow fetches current-season team, skater, goalie, and roster information
 
 ## Important limitations
 
-This is an auditable team/player statistical baseline, not a claim of guaranteed betting advantage. Skater props use independent Poisson approximations from season per-game rates and are not correlated to the simulated team score. Goalie selection is based on season starts unless a player ID is manually supplied. The current roster endpoint does not confirm game-day scratches, injuries, line combinations, or official starting goalies. Verify official team reports and sportsbook prices before placing bets. Overtime/shootout is represented by a 52/48 home-ice proxy. No player prop odds are supplied automatically.
+This is an auditable team/player statistical baseline, not a claim of guaranteed betting advantage. Skater props use independent Poisson approximations from season per-game rates and are not correlated to the simulated team score. Goalie selection is based on season starts unless a player ID is manually supplied. The current roster endpoint does not confirm game-day scratches, injuries, line combinations, or official starting goalies. You can manually exclude known inactive player IDs at launch. Verify official team reports and sportsbook prices before placing bets. Overtime/shootout is represented by a 52/48 home-ice proxy. No player prop odds are supplied automatically.
 
 ## Tests
 
