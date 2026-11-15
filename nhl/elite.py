@@ -101,12 +101,13 @@ def load_data(home, away, season):
         roster_data[code] = get_json(f"{WEB}/roster/{code}/current")
     return team_stats, skaters, goalies, roster_data
 
-def build_player_pool(code, roster, skater_rows, goalie_rows):
+def build_player_pool(code, roster, skater_rows, goalie_rows, excluded_ids=None):
+    excluded_ids = {str(x) for x in (excluded_ids or [])}
     active = {}
     for group in ("forwards","defensemen"):
         for p in roster.get(group, []) or []:
             pid = player_id(p)
-            if pid: active[str(pid)] = {"id":pid,"name":player_name(p),"position":"F" if group == "forwards" else "D"}
+            if pid and str(pid) not in excluded_ids: active[str(pid)] = {"id":pid,"name":player_name(p),"position":"F" if group == "forwards" else "D"}
     # API may expose roster group as goalies; goalie props are handled separately.
     skaters = []
     for row in skater_rows:
@@ -126,7 +127,7 @@ def build_player_pool(code, roster, skater_rows, goalie_rows):
             "toi_min":(first_num(row,["timeOnIcePerGame","avgTimeOnIce"],0) or 0)/60,
         })
     goalies = []
-    roster_goalies = {str(player_id(p)):p for p in (roster.get("goalies",[]) or []) if player_id(p)}
+    roster_goalies = {str(player_id(p)):p for p in (roster.get("goalies",[]) or []) if player_id(p) and str(player_id(p)) not in excluded_ids}
     for row in goalie_rows:
         pid = player_id(row)
         if team_code(row) != code or not pid or str(pid) not in roster_goalies: continue
@@ -158,13 +159,13 @@ def matchup_means(h, a):
     return max(.5,home), max(.5,away), league_gf
 
 def simulate(home_code, away_code, team_stats, skaters, goalies, rosters, trials=100000,
-             total=6.0, puck_line=1.5, seed=20261115, home_goalie_id=None, away_goalie_id=None):
+             total=6.0, puck_line=1.5, seed=20261115, home_goalie_id=None, away_goalie_id=None, excluded_ids=None):
     if trials < 1000:
         raise ValueError("Use at least 1,000 trials.")
     h, a = team_stats[home_code], team_stats[away_code]
     hm, am, _ = matchup_means(h, a)
-    hp, hg = build_player_pool(home_code, rosters[home_code], skaters, goalies)
-    ap, ag = build_player_pool(away_code, rosters[away_code], skaters, goalies)
+    hp, hg = build_player_pool(home_code, rosters[home_code], skaters, goalies, excluded_ids)
+    ap, ag = build_player_pool(away_code, rosters[away_code], skaters, goalies, excluded_ids)
     selected = {}
     for code, pool, chosen in ((home_code, hg, home_goalie_id), (away_code, ag, away_goalie_id)):
         found = next((g for g in pool if str(g["id"]) == str(chosen)), None) if chosen else None
@@ -361,6 +362,7 @@ def main():
     p.add_argument("--trials",type=int,default=100000); p.add_argument("--total",type=float,default=6.0)
     p.add_argument("--puck-line",type=float,default=1.5); p.add_argument("--seed",type=int,default=20261115)
     p.add_argument("--home-goalie-id"); p.add_argument("--away-goalie-id")
+    p.add_argument("--exclude-player-ids",default="",help="Comma-separated NHL player IDs to exclude from projections")
     p.add_argument("--home-ml",type=float,default=0); p.add_argument("--away-ml",type=float,default=0)
     p.add_argument("--over-odds",type=float,default=0); p.add_argument("--under-odds",type=float,default=0)
     p.add_argument("--home-puck-odds",type=float,default=0); p.add_argument("--away-puck-odds",type=float,default=0)
@@ -368,7 +370,8 @@ def main():
     args=p.parse_args()
     if args.home==args.away: p.error("Home and away must differ.")
     team,skaters,goalies,rosters=load_data(args.home,args.away,args.season)
-    result=simulate(args.home,args.away,team,skaters,goalies,rosters,args.trials,args.total,args.puck_line,args.seed,args.home_goalie_id,args.away_goalie_id)
+    excluded=[x.strip() for x in args.exclude_player_ids.split(",") if x.strip()]
+    result=simulate(args.home,args.away,team,skaters,goalies,rosters,args.trials,args.total,args.puck_line,args.seed,args.home_goalie_id,args.away_goalie_id,excluded)
     result["team_stats"]={c:team[c] for c in (args.home,args.away)}
     result["sportsbook_comparison"]={
       "moneyline":evaluate_two_way_market(result["moneyline_pct"]["home"],result["moneyline_pct"]["away"],args.home_ml,args.away_ml),
