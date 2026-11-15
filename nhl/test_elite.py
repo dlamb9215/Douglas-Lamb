@@ -1,5 +1,5 @@
 import unittest
-from nhl.elite import season_id, normalize_team, matchup_means, poisson, simulate, TEAMS
+from nhl.elite import season_id, normalize_team, matchup_means, poisson, simulate, TEAMS, evaluate_two_way_market
 
 class EliteNHLTests(unittest.TestCase):
     def setUp(self):
@@ -30,6 +30,10 @@ class EliteNHLTests(unittest.TestCase):
         self.assertAlmostEqual(out["moneyline_pct"]["home"]+out["moneyline_pct"]["away"],100.0)
         self.assertGreaterEqual(out["total_pct"]["over"],0)
         self.assertLessEqual(out["total_pct"]["over"],100)
+    def test_no_vig_odds_comparison(self):
+        out=evaluate_two_way_market(60,40,-120,110)
+        self.assertIn("no_vig_market_pct",out)
+        self.assertGreater(out["no_vig_market_pct"]["side_a"],0)
     def test_team_rates_not_fabricated(self):
         x=normalize_team({"teamAbbrev":"BOS","gamesPlayed":20})
         self.assertIsNone(x["gf"]); self.assertIsNone(x["ga"])
