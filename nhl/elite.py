@@ -46,9 +46,9 @@ def player_id(row):
     return row.get("playerId") or row.get("player_id") or row.get("id")
 
 def player_name(row):
-    full = row.get(" skaterFullName") or row.get(" skaterFullName")
+    full = row.get("skaterFullName") or row.get("playerName")
     if full: return str(full).strip()
-    first, last = row.get(" skaterFirstName") or row.get("firstName"), row.get(" skaterLastName") or row.get("lastName")
+    first, last = row.get("skaterFirstName") or row.get("firstName"), row.get("skaterLastName") or row.get("lastName")
     if isinstance(first, dict): first = first.get("default")
     if isinstance(last, dict): last = last.get("default")
     return " ".join(str(x) for x in (first,last) if x) or str(row.get("playerName") or player_id(row) or "Unknown")
@@ -188,7 +188,7 @@ def simulate(home_code, away_code, team_stats, skaters, goalies, rosters, trials
         else: wins_a+=1
         margin=gh-ga
         if margin>puck_line: cover_h+=1
-        elif margin<puck_line and margin != -puck_line: cover_a+=1
+        else: cover_a+=1
         if gh+ga>total: over+=1
         elif gh+ga<total: under+=1
         else: push+=1
@@ -238,7 +238,7 @@ def simulate(home_code, away_code, team_stats, skaters, goalies, rosters, trials
       "projected_shots":{"home":round(shots_h/trials,1),"away":round(shots_a/trials,1)},
       "period_goals_avg":{"home":[round(x/trials,2) for x in period_h],"away":[round(x/trials,2) for x in period_a]},
       "goalies":{c:{"selected":selected[c],"status":"projected from season starts; confirm official starter"} for c in (home_code,away_code)},
-      "goalie_save_props":[{"goalie_id":gid,"projected_saves":round(s/trials,1)} for gid,s in goalie_saves.items()],
+      "goalie_save_props":[{"goalie_id":gid,"projected_saves":round(s/trials,1),\n        "p_20plus_saves_pct":round(100*max(0,1-sum(math.exp(-s/trials)*(s/trials)**i/math.factorial(i) for i in range(20))),2),\n        "p_25plus_saves_pct":round(100*max(0,1-sum(math.exp(-s/trials)*(s/trials)**i/math.factorial(i) for i in range(25))),2),\n        "p_30plus_saves_pct":round(100*max(0,1-sum(math.exp(-s/trials)*(s/trials)**i/math.factorial(i) for i in range(30))),2)} for gid,s in goalie_saves.items()],
       "player_props":props,
       "data_quality":{"home_games":h["games"],"away_games":a["games"],
         "injuries":"Not verified by this data endpoint; check official injury report/inactives before betting.",
