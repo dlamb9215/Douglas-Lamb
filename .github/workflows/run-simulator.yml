@@ -1,0 +1,320 @@
+name: Run Doug's Elite Game Simulator
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "main.py"
+      - "nfl_data.py"
+      - "drive_simulator.py"
+      - "update_nfl_stats.py"
+      - "nfl_player_data.py"
+      - "refresh_player_data.py"
+      - "pregame_context.py"
+      - "test_pregame_context.py"
+      - "test_nfl_player_data.py"
+      - "test_simulator.py"
+      - "calibration.py"
+      - "test_calibration.py"
+      - "test_player_prop_simulator.py"
+      - "test_matchup_player_pipeline.py"
+      - "test_game_day_confirmations.py"
+      - "player_projections.py"
+      - "player_prop_simulator.py"
+      - "matchup_player_pipeline.py"
+      - "game_day_confirmations.py"
+      - "test_nfl_forecast_ledger.py"
+      - "test_injury_exposure.py"
+      - "test_nfl_weather.py"
+      - "nfl_forecast_ledger.py"
+      - "injury_exposure.py"
+      - "nfl_weather.py"
+      - "market_data.py"
+      - "betting_engine/**"
+      - "test_market_data.py"
+  workflow_dispatch:
+    inputs:
+      home:
+        description: Home team
+        required: true
+        default: CLE
+        type: string
+      away:
+        description: Away team
+        required: true
+        default: HOU
+        type: string
+      home_qb_confirmed:
+        description: Officially confirmed home-team starting QB
+        required: false
+        default: "Deshaun Watson"
+        type: string
+      away_qb_confirmed:
+        description: Officially confirmed away-team starting QB
+        required: false
+        default: "C.J. Stroud"
+        type: string
+      trials:
+        description: Simulation trials
+        required: true
+        default: "100000"
+        type: string
+      spread:
+        description: Current sportsbook spread (home-team perspective); leave blank if unavailable
+        required: false
+        default: ""
+        type: string
+      total:
+        description: Current sportsbook total; leave blank if unavailable
+        required: false
+        default: ""
+        type: string
+      home_spread_odds:
+        description: Current home spread-side American odds
+        required: false
+        default: ""
+        type: string
+      away_spread_odds:
+        description: Current away spread-side American odds
+        required: false
+        default: ""
+        type: string
+      home_odds:
+        description: Current home moneyline American odds; leave blank if unavailable
+        required: false
+        default: ""
+        type: string
+      away_odds:
+        description: Current away moneyline American odds; leave blank if unavailable
+        required: false
+        default: ""
+        type: string
+      over_odds:
+        description: Current over American odds; leave blank if unavailable
+        required: false
+        default: ""
+        type: string
+      under_odds:
+        description: Current under American odds; leave blank if unavailable
+        required: false
+        default: ""
+        type: string
+      odds_source:
+        description: Sportsbook name/source for all supplied market lines
+        required: false
+        default: ""
+        type: string
+      odds_checked_at:
+        description: ISO-8601 timestamp with timezone for when market lines were checked
+        required: false
+        default: ""
+        type: string
+      neutral_site:
+        description: Neutral-site game; disables home-field advantage
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependencies
+        run: python -m pip install --upgrade pip numpy pypdf
+
+      - name: Refresh current-season NFL team statistics
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python update_nfl_stats.py
+
+      - name: Validate refreshed 32-team statistics
+        run: python nfl_data.py
+
+      - name: Refresh current-season player, injury, roster and depth-chart data
+        run: python refresh_player_data.py --weeks 5 --output player_pool.json
+
+      - name: Fetch matchup kickoff weather
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        env:
+          HOME_TEAM: ${{ inputs.home || 'CLE' }}
+          AWAY_TEAM: ${{ inputs.away || 'HOU' }}
+          NEUTRAL_SITE: ${{ inputs.neutral_site }}
+        run: |
+          if [[ "$NEUTRAL_SITE" == "true" ]]; then
+            python -c 'import json,os; json.dump({"available":False,"neutral_site":True,"home_team":os.environ["HOME_TEAM"],"away_team":os.environ["AWAY_TEAM"],"warning":"Neutral-site game; no outdoor weather adjustment applied."},open("nfl-weather.json","w"),indent=2)'
+          elif ! python nfl_weather.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --output nfl-weather.json; then
+            python -c 'import json,os; json.dump({"available":False,"home_team":os.environ["HOME_TEAM"],"away_team":os.environ["AWAY_TEAM"],"warning":"Weather lookup unavailable; no adjustment applied."},open("nfl-weather.json","w"),indent=2)'
+          fi
+
+      - name: Validate fresh pregame context with weather
+        if: github.event_name == 'workflow_dispatch'
+        run: python pregame_context.py --home "${{ inputs.home || 'CLE' }}" --away "${{ inputs.away || 'HOU' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "${{ inputs.home_qb_confirmed || 'Deshaun Watson' }}" --away-qb-confirmed "${{ inputs.away_qb_confirmed || 'C.J. Stroud' }}" --home-qb-source "https://www.clevelandbrowns.com/team/depth-chart/" --away-qb-source "https://www.houstontexans.com/team/depth-chart/" --output pregame-context.json
+
+      - name: Validate fresh pregame context
+        if: github.event_name != 'workflow_dispatch'
+        run: python pregame_context.py --home WAS --away LAR --input player_pool.json --output pregame-context.json
+
+      - name: Reconcile prior NFL forecasts and report calibration
+        shell: bash
+        run: |
+          if ! python nfl_forecast_ledger.py --reconcile --summary; then
+            echo "Forecast reconciliation unavailable; existing ledger retained."
+          fi
+
+      - name: Run tests
+        run: python -m unittest -v
+
+      - name: Prepare official game-day confirmation input
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          if [[ ! -f game_day_confirmations.json ]]; then
+            python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          payload = {
+              "source": "No official confirmation file supplied; placeholder only",
+              "source_url": "",
+              "checked_at_utc": datetime.now(timezone.utc).isoformat(),
+              "all_inactives_reviewed": False,
+              "players": [],
+          }
+          with open("game_day_confirmations.json", "w", encoding="utf-8") as handle:
+              json.dump(payload, handle, indent=2)
+          PY
+          fi
+
+      - name: Run matchup
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        env:
+          INPUT_SPREAD: ${{ inputs.spread }}
+          INPUT_TOTAL: ${{ inputs.total }}
+          INPUT_HOME_ODDS: ${{ inputs.home_odds }}
+          INPUT_HOME_SPREAD_ODDS: ${{ inputs.home_spread_odds }}
+          INPUT_AWAY_SPREAD_ODDS: ${{ inputs.away_spread_odds }}
+          INPUT_AWAY_ODDS: ${{ inputs.away_odds }}
+          INPUT_OVER_ODDS: ${{ inputs.over_odds }}
+          INPUT_UNDER_ODDS: ${{ inputs.under_odds }}
+          INPUT_ODDS_SOURCE: ${{ inputs.odds_source }}
+          INPUT_ODDS_CHECKED_AT: ${{ inputs.odds_checked_at }}
+        run: |
+          ARGS=(--home "${{ inputs.home || 'CLE' }}" --away "${{ inputs.away || 'HOU' }}" --trials "${{ inputs.trials || '100000' }}" --pregame-report pregame-context.json --game-day-confirmations game_day_confirmations.json)
+          HAS_MARKET_LINES=false
+          for value in "$INPUT_SPREAD" "$INPUT_TOTAL" "$INPUT_HOME_ODDS" "$INPUT_AWAY_ODDS" "$INPUT_HOME_SPREAD_ODDS" "$INPUT_AWAY_SPREAD_ODDS" "$INPUT_OVER_ODDS" "$INPUT_UNDER_ODDS"; do
+            if [[ -n "$value" ]]; then HAS_MARKET_LINES=true; fi
+          done
+          if [[ "$HAS_MARKET_LINES" == "true" && ( -z "$INPUT_ODDS_SOURCE" || -z "$INPUT_ODDS_CHECKED_AT" ) ]]; then
+            echo "WARNING: Market lines entered without sportsbook source and timezone-aware checked-at timestamp. Ignoring all market lines; continuing with the 100,000-trial matchup simulation."
+            echo "Market lines ignored: missing sportsbook source and/or timestamp." > market-data-warning.txt
+          else
+            [[ -n "$INPUT_SPREAD" ]] && ARGS+=(--spread "$INPUT_SPREAD")
+            [[ -n "$INPUT_TOTAL" ]] && ARGS+=(--total "$INPUT_TOTAL")
+            [[ -n "$INPUT_HOME_ODDS" ]] && ARGS+=(--home-odds "$INPUT_HOME_ODDS")
+            [[ -n "$INPUT_HOME_SPREAD_ODDS" ]] && ARGS+=(--home-spread-odds "$INPUT_HOME_SPREAD_ODDS")
+            [[ -n "$INPUT_AWAY_SPREAD_ODDS" ]] && ARGS+=(--away-spread-odds "$INPUT_AWAY_SPREAD_ODDS")
+            [[ -n "$INPUT_AWAY_ODDS" ]] && ARGS+=(--away-odds "$INPUT_AWAY_ODDS")
+            [[ -n "$INPUT_OVER_ODDS" ]] && ARGS+=(--over-odds "$INPUT_OVER_ODDS")
+            [[ -n "$INPUT_UNDER_ODDS" ]] && ARGS+=(--under-odds "$INPUT_UNDER_ODDS")
+            [[ -n "$INPUT_ODDS_SOURCE" ]] && ARGS+=(--odds-source "$INPUT_ODDS_SOURCE")
+            [[ -n "$INPUT_ODDS_CHECKED_AT" ]] && ARGS+=(--odds-checked-at "$INPUT_ODDS_CHECKED_AT")
+          fi
+          if [[ "${{ inputs.neutral_site }}" == "true" ]]; then ARGS+=(--neutral-site); fi
+          python main.py "${ARGS[@]}" | tee simulation-results.txt
+
+      - name: Run confirmed-starter player prop projections
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        env:
+          HOME_TEAM: ${{ inputs.home || 'CLE' }}
+          AWAY_TEAM: ${{ inputs.away || 'HOU' }}
+        run: |
+          if [[ ! -f game_day_confirmations.json ]]; then
+            python -c 'import json,os,datetime; json.dump({"source":"No official confirmation file supplied; placeholder only","checked_at_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"players":[]},open("game_day_confirmations.json","w"),indent=2)'
+          fi
+          ARGS=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --pool player_pool.json --confirmations game_day_confirmations.json --trials "${{ inputs.trials || '100000' }}" --output matchup-player-report.json)
+          if [[ -f player_prop_lines.json ]]; then ARGS+=(--lines player_prop_lines.json); fi
+          if ! python matchup_player_pipeline.py "${ARGS[@]}" > player-prop-status.txt 2>&1; then
+            echo "PLAYER PROPS BLOCKED: confirmation file is stale, invalid, or missing required data." >> player-prop-status.txt
+          fi
+
+      - name: Write readable run summary
+        if: always() && github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          {
+            echo "# Doug's Elite Game Simulator"
+            echo ""
+            echo "- Matchup: ${{ inputs.away || 'HOU' }} at ${{ inputs.home || 'CLE' }}"
+            echo "- Trials requested: ${{ inputs.trials || '100000' }}"
+            echo "- Workflow run: ${{ github.run_id }}"
+            echo ""
+            echo "## Pregame gates"
+            if [[ -f pregame-context.json ]]; then
+              python - <<'PY'
+          import json
+          d=json.load(open("pregame-context.json", encoding="utf-8"))
+          print(f"- Player data source: {d.get('source', 'unknown')}")
+          print(f"- Team simulation context available: {d.get('team_simulation_ready', False)}")
+          print("- Official game-day inactives/starters: NOT CONFIRMED by feed")
+          for item in d.get("betting_readiness_blockers", []):
+              print(f"- Betting gate: {item}")
+          PY
+            else
+              echo "- Pregame context report was not created."
+            fi
+            echo ""
+            if [[ -f market-data-warning.txt ]]; then cat market-data-warning.txt; echo ""; fi
+            echo "## Simulation output"
+            if [[ -f simulation-results.txt ]]; then
+              cat simulation-results.txt
+            else
+              echo "No simulation-results.txt was created; inspect failed workflow steps."
+            fi
+            echo ""
+            echo "## Player-prop status"
+            if [[ -f player-prop-status.txt ]]; then
+              cat player-prop-status.txt
+            else
+              echo "Player-prop pipeline did not create a status report."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Save results
+        if: always() && github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: matchup-simulation-results
+          if-no-files-found: warn
+          path: |
+            simulation-results.txt
+            pregame-context.json
+            nfl-weather.json
+            matchup-player-report.json
+            player-prop-status.txt
+            nfl_forecast_ledger.csv
+            market-data-warning.txt
+
+      - name: Persist NFL forecast ledger
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          if [[ -f nfl_forecast_ledger.csv ]] && [[ -n "$(git status --porcelain -- nfl_forecast_ledger.csv)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add nfl_forecast_ledger.csv
+            git commit -m "Record NFL matchup forecast"
+            git push
+          fi
