@@ -37,22 +37,22 @@ on:
       home:
         description: Home team
         required: true
-        default: NE
+        default: DET
         type: string
       away:
         description: Away team
         required: true
-        default: DET
+        default: NE
         type: string
       home_qb_confirmed:
         description: Officially confirmed home-team starting QB
         required: false
-        default: "Drake Maye"
+        default: "Jared Goff"
         type: string
       away_qb_confirmed:
         description: Officially confirmed away-team starting QB
         required: false
-        default: "Jared Goff"
+        default: "Drake Maye"
         type: string
       trials:
         description: Simulation trials
@@ -112,7 +112,7 @@ on:
       neutral_site:
         description: Neutral-site game; disables home-field advantage
         required: true
-        default: false
+        default: true
         type: boolean
 
 permissions:
@@ -148,16 +148,19 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         shell: bash
         env:
-          HOME_TEAM: ${{ inputs.home || 'NE' }}
-          AWAY_TEAM: ${{ inputs.away || 'DET' }}
+          HOME_TEAM: ${{ inputs.home || 'DET' }}
+          AWAY_TEAM: ${{ inputs.away || 'NE' }}
+          NEUTRAL_SITE: ${{ inputs.neutral_site }}
         run: |
-          if ! python nfl_weather.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --output nfl-weather.json; then
+          if [[ "$NEUTRAL_SITE" == "true" ]]; then
+            python -c 'import json,os; json.dump({"available":False,"neutral_site":True,"home_team":os.environ["HOME_TEAM"],"away_team":os.environ["AWAY_TEAM"],"warning":"Neutral-site Munich game; no outdoor weather adjustment applied."},open("nfl-weather.json","w"),indent=2)'
+          elif ! python nfl_weather.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --output nfl-weather.json; then
             python -c 'import json,os; json.dump({"available":False,"home_team":os.environ["HOME_TEAM"],"away_team":os.environ["AWAY_TEAM"],"warning":"Weather lookup unavailable; no adjustment applied."},open("nfl-weather.json","w"),indent=2)'
           fi
 
       - name: Validate fresh pregame context with weather
         if: github.event_name == 'workflow_dispatch'
-        run: python pregame_context.py --home "${{ inputs.home || 'NE' }}" --away "${{ inputs.away || 'DET' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "${{ inputs.home_qb_confirmed || 'Drake Maye' }}" --away-qb-confirmed "${{ inputs.away_qb_confirmed || 'Jared Goff' }}" --home-qb-source "https://www.patriots.com/team/depth-chart/" --away-qb-source "https://www.detroitlions.com/team/depth-chart/" --output pregame-context.json
+        run: python pregame_context.py --home "${{ inputs.home || 'DET' }}" --away "${{ inputs.away || 'NE' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "${{ inputs.home_qb_confirmed || 'Jared Goff' }}" --away-qb-confirmed "${{ inputs.away_qb_confirmed || 'Drake Maye' }}" --home-qb-source "https://www.detroitlions.com/team/depth-chart/" --away-qb-source "https://www.patriots.com/team/depth-chart/" --output pregame-context.json
 
       - name: Validate fresh pregame context
         if: github.event_name != 'workflow_dispatch'
@@ -254,7 +257,7 @@ jobs:
           {
             echo "# Doug's Elite Game Simulator"
             echo ""
-            echo "- Matchup: ${{ inputs.away || 'DET' }} at ${{ inputs.home || 'NE' }}"
+            echo "- Matchup: ${{ inputs.away || 'NE' }} at ${{ inputs.home || 'DET' }}"
             echo "- Trials requested: ${{ inputs.trials || '100000' }}"
             echo "- Workflow run: ${{ github.run_id }}"
             echo ""
