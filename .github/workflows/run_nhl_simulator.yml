@@ -1,4 +1,4 @@
-name: Run Doug's Elite NHL Simulator
+name: LEGACY - NHL Simulator v1 (do not launch)
 
 on:
   workflow_dispatch:
