@@ -8,13 +8,13 @@ on:
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: PHI
+        default: NYR
       away:
         description: Away team
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: EDM
+        default: MTL
       trials:
         description: Monte Carlo trials
         required: true
@@ -29,7 +29,7 @@ on:
       seed:
         description: Reproducible seed
         required: true
-        default: "20261115"
+        default: "20261116"
         type: string
       home_goalie_id:
         description: Optional confirmed home goalie NHL player ID
