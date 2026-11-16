@@ -17,7 +17,7 @@ from typing import Any
 from nba.data_quality import validate_payload
 from nba.injuries import fetch_official_injuries
 from nba.schedule import build_context
-from nba.player_props import validate_game_availability, fetch_roster
+from nba.player_props import validate_game_availability, validate_lineup_roster_membership, fetch_roster
 from nba.odds import matchup_odds
 from nba.espn_odds import fetch_espn_bet_odds
 
@@ -214,10 +214,25 @@ def build_report(home: str, away: str, game_date: date, team_stats_path: str = "
         try:
             lineup = json.loads(Path(lineup_path).read_text(encoding="utf-8"))
             valid, reason = validate_game_availability(lineup, [home_code, away_code])
+            roster_checks = {}
+            if valid:
+                for code in (home_code, away_code):
+                    roster = fetch_roster(code)
+                    roster_checks[code] = validate_lineup_roster_membership(
+                        lineup.get("teams", {}).get(code, {}), roster
+                    )
+                invalid_rosters = {code: detail[1] for code, detail in roster_checks.items() if not detail[0]}
+                if invalid_rosters:
+                    valid = False
+                    reason = "lineup starters do not match current team rosters: " + "; ".join(
+                        f"{code}: {detail}" for code, detail in invalid_rosters.items()
+                    )
             report["sources"]["lineups"] = {
                 "status": "confirmed" if valid else "incomplete",
                 "provider": lineup.get("source"), "confirmed_at": lineup.get("confirmed_at"),
                 "validation": reason,
+                "roster_validation": {code: {"passed": detail[0], "detail": detail[1]}
+                                      for code, detail in roster_checks.items()},
             }
             report["readiness"]["confirmed_lineups"] = valid
         except Exception as exc:
