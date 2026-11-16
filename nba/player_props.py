@@ -66,6 +66,26 @@ def validate_lineup_context(payload: dict[str, Any] | None, required_teams: list
     return True, "confirmed lineup input validated"
 
 
+def validate_lineup_roster_membership(lineup: dict[str, Any], roster: list[dict[str, Any]]) -> tuple[bool, str]:
+    """Require exactly five confirmed starters, all present on the requested team's roster."""
+    roster_names = {
+        " ".join(re.findall(r"[a-z0-9]+", str(player.get("name", "")).casefold()))
+        for player in roster if player.get("name")
+    }
+    starters = [(str(name), entry) for name, entry in lineup.items()
+                if isinstance(entry, dict) and entry.get("starter") is True]
+    if len(starters) != 5:
+        return False, f"expected exactly five named starters, found {len(starters)}"
+    mismatches = []
+    for name, entry in starters:
+        key = " ".join(re.findall(r"[a-z0-9]+", name.casefold()))
+        if key not in roster_names:
+            mismatches.append(name)
+    if mismatches:
+        return False, "starter(s) absent from current team roster: " + ", ".join(mismatches)
+    return True, "all five confirmed starters match the current team roster"
+
+
 def validate_game_availability(payload: dict[str, Any] | None, required_teams: list[str],
                                 now: datetime | None = None) -> tuple[bool, str]:
     """Require five explicitly confirmed available starters for each team."""
@@ -432,6 +452,11 @@ def build_matchup_player_projections(home: str, away: str, game_date: date, seas
         roster = fetch_roster(team_code)
         projections = []
         lineup = confirmed_lineups["teams"].get(team_code, {})
+        roster_ok, roster_reason = validate_lineup_roster_membership(lineup, roster)
+        if not roster_ok:
+            warnings.append(f"Player props withheld for {team_code}: lineup/roster validation failed ({roster_reason}).")
+            teams[team_code] = []
+            continue
         for player in roster:
             if not player["active"]:
                 continue
