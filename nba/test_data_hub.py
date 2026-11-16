@@ -59,6 +59,16 @@ class TestNBADataHub(unittest.TestCase):
         self.assertTrue(report["readiness"]["official_injuries"])
         self.assertTrue(report["readiness"]["confirmed_lineups"])
 
+    def test_injury_roster_mismatch_blocks_official_injury_readiness(self):
+        from nba.data_hub import validate_injury_roster_consistency
+        statuses = [{"team": "MEM", "player": "Wrong Team Player", "status": "Out"}]
+        with patch("nba.data_hub.fetch_roster", side_effect=[
+            [{"name": "Memphis Player"}], [{"name": "Washington Player"}]
+        ]):
+            result = validate_injury_roster_consistency(statuses, ("MEM", "WSH"))
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(result["mismatches"][0]["player"], "Wrong Team Player")
+
     def test_bad_team_codes_rejected(self):
         with self.assertRaisesRegex(ValueError, "recognized NBA"):
             build_report("XXX", "DET", date(2026, 11, 12))
