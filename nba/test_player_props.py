@@ -24,6 +24,16 @@ class TestNBAPlayerProps(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "roster team mismatch"):
                 fetch_roster("WSH")
 
+    def test_roster_endpoint_accepts_espn_canonical_alias(self):
+        from unittest.mock import patch
+        from nba.player_props import fetch_roster
+        with patch("nba.player_props._get_json", return_value={
+            "team": {"abbreviation": "WSH"},
+            "athletes": [{"id": "1", "fullName": "Example Player"}],
+        }):
+            roster = fetch_roster("WSH")
+        self.assertEqual(roster[0]["team_code"], "WSH")
+
     def test_parse_gamelog_from_espn_v3_shape(self):
         payload = {
             "labels": ["MIN", "FG", "3PT", "FT", "REB", "AST", "STL", "BLK", "PTS"],
