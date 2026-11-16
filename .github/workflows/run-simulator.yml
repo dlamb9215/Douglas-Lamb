@@ -52,7 +52,7 @@ on:
       away_qb_confirmed:
         description: Officially confirmed away-team starting QB
         required: false
-        default: ""
+        default: "Justin Herbert"
         type: string
       trials:
         description: Simulation trials
