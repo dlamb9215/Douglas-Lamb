@@ -148,10 +148,11 @@ def fetch_roster(team: str) -> list[dict[str, Any]]:
     # team slug. Never silently attach those players to the requested team.
     root_team = payload.get("team") if isinstance(payload.get("team"), dict) else {}
     returned_code = str(root_team.get("abbreviation") or root_team.get("shortDisplayName") or "").upper()
-    expected_espn_code = ALIASES.get(requested, requested)
-    if returned_code and returned_code != expected_espn_code:
+    expected_codes = {requested, ALIASES.get(requested, requested)}
+    if returned_code and returned_code not in expected_codes:
+        expected_label = "/".join(sorted(expected_codes))
         raise RuntimeError(
-            f"ESPN roster team mismatch: requested {requested} ({expected_espn_code}), "
+            f"ESPN roster team mismatch: requested {requested} ({expected_label}), "
             f"received {returned_code}"
         )
     players = {}
