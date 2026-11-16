@@ -37,12 +37,12 @@ on:
       home:
         description: Home team
         required: true
-        default: "CIN"
+        default: "BAL"
         type: string
       away:
         description: Away team
         required: true
-        default: "PIT"
+        default: "LAC"
         type: string
       home_qb_confirmed:
         description: Officially confirmed home-team starting QB
@@ -160,7 +160,7 @@ jobs:
 
       - name: Validate fresh pregame context with weather
         if: github.event_name == 'workflow_dispatch'
-        run: python pregame_context.py --home "${{ inputs.home || 'CIN' }}" --away "${{ inputs.away || 'PIT' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "${{ inputs.home_qb_confirmed || '' }}" --away-qb-confirmed "${{ inputs.away_qb_confirmed || '' }}" --home-qb-source "https://www.bengals.com/team/depth-chart" --away-qb-source "https://www.steelers.com/team/depth-chart" --output pregame-context.json
+        run: python pregame_context.py --home "${{ inputs.home || 'CIN' }}" --away "${{ inputs.away || 'PIT' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "${{ inputs.home_qb_confirmed || '' }}" --away-qb-confirmed "${{ inputs.away_qb_confirmed || '' }}" --home-qb-source "https://www.baltimoreravens.com/team/depth-chart" --away-qb-source "https://www.chargers.com/team/depth-chart" --output pregame-context.json
 
       - name: Validate fresh pregame context
         if: github.event_name != 'workflow_dispatch'
