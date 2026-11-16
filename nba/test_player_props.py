@@ -14,6 +14,16 @@ class TestNBAPlayerProps(unittest.TestCase):
         found = list(_walk_players(payload))
         self.assertEqual({str(player["id"]) for player in found}, {"10", "11"})
 
+    def test_roster_endpoint_rejects_wrong_returned_team(self):
+        from unittest.mock import patch
+        from nba.player_props import fetch_roster
+        with patch("nba.player_props._get_json", return_value={
+            "team": {"abbreviation": "BOS"},
+            "athletes": [{"id": "1", "fullName": "Example Player"}],
+        }):
+            with self.assertRaisesRegex(RuntimeError, "roster team mismatch"):
+                fetch_roster("WSH")
+
     def test_parse_gamelog_from_espn_v3_shape(self):
         payload = {
             "labels": ["MIN", "FG", "3PT", "FT", "REB", "AST", "STL", "BLK", "PTS"],
