@@ -61,7 +61,7 @@ on:
       game_config_json:
         description: Optional JSON object for sportsbook prices, source/timestamp, confirmed lineups, player-prop lines, rest/travel and other settings; see BETTING_ENGINE_UPGRADE.md
         required: false
-        default: '{"auto_injuries":true,"auto_odds":true,"player_props":true,"prop_trials":50000,"seed":42}'
+        default: '{"auto_injuries":true,"auto_odds":true,"player_props":false,"seed":42,"away_injury_points":-3.5,"scenario_note":"Stephen Curry OUT; conservative estimated -3.5 point Golden State adjustment. Other listed injuries remain subject to official report; this is a scenario estimate, not a measured player-value model."}'
         type: string
 
 jobs:
