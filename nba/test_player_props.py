@@ -73,6 +73,19 @@ class TestNBAPlayerProps(unittest.TestCase):
         self.assertIsNotNone(confirmed_minutes({"confirmed": True, "status": "questionable", "minutes": 34, "minutes_sd": 2})[2])
         self.assertIsNotNone(confirmed_minutes({"confirmed": True, "status": "available", "minutes": 34, "minutes_sd": 9})[2])
 
+    def test_lineup_starters_must_match_current_team_roster(self):
+        from nba.player_props import validate_lineup_roster_membership
+        lineup = {
+            f"Player {i}": {"starter": True, "confirmed": True}
+            for i in range(5)
+        }
+        roster = [{"name": f"Player {i}"} for i in range(5)]
+        self.assertTrue(validate_lineup_roster_membership(lineup, roster)[0])
+        roster.pop()
+        self.assertFalse(validate_lineup_roster_membership(lineup, roster)[0])
+        lineup["Player 5"] = {"starter": True, "confirmed": True}
+        self.assertFalse(validate_lineup_roster_membership(lineup, roster)[0])
+
     def test_confirmed_lineup_source_and_freshness_gate(self):
         now = datetime(2026, 11, 9, 18, 0, tzinfo=timezone.utc)
         valid = {"source": "official team lineup", "confirmed_at": (now - timedelta(minutes=30)).isoformat(),
