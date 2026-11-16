@@ -39,7 +39,10 @@ class TestNBADataHub(unittest.TestCase):
             stats = Path(tmp) / "stats.json"
             stats.write_text(json.dumps({"league": "NBA"}), encoding="utf-8")
             lineup = Path(tmp) / "lineup.json"
-            lineup.write_text(json.dumps({"teams": {"GS": {}, "TOR": {}}}), encoding="utf-8")
+            lineup.write_text(json.dumps({"source": "official team lineup", "confirmed_at": "2026-11-12T12:00:00Z", "teams": {
+                code: {f"Player {i}": {"starter": True, "confirmed": True, "status": "available", "minutes": 30, "minutes_sd": 2}
+                       for i in range(5)} for code in ("GS", "TOR")
+            }}), encoding="utf-8")
             with (
                 patch("nba.data_hub.validate_payload", return_value={"ready": True, "warnings": []}),
                 patch("nba.data_hub.build_context", return_value={
@@ -52,6 +55,10 @@ class TestNBADataHub(unittest.TestCase):
                     "team_submission": {"GS": "SUBMITTED", "TOR": "SUBMITTED"}, "warnings": []
                 }),
                 patch("nba.data_hub.validate_game_availability", return_value=(True, "valid")),
+                patch("nba.data_hub.fetch_roster", side_effect=[
+                    [{"name": f"Player {i}"} for i in range(5)],
+                    [{"name": f"Player {i}"} for i in range(5)],
+                ]),
                 patch("nba.data_hub.fetch_espn_bet_odds", side_effect=RuntimeError("not posted")),
                 patch.dict(os.environ, {"ODDS_API_KEY": ""}),
             ):
