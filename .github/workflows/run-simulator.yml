@@ -47,7 +47,7 @@ on:
       home_qb_confirmed:
         description: Officially confirmed home-team starting QB
         required: false
-        default: ""
+        default: "Jacoby Brissett"
         type: string
       away_qb_confirmed:
         description: Officially confirmed away-team starting QB
@@ -160,7 +160,7 @@ jobs:
 
       - name: Validate fresh pregame context with weather
         if: github.event_name == 'workflow_dispatch'
-        run: python pregame_context.py --home "${{ inputs.home || 'CIN' }}" --away "${{ inputs.away || 'PIT' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "${{ inputs.home_qb_confirmed || '' }}" --away-qb-confirmed "${{ inputs.away_qb_confirmed || '' }}" --home-qb-source "https://www.baltimoreravens.com/team/depth-chart" --away-qb-source "https://www.chargers.com/team/depth-chart" --output pregame-context.json
+        run: python pregame_context.py --home "${{ inputs.home || 'CIN' }}" --away "${{ inputs.away || 'PIT' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "${{ inputs.home_qb_confirmed || '' }}" --away-qb-confirmed "${{ inputs.away_qb_confirmed || '' }}" --home-qb-source "https://www.baltimoreravens.com/news/game-preview-jacoby-brissett-ravens-first-start-week-10-against-chargers-monday-night-football" --away-qb-source "https://www.chargers.com/team/depth-chart" --output pregame-context.json
 
       - name: Validate fresh pregame context
         if: github.event_name != 'workflow_dispatch'
