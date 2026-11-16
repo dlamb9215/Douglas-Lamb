@@ -121,8 +121,19 @@ def _walk_players(node: Any):
             yield from _walk_players(value)
 
 def fetch_roster(team: str) -> list[dict[str, Any]]:
-    code = ALIASES.get(team.upper(), team.upper()).lower()
+    requested = team.upper()
+    code = ALIASES.get(requested, requested).lower()
     payload = _get_json(f"{SITE}/teams/{urllib.parse.quote(code)}/roster")
+    # ESPN's roster endpoint can return a valid JSON payload for an unexpected
+    # team slug. Never silently attach those players to the requested team.
+    root_team = payload.get("team") if isinstance(payload.get("team"), dict) else {}
+    returned_code = str(root_team.get("abbreviation") or root_team.get("shortDisplayName") or "").upper()
+    expected_espn_code = ALIASES.get(requested, requested)
+    if returned_code and returned_code != expected_espn_code:
+        raise RuntimeError(
+            f"ESPN roster team mismatch: requested {requested} ({expected_espn_code}), "
+            f"received {returned_code}"
+        )
     players = {}
     for raw in _walk_players(payload):
         pid = str(raw["id"])
@@ -134,6 +145,7 @@ def fetch_roster(team: str) -> list[dict[str, Any]]:
             "name": raw.get("fullName") or raw.get("displayName"),
             "position": str(position or ""),
             "active": raw.get("active", True) is not False,
+            "team_code": requested,
         }
     if not players:
         raise RuntimeError(f"ESPN roster returned no player records for {team}")
