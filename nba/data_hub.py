@@ -17,7 +17,7 @@ from typing import Any
 from nba.data_quality import validate_payload
 from nba.injuries import fetch_official_injuries
 from nba.schedule import build_context
-from nba.player_props import validate_game_availability
+from nba.player_props import validate_game_availability, fetch_roster
 from nba.odds import matchup_odds
 from nba.espn_odds import fetch_espn_bet_odds
 
@@ -40,6 +40,45 @@ TEAM_NAMES = {
     "WAS": "Washington Wizards",
 }
 
+
+
+def _person_key(value: str) -> str:
+    import re
+    tokens = re.findall(r"[a-z0-9]+", str(value).casefold())
+    while tokens and tokens[-1] in {"jr", "sr", "ii", "iii", "iv"}:
+        tokens.pop()
+    return " ".join(tokens)
+
+
+def validate_injury_roster_consistency(player_statuses: list[dict[str, Any]],
+                                       team_codes: tuple[str, str]) -> dict[str, Any]:
+    """Cross-check every parsed injury row against that team's live ESPN roster.
+
+    A mismatch is a hard data-quality failure: the player status is not trusted
+    for player-level modeling until the source/team association is corrected.
+    """
+    rosters: dict[str, set[str]] = {}
+    for code in team_codes:
+        roster = fetch_roster(code)
+        rosters[code] = {_person_key(player.get("name", "")) for player in roster if player.get("name")}
+    mismatches = []
+    unknown_teams = []
+    for row in player_statuses:
+        code = str(row.get("team", "")).upper()
+        name = str(row.get("player", "")).strip()
+        if code not in rosters:
+            unknown_teams.append({"team": code, "player": name})
+            continue
+        if _person_key(name) not in rosters[code]:
+            mismatches.append({"team": code, "player": name})
+    return {
+        "status": "passed" if not mismatches and not unknown_teams else "failed",
+        "checked_injury_rows": len(player_statuses),
+        "mismatches": mismatches,
+        "unknown_team_rows": unknown_teams,
+        "roster_provider": "ESPN current team roster",
+        "note": "Roster membership cross-check; does not establish game availability or starting status.",
+    }
 
 
 def fetch_sportradar_injuries(api_key: str) -> dict[str, Any]:
@@ -137,11 +176,32 @@ def build_report(home: str, away: str, game_date: date, team_stats_path: str = "
             "player_statuses": injuries.get("player_statuses", []),
             "official": official, "warnings": injuries.get("warnings", []),
         }
-        report["readiness"]["official_injuries"] = official and all(
+        submissions_complete = all(
             injuries.get("team_submission", {}).get(code) == "SUBMITTED"
             for code in (home_code, away_code)
         )
+        roster_check = {"status": "not_run", "checked_injury_rows": 0, "mismatches": [],
+                        "note": "No parsed injury rows required roster cross-check."}
+        if official and injuries.get("player_statuses"):
+            try:
+                roster_check = validate_injury_roster_consistency(
+                    injuries.get("player_statuses", []), (home_code, away_code)
+                )
+            except Exception as roster_error:
+                roster_check = {"status": "unavailable", "error": str(roster_error),
+                                "checked_injury_rows": 0, "mismatches": []}
+        report["sources"]["injury_roster_validation"] = roster_check
+        report["readiness"]["injury_roster_consistent"] = roster_check.get("status") in {"passed", "not_run"}
+        report["readiness"]["official_injuries"] = official and submissions_complete and report["readiness"]["injury_roster_consistent"]
         report["warnings"].extend(injuries.get("warnings", []))
+        if roster_check.get("status") == "failed":
+            report["warnings"].append(
+                "Injury-report player/team assignments failed current-roster validation; do not use those injury rows for player props or bet approval."
+            )
+        elif roster_check.get("status") == "unavailable":
+            report["warnings"].append(
+                "Could not validate injury-report player/team assignments against current rosters; player-level availability remains blocked."
+            )
         if not official:
             report["warnings"].append("Third-party injury fallback is context only; official injury confirmation is not satisfied.")
     except Exception as exc:
@@ -219,7 +279,7 @@ def build_report(home: str, away: str, game_date: date, team_stats_path: str = "
 
     report["readiness"]["bet_eligible_data"] = all(
         report["readiness"].get(key, False)
-        for key in ("team_stats", "schedule", "official_injuries", "confirmed_lineups", "two_sided_odds")
+        for key in ("team_stats", "schedule", "official_injuries", "injury_roster_consistent", "confirmed_lineups", "two_sided_odds")
     )
     report["warnings"].append("This is a data-readiness report, not proof of model accuracy or profitability. Calibration remains a separate required gate.")
     report["overall_status"] = "ready_for_review" if report["readiness"]["bet_eligible_data"] else "simulation_only_missing_inputs"
