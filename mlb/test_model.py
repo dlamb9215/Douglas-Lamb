@@ -58,6 +58,10 @@ class MLBModelTests(unittest.TestCase):
         result = simulate_one_plus_hit(0.25, 4, trials=50000, seed=17)
         self.assertLess(abs(result["simulated_probability"] - result["analytic_probability"]), 0.02)
 
+    def test_fractional_plate_appearance_simulation_matches_analytic_probability(self):
+        result = simulate_one_plus_hit(0.24, 4.35, trials=100000, seed=29)
+        self.assertLess(abs(result["simulated_probability"] - result["analytic_probability"]), 0.015)
+
 
 if __name__ == "__main__":
     unittest.main()
