@@ -51,9 +51,9 @@ Remove silent league-average fallback for required live team inputs. Require exp
 
 ## Completion checklist
 
-- [x] Initial four-sport repository audit documented on this branch\n- [x] Shared BET/PASS decision gate expanded to accept NFL, NBA, MLB and NHL labels (sport-specific integrations and validation still required)\n- [x] Legacy root NHL simulator changed to fail closed on live-data failure, with regression test\n- [x] Shared betting and NHL test suites added to general CI workflow\n- [ ] NFL audit, code review, tests and data-readiness contract complete
+- [x] Initial four-sport repository audit documented on this branch\n- [x] Shared BET/PASS decision gate expanded to accept NFL, NBA, MLB and NHL labels (sport-specific integrations and validation still required)\n- [x] Legacy root NHL simulator changed to fail closed on live-data failure, with regression test\n- [x] Shared betting and NHL test suites added to general CI workflow\n- [x] Initial MLB schedule/season-stat adapter, confirmed-lineup validator, 1+ hit baseline, tests, README and manual workflow added\n- [x] Shared two-way decision adapter tests extended to MLB and NHL; calibration remains a hard blocker\n- [ ] NFL audit, code review, tests and data-readiness contract complete
 - [ ] NBA audit, code review, tests and data-readiness contract complete
-- [ ] MLB package, workflow, tests, ledger and model complete
+- [ ] MLB package expanded with handedness/Statcast/bullpen/park features, sportsbook integration, prediction/settlement ledger and historical validation
 - [ ] NHL fail-closed behavior, goalie/lineup data, tests and ledger complete
 - [ ] Shared cross-sport odds/EV/decision layer supports NFL, NBA, MLB and NHL
 - [ ] Every sport/market has chronological backtesting and calibration review
