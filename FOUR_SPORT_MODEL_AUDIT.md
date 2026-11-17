@@ -13,7 +13,7 @@ This is an initial repository audit, not a certification of betting performance.
 | NFL | Drive-based simulator, team-stat comparison, player pipeline, game-day confirmation file, forecast ledger, market quote validation, shared BET/PASS layer | Out-of-sample calibration remains blocked; official inactives and active starters must be supplied and verified; workload inputs such as routes/red-zone usage are not consistently available |
 | NBA | Monte Carlo engine, data preflight, confirmed-lineup input contract, market adapter, prediction ledger and settlement workflow | Market-specific calibration deliberately false; lineup/minute inputs are manually supplied; official injury report and two-sided current odds required |
 | MLB | No top-level MLB package, simulator entry point, MLB-specific workflow, or MLB tests were visible in the repository root listing | Treat as an incomplete/missing standalone model until a full package, data adapters, simulation engine, tests, ledger and workflow are implemented |
-| NHL | NHL simulator and workflow, team-stat API adapter, goal/shot simulation and tests | Current code silently falls back to league-average inputs when live API data fails; README claims essential data fails closed, so implementation and documentation conflict. Goalie selection and skater props are not game-confirmed/correlated; no unified decision/calibration ledger observed |
+| NHL | Dedicated `nhl/elite.py` and `nhl/simulator.py` package, current-season NHL API data, team-level Monte Carlo, optional goalie selection, workflow and tests | Current elite model is primarily team-level; roster-season goalie selection is not the same as a confirmed game starter, skater props are not correlated with team score, and there is no NHL historical calibration ledger or shared BET/PASS integration |
 
 ## Confirmed repository findings
 
@@ -51,7 +51,7 @@ Remove silent league-average fallback for required live team inputs. Require exp
 
 ## Completion checklist
 
-- [ ] NFL audit, code review, tests and data-readiness contract complete
+- [x] Initial four-sport repository audit documented on this branch\n- [x] Shared BET/PASS decision gate expanded to accept NFL, NBA, MLB and NHL labels (sport-specific integrations and validation still required)\n- [x] Legacy root NHL simulator changed to fail closed on live-data failure, with regression test\n- [x] Shared betting and NHL test suites added to general CI workflow\n- [ ] NFL audit, code review, tests and data-readiness contract complete
 - [ ] NBA audit, code review, tests and data-readiness contract complete
 - [ ] MLB package, workflow, tests, ledger and model complete
 - [ ] NHL fail-closed behavior, goalie/lineup data, tests and ledger complete
