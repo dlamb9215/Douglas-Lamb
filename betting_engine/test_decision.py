@@ -57,6 +57,17 @@ class BettingDecisionTests(unittest.TestCase):
         rows = rank_candidates([replace(self.base, quoted_at="")], now=self.now)
         self.assertEqual(rows[0]["decision"], "PASS")
 
+    def test_shared_decision_gate_accepts_all_four_sports(self):
+        from dataclasses import replace
+        for sport in ("NFL", "NBA", "MLB", "NHL"):
+            result = evaluate(replace(self.base, sport=sport), now=self.now)
+            self.assertEqual(result["decision"], "BET", sport)
+
+    def test_shared_decision_gate_rejects_unknown_sport(self):
+        from dataclasses import replace
+        with self.assertRaises(ValueError):
+            evaluate(replace(self.base, sport="NCAA"), now=self.now)
+
 
 if __name__ == "__main__":
     unittest.main()
