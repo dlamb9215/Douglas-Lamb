@@ -6,7 +6,8 @@ import json
 from pathlib import Path
 
 from mlb.data import fetch_player_stats, fetch_schedule
-from mlb.model import project_one_plus_hit, validate_confirmed_lineup
+from mlb.model import project_one_plus_hit, simulate_one_plus_hit, validate_confirmed_lineup
+from betting_engine.integrations import evaluate_two_way_market
 
 
 def build_report(game, lineup, season, trials, seed):
@@ -30,6 +31,24 @@ def build_report(game, lineup, season, trials, seed):
                 pitcher_bf=float(pitcher_bf),
                 batting_order=batter["batting_order"],
             )
+            mc = simulate_one_plus_hit(
+                projection["blended_hit_per_pa"],
+                projection["projected_plate_appearances"],
+                trials=trials, seed=seed + int(batter["player_id"]),
+            )
+            p_hit = projection["one_plus_hit_probability"]
+            market = evaluate_two_way_market(
+                sport="MLB", event=f"{game['away']} at {game['home']}",
+                market="player_hits", line=0.5,
+                selection_a="Over 0.5 hits", probability_a=p_hit,
+                odds_a=batter.get("over_odds"),
+                selection_b="Under 0.5 hits", probability_b=1-p_hit,
+                odds_b=batter.get("under_odds"),
+                sportsbook=batter.get("sportsbook", ""),
+                quoted_at=batter.get("quoted_at", ""),
+                data_ready=True, availability_confirmed=True,
+                calibration_ready=False,
+            )
             player_rows.append({
                 "team_side": batting_side,
                 "player_id": batter["player_id"],
@@ -37,8 +56,10 @@ def build_report(game, lineup, season, trials, seed):
                 "opposing_pitcher_id": opposing_pitcher_id,
                 "batting_order": batter["batting_order"],
                 **projection,
+                "monte_carlo_check": mc,
+                "market_evaluation": market,
                 "bet_decision": "PASS",
-                "bet_blockers": ["market odds not supplied", "market-specific calibration not approved"],
+                "bet_blockers": ["market-specific calibration not approved"],
             })
     return {
         "sport": "MLB",
