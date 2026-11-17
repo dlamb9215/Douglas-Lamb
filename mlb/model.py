@@ -145,7 +145,7 @@ def simulate_one_plus_hit(hit_rate_per_pa: float, projected_pa: float,
     for _ in range(trials):
         has_hit = any(rng.random() < rate for _ in range(full_pa))
         if not has_hit and fractional_pa > 0:
-            has_hit = rng.random() < (fractional_pa * rate)
+            has_hit = rng.random() < (1.0 - (1.0 - rate) ** fractional_pa)
         if has_hit:
             hits += 1
     return {"trials": trials, "seed": seed,
