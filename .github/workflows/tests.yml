@@ -28,6 +28,8 @@ jobs:
       - name: Run MLB model tests
         run: python -m unittest -v mlb.test_model
       - name: Run shared betting decision and NHL simulator tests
-        run: python -m unittest -v betting_engine.test_decision betting_engine.test_integrations betting_engine.test_validation nhl.test_elite nhl.test_simulator test_nhl_simulator
+        run: python -m unittest -v betting_engine.test_decision betting_engine.test_integrations nhl.test_elite nhl.test_simulator test_nhl_simulator
+      - name: Run chronological four-sport validation tests
+        run: python -m unittest -v betting_engine.test_validation
       - name: Run NCAA simulator and data pipeline tests
         run: python -m unittest discover -s ncaa/tests -v
