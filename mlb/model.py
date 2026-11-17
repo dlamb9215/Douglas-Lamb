@@ -139,10 +139,15 @@ def simulate_one_plus_hit(hit_rate_per_pa: float, projected_pa: float,
     if not isinstance(trials, int) or trials < 1000:
         raise ValueError("trials must be an integer of at least 1,000")
     rng = random.Random(seed)
+    full_pa = int(pa)
+    fractional_pa = pa - full_pa
     hits = 0
     for _ in range(trials):
-        if any(rng.random() < rate for _ in range(round(pa))):
+        has_hit = any(rng.random() < rate for _ in range(full_pa))
+        if not has_hit and fractional_pa > 0:
+            has_hit = rng.random() < (fractional_pa * rate)
+        if has_hit:
             hits += 1
     return {"trials": trials, "seed": seed,
             "simulated_probability": hits / trials,
-            "analytic_probability": 1 - (1-rate) ** round(pa)}
+            "analytic_probability": 1 - (1-rate) ** pa}
