@@ -51,6 +51,20 @@ class SharedIntegrationTests(unittest.TestCase):
         ]}
         self.assertEqual(evaluate_market_set([market])["status"], "PASS_ALL_MARKETS")
 
+    def test_shared_two_way_adapter_supports_mlb_and_nhl_but_requires_calibration(self):
+        for sport in ("MLB", "NHL"):
+            result = evaluate_two_way_market(
+                sport=sport, event="Away at Home", market="player_prop", line=0.5,
+                selection_a="Over 0.5", probability_a=.70, odds_a=-110,
+                selection_b="Under 0.5", probability_b=.30, odds_b=-110,
+                sportsbook="ExampleBook", quoted_at=self.quote,
+                data_ready=True, availability_confirmed=True,
+                calibration_ready=False, now=self.now,
+            )
+            self.assertEqual(result["decision"], "PASS", sport)
+            self.assertTrue(all(any("calibration" in b for b in side["blockers"])
+                                for side in result["selections"]), sport)
+
 
 if __name__ == "__main__":
     unittest.main()
