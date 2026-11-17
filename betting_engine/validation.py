@@ -32,7 +32,11 @@ def _metrics(rows: list[dict]) -> dict:
     ) / n
     bins = []
     for lower in range(0, 100, 10):
-        group = [r for r in rows if lower / 100 <= r["probability"] < (lower + 10) / 100\n                 or (lower == 90 and r["probability"] == 1.0)]
+        group = [
+            r for r in rows
+            if lower / 100 <= r["probability"] < (lower + 10) / 100
+            or (lower == 90 and r["probability"] == 1.0)
+        ]
         if group:
             bins.append({
                 "range": f"{lower}-{lower+10}%",
