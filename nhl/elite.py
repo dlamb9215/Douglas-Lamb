@@ -6,6 +6,7 @@ Unknown injuries/confirmed starters are explicitly reported, never invented.
 from __future__ import annotations
 import argparse, json, math, random, urllib.parse, urllib.request
 from datetime import datetime, timezone
+from nhl.readiness import validate_confirmed_goalies
 
 WEB = "https://api-web.nhle.com/v1"
 STATS = "https://api.nhle.com/stats/rest/en"
@@ -388,6 +389,7 @@ def main():
     p.add_argument("--trials",type=int,default=100000); p.add_argument("--total",type=float,default=6.0)
     p.add_argument("--puck-line",type=float,default=1.5); p.add_argument("--seed",type=int,default=20261115)
     p.add_argument("--home-goalie-id"); p.add_argument("--away-goalie-id")
+    p.add_argument("--goalie-confirmations", help="JSON snapshot with official confirmed starters for both teams")
     p.add_argument("--exclude-player-ids",default="",help="Comma-separated NHL player IDs to exclude from projections")
     p.add_argument("--home-ml",type=float,default=0); p.add_argument("--away-ml",type=float,default=0)
     p.add_argument("--over-odds",type=float,default=0); p.add_argument("--under-odds",type=float,default=0)
@@ -397,7 +399,26 @@ def main():
     if args.home==args.away: p.error("Home and away must differ.")
     team,skaters,goalies,rosters=load_data(args.home,args.away,args.season)
     excluded=[x.strip() for x in args.exclude_player_ids.split(",") if x.strip()]
+    goalie_check = None
+    if args.goalie_confirmations:
+        with open(args.goalie_confirmations, encoding="utf-8") as handle:
+            goalie_payload = json.load(handle)
+        goalie_check = validate_confirmed_goalies(goalie_payload, args.home, args.away)
+        args.home_goalie_id = str(goalie_check["goalies"]["home"]["player_id"])
+        args.away_goalie_id = str(goalie_check["goalies"]["away"]["player_id"])
     result=simulate(args.home,args.away,team,skaters,goalies,rosters,args.trials,args.total,args.puck_line,args.seed,args.home_goalie_id,args.away_goalie_id,excluded)
+    result["goalie_confirmation"] = goalie_check or {"status":"NOT_PROVIDED","availability_confirmed":False}
+    result["betting_gate"] = {
+        "status":"PASS",
+        "availability_confirmed":False,
+        "goalie_starters_confirmed": bool(goalie_check),
+        "blockers":[
+            "Confirmed full skater lineup and scratches are not yet ingested by this workflow.",
+            "Market-specific out-of-sample calibration is not approved.",
+            "Current two-sided sportsbook quotes with source and timestamp are required."
+        ],
+        "note":"Confirmed goalies alone do not authorize a BET recommendation."
+    }
     result["team_stats"]={c:team[c] for c in (args.home,args.away)}
     result["sportsbook_comparison"]={
       "moneyline":evaluate_two_way_market(result["moneyline_pct"]["home"],result["moneyline_pct"]["away"],args.home_ml,args.away_ml),
