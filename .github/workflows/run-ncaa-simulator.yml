@@ -67,10 +67,10 @@ jobs:
           config = json.loads(raw) if raw else {}
           if not isinstance(config, dict): raise SystemExit("game_config_json must be a JSON object")
           with open("ncaa-game-config.json", "w", encoding="utf-8") as handle: json.dump(config, handle, indent=2)
-          for key, filename in (("pregame_checks_json", "pregame-checks.json"), ("player_inputs_json", "player-inputs.json")):
+          for key, filename, expected in (("pregame_checks_json", "pregame-checks.json", dict), ("player_inputs_json", "player-inputs.json", list)):
               payload = config.get(key)
               if payload is not None:
-                  if not isinstance(payload, dict): raise SystemExit(f"{key} must be a JSON object")
+                  if not isinstance(payload, expected): raise SystemExit(f"{key} has the wrong JSON type")
                   with open(filename, "w", encoding="utf-8") as handle: json.dump(payload, handle, indent=2)
           PY
       - name: Refresh current-season NCAA team statistics
