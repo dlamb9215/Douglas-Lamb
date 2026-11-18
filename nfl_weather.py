@@ -20,7 +20,7 @@ SCHEDULE_URL = "https://github.com/nflverse/nflverse-data/releases/download/sche
 # venue aliases so a neutral-site game is geocoded at the actual stadium.
 INTERNATIONAL_VENUES = {
     "bernabeu": ("Madrid, Spain", "ES"),
-    "santiago bernabeu": ("Madrid, Spain", "GB"),
+    "santiago bernabeu": ("Madrid, Spain", "ES"),
     "tottenham hotspur stadium": ("London, United Kingdom", "GB"),
     "wembley stadium": ("London, United Kingdom", "GB"),
     "allianz arena": ("Munich, Germany", "DE"),
