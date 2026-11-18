@@ -26,14 +26,23 @@ on:
         type: choice
         options: ["100000", "250000", "500000", "1000000", "5000000"]
         default: "100000"
+      game_date:
+        description: Game date in YYYY-MM-DD
+        required: true
+        default: "2026-11-19"
+        type: string
       game_config_json:
-        description: Optional JSON for total, seed, confirmed goalie IDs, scratched player IDs, and sportsbook prices
+        description: Optional JSON for total, seed, confirmed goalie IDs, scratched player IDs, and sportsbook prices with source/timestamp
         required: false
         default: '{"total":6.0,"seed":20261119}'
         type: string
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: nhl-forecast-ledger
+  cancel-in-progress: false
 
 jobs:
   simulate:
@@ -56,13 +65,19 @@ jobs:
           with open("nhl-game-config.json", "w", encoding="utf-8") as handle: json.dump(config, handle, indent=2)
           PY
       - name: Run offline unit tests
-        run: python -m unittest -v nhl.test_elite
+        run: python -m unittest -v nhl.test_elite nhl.test_ledger
+      - name: Reconcile prior NHL forecasts
+        if: github.event_name == 'workflow_dispatch'
+        continue-on-error: true
+        run: python -m nhl.ledger --ledger nhl/ledger/predictions.csv --reconcile
       - name: Run NHL matchup model
+        id: run_matchup
         shell: bash
         env:
           HOME_TEAM: ${{ inputs.home || 'TOR' }}
           AWAY_TEAM: ${{ inputs.away || 'LAK' }}
           TRIALS: ${{ inputs.trials || '100000' }}
+          GAME_DATE: ${{ inputs.game_date || '2026-11-19' }}
         run: |
           CONFIG=nhl-game-config.json
           TOTAL="$(jq -r '.total // 6.0' "$CONFIG")"
@@ -76,13 +91,39 @@ jobs:
           UNDER_ODDS="$(jq -r '.under_odds // 0' "$CONFIG")"
           HOME_PUCK_ODDS="$(jq -r '.home_puck_odds // 0' "$CONFIG")"
           AWAY_PUCK_ODDS="$(jq -r '.away_puck_odds // 0' "$CONFIG")"
-          ARGS=()
+          ODDS_SOURCE="$(jq -r '.odds_source // empty' "$CONFIG")"
+          ODDS_CHECKED_AT="$(jq -r '.odds_checked_at // empty' "$CONFIG")"
+          ARGS=(--game-date "$GAME_DATE")
+          if [[ -n "$ODDS_SOURCE" ]]; then ARGS+=(--odds-source "$ODDS_SOURCE"); fi
+          if [[ -n "$ODDS_CHECKED_AT" ]]; then ARGS+=(--odds-checked-at "$ODDS_CHECKED_AT"); fi
           if [ -n "$HOME_GOALIE_ID" ]; then ARGS+=(--home-goalie-id "$HOME_GOALIE_ID"); fi
           if [ -n "$AWAY_GOALIE_ID" ]; then ARGS+=(--away-goalie-id "$AWAY_GOALIE_ID"); fi
           if [ -n "$EXCLUDED_PLAYER_IDS" ]; then ARGS+=(--exclude-player-ids "$EXCLUDED_PLAYER_IDS"); fi
           python -m nhl.elite --home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --total "$TOTAL" --seed "$SEED" --home-ml "$HOME_ML" --away-ml "$AWAY_ML" --over-odds "$OVER_ODDS" --under-odds "$UNDER_ODDS" --home-puck-odds "$HOME_PUCK_ODDS" --away-puck-odds "$AWAY_PUCK_ODDS" "${ARGS[@]}" | tee nhl-elite-results.txt
           test -s nhl-elite-results.json
           test -s nhl-elite-results.txt
+      - name: Archive NHL forecast and commit ledger
+        if: github.event_name == 'workflow_dispatch' && steps.run_matchup.outcome == 'success'
+        env:
+          RUN_ID: ${{ github.run_id }}
+          GAME_DATE: ${{ inputs.game_date }}
+        run: |
+          set -euo pipefail
+          CONFIG=nhl-game-config.json
+          ODDS_SOURCE="$(jq -r '.odds_source // empty' "$CONFIG")"
+          ODDS_CHECKED_AT="$(jq -r '.odds_checked_at // empty' "$CONFIG")"
+          python -m nhl.ledger --payload nhl-elite-results.json --ledger nhl/ledger/predictions.csv --run-id "$RUN_ID" --game-date "$GAME_DATE" --odds-source "$ODDS_SOURCE" --odds-checked-at "$ODDS_CHECKED_AT"
+          python -m nhl.ledger --ledger nhl/ledger/predictions.csv --reconcile
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add nhl/ledger/predictions.csv
+          if git diff --cached --quiet; then
+            echo "NHL forecast ledger unchanged."
+          else
+            git commit -m "Record NHL pregame forecast"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
       - name: Upload simulation results
         uses: actions/upload-artifact@v4
         with:
@@ -90,4 +131,5 @@ jobs:
           path: |
             nhl-elite-results.txt
             nhl-elite-results.json
+            nhl/ledger/predictions.csv
           if-no-files-found: error
