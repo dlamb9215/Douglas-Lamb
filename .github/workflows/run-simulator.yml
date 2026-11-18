@@ -52,7 +52,7 @@ on:
       game_config_json:
         description: Optional JSON for confirmed QBs and official source URLs, official game-day confirmation payload, player-prop lines, sportsbook lines/prices/source/timestamp, and neutral_site
         required: false
-        default: '{"neutral_site":false,"away_qb_confirmed":"Daniel Jones","away_qb_source":"https://www.colts.com/news/5-colts-things-cj-allen-shines-seth-mcgowan-shows-why-jonathan-taylor-s-usage-was-not-about-nfl-trade-deadline-justin-walley-delivers-in-week-10-win-over-dolphins"}'
+        default: '{"neutral_site":false}'
         type: string
 permissions:
   contents: write
