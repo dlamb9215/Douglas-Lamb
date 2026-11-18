@@ -67,7 +67,11 @@ jobs:
           UNDER_ODDS="$(jq -r '.under_odds // 0' "$CONFIG")"
           HOME_PUCK_ODDS="$(jq -r '.home_puck_odds // 0' "$CONFIG")"
           AWAY_PUCK_ODDS="$(jq -r '.away_puck_odds // 0' "$CONFIG")"
+          ODDS_SOURCE="$(jq -r '.odds_source // empty' "$CONFIG")"
+          ODDS_CHECKED_AT="$(jq -r '.odds_checked_at // empty' "$CONFIG")"
           ARGS=()
+          if [ -n "$ODDS_SOURCE" ]; then ARGS+=(--odds-source "$ODDS_SOURCE"); fi
+          if [ -n "$ODDS_CHECKED_AT" ]; then ARGS+=(--odds-checked-at "$ODDS_CHECKED_AT"); fi
           if [ -n "$HOME_GOALIE_ID" ]; then ARGS+=(--home-goalie-id "$HOME_GOALIE_ID"); fi
           if [ -n "$AWAY_GOALIE_ID" ]; then ARGS+=(--away-goalie-id "$AWAY_GOALIE_ID"); fi
           if [ -n "$EXCLUDED_PLAYER_IDS" ]; then ARGS+=(--exclude-player-ids "$EXCLUDED_PLAYER_IDS"); fi
