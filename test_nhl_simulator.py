@@ -1,5 +1,6 @@
 import unittest
 import random
+from unittest.mock import patch
 from nhl_simulator import TeamStats, poisson, expected_goals, run_simulation, NHL_TEAMS
 
 class NHLModelTests(unittest.TestCase):
@@ -26,6 +27,12 @@ class NHLModelTests(unittest.TestCase):
     def test_rejects_too_few_trials(self):
         with self.assertRaises(ValueError):
             run_simulation(TeamStats("BOS","Boston"),TeamStats("NYR","New York"),100)
+
+    def test_live_team_data_failure_does_not_fall_back_to_league_average(self):
+        from nhl_simulator import fetch_team_stats
+        with patch("nhl_simulator.urlopen", side_effect=TimeoutError("offline")):
+            with self.assertRaisesRegex(RuntimeError, "Required live NHL team data unavailable"):
+                fetch_team_stats("BOS")
 
 if __name__ == "__main__":
     unittest.main()

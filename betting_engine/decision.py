@@ -68,8 +68,8 @@ def evaluate(candidate: BetCandidate, *, now: datetime | None = None,
         raise ValueError("Invalid model or push probability")
     if isinstance(candidate.odds_american, bool) or not isinstance(candidate.odds_american, (int, float)) or not isfinite(float(candidate.odds_american)) or candidate.odds_american == 0:
         raise ValueError("American odds must be a finite non-zero number")
-    if not candidate.sport or candidate.sport.upper() not in {"NBA", "NFL"}:
-        raise ValueError("sport must be NBA or NFL")
+    if not candidate.sport or candidate.sport.upper() not in {"NBA", "NFL", "MLB", "NHL"}:
+        raise ValueError("sport must be one of NBA, NFL, MLB, or NHL")
     if not candidate.sportsbook:
         raise ValueError("Sportsbook/source is required")
     age = quote_age_hours(candidate.quoted_at, now)

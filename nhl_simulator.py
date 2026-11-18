@@ -69,7 +69,10 @@ def fetch_team_stats(code: str, timeout: float = 8.0) -> TeamStats:
         if stats.fo > 1: stats.fo /= 100
         stats.source = "NHL public club-stats API"
     except (URLError, HTTPError, TimeoutError, ValueError, json.JSONDecodeError, KeyError) as exc:
-        stats.source = f"league-average fallback (live stats unavailable: {type(exc).__name__})"
+        # Never silently substitute league averages for a real matchup.
+        raise RuntimeError(
+            f"Required live NHL team data unavailable for {code}: {type(exc).__name__}"
+        ) from exc
     return stats
 
 def poisson(lam: float, rng: random.Random) -> int:

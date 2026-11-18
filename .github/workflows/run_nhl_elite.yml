@@ -41,6 +41,16 @@ on:
         required: false
         default: ""
         type: string
+      goalie_confirmations_json:
+        description: Optional JSON snapshot confirming both official starting goalies
+        required: false
+        default: ""
+        type: string
+      lineup_confirmations_json:
+        description: Optional JSON snapshot confirming both active skater lineups and scratches
+        required: false
+        default: ""
+        type: string
       excluded_player_ids:
         description: Optional comma-separated inactive or scratched NHL player IDs to exclude
         required: false
@@ -90,18 +100,28 @@ jobs:
         with:
           python-version: "3.12"
       - name: Run offline unit tests
-        run: python -m unittest -v nhl.test_elite
+        run: python -m unittest -v nhl.test_elite nhl.test_readiness
       - name: Run NHL matchup model
         env:
           HOME_GOALIE_ID: ${{ inputs.home_goalie_id }}
           AWAY_GOALIE_ID: ${{ inputs.away_goalie_id }}
           EXCLUDED_PLAYER_IDS: ${{ inputs.excluded_player_ids }}
+          GOALIE_CONFIRMATIONS_JSON: ${{ inputs.goalie_confirmations_json }}
+          LINEUP_CONFIRMATIONS_JSON: ${{ inputs.lineup_confirmations_json }}
         run: |
           set -euo pipefail
           ARGS=""
           if [ -n "$HOME_GOALIE_ID" ]; then ARGS="$ARGS --home-goalie-id $HOME_GOALIE_ID"; fi
           if [ -n "$AWAY_GOALIE_ID" ]; then ARGS="$ARGS --away-goalie-id $AWAY_GOALIE_ID"; fi
           if [ -n "$EXCLUDED_PLAYER_IDS" ]; then ARGS="$ARGS --exclude-player-ids $EXCLUDED_PLAYER_IDS"; fi
+          if [ -n "$GOALIE_CONFIRMATIONS_JSON" ]; then
+            printf '%s' "$GOALIE_CONFIRMATIONS_JSON" > goalie-confirmations.json
+            ARGS="$ARGS --goalie-confirmations goalie-confirmations.json"
+          fi
+          if [ -n "$LINEUP_CONFIRMATIONS_JSON" ]; then
+            printf '%s' "$LINEUP_CONFIRMATIONS_JSON" > lineup-confirmations.json
+            ARGS="$ARGS --lineup-confirmations lineup-confirmations.json"
+          fi
           python -m nhl.elite --home "${{ inputs.home }}" --away "${{ inputs.away }}" --trials "${{ inputs.trials }}" --total "${{ inputs.total }}" --seed "${{ inputs.seed }}" --home-ml "${{ inputs.home_ml }}" --away-ml "${{ inputs.away_ml }}" --over-odds "${{ inputs.over_odds }}" --under-odds "${{ inputs.under_odds }}" --home-puck-odds "${{ inputs.home_puck_odds }}" --away-puck-odds "${{ inputs.away_puck_odds }}" $ARGS | tee nhl-elite-results.txt
           test -s nhl-elite-results.json
           test -s nhl-elite-results.txt

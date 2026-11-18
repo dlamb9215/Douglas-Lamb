@@ -1,5 +1,5 @@
 import unittest
-from nhl.elite import season_id, normalize_team, matchup_means, poisson, simulate, TEAMS, evaluate_two_way_market, attach_team_ranks
+from nhl.elite import season_id, normalize_team, matchup_means, poisson, simulate, TEAMS, evaluate_two_way_market, attach_team_ranks, build_player_pool
 
 class EliteNHLTests(unittest.TestCase):
     def setUp(self):
@@ -37,6 +37,24 @@ class EliteNHLTests(unittest.TestCase):
     def test_invalid_selected_goalie_rejected(self):
         with self.assertRaises(ValueError):
             simulate("BOS","FLA",self.teams,[],[],self.rosters,trials=1000,home_goalie_id="invalid")
+
+    def test_confirmed_skater_lineup_filters_player_projection_pool(self):
+        roster = {"forwards": [
+            {"id": 11, "firstName": "Active", "lastName": "One"},
+            {"id": 12, "firstName": "Scratched", "lastName": "Two"},
+        ], "defensemen": [], "goalies": []}
+        stats = [
+            {"teamAbbrev": "BOS", "playerId": 11, "gamesPlayed": 10, "goals": 2, "assists": 3, "points": 5, "shots": 20},
+            {"teamAbbrev": "BOS", "playerId": 12, "gamesPlayed": 10, "goals": 4, "assists": 3, "points": 7, "shots": 30},
+        ]
+        players, _ = build_player_pool("BOS", roster, stats, [], confirmed_active_ids=[11])
+        self.assertEqual([p["id"] for p in players], [11])
+
+    def test_confirmed_lineup_unknown_roster_player_fails_closed(self):
+        roster = {"forwards": [{"id": 11}], "defensemen": [], "goalies": []}
+        with self.assertRaisesRegex(ValueError, "missing from the current roster"):
+            build_player_pool("BOS", roster, [], [], confirmed_active_ids=[999])
+
     def test_no_vig_odds_comparison(self):
         out=evaluate_two_way_market(60,40,-120,110)
         self.assertIn("no_vig_market_pct",out)

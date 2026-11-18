@@ -1,8 +1,10 @@
 # Unified NBA + NFL Betting Decision Engine
 
-The shared, conservative decision layer at `betting_engine/` is now wired into
-the NBA team-market CLI, NFL team-market CLI, NBA player-prop ranking, and NFL
-player-prop pipeline. It consumes each sport model's probabilities and actual
+The shared, conservative decision layer at `betting_engine/` is wired into
+the NBA and NFL callers. Its generic two-way market adapter and decision gate
+now accept NBA, NFL, MLB and NHL, so MLB/NHL callers can use the same price and
+BET/PASS contract. Sport-specific end-to-end integrations must still be
+completed and validated. It consumes each sport model's probabilities and actual
 two-sided prices; it does not replace either scoring engine.
 
 ## Decision outputs
@@ -192,3 +194,29 @@ line movement. A minimum of 200 settled predictions per market is reported as
 a sample-size checkpoint only. It does not automatically open the betting
 calibration gate. Chronological holdout performance, market-baseline
 comparisons, positive closing-line value, and manual review remain required.
+
+
+## Four-sport chronological holdout validation
+
+`betting_engine.validation.evaluate_chronological_holdout` validates unique
+pregame predictions, requires timezone-aware forecast and event-start times,
+rejects forecasts made at/after event start, groups results by sport and market,
+and splits each group chronologically into training-history and holdout rows.
+It reports holdout Brier score, log loss and calibration bins. It never sets
+`calibration_ready` true automatically; market baseline, closing-line value,
+ROI uncertainty, data leakage, sample sufficiency and manual review remain
+required. Run:
+
+```bash
+python -m unittest -v betting_engine.test_validation
+```
+
+## MLB baseline
+
+The initial `mlb/` package uses MLB Stats API schedule and season-stat
+adapters, strict official confirmed-lineup snapshots, a shrunk hitter hit/PA
+rate blended with opposing pitcher hits/batters-faced, and a Monte Carlo
+cross-check. Per-player 1+ hit markets route through the shared two-way
+decision adapter and remain PASS until current two-sided odds and market
+calibration are supplied. This is a foundation, not a validated MLB betting
+model. See `mlb/README.md`.

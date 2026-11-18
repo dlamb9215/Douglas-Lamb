@@ -52,6 +52,7 @@ class TestBacktest(unittest.TestCase):
         self.assertEqual(result["pending_rows_excluded"], 1)
         self.assertEqual(result["postgame_forecasts_excluded"], 1)
         self.assertFalse(result["calibration_ready"])
+        self.assertEqual(result["betting_approval"], "NOT_APPROVED")
 
     def test_rejects_duplicate_forecast_ids(self):
         row = {
@@ -67,6 +68,31 @@ class TestBacktest(unittest.TestCase):
                 writer.writerow(row)
             with self.assertRaisesRegex(ValueError, "Duplicate forecast_id"):
                 evaluate(path)
+
+    def test_deduplicates_multiple_forecasts_for_same_event(self):
+        rows = [
+            {"forecast_id": "early", "event_id": "game-1",
+             "forecasted_at": "2026-11-12T18:00:00Z", "game_start_time": "2026-11-12T23:00:00Z",
+             "projected_home": 110, "projected_away": 105, "actual_home": 112, "actual_away": 104,
+             "home_win_probability": 60},
+            {"forecast_id": "late", "event_id": "game-1",
+             "forecasted_at": "2026-11-12T20:00:00Z", "game_start_time": "2026-11-12T23:00:00Z",
+             "projected_home": 111, "projected_away": 104, "actual_home": 112, "actual_away": 104,
+             "home_win_probability": 70},
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "ledger.csv"
+            with path.open("w", newline="", encoding="utf-8") as handle:
+                writer = csv.DictWriter(handle, fieldnames=rows[0].keys())
+                writer.writeheader()
+                writer.writerows(rows)
+            result = evaluate(path)
+        self.assertEqual(result["games"], 1)
+        self.assertEqual(result["duplicate_event_forecasts_excluded"], 1)
+        self.assertEqual(result["home_points_mae"], 1.0)
+        self.assertEqual(result["availability_confirmed_rows"], 0)
+        self.assertEqual(result["betting_approval"], "NOT_APPROVED")
+        self.assertTrue(result["betting_approval_blockers"])
 
     def test_metrics_on_small_fixture(self):
         rows = [

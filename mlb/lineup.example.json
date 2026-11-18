@@ -1,0 +1,36 @@
+{
+  "gamePk": 0,
+  "confirmed": false,
+  "source_url": "https://www.mlb.com/",
+  "checked_at_utc": "2026-11-17T18:00:00Z",
+  "teams": {
+    "home": {
+      "starting_pitcher_id": 0,
+      "batters": [
+        {"player_id": 1, "name": "REPLACE WITH CONFIRMED PLAYER", "batting_order": 1},
+        {"player_id": 2, "name": "REPLACE WITH CONFIRMED PLAYER", "batting_order": 2},
+        {"player_id": 3, "name": "REPLACE WITH CONFIRMED PLAYER", "batting_order": 3},
+        {"player_id": 4, "name": "REPLACE WITH CONFIRMED PLAYER", "batting_order": 4},
+        {"player_id": 5, "name": "REPLACE WITH CONFIRMED PLAYER", "batting_order": 5},
+        {"player_id": 6, "name": "REPLACE WITH CONFIRMED PLAYER", "batting_order": 6},
+        {"player_id": 7, "name": "REPLACE WITH CONFIRMED PLAYER", "batting_order": 7},
+        {"player_id": 8, "name": "REPLACE WITH CONFIRMED PLAYER", "batting_order": 8},
+        {"player_id": 9, "name": "REPLACE WITH CONFIRMED PLAYER", "batting_order": 9}
+      ]
+    },
+    "away": {
+      "starting_pitcher_id": 0,
+      "batters": [
+        {"player_id": 21, "name": "REPLACE WITH CONFIRMED PLAYER", "batting_order": 1},
+        {"player_id": 22, "name": "REPLACE WITH CONFIRMED PLAYER", "batting_order": 2},
+        {"player_id": 23, "name": "REPLACE WITH CONFIRMED PLAYER", "batting_order": 3},
+        {"player_id": 24, "name": "REPLACE WITH CONFIRMED PLAYER", "batting_order": 4},
+        {"player_id": 25, "name": "REPLACE WITH CONFIRMED PLAYER", "batting_order": 5},
+        {"player_id": 26, "name": "REPLACE WITH CONFIRMED PLAYER", "batting_order": 6},
+        {"player_id": 27, "name": "REPLACE WITH CONFIRMED PLAYER", "batting_order": 7},
+        {"player_id": 28, "name": "REPLACE WITH CONFIRMED PLAYER", "batting_order": 8},
+        {"player_id": 29, "name": "REPLACE WITH CONFIRMED PLAYER", "batting_order": 9}
+      ]
+    }
+  }
+}

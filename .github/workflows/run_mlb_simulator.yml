@@ -1,0 +1,70 @@
+name: Run Doug's Elite MLB Model
+
+on:
+  workflow_dispatch:
+    inputs:
+      game_date:
+        description: MLB local game date (YYYY-MM-DD)
+        required: true
+        type: string
+      game_pk:
+        description: MLB gamePk (required when lineup_json is supplied)
+        required: false
+        type: string
+      trials:
+        description: Monte Carlo validation trials
+        required: true
+        default: "500000"
+        type: choice
+        options: ["100000", "250000", "500000", "1000000"]
+      lineup_json:
+        description: Optional complete official confirmed-lineup JSON snapshot; see mlb/lineup.example.json
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run MLB model tests
+        run: python -m unittest -v mlb.test_model
+      - name: Prepare confirmed lineup snapshot
+        env:
+          LINEUP_JSON: ${{ inputs.lineup_json }}
+        run: |
+          python - <<'PY'
+          import os
+          raw = os.environ.get("LINEUP_JSON", "").strip()
+          if raw:
+              with open("mlb-confirmed-lineups.json", "w", encoding="utf-8") as f:
+                  f.write(raw)
+          PY
+      - name: Run MLB schedule or matchup model
+        env:
+          GAME_DATE: ${{ inputs.game_date }}
+          GAME_PK: ${{ inputs.game_pk }}
+          TRIALS: ${{ inputs.trials }}
+        run: |
+          set -euo pipefail
+          if [ -s mlb-confirmed-lineups.json ]; then
+            test -n "$GAME_PK"
+            python -m mlb.engine --date "$GAME_DATE" --game-pk "$GAME_PK" --lineup-file mlb-confirmed-lineups.json --trials "$TRIALS" --output mlb-results.json
+          else
+            python -m mlb.engine --date "$GAME_DATE" --trials "$TRIALS" --output mlb-results.json
+          fi
+          test -s mlb-results.json
+      - name: Upload MLB model results
+        uses: actions/upload-artifact@v4
+        with:
+          name: dougs-elite-mlb-results
+          path: mlb-results.json
+          if-no-files-found: error
