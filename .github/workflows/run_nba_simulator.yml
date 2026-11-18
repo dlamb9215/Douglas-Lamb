@@ -54,9 +54,9 @@ on:
         default: "5000000"
         type: string
       game_date:
-        description: Matchup date YYYY-MM-DD
+        description: Matchup date YYYY-MM-DD (Thursday default)
         required: false
-        default: ""
+        default: "2026-11-19"
         type: string
       game_config_json:
         description: Optional JSON object for sportsbook prices, source/timestamp, confirmed lineups, player-prop lines, rest/travel and other settings; see BETTING_ENGINE_UPGRADE.md
