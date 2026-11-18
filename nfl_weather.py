@@ -20,11 +20,28 @@ SCHEDULE_URL = "https://github.com/nflverse/nflverse-data/releases/download/sche
 # venue aliases so a neutral-site game is geocoded at the actual stadium.
 INTERNATIONAL_VENUES = {
     "bernabeu": ("Madrid, Spain", "ES"),
-    "santiago bernabeu": ("Madrid, Spain", "ES"),
+    "santiago bernabeu": ("Madrid, Spain", "GB"),
     "tottenham hotspur stadium": ("London, United Kingdom", "GB"),
     "wembley stadium": ("London, United Kingdom", "GB"),
     "allianz arena": ("Munich, Germany", "DE"),
     "estadio azteca": ("Mexico City, Mexico", "MX"),
+}
+
+# nflverse can return generic "Home"/"Away" for domestic stadiums.
+TEAM_HOME_LOCATIONS = {
+    "ARI": "Glendale, Arizona", "ATL": "Atlanta, Georgia", "BAL": "Baltimore, Maryland",
+    "BUF": "Orchard Park, New York", "CAR": "Charlotte, North Carolina",
+    "CHI": "Chicago, Illinois", "CIN": "Cincinnati, Ohio", "CLE": "Cleveland, Ohio",
+    "DAL": "Arlington, Texas", "DEN": "Denver, Colorado", "DET": "Detroit, Michigan",
+    "GB": "Green Bay, Wisconsin", "HOU": "Houston, Texas", "IND": "Indianapolis, Indiana",
+    "JAX": "Jacksonville, Florida", "KC": "Kansas City, Missouri", "LV": "Paradise, Nevada",
+    "LAC": "Inglewood, California", "LAR": "Inglewood, California",
+    "MIA": "Miami Gardens, Florida", "MIN": "Minneapolis, Minnesota",
+    "NE": "Foxborough, Massachusetts", "NO": "New Orleans, Louisiana",
+    "NYG": "East Rutherford, New Jersey", "NYJ": "East Rutherford, New Jersey",
+    "PHI": "Philadelphia, Pennsylvania", "PIT": "Pittsburgh, Pennsylvania",
+    "SF": "Santa Clara, California", "SEA": "Seattle, Washington",
+    "TB": "Tampa, Florida", "TEN": "Nashville, Tennessee", "WAS": "Landover, Maryland",
 }
 
 
@@ -49,16 +66,19 @@ def _kickoff(row):
     return local.replace(tzinfo=ZoneInfo("America/New_York"))
 
 
-def _resolve_venue_location(venue, schedule_location):
+def _resolve_venue_location(venue, schedule_location, home_team=None):
     """Return (search location, expected country code) for the stadium."""
     normalized = (venue or "").strip().lower()
     for alias, location in INTERNATIONAL_VENUES.items():
         if alias in normalized:
             return location
     location = (schedule_location or "").strip()
-    if location and location.lower() not in {"neutral", "international", "tbd"}:
-        # NFL domestic venues in nflverse schedule data are U.S. locations.
+    generic = {"", "home", "away", "neutral", "international", "tbd", "unknown"}
+    if location and location.lower() not in generic:
         return location + ", United States", "US"
+    fallback = TEAM_HOME_LOCATIONS.get(str(home_team or "").upper())
+    if fallback:
+        return fallback + ", United States", "US"
     raise RuntimeError(
         f"Schedule location is ambiguous for venue {venue!r}; refusing to guess weather coordinates."
     )
@@ -107,7 +127,7 @@ def fetch_matchup_weather(home, away, season=None, week=None):
     future = [item for item in candidates if item[0].astimezone(timezone.utc) >= now]
     kickoff, game = min(future or candidates, key=lambda item: abs((item[0].astimezone(timezone.utc)-now).total_seconds()))
     venue = game.get("stadium") or ""
-    location, expected_country = _resolve_venue_location(venue, game.get("location"))
+    location, expected_country = _resolve_venue_location(venue, game.get("location"), home)
     query = ", ".join(part for part in (venue, location) if part)
     geo_url = "https://geocoding-api.open-meteo.com/v1/search?" + urlencode({
         "name": query, "count": 10, "language": "en", "format": "json"
