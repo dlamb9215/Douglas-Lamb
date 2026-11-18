@@ -45,7 +45,7 @@ on:
       game_config_json:
         description: Optional JSON for kickoff, lines/odds, neutral site, sourced pregame checks and player inputs
         required: false
-        default: '{"neutral_site":false,"require_verified_pregame":false}'
+        default: '{"neutral_site":false,"require_verified_pregame":false,"kickoff":"2026-11-19T18:30:00-06:00"}'
         type: string
 jobs:
   simulate:
