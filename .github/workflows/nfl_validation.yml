@@ -107,7 +107,7 @@ jobs:
       - name: Verify NumPy import
         run: python -c "import numpy; print(numpy.__version__)"
 
-      - name: Lint NFL and NHL workflow files
+      - name: Lint all sports simulator workflow files
         uses: rhysd/actionlint@v1.7.7
         with:
           args: .github/workflows/run-simulator.yml .github/workflows/run_nhl_elite.yml .github/workflows/run-ncaa-simulator.yml
