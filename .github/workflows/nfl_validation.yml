@@ -130,8 +130,8 @@ jobs:
       - name: Build fresh matchup pregame gate
         if: github.event_name != 'pull_request'
         env:
-          HOME_TEAM: ${{ github.event.inputs.home || 'ATL' }}
-          AWAY_TEAM: ${{ github.event.inputs.away || 'CIN' }}
+          HOME_TEAM: ${{ github.event.inputs.home || 'HOU' }}
+          AWAY_TEAM: ${{ github.event.inputs.away || 'IND' }}
         run: |
           if [ -s kickoff-weather.json ]; then
             python pregame_context.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --input player_pool.json --output pregame-context.json --weather-input kickoff-weather.json
