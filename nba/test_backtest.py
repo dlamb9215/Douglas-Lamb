@@ -52,6 +52,7 @@ class TestBacktest(unittest.TestCase):
         self.assertEqual(result["pending_rows_excluded"], 1)
         self.assertEqual(result["postgame_forecasts_excluded"], 1)
         self.assertFalse(result["calibration_ready"])
+        self.assertEqual(result["betting_approval"], "NOT_APPROVED")
 
     def test_rejects_duplicate_forecast_ids(self):
         row = {
@@ -90,7 +91,8 @@ class TestBacktest(unittest.TestCase):
         self.assertEqual(result["duplicate_event_forecasts_excluded"], 1)
         self.assertEqual(result["home_points_mae"], 1.0)
         self.assertEqual(result["availability_confirmed_rows"], 0)
-        self.assertEqual(result["betting_approval"], "PASS")
+        self.assertEqual(result["betting_approval"], "NOT_APPROVED")
+        self.assertTrue(result["betting_approval_blockers"])
 
     def test_metrics_on_small_fixture(self):
         rows = [
