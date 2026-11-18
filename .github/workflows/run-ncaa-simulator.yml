@@ -124,19 +124,15 @@ jobs:
           HOME_SPREAD="$(jq -r '.home_spread // empty' "$CONFIG")"
           TOTAL_LINE="$(jq -r '.total // empty' "$CONFIG")"
           NEUTRAL_SITE="$(jq -r '.neutral_site // false' "$CONFIG")"
-          HOME_ML_ODDS="$(jq -r '.home_ml_odds // empty' "$CONFIG")"
-          AWAY_ML_ODDS="$(jq -r '.away_ml_odds // empty' "$CONFIG")"
-          OVER_ODDS="$(jq -r '.over_odds // empty' "$CONFIG")"
-          UNDER_ODDS="$(jq -r '.under_odds // empty' "$CONFIG")"
           REQUIRE_PREGAME="$(jq -r '.require_verified_pregame // false' "$CONFIG")"
           GAME_KICKOFF="$(jq -r '.kickoff // empty' "$CONFIG")"
           args=(--home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --season "$SEASON_YEAR" --classification "$CLASSIFICATION")
           if [[ -n "$HOME_SPREAD" ]]; then args+=(--home-spread "$HOME_SPREAD"); fi
           if [[ -n "$TOTAL_LINE" ]]; then args+=(--total "$TOTAL_LINE"); fi
           if [[ "$NEUTRAL_SITE" == "true" ]]; then args+=(--neutral-site); fi
-          for pair in "HOME_ML_ODDS:--home-ml-odds" "AWAY_ML_ODDS:--away-ml-odds" "OVER_ODDS:--over-odds" "UNDER_ODDS:--under-odds"; do
+          for pair in "home_ml_odds:--home-ml-odds" "away_ml_odds:--away-ml-odds" "over_odds:--over-odds" "under_odds:--under-odds"; do
             key="${pair%%:*}"; flag="${pair#*:}"
-            value="${!key}"
+            value="$(jq -r --arg key "$key" '.[$key] // empty' "$CONFIG")"
             if [[ -n "$value" ]]; then args+=("$flag" "$value"); fi
           done
           if [[ -f pregame-checks.json ]]; then args+=(--pregame-checks pregame-checks.json); fi
