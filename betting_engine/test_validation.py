@@ -29,6 +29,14 @@ class ChronologicalValidationTests(unittest.TestCase):
         self.assertFalse(result["calibration_ready"])
         self.assertEqual(row["brier_score"], 0.16)
 
+    def test_holdout_splits_by_event_start_not_forecast_creation_time(self):
+        rows = [dict(row) for row in self.rows]
+        rows[0]["event_start"] = (datetime(2026, 1, 30, tzinfo=timezone.utc)).isoformat()
+        rows[-1]["event_start"] = (datetime(2026, 1, 2, tzinfo=timezone.utc)).isoformat()
+        result = evaluate_chronological_holdout(rows, min_holdout_rows=5)
+        report = result["reports"][0]
+        self.assertLessEqual(report["train_event_end"], report["holdout_event_start"])
+
     def test_postgame_prediction_rejected(self):
         self.rows[0]["event_start"] = self.rows[0]["forecasted_at"]
         with self.assertRaises(ValueError):
