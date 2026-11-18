@@ -105,8 +105,39 @@ def attach_team_ranks(team_stats):
     return team_stats
 
 
+def attach_team_summary(team_stats, rows):
+    """Merge official NHL Stats REST team-summary rates into standings rows."""
+    by_code = {}
+    for row in rows:
+        code = team_code(row)
+        if code:
+            by_code[code] = row
+    fields = {
+        "sf": ("shotsForPerGame", "shotsPerGame", "shots_for_per_game"),
+        "sa": ("shotsAgainstPerGame", "shotsAllowedPerGame", "shots_against_per_game"),
+        "pp": ("powerPlayPct", "powerPlayPercentage", "power_play_pct"),
+        "pk": ("penaltyKillPct", "penaltyKillPercentage", "penalty_kill_pct"),
+        "fo": ("faceoffWinPct", "faceOffWinPercentage", "faceoff_win_pct"),
+    }
+    for code, stats in team_stats.items():
+        row = by_code.get(code)
+        missing = []
+        for target, candidates in fields.items():
+            value = first_num(row, candidates, None) if row else None
+            if value is not None and target in {"pp", "pk", "fo"} and 0 <= value <= 1:
+                value *= 100
+            stats[target] = value
+            if value is None:
+                missing.append(target)
+        stats["team_summary_available"] = not missing
+        stats["team_summary_missing_fields"] = missing
+        stats["team_summary_source"] = "NHL Stats REST team/summary" if row else None
+    return team_stats
+
+
 def load_data(home, away, season):
-    # Use the NHL Web API standings feed for current-season GP/GF/GA totals.
+    # Standings provide current-season GP/GF/GA; the Stats REST team summary
+    # adds shots, special teams and faceoff rates used by the matchup model.
     standings_payload = get_json(f"{WEB}/standings/now")
     standing_rows = standings_payload.get("standings", [])
     if not isinstance(standing_rows, list) or not standing_rows:
@@ -117,6 +148,15 @@ def load_data(home, away, season):
     for code in (home, away):
         if team_stats[code]["gf"] is None or team_stats[code]["ga"] is None:
             raise RuntimeError(f"Current-season goals-for/goals-against totals are incomplete for {code}.")
+    try:
+        team_rows = stats_report("team", season, 1000)
+        attach_team_summary(team_stats, team_rows)
+    except Exception as exc:
+        for code in (home, away):
+            team_stats[code]["team_summary_available"] = False
+            team_stats[code]["team_summary_missing_fields"] = ["sf", "sa", "pp", "pk", "fo"]
+            team_stats[code]["team_summary_source"] = None
+            team_stats[code]["team_summary_error"] = str(exc)
     attach_team_ranks(team_stats)
     skaters = stats_report("skater", season, 1500)
     goalies = stats_report("goalie", season, 500)
@@ -343,6 +383,14 @@ def simulate(home_code, away_code, team_stats, skaters, goalies, rosters, trials
         "goalie_save_props": goalie_props, "player_props": props,
         "data_quality": {
             "home_games": h["games"], "away_games": a["games"],
+            "team_summary_features": {
+                home_code: {"available": h.get("team_summary_available", False),
+                            "missing_fields": h.get("team_summary_missing_fields", ["sf", "sa", "pp", "pk", "fo"]),
+                            "source": h.get("team_summary_source")},
+                away_code: {"available": a.get("team_summary_available", False),
+                            "missing_fields": a.get("team_summary_missing_fields", ["sf", "sa", "pp", "pk", "fo"]),
+                            "source": a.get("team_summary_source")},
+            },
             "injuries": "Not verified by this data endpoint; check official injury report/inactives before betting.",
             "lineups": "Current roster filtered; game-day scratches and line combinations are not guaranteed.",
             "goalies": "Top season-start goalie is a projection, not a confirmed starter."
