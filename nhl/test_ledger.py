@@ -39,8 +39,10 @@ class NHLForecastLedgerTests(unittest.TestCase):
     def test_duplicate_run_is_not_appended_twice(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "predictions.csv"
-            self.assertTrue(append_forecast(payload(), path, "12345", "2026-11-19"))
-            self.assertFalse(append_forecast(payload(), path, "12345", "2026-11-19"))
+            self.assertTrue(append_forecast(payload(), path, "12345", "2026-11-19",
+                                             "ESPN BET", "2026-11-19T10:00:00Z"))
+            self.assertFalse(append_forecast(payload(), path, "12345", "2026-11-19",
+                                              "ESPN BET", "2026-11-19T10:00:00Z"))
             self.assertEqual(sum(1 for _ in path.open()) - 1, 1)
 
     def test_prices_require_source_and_timezone_aware_quote_time(self):
