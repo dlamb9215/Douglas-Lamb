@@ -117,11 +117,14 @@ def attach_team_ranks(team_stats):
 def attach_team_summary(team_stats, rows, team_id_to_code=None):
     """Merge official NHL Stats REST summary rows using real API field names."""
     team_id_to_code = {str(k): str(v).upper() for k, v in (team_id_to_code or {}).items()}
-    by_code, by_name = {}, {}
+    by_code, by_id, by_name = {}, {}, {}
     for row in rows:
         code = team_code(row)
-        if not code and row.get("teamId") is not None:
-            code = team_id_to_code.get(str(row.get("teamId")), "")
+        team_id = row.get("teamId") or row.get("team_id")
+        if team_id is not None:
+            by_id[str(team_id)] = row
+        if not code and team_id is not None:
+            code = team_id_to_code.get(str(team_id), "")
         if code:
             by_code[code] = row
         name = row.get("teamFullName") or row.get("team_full_name")
@@ -136,6 +139,8 @@ def attach_team_summary(team_stats, rows, team_id_to_code=None):
     }
     for code, stats in team_stats.items():
         row = by_code.get(code)
+        if row is None and stats.get("team_id") is not None:
+            row = by_id.get(str(stats["team_id"]))
         if row is None and stats.get("team_full_name"):
             key = " ".join(str(stats["team_full_name"]).casefold().split())
             row = by_name.get(key)
