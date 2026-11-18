@@ -19,6 +19,7 @@ on:
       - ".github/workflows/nfl_validation.yml"
       - ".github/workflows/run-simulator.yml"
       - ".github/workflows/run_nhl_elite.yml"
+      - ".github/workflows/run-ncaa-simulator.yml"
   pull_request:
     paths:
       - "main.py"
@@ -36,6 +37,7 @@ on:
       - ".github/workflows/nfl_validation.yml"
       - ".github/workflows/run-simulator.yml"
       - ".github/workflows/run_nhl_elite.yml"
+      - ".github/workflows/run-ncaa-simulator.yml"
   workflow_dispatch:
     inputs:
       home:
@@ -108,7 +110,7 @@ jobs:
       - name: Lint NFL and NHL workflow files
         uses: rhysd/actionlint@v1.7.7
         with:
-          args: .github/workflows/run-simulator.yml .github/workflows/run_nhl_elite.yml
+          args: .github/workflows/run-simulator.yml .github/workflows/run_nhl_elite.yml .github/workflows/run-ncaa-simulator.yml
 
       - name: Run complete unit test suite
         run: python -m unittest -v
