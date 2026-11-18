@@ -31,7 +31,9 @@ class ChronologicalValidationTests(unittest.TestCase):
 
     def test_holdout_splits_by_event_start_not_forecast_creation_time(self):
         rows = [dict(row) for row in self.rows]
+        rows[0]["forecasted_at"] = (datetime(2026, 1, 29, tzinfo=timezone.utc)).isoformat()
         rows[0]["event_start"] = (datetime(2026, 1, 30, tzinfo=timezone.utc)).isoformat()
+        rows[-1]["forecasted_at"] = (datetime(2026, 1, 1, tzinfo=timezone.utc)).isoformat()
         rows[-1]["event_start"] = (datetime(2026, 1, 2, tzinfo=timezone.utc)).isoformat()
         result = evaluate_chronological_holdout(rows, min_holdout_rows=5)
         report = result["reports"][0]
