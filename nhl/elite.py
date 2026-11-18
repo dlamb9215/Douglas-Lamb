@@ -5,7 +5,7 @@ Unknown injuries/confirmed starters are explicitly reported, never invented.
 """
 from __future__ import annotations
 import argparse, json, math, random, urllib.parse, urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 WEB = "https://api-web.nhle.com/v1"
 STATS = "https://api.nhle.com/stats/rest/en"
@@ -413,6 +413,29 @@ def american_implied_probability(odds):
         return 100.0 / (odds + 100.0)
     return abs(odds) / (abs(odds) + 100.0)
 
+def validate_odds_context(odds_values, source=None, checked_at=None, now=None, max_age_hours=12):
+    """Require source and a fresh timezone-aware quote timestamp when prices are supplied."""
+    supplied = any(value not in (None, 0, 0.0, "") for value in (odds_values or []))
+    if not supplied:
+        return {"valid": False, "status": "NO_ODDS_SUPPLIED", "source": None, "checked_at": None}
+    if not isinstance(source, str) or not source.strip():
+        raise ValueError("Sportsbook prices require --odds-source.")
+    if not isinstance(checked_at, str) or not checked_at.strip():
+        raise ValueError("Sportsbook prices require --odds-checked-at with a timezone.")
+    try:
+        stamp = datetime.fromisoformat(checked_at.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError("--odds-checked-at must be ISO-8601.") from exc
+    if stamp.tzinfo is None:
+        raise ValueError("--odds-checked-at must include a timezone.")
+    current = now or datetime.now(timezone.utc)
+    age = current - stamp.astimezone(timezone.utc)
+    if age < -timedelta(minutes=5) or age > timedelta(hours=max_age_hours):
+        raise ValueError(f"Sportsbook quote is future-dated or older than {max_age_hours} hours.")
+    return {"valid": True, "status": "FRESH_QUOTE", "source": source.strip(),
+            "checked_at": stamp.astimezone(timezone.utc).isoformat()}
+
+
 def evaluate_two_way_market(model_a_pct, model_b_pct, odds_a, odds_b):
     if not odds_a or not odds_b:
         return {"status":"odds not supplied"}
@@ -438,15 +461,39 @@ def main():
     p.add_argument("--home-goalie-id"); p.add_argument("--away-goalie-id")
     p.add_argument("--exclude-player-ids",default="",help="Comma-separated NHL player IDs to exclude from projections")
     p.add_argument("--home-ml",type=float,default=0); p.add_argument("--away-ml",type=float,default=0)
+    p.add_argument("--odds-source"); p.add_argument("--odds-checked-at")
     p.add_argument("--over-odds",type=float,default=0); p.add_argument("--under-odds",type=float,default=0)
     p.add_argument("--home-puck-odds",type=float,default=0); p.add_argument("--away-puck-odds",type=float,default=0)
     p.add_argument("--season",type=int,default=season_id()); p.add_argument("--output",default="nhl-elite-results.json")
     args=p.parse_args()
     if args.home==args.away: p.error("Home and away must differ.")
+    try:
+        odds_context = validate_odds_context(
+            [args.home_ml, args.away_ml, args.over_odds, args.under_odds,
+             args.home_puck_odds, args.away_puck_odds],
+            args.odds_source, args.odds_checked_at)
+    except ValueError as exc:
+        p.error(str(exc))
     team,skaters,goalies,rosters=load_data(args.home,args.away,args.season)
     excluded=[x.strip() for x in args.exclude_player_ids.split(",") if x.strip()]
     result=simulate(args.home,args.away,team,skaters,goalies,rosters,args.trials,args.total,args.puck_line,args.seed,args.home_goalie_id,args.away_goalie_id,excluded)
     result["team_stats"]={c:team[c] for c in (args.home,args.away)}
+    readiness_blockers = [
+        "Official game-day skater availability and line combinations are not verified.",
+        "Confirmed starting goalies are not verified from an official game-day source.",
+        "NHL player props use independent per-game Poisson approximations and are projection-only.",
+        "No out-of-sample market-specific calibration has been certified."
+    ]
+    if not odds_context["valid"]:
+        readiness_blockers.append("Current two-sided sportsbook prices with source and timestamp are not supplied.")
+    result["betting_readiness"] = {
+        "ready": False,
+        "status": "PROJECTION_ONLY",
+        "blockers": readiness_blockers,
+        "sportsbook_quote": odds_context,
+        "player_props_status": "PROJECTION_ONLY_NOT_BETTING_APPROVED",
+        "game_markets_status": "NOT_APPROVED",
+    }
     result["sportsbook_comparison"]={
       "moneyline":evaluate_two_way_market(result["moneyline_pct"]["home"],result["moneyline_pct"]["away"],args.home_ml,args.away_ml),
       "game_total":evaluate_two_way_market(result["total_pct"]["over"]*100/(result["total_pct"]["over"]+result["total_pct"]["under"]) if result["total_pct"]["over"]+result["total_pct"]["under"] else 0,result["total_pct"]["under"]*100/(result["total_pct"]["over"]+result["total_pct"]["under"]) if result["total_pct"]["over"]+result["total_pct"]["under"] else 0,args.over_odds,args.under_odds),
