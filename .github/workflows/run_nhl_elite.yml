@@ -41,6 +41,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: nhl-simulator-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   simulate:
     runs-on: ubuntu-latest
@@ -89,30 +93,32 @@ jobs:
           python -m nhl.elite --home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --total "$TOTAL" --seed "$SEED" --home-ml "$HOME_ML" --away-ml "$AWAY_ML" --over-odds "$OVER_ODDS" --under-odds "$UNDER_ODDS" --home-puck-odds "$HOME_PUCK_ODDS" --away-puck-odds "$AWAY_PUCK_ODDS" "${ARGS[@]}" | tee nhl-elite-results.txt
           test -s nhl-elite-results.json
           test -s nhl-elite-results.txt
-      - name: Reconcile previous NHL forecasts
+      - name: Reconcile and archive NHL forecasts
         if: success()
-        continue-on-error: true
-        run: python -m nhl.ledger --ledger nhl/ledger/predictions.csv --reconcile
-
-      - name: Append manually launched NHL forecast to persistent ledger
-        if: github.event_name == 'workflow_dispatch' && success()
         shell: bash
         env:
           GITHUB_RUN_ID: ${{ github.run_id }}
           GAME_DATE: ${{ inputs.game_date || '2026-11-19' }}
         run: |
           set -euo pipefail
-          ODDS_SOURCE="$(jq -r '.odds_source // empty' nhl-game-config.json)"
-          ODDS_CHECKED_AT="$(jq -r '.odds_checked_at // empty' nhl-game-config.json)"
-          python -m nhl.ledger --payload nhl-elite-results.json --ledger nhl/ledger/predictions.csv --run-id "$GITHUB_RUN_ID" --game-date "$GAME_DATE" --odds-source "$ODDS_SOURCE" --odds-checked-at "$ODDS_CHECKED_AT"
+          python -m nhl.ledger --ledger nhl/ledger/predictions.csv --reconcile
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            ODDS_SOURCE="$(jq -r '.odds_source // empty' nhl-game-config.json)"
+            ODDS_CHECKED_AT="$(jq -r '.odds_checked_at // empty' nhl-game-config.json)"
+            python -m nhl.ledger --payload nhl-elite-results.json --ledger nhl/ledger/predictions.csv --run-id "$GITHUB_RUN_ID" --game-date "$GAME_DATE" --odds-source "$ODDS_SOURCE" --odds-checked-at "$ODDS_CHECKED_AT"
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add nhl/ledger/predictions.csv
+          if [ -f nhl/ledger/predictions.csv ]; then
+            git add nhl/ledger/predictions.csv
+          fi
           if git diff --cached --quiet; then
-            echo "NHL forecast already recorded; no ledger update."
+            echo "No NHL ledger changes to commit."
           else
-            git commit -m "Record NHL pregame forecast"
-            git push
+            git commit -m "Reconcile and record NHL forecasts"
+            git fetch origin "$GITHUB_REF_NAME"
+            git rebase FETCH_HEAD
+            git push origin "HEAD:$GITHUB_REF_NAME"
           fi
 
       - name: Upload simulation results and forecast ledger
