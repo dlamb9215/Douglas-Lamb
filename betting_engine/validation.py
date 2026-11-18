@@ -85,17 +85,19 @@ def evaluate_chronological_holdout(rows: list[dict], *, min_holdout_rows: int = 
             raise ValueError(f"Row {index} outcome must be 0 or 1")
         groups[(sport, market)].append({
             "prediction_id": pid, "forecasted_at": forecasted,
-            "probability": float(p), "outcome": int(y),
+            "event_start": start, "probability": float(p), "outcome": int(y),
         })
 
     reports = []
     for (sport, market), items in sorted(groups.items()):
-        items.sort(key=lambda r: r["forecasted_at"])
+        items.sort(key=lambda r: (r["event_start"], r["forecasted_at"], r["prediction_id"]))
         split = max(1, min(len(items)-1, int(len(items) * train_fraction))) if len(items) > 1 else len(items)
         train, holdout = items[:split], items[split:]
         report = {
             "sport": sport, "market": market,
             "train_rows": len(train), "holdout_rows": len(holdout),
+            "train_event_end": train[-1]["event_start"].isoformat() if train else None,
+            "holdout_event_start": holdout[0]["event_start"].isoformat() if holdout else None,
             "holdout_status": "ELIGIBLE_FOR_MANUAL_REVIEW" if len(holdout) >= min_holdout_rows else "INSUFFICIENT_HOLDOUT_SAMPLE",
             "calibration_ready": False,
             "note": "Holdout metrics are descriptive only; review market baseline, CLV, ROI uncertainty, data leakage and model version before approval.",
