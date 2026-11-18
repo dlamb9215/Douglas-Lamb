@@ -1,5 +1,5 @@
 import unittest
-from nhl.elite import season_id, normalize_team, matchup_means, poisson, simulate, TEAMS, evaluate_two_way_market, attach_team_ranks
+from nhl.elite import season_id, normalize_team, matchup_means, poisson, simulate, TEAMS, evaluate_two_way_market, attach_team_ranks, attach_team_summary
 
 class EliteNHLTests(unittest.TestCase):
     def setUp(self):
@@ -51,6 +51,36 @@ class EliteNHLTests(unittest.TestCase):
         self.assertEqual(x["team"],"FLA")
         self.assertEqual(x["gf"],3.5)
         self.assertEqual(x["ga"],2.8)
+    def test_team_summary_adds_shots_special_teams_and_faceoffs(self):
+        teams = {
+            "BOS": {"team": "BOS", "games": 20, "gf": 3.2, "ga": 2.7},
+            "FLA": {"team": "FLA", "games": 20, "gf": 3.4, "ga": 2.9},
+        }
+        rows = [
+            {"teamAbbrev": "BOS", "shotsForPerGame": 31.4, "shotsAgainstPerGame": 27.2,
+             "powerPlayPct": 0.235, "penaltyKillPct": 0.812, "faceoffWinPct": 0.518},
+            {"teamAbbrev": "FLA", "shotsPerGame": 32.1, "shotsAllowedPerGame": 28.4,
+             "powerPlayPercentage": 22.5, "penaltyKillPercentage": 80.1,
+             "faceOffWinPercentage": 51.2},
+        ]
+        attach_team_summary(teams, rows)
+        self.assertEqual(teams["BOS"]["sf"], 31.4)
+        self.assertEqual(teams["BOS"]["sa"], 27.2)
+        self.assertAlmostEqual(teams["BOS"]["pp"], 23.5)
+        self.assertAlmostEqual(teams["BOS"]["pk"], 81.2)
+        self.assertAlmostEqual(teams["BOS"]["fo"], 51.8)
+        self.assertEqual(teams["FLA"]["sf"], 32.1)
+        self.assertEqual(teams["FLA"]["sa"], 28.4)
+        self.assertTrue(teams["BOS"]["team_summary_available"])
+        self.assertTrue(teams["FLA"]["team_summary_available"])
+
+    def test_missing_team_summary_features_remain_explicitly_missing(self):
+        teams = {"BOS": {"team": "BOS", "games": 20, "gf": 3.2, "ga": 2.7}}
+        attach_team_summary(teams, [])
+        self.assertFalse(teams["BOS"]["team_summary_available"])
+        self.assertEqual(set(teams["BOS"]["team_summary_missing_fields"]), {"sf", "sa", "pp", "pk", "fo"})
+        self.assertIsNone(teams["BOS"]["pp"])
+
     def test_team_rates_not_fabricated(self):
         x=normalize_team({"teamAbbrev":"BOS","gamesPlayed":20})
         self.assertIsNone(x["gf"]); self.assertIsNone(x["ga"])
