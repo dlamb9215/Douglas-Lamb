@@ -462,12 +462,36 @@ def main():
     p.add_argument("--home-ml",type=float,default=0); p.add_argument("--away-ml",type=float,default=0)
     p.add_argument("--over-odds",type=float,default=0); p.add_argument("--under-odds",type=float,default=0)
     p.add_argument("--home-puck-odds",type=float,default=0); p.add_argument("--away-puck-odds",type=float,default=0)
+    p.add_argument("--odds-source",default=""); p.add_argument("--odds-checked-at",default="")
+    p.add_argument("--game-date",default=datetime.now(timezone.utc).date().isoformat())
     p.add_argument("--season",type=int,default=season_id()); p.add_argument("--output",default="nhl-elite-results.json")
     args=p.parse_args()
     if args.home==args.away: p.error("Home and away must differ.")
+    supplied_prices = any((args.home_ml,args.away_ml,args.over_odds,args.under_odds,args.home_puck_odds,args.away_puck_odds))
+    if supplied_prices and (not args.odds_source.strip() or not args.odds_checked_at.strip()):
+        p.error("Sportsbook prices require --odds-source and timezone-aware --odds-checked-at.")
+    if args.odds_checked_at:
+        try:
+            quote_time = datetime.fromisoformat(args.odds_checked_at.replace("Z","+00:00"))
+            if quote_time.tzinfo is None: raise ValueError("timezone missing")
+            args.odds_checked_at = quote_time.astimezone(timezone.utc).isoformat()
+        except ValueError as exc:
+            p.error(f"Invalid --odds-checked-at: {exc}")
+    try:
+        datetime.strptime(args.game_date,"%Y-%m-%d")
+    except ValueError:
+        p.error("--game-date must be YYYY-MM-DD.")
     team,skaters,goalies,rosters=load_data(args.home,args.away,args.season)
     excluded=[x.strip() for x in args.exclude_player_ids.split(",") if x.strip()]
     result=simulate(args.home,args.away,team,skaters,goalies,rosters,args.trials,args.total,args.puck_line,args.seed,args.home_goalie_id,args.away_goalie_id,excluded)
+    result["game_date"] = args.game_date
+    result["sportsbook_source"] = args.odds_source or None
+    result["odds_checked_at_utc"] = args.odds_checked_at or None
+    result["sportsbook_prices"] = {
+      "home_ml": args.home_ml or None, "away_ml": args.away_ml or None,
+      "over": args.over_odds or None, "under": args.under_odds or None,
+      "home_puck": args.home_puck_odds or None, "away_puck": args.away_puck_odds or None,
+    }
     result["team_stats"]={c:team[c] for c in (args.home,args.away)}
     result["sportsbook_comparison"]={
       "moneyline":evaluate_two_way_market(result["moneyline_pct"]["home"],result["moneyline_pct"]["away"],args.home_ml,args.away_ml),
