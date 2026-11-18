@@ -415,15 +415,14 @@ def main():
     result["goalie_confirmation"] = goalie_check or {"status":"NOT_PROVIDED","availability_confirmed":False}
     result["skater_lineup_confirmation"] = lineup_check or {"status":"NOT_PROVIDED","availability_confirmed":False}
     result["betting_gate"] = {
-        "status":"PASS",
+        "status":"NOT_APPROVED",
         "availability_confirmed": bool(goalie_check and lineup_check),
         "goalie_starters_confirmed": bool(goalie_check),
         "skater_lineups_confirmed": bool(lineup_check),
-        "blockers":[
-            "Confirmed full skater lineup and scratches are not yet ingested by this workflow." if not lineup_check else "",
-            "Market-specific out-of-sample calibration is not approved.",
-            "Current two-sided sportsbook quotes with source and timestamp are required."
-        ],
+        "blockers": ([["Confirmed starting goalies are not confirmed."] if not goalie_check else []] +
+            [["Confirmed full skater lineups and scratches are not supplied."] if not lineup_check else []] +
+            ["Market-specific out-of-sample calibration is not approved.",
+             "Current two-sided sportsbook quotes with source and timestamp are required."]),
         "note":"Confirmed goalies alone do not authorize a BET recommendation."
     }
     result["team_stats"]={c:team[c] for c in (args.home,args.away)}
