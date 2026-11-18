@@ -50,7 +50,7 @@ on:
         default: "100000"
         type: string
       game_config_json:
-        description: Optional JSON for confirmed QBs and official source URLs, sportsbook lines/prices/source/timestamp, and neutral_site
+        description: Optional JSON for confirmed QBs and official source URLs, official game-day confirmation payload, player-prop lines, sportsbook lines/prices/source/timestamp, and neutral_site
         required: false
         default: '{"neutral_site":false}'
         type: string
@@ -83,6 +83,11 @@ jobs:
           config = json.loads(raw) if raw else {}
           if not isinstance(config, dict): raise SystemExit("game_config_json must be a JSON object")
           with open("game-config.json", "w", encoding="utf-8") as handle: json.dump(config, handle, indent=2)
+          for key, filename in (("game_day_confirmations_json", "game_day_confirmations.json"), ("player_prop_lines_json", "player_prop_lines.json")):
+              payload = config.get(key)
+              if payload is not None:
+                  if not isinstance(payload, dict): raise SystemExit(f"{key} must be a JSON object")
+                  with open(filename, "w", encoding="utf-8") as handle: json.dump(payload, handle, indent=2)
           PY
 
       - name: Refresh current-season NFL team statistics
