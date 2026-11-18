@@ -20,6 +20,7 @@ on:
       - ".github/workflows/run-simulator.yml"
       - ".github/workflows/run_nhl_elite.yml"
       - ".github/workflows/run-ncaa-simulator.yml"
+      - "nhl/**"
   pull_request:
     paths:
       - "main.py"
@@ -38,6 +39,7 @@ on:
       - ".github/workflows/run-simulator.yml"
       - ".github/workflows/run_nhl_elite.yml"
       - ".github/workflows/run-ncaa-simulator.yml"
+      - "nhl/**"
   workflow_dispatch:
     inputs:
       home:
