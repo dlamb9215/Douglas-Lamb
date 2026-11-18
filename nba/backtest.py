@@ -146,7 +146,11 @@ def evaluate(path):
         "duplicate_event_forecasts_excluded": duplicate_event_rows,
         "settled_rows_without_event_id": len(no_event_id),
         "availability_confirmed_rows": sum(x["availability_confirmed"] for x in rows),
-        "betting_approval": "PASS",
+        "betting_approval": "NOT_APPROVED",
+        "betting_approval_blockers": [
+            "Backtest accuracy metrics alone cannot authorize betting.",
+            "Market-specific chronological holdout, positive closing-line value, odds validation and manual review are required.",
+        ],
         "postgame_forecasts_excluded": postgame_excluded,
         "home_points_mae": mean([abs(x["projected_home"] - x["actual_home"]) for x in rows]),
         "away_points_mae": mean([abs(x["projected_away"] - x["actual_away"]) for x in rows]),
