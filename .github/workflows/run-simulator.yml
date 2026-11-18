@@ -53,7 +53,8 @@ on:
         description: Officially confirmed away-team starting QB
         required: false
         default: ""
-        type: string      home_qb_source:
+        type: string
+      home_qb_source:
         description: Official team source URL confirming the home-team starting QB
         required: false
         default: ""
