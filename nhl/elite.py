@@ -79,7 +79,8 @@ def normalize_team(row):
     gf = gf_total / gp if gf_total is not None else first_num(row, ["goalsForPerGame"], None)
     ga = ga_total / gp if ga_total is not None else first_num(row, ["goalsAgainstPerGame"], None)
     return {
-        "team": code, "games": int(gp), "gf": gf, "ga": ga,
+        "team": code, "team_id": row.get("teamId") or row.get("team_id"),
+        "games": int(gp), "gf": gf, "ga": ga,
         "sf": None, "sa": None, "pp": None, "pk": None, "fo": None,
         "season": row.get("seasonId") or row.get("season"),
         "source": "NHL standings feed",
@@ -108,10 +109,14 @@ def attach_team_ranks(team_stats):
 def attach_team_summary(team_stats, rows):
     """Merge official NHL Stats REST team-summary rates into standings rows."""
     by_code = {}
+    by_id = {}
     for row in rows:
         code = team_code(row)
         if code:
             by_code[code] = row
+        team_id = row.get("teamId") or row.get("team_id")
+        if team_id is not None:
+            by_id[str(team_id)] = row
     fields = {
         "sf": ("shotsForPerGame", "shotsPerGame", "shots_for_per_game"),
         "sa": ("shotsAgainstPerGame", "shotsAllowedPerGame", "shots_against_per_game"),
@@ -121,6 +126,8 @@ def attach_team_summary(team_stats, rows):
     }
     for code, stats in team_stats.items():
         row = by_code.get(code)
+        if row is None and stats.get("team_id") is not None:
+            row = by_id.get(str(stats["team_id"]))
         missing = []
         for target, candidates in fields.items():
             value = first_num(row, candidates, None) if row else None
