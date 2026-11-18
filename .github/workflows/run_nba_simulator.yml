@@ -61,7 +61,7 @@ on:
       game_config_json:
         description: Optional JSON object for sportsbook prices, source/timestamp, confirmed lineups, player-prop lines, rest/travel and other settings; see BETTING_ENGINE_UPGRADE.md
         required: false
-        default: '{"auto_injuries":true,"auto_odds":true,"player_props":true,"prop_trials":50000,"seed":42}'
+        default: '{"auto_injuries":true,"auto_odds":false,"player_props":false,"prop_trials":50000,"seed":42}'
         type: string
 
 jobs:
