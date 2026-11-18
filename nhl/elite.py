@@ -419,8 +419,8 @@ def main():
         "availability_confirmed": bool(goalie_check and lineup_check),
         "goalie_starters_confirmed": bool(goalie_check),
         "skater_lineups_confirmed": bool(lineup_check),
-        "blockers": ([["Confirmed starting goalies are not confirmed."] if not goalie_check else []] +
-            [["Confirmed full skater lineups and scratches are not supplied."] if not lineup_check else []] +
+        "blockers": (["Confirmed starting goalies are not confirmed."] if not goalie_check else []) +
+            (["Confirmed full skater lineups and scratches are not supplied."] if not lineup_check else []) +
             ["Market-specific out-of-sample calibration is not approved.",
              "Current two-sided sportsbook quotes with source and timestamp are required."]),
         "note":"Confirmed goalies alone do not authorize a BET recommendation."
