@@ -4,13 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       home:
-        description: Home team
+        description: Home team (TOR for Thursday's first game)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
         default: TOR
       away:
-        description: Away team
+        description: Away team (LAK for Thursday's first game)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
@@ -21,60 +21,10 @@ on:
         type: choice
         options: ["100000", "250000", "500000", "1000000", "5000000"]
         default: "100000"
-      total:
-        description: Game total goals line
-        required: true
-        default: "6.0"
-        type: string
-      seed:
-        description: Reproducible seed
-        required: true
-        default: "20261119"
-        type: string
-      home_goalie_id:
-        description: Optional confirmed home goalie NHL player ID
+      game_config_json:
+        description: Optional JSON for total, seed, confirmed goalie IDs, scratched player IDs, and sportsbook prices
         required: false
-        default: ""
-        type: string
-      away_goalie_id:
-        description: Optional confirmed away goalie NHL player ID
-        required: false
-        default: ""
-        type: string
-      excluded_player_ids:
-        description: Optional comma-separated inactive or scratched NHL player IDs to exclude
-        required: false
-        default: ""
-        type: string
-      home_ml:
-        description: Home moneyline odds (American; 0 skips comparison)
-        required: true
-        default: "0"
-        type: string
-      away_ml:
-        description: Away moneyline odds (American; 0 skips comparison)
-        required: true
-        default: "0"
-        type: string
-      over_odds:
-        description: Over odds (American; 0 skips comparison)
-        required: true
-        default: "0"
-        type: string
-      under_odds:
-        description: Under odds (American; 0 skips comparison)
-        required: true
-        default: "0"
-        type: string
-      home_puck_odds:
-        description: Home -1.5 odds (American; 0 skips comparison)
-        required: true
-        default: "0"
-        type: string
-      away_puck_odds:
-        description: Away +1.5 odds (American; 0 skips comparison)
-        required: true
-        default: "0"
+        default: '{"total":6.0,"seed":20261119}'
         type: string
 
 permissions:
@@ -89,20 +39,39 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Parse matchup configuration
+        env:
+          GAME_CONFIG_JSON: ${{ inputs.game_config_json }}
+        run: |
+          python - <<'PY'
+          import json, os
+          raw = os.environ.get("GAME_CONFIG_JSON", "").strip()
+          config = json.loads(raw) if raw else {}
+          if not isinstance(config, dict): raise SystemExit("game_config_json must be a JSON object")
+          with open("nhl-game-config.json", "w", encoding="utf-8") as handle: json.dump(config, handle, indent=2)
+          PY
       - name: Run offline unit tests
         run: python -m unittest -v nhl.test_elite
       - name: Run NHL matchup model
-        env:
-          HOME_GOALIE_ID: ${{ inputs.home_goalie_id }}
-          AWAY_GOALIE_ID: ${{ inputs.away_goalie_id }}
-          EXCLUDED_PLAYER_IDS: ${{ inputs.excluded_player_ids }}
+        shell: bash
         run: |
-          set -euo pipefail
-          ARGS=""
-          if [ -n "$HOME_GOALIE_ID" ]; then ARGS="$ARGS --home-goalie-id $HOME_GOALIE_ID"; fi
-          if [ -n "$AWAY_GOALIE_ID" ]; then ARGS="$ARGS --away-goalie-id $AWAY_GOALIE_ID"; fi
-          if [ -n "$EXCLUDED_PLAYER_IDS" ]; then ARGS="$ARGS --exclude-player-ids $EXCLUDED_PLAYER_IDS"; fi
-          python -m nhl.elite --home "${{ inputs.home }}" --away "${{ inputs.away }}" --trials "${{ inputs.trials }}" --total "${{ inputs.total }}" --seed "${{ inputs.seed }}" --home-ml "${{ inputs.home_ml }}" --away-ml "${{ inputs.away_ml }}" --over-odds "${{ inputs.over_odds }}" --under-odds "${{ inputs.under_odds }}" --home-puck-odds "${{ inputs.home_puck_odds }}" --away-puck-odds "${{ inputs.away_puck_odds }}" $ARGS | tee nhl-elite-results.txt
+          CONFIG=nhl-game-config.json
+          TOTAL="$(jq -r '.total // 6.0' "$CONFIG")"
+          SEED="$(jq -r '.seed // 20261119' "$CONFIG")"
+          HOME_GOALIE_ID="$(jq -r '.home_goalie_id // empty' "$CONFIG")"
+          AWAY_GOALIE_ID="$(jq -r '.away_goalie_id // empty' "$CONFIG")"
+          EXCLUDED_PLAYER_IDS="$(jq -r '.excluded_player_ids // empty' "$CONFIG")"
+          HOME_ML="$(jq -r '.home_ml // 0' "$CONFIG")"
+          AWAY_ML="$(jq -r '.away_ml // 0' "$CONFIG")"
+          OVER_ODDS="$(jq -r '.over_odds // 0' "$CONFIG")"
+          UNDER_ODDS="$(jq -r '.under_odds // 0' "$CONFIG")"
+          HOME_PUCK_ODDS="$(jq -r '.home_puck_odds // 0' "$CONFIG")"
+          AWAY_PUCK_ODDS="$(jq -r '.away_puck_odds // 0' "$CONFIG")"
+          ARGS=()
+          if [ -n "$HOME_GOALIE_ID" ]; then ARGS+=(--home-goalie-id "$HOME_GOALIE_ID"); fi
+          if [ -n "$AWAY_GOALIE_ID" ]; then ARGS+=(--away-goalie-id "$AWAY_GOALIE_ID"); fi
+          if [ -n "$EXCLUDED_PLAYER_IDS" ]; then ARGS+=(--exclude-player-ids "$EXCLUDED_PLAYER_IDS"); fi
+          python -m nhl.elite --home "${{ inputs.home }}" --away "${{ inputs.away }}" --trials "${{ inputs.trials }}" --total "$TOTAL" --seed "$SEED" --home-ml "$HOME_ML" --away-ml "$AWAY_ML" --over-odds "$OVER_ODDS" --under-odds "$UNDER_ODDS" --home-puck-odds "$HOME_PUCK_ODDS" --away-puck-odds "$AWAY_PUCK_ODDS" "${ARGS[@]}" | tee nhl-elite-results.txt
           test -s nhl-elite-results.json
           test -s nhl-elite-results.txt
       - name: Upload simulation results
