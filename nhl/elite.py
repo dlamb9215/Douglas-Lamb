@@ -38,7 +38,8 @@ def first_num(row, names, default=None):
     return default
 
 def team_code(row):
-    v = row.get("teamAbbrevs") or row.get("teamAbbrev") or row.get("teamCode") or row.get("teamAbbreviation")
+    v = (row.get("teamAbbrevs") or row.get("teamAbbrev") or row.get("teamCode")
+         or row.get("teamAbbreviation") or row.get("triCode") or row.get("rawTricode"))
     if isinstance(v, dict): v = v.get("default") or v.get("triCode")
     return str(v).upper() if v else ""
 
@@ -106,8 +107,9 @@ def attach_team_ranks(team_stats):
     return team_stats
 
 
-def attach_team_summary(team_stats, rows):
+def attach_team_summary(team_stats, rows, team_id_by_code=None):
     """Merge official NHL Stats REST team-summary rates into standings rows."""
+    team_id_by_code = team_id_by_code or {}
     by_code = {}
     by_id = {}
     for row in rows:
@@ -126,8 +128,11 @@ def attach_team_summary(team_stats, rows):
     }
     for code, stats in team_stats.items():
         row = by_code.get(code)
-        if row is None and stats.get("team_id") is not None:
-            row = by_id.get(str(stats["team_id"]))
+        team_id = stats.get("team_id") or team_id_by_code.get(code)
+        if row is None and team_id is not None:
+            row = by_id.get(str(team_id))
+        if team_id is not None:
+            stats["team_id"] = team_id
         missing = []
         for target, candidates in fields.items():
             value = first_num(row, candidates, None) if row else None
@@ -156,8 +161,18 @@ def load_data(home, away, season):
         if team_stats[code]["gf"] is None or team_stats[code]["ga"] is None:
             raise RuntimeError(f"Current-season goals-for/goals-against totals are incomplete for {code}.")
     try:
+        # The Stats REST team reference endpoint maps the NHL Web API's
+        # abbreviations to the team IDs used by team/summary report rows.
+        team_reference = get_json(f"{STATS}/team").get("data", [])
+        if not isinstance(team_reference, list) or not team_reference:
+            raise RuntimeError("NHL Stats REST team reference returned no team rows.")
+        team_id_by_code = {
+            str(row.get("triCode") or row.get("rawTricode") or "").upper(): row.get("id")
+            for row in team_reference
+            if (row.get("triCode") or row.get("rawTricode")) and row.get("id") is not None
+        }
         team_rows = stats_report("team", season, 1000)
-        attach_team_summary(team_stats, team_rows)
+        attach_team_summary(team_stats, team_rows, team_id_by_code)
     except Exception as exc:
         for code in (home, away):
             team_stats[code]["team_summary_available"] = False
