@@ -33,13 +33,21 @@ def stats_report(kind, season, limit=1000):
 def first_num(row, names, default=None):
     for name in names:
         value = row.get(name)
-        if isinstance(value, (int,float)) and math.isfinite(value):
-            return float(value)
+        if isinstance(value, bool) or value is None:
+            continue
+        try:
+            number = float(value)
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(number):
+            return number
     return default
 
 def team_code(row):
-    v = row.get("teamAbbrevs") or row.get("teamAbbrev") or row.get("teamCode") or row.get("teamAbbreviation")
-    if isinstance(v, dict): v = v.get("default") or v.get("triCode")
+    v = (row.get("teamAbbrevs") or row.get("teamAbbrev") or row.get("teamCode")
+         or row.get("teamAbbreviation") or row.get("triCode") or row.get("rawTricode")
+         or row.get("team_abbrev") or row.get("team_tricode"))
+    if isinstance(v, dict): v = v.get("default") or v.get("triCode") or v.get("rawTricode")
     return str(v).upper() if v else ""
 
 def player_id(row):
@@ -106,28 +114,31 @@ def attach_team_ranks(team_stats):
     return team_stats
 
 
-def attach_team_summary(team_stats, rows):
-    """Merge official NHL Stats REST team-summary rates into standings rows."""
-    by_code = {}
-    by_id = {}
+def attach_team_summary(team_stats, rows, team_id_to_code=None):
+    """Merge official NHL Stats REST summary rows using real API field names."""
+    team_id_to_code = {str(k): str(v).upper() for k, v in (team_id_to_code or {}).items()}
+    by_code, by_name = {}, {}
     for row in rows:
         code = team_code(row)
+        if not code and row.get("teamId") is not None:
+            code = team_id_to_code.get(str(row.get("teamId")), "")
         if code:
             by_code[code] = row
-        team_id = row.get("teamId") or row.get("team_id")
-        if team_id is not None:
-            by_id[str(team_id)] = row
+        name = row.get("teamFullName") or row.get("team_full_name")
+        if name:
+            by_name[" ".join(str(name).casefold().split())] = row
     fields = {
         "sf": ("shotsForPerGame", "shotsPerGame", "shots_for_per_game"),
-        "sa": ("shotsAgainstPerGame", "shotsAllowedPerGame", "shots_against_per_game"),
+        "sa": ("shotsAgainstPerGame", "shotsAllowedPerGame", "shots_against_per_game", "shots_allowed_per_game"),
         "pp": ("powerPlayPct", "powerPlayPercentage", "power_play_pct"),
         "pk": ("penaltyKillPct", "penaltyKillPercentage", "penalty_kill_pct"),
         "fo": ("faceoffWinPct", "faceOffWinPercentage", "faceoff_win_pct"),
     }
     for code, stats in team_stats.items():
         row = by_code.get(code)
-        if row is None and stats.get("team_id") is not None:
-            row = by_id.get(str(stats["team_id"]))
+        if row is None and stats.get("team_full_name"):
+            key = " ".join(str(stats["team_full_name"]).casefold().split())
+            row = by_name.get(key)
         missing = []
         for target, candidates in fields.items():
             value = first_num(row, candidates, None) if row else None
@@ -139,6 +150,8 @@ def attach_team_summary(team_stats, rows):
         stats["team_summary_available"] = not missing
         stats["team_summary_missing_fields"] = missing
         stats["team_summary_source"] = "NHL Stats REST team/summary" if row else None
+        if row:
+            stats["team_summary_team_id"] = row.get("teamId") or row.get("team_id")
     return team_stats
 
 
@@ -157,7 +170,18 @@ def load_data(home, away, season):
             raise RuntimeError(f"Current-season goals-for/goals-against totals are incomplete for {code}.")
     try:
         team_rows = stats_report("team", season, 1000)
-        attach_team_summary(team_stats, team_rows)
+        directory_payload = get_json(f"{STATS}/team")
+        directory_rows = directory_payload.get("data", [])
+        team_id_to_code = {}
+        for item in directory_rows if isinstance(directory_rows, list) else []:
+            tid = item.get("id") or item.get("teamId")
+            tri = item.get("triCode") or item.get("rawTricode") or item.get("teamAbbrev")
+            if tid is not None and tri:
+                team_id_to_code[str(tid)] = str(tri).upper()
+        attach_team_summary(team_stats, team_rows, team_id_to_code)
+        for code in (home, away):
+            team_stats[code]["team_summary_rows_seen"] = len(team_rows)
+            team_stats[code]["team_directory_codes_seen"] = len(team_id_to_code)
     except Exception as exc:
         for code in (home, away):
             team_stats[code]["team_summary_available"] = False
