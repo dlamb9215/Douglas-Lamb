@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime, timezone, timedelta
 
-from nhl.readiness import validate_confirmed_goalies
+from nhl.readiness import validate_confirmed_goalies, validate_confirmed_skater_lineups
 
 
 class NHLReadinessTests(unittest.TestCase):
@@ -44,6 +44,42 @@ class NHLReadinessTests(unittest.TestCase):
         self.payload["goalies"]["away"]["player_id"] = None
         with self.assertRaises(ValueError):
             validate_confirmed_goalies(self.payload, "DAL", "FLA", now=self.now)
+
+    def lineup_payload(self):
+        return {
+            "confirmed": True, "home": "DAL", "away": "FLA",
+            "source_url": "https://www.nhl.com/",
+            "checked_at_utc": (self.now - timedelta(minutes=20)).isoformat(),
+            "lineups": {
+                "home": {"team": "DAL", "player_ids": list(range(1, 19)), "scratched_player_ids": [90]},
+                "away": {"team": "FLA", "player_ids": list(range(101, 119)), "scratched_player_ids": [190]},
+            },
+        }
+
+    def test_accepts_fresh_confirmed_skater_lineups(self):
+        out = validate_confirmed_skater_lineups(self.lineup_payload(), "DAL", "FLA", now=self.now)
+        self.assertTrue(out["availability_confirmed"])
+        self.assertEqual(len(out["lineups"]["home"]["player_ids"]), 18)
+
+    def test_rejects_incomplete_or_duplicate_lineups(self):
+        payload = self.lineup_payload()
+        payload["lineups"]["home"]["player_ids"] = [1, 2, 3]
+        with self.assertRaises(ValueError):
+            validate_confirmed_skater_lineups(payload, "DAL", "FLA", now=self.now)
+        payload = self.lineup_payload()
+        payload["lineups"]["away"]["player_ids"][1] = payload["lineups"]["away"]["player_ids"][0]
+        with self.assertRaises(ValueError):
+            validate_confirmed_skater_lineups(payload, "DAL", "FLA", now=self.now)
+
+    def test_rejects_scratch_marked_active_and_stale_lineup(self):
+        payload = self.lineup_payload()
+        payload["lineups"]["home"]["scratched_player_ids"] = [1]
+        with self.assertRaises(ValueError):
+            validate_confirmed_skater_lineups(payload, "DAL", "FLA", now=self.now)
+        payload = self.lineup_payload()
+        payload["checked_at_utc"] = (self.now - timedelta(hours=4)).isoformat()
+        with self.assertRaises(ValueError):
+            validate_confirmed_skater_lineups(payload, "DAL", "FLA", now=self.now)
 
 
 if __name__ == "__main__":
