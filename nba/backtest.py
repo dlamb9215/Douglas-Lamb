@@ -56,6 +56,38 @@ def evaluate(path):
     if len(ids) != len(set(ids)):
         raise ValueError("Duplicate forecast_id values found; refusing a contaminated backtest")
 
+    # Multiple workflow launches can create several forecasts for one game.
+    # Keep the latest valid pregame forecast per event; never count one game
+    # multiple times in the same performance sample.
+    latest_by_event = {}
+    no_event_id = []
+    duplicate_event_rows = 0
+    for source in settled:
+        event_key = str(source.get("event_id", "")).strip()
+        if not event_key:
+            no_event_id.append(source)
+            continue
+        forecasted = source.get("forecasted_at", "")
+        game_start = source.get("game_start_time", "")
+        if forecasted and game_start:
+            try:
+                ft = datetime.fromisoformat(forecasted.replace("Z", "+00:00"))
+                st = datetime.fromisoformat(game_start.replace("Z", "+00:00"))
+                if ft.tzinfo is None or st.tzinfo is None:
+                    raise ValueError("forecast and game start timestamps must include timezones")
+                if ft >= st:
+                    continue
+            except ValueError as exc:
+                raise ValueError(f"Invalid forecast timing while de-duplicating event {event_key}: {exc}") from exc
+        prior = latest_by_event.get(event_key)
+        if prior is None or str(forecasted) > str(prior.get("forecasted_at", "")):
+            if prior is not None:
+                duplicate_event_rows += 1
+            latest_by_event[event_key] = source
+        else:
+            duplicate_event_rows += 1
+    settled = list(latest_by_event.values()) + no_event_id
+
     rows = []
     postgame_excluded = 0
     for index, source in enumerate(settled, 2):
@@ -110,6 +142,8 @@ def evaluate(path):
 
     result = {
         "games": len(rows), "pending_rows_excluded": pending,
+        "duplicate_event_forecasts_excluded": duplicate_event_rows,
+        "settled_rows_without_event_id": len(no_event_id),
         "postgame_forecasts_excluded": postgame_excluded,
         "home_points_mae": mean([abs(x["projected_home"] - x["actual_home"]) for x in rows]),
         "away_points_mae": mean([abs(x["projected_away"] - x["actual_away"]) for x in rows]),
