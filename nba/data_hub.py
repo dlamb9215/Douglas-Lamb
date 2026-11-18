@@ -287,10 +287,47 @@ def build_report(home: str, away: str, game_date: date, team_stats_path: str = "
         try:
             espn_odds = fetch_espn_bet_odds(event_id)
             report["sources"]["espn_bet"] = espn_odds
+            # ESPN BET is a supported primary quote source in this workflow.
+            # Only accept both sides with a bookmaker quote timestamp; retrieval
+            # time alone is not evidence that the underlying price is current.
+            espn_ml_ready = (
+                espn_odds.get("home_ml_odds") is not None
+                and espn_odds.get("away_ml_odds") is not None
+                and bool(espn_odds.get("last_updated"))
+            )
+            if not report["readiness"].get("two_sided_odds", False) and espn_ml_ready:
+                report["readiness"]["two_sided_odds"] = True
+                report["sources"]["sportsbook_odds"] = {
+                    "status": "available", "provider": espn_odds.get("source", "ESPN BET"),
+                    "home_ml_odds": espn_odds["home_ml_odds"],
+                    "away_ml_odds": espn_odds["away_ml_odds"],
+                    "moneyline_last_updated": espn_odds.get("last_updated"),
+                    "event_id": event_id,
+                    "retrieved_at": espn_odds.get("retrieved_at"),
+                }
+            report["readiness"]["espn_bet_moneyline"] = espn_ml_ready
+            report["readiness"]["espn_bet_spread"] = (
+                espn_odds.get("home_spread") is not None
+                and espn_odds.get("home_spread_odds") is not None
+                and espn_odds.get("away_spread_odds") is not None
+                and bool(espn_odds.get("last_updated"))
+            )
+            report["readiness"]["espn_bet_total"] = (
+                espn_odds.get("total") is not None
+                and espn_odds.get("over_odds") is not None
+                and espn_odds.get("under_odds") is not None
+                and bool(espn_odds.get("last_updated"))
+            )
         except Exception as exc:
             report["sources"]["espn_bet"] = {"status": "unavailable", "provider": "ESPN BET", "error": str(exc)}
+            report["readiness"]["espn_bet_moneyline"] = False
+            report["readiness"]["espn_bet_spread"] = False
+            report["readiness"]["espn_bet_total"] = False
     else:
         report["sources"]["espn_bet"] = {"status": "not_checked", "note": "No verified ESPN event ID from schedule adapter."}
+        report["readiness"]["espn_bet_moneyline"] = False
+        report["readiness"]["espn_bet_spread"] = False
+        report["readiness"]["espn_bet_total"] = False
 
     report["readiness"]["bet_eligible_data"] = all(
         report["readiness"].get(key, False)
