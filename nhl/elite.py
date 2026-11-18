@@ -113,7 +113,9 @@ def attach_team_summary(team_stats, rows, team_lookup=None):
     team_lookup = {str(k): str(v).upper() for k, v in (team_lookup or {}).items()}
     for row in rows:
         team_id = row.get("teamId") or row.get("team_id")
-        code = team_code(row) or team_lookup.get(str(team_id), "") if team_id is not None else team_code(row)
+        code = team_code(row)
+        if not code and team_id is not None:
+            code = team_lookup.get(str(team_id), "")
         if code:
             by_code[code] = row
         if team_id is not None:
