@@ -17,6 +17,8 @@ on:
       - "test_*.py"
       - "requirements-nba.txt"
       - ".github/workflows/nfl_validation.yml"
+      - ".github/workflows/run-simulator.yml"
+      - ".github/workflows/run_nhl_elite.yml"
   pull_request:
     paths:
       - "main.py"
@@ -32,6 +34,8 @@ on:
       - "test_*.py"
       - "requirements-nba.txt"
       - ".github/workflows/nfl_validation.yml"
+      - ".github/workflows/run-simulator.yml"
+      - ".github/workflows/run_nhl_elite.yml"
   workflow_dispatch:
     inputs:
       home:
@@ -100,6 +104,11 @@ jobs:
 
       - name: Verify NumPy import
         run: python -c "import numpy; print(numpy.__version__)"
+
+      - name: Lint NFL and NHL workflow files
+        uses: rhysd/actionlint@v1.7.7
+        with:
+          args: .github/workflows/run-simulator.yml .github/workflows/run_nhl_elite.yml
 
       - name: Run complete unit test suite
         run: python -m unittest -v
