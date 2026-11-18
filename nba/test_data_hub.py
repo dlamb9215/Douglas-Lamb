@@ -66,6 +66,64 @@ class TestNBADataHub(unittest.TestCase):
         self.assertTrue(report["readiness"]["official_injuries"])
         self.assertTrue(report["readiness"]["confirmed_lineups"])
 
+    def test_espn_bet_two_sided_timestamped_odds_can_satisfy_odds_gate(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            stats = Path(tmp) / "stats.json"
+            stats.write_text(json.dumps({"league": "NBA"}), encoding="utf-8")
+            with (
+                patch("nba.data_hub.validate_payload", return_value={"ready": True, "warnings": []}),
+                patch("nba.data_hub.build_context", return_value={
+                    "event": {"event_id": "123"}, "source": "ESPN", "retrieved_at": "2026-11-12T12:00:00Z",
+                    "home_rest_days": 2, "away_rest_days": 1, "warnings": []
+                }),
+                patch("nba.data_hub.fetch_official_injuries", return_value={
+                    "source": "NBA official injury report", "retrieved_at": "2026-11-12T12:00:00Z",
+                    "report_url": "https://official.nba.com/report.pdf", "player_statuses": [],
+                    "team_submission": {}, "warnings": []
+                }),
+                patch("nba.data_hub.fetch_espn_bet_odds", return_value={
+                    "home_ml_odds": -115, "away_ml_odds": 105,
+                    "home_spread": -2.5, "home_spread_odds": -110, "away_spread_odds": -110,
+                    "total": 221.5, "over_odds": -110, "under_odds": -110,
+                    "last_updated": "2026-11-12T11:59:00Z",
+                    "retrieved_at": "2026-11-12T12:00:00Z",
+                    "source": "ESPN BET via ESPN Core API",
+                }),
+                patch.dict(os.environ, {"ODDS_API_KEY": ""}),
+            ):
+                report = build_report("WAS", "DET", date(2026, 11, 12), str(stats))
+        self.assertTrue(report["readiness"]["two_sided_odds"])
+        self.assertTrue(report["readiness"]["espn_bet_moneyline"])
+        self.assertTrue(report["readiness"]["espn_bet_spread"])
+        self.assertTrue(report["readiness"]["espn_bet_total"])
+        self.assertEqual(report["sources"]["sportsbook_odds"]["provider"], "ESPN BET via ESPN Core API")
+
+    def test_espn_bet_without_quote_timestamp_does_not_satisfy_odds_gate(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            stats = Path(tmp) / "stats.json"
+            stats.write_text(json.dumps({"league": "NBA"}), encoding="utf-8")
+            with (
+                patch("nba.data_hub.validate_payload", return_value={"ready": True, "warnings": []}),
+                patch("nba.data_hub.build_context", return_value={
+                    "event": {"event_id": "123"}, "source": "ESPN", "retrieved_at": "2026-11-12T12:00:00Z",
+                    "home_rest_days": 2, "away_rest_days": 1, "warnings": []
+                }),
+                patch("nba.data_hub.fetch_official_injuries", return_value={
+                    "source": "NBA official injury report", "retrieved_at": "2026-11-12T12:00:00Z",
+                    "report_url": "https://official.nba.com/report.pdf", "player_statuses": [],
+                    "team_submission": {}, "warnings": []
+                }),
+                patch("nba.data_hub.fetch_espn_bet_odds", return_value={
+                    "home_ml_odds": -115, "away_ml_odds": 105,
+                    "retrieved_at": "2026-11-12T12:00:00Z",
+                    "source": "ESPN BET via ESPN Core API",
+                }),
+                patch.dict(os.environ, {"ODDS_API_KEY": ""}),
+            ):
+                report = build_report("WAS", "DET", date(2026, 11, 12), str(stats))
+        self.assertFalse(report["readiness"]["two_sided_odds"])
+        self.assertFalse(report["readiness"]["espn_bet_moneyline"])
+
     def test_injury_roster_mismatch_blocks_official_injury_readiness(self):
         from nba.data_hub import validate_injury_roster_consistency
         statuses = [{"team": "MEM", "player": "Wrong Team Player", "status": "Out"}]
