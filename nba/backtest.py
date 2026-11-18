@@ -115,6 +115,7 @@ def evaluate(path):
             "projected_home": ph, "projected_away": pa, "actual_home": ah, "actual_away": aa,
             "predicted_total": ph + pa, "actual_total": ah + aa,
             "predicted_margin": ph - pa, "actual_margin": ah - aa,
+            "availability_confirmed": str(source.get("availability_confirmed", "")).strip().lower() == "true",
         }
         for key in ("home_win_probability", "spread", "total", "home_cover_probability",
                     "over_probability", "closing_spread", "closing_total"):
