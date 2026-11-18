@@ -19,6 +19,7 @@ on:
       - ".github/workflows/nfl_validation.yml"
       - ".github/workflows/run-simulator.yml"
       - ".github/workflows/run_nhl_elite.yml"
+      - "nhl/**"
   pull_request:
     paths:
       - "main.py"
@@ -36,6 +37,7 @@ on:
       - ".github/workflows/nfl_validation.yml"
       - ".github/workflows/run-simulator.yml"
       - ".github/workflows/run_nhl_elite.yml"
+      - "nhl/**"
   workflow_dispatch:
     inputs:
       home:
