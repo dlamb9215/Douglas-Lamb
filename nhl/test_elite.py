@@ -1,5 +1,5 @@
 import unittest
-from nhl.elite import season_id, normalize_team, matchup_means, poisson, simulate, TEAMS, evaluate_two_way_market, attach_team_ranks, attach_team_summary
+from nhl.elite import season_id, normalize_team, matchup_means, poisson, simulate, TEAMS, evaluate_two_way_market, attach_team_ranks, attach_team_summary, validate_odds_context
 
 class EliteNHLTests(unittest.TestCase):
     def setUp(self):
@@ -37,6 +37,24 @@ class EliteNHLTests(unittest.TestCase):
     def test_invalid_selected_goalie_rejected(self):
         with self.assertRaises(ValueError):
             simulate("BOS","FLA",self.teams,[],[],self.rosters,trials=1000,home_goalie_id="invalid")
+    def test_odds_context_requires_source_and_timezone_aware_timestamp(self):
+        from datetime import datetime, timezone
+        now = datetime(2026, 11, 18, 18, 0, tzinfo=timezone.utc)
+        with self.assertRaises(ValueError):
+            validate_odds_context([-110, 100], None, "2026-11-18T17:00:00Z", now=now)
+        with self.assertRaises(ValueError):
+            validate_odds_context([-110, 100], "Example Book", "2026-11-18T17:00:00", now=now)
+        with self.assertRaises(ValueError):
+            validate_odds_context([-110, 100], "Example Book", "2026-11-18T01:00:00Z", now=now)
+        valid = validate_odds_context([-110, 100], "Example Book", "2026-11-18T17:00:00Z", now=now)
+        self.assertTrue(valid["valid"])
+        self.assertEqual(valid["status"], "FRESH_QUOTE")
+
+    def test_no_odds_context_is_not_mislabeled_ready(self):
+        result = validate_odds_context([0, 0], None, None)
+        self.assertFalse(result["valid"])
+        self.assertEqual(result["status"], "NO_ODDS_SUPPLIED")
+
     def test_no_vig_odds_comparison(self):
         out=evaluate_two_way_market(60,40,-120,110)
         self.assertIn("no_vig_market_pct",out)
