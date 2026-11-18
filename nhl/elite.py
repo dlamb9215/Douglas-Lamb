@@ -106,15 +106,16 @@ def attach_team_ranks(team_stats):
     return team_stats
 
 
-def attach_team_summary(team_stats, rows):
+def attach_team_summary(team_stats, rows, team_lookup=None):
     """Merge official NHL Stats REST team-summary rates into standings rows."""
     by_code = {}
     by_id = {}
+    team_lookup = {str(k): str(v).upper() for k, v in (team_lookup or {}).items()}
     for row in rows:
-        code = team_code(row)
+        team_id = row.get("teamId") or row.get("team_id")
+        code = team_code(row) or team_lookup.get(str(team_id), "") if team_id is not None else team_code(row)
         if code:
             by_code[code] = row
-        team_id = row.get("teamId") or row.get("team_id")
         if team_id is not None:
             by_id[str(team_id)] = row
     fields = {
@@ -156,8 +157,20 @@ def load_data(home, away, season):
         if team_stats[code]["gf"] is None or team_stats[code]["ga"] is None:
             raise RuntimeError(f"Current-season goals-for/goals-against totals are incomplete for {code}.")
     try:
+        team_refs_payload = get_json(f"{STATS}/team")
+        team_refs = team_refs_payload.get("data", []) if isinstance(team_refs_payload, dict) else []
+        team_lookup = {}
+        for ref in team_refs:
+            team_id = ref.get("id")
+            code = ref.get("triCode") or ref.get("rawTricode")
+            if team_id is not None and code:
+                team_lookup[str(team_id)] = str(code).upper()
+        team_ids = {code: team_id for team_id, code in team_lookup.items()}
+        for code, stats in team_stats.items():
+            if stats.get("team_id") is None and code in team_ids:
+                stats["team_id"] = team_ids[code]
         team_rows = stats_report("team", season, 1000)
-        attach_team_summary(team_stats, team_rows)
+        attach_team_summary(team_stats, team_rows, team_lookup)
     except Exception as exc:
         for code in (home, away):
             team_stats[code]["team_summary_available"] = False
