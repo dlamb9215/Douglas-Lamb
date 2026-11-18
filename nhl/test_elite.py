@@ -91,6 +91,21 @@ class EliteNHLTests(unittest.TestCase):
         self.assertEqual(teams["TOR"]["sf"], 31.0)
         self.assertEqual(teams["LAK"]["sa"], 28.0)
 
+    def test_team_summary_uses_official_team_lookup_when_standings_lack_ids(self):
+        teams = {
+            "TOR": {"team": "TOR", "team_id": None, "games": 20, "gf": 3.2, "ga": 2.7},
+            "LAK": {"team": "LAK", "team_id": None, "games": 20, "gf": 3.4, "ga": 2.9},
+        }
+        rows = [
+            {"teamId": 10, "shotsForPerGame": 31.0, "shotsAgainstPerGame": 29.0, "powerPlayPct": 21.0, "penaltyKillPct": 82.0, "faceoffWinPct": 52.0},
+            {"teamId": 26, "shotsForPerGame": 30.0, "shotsAgainstPerGame": 28.0, "powerPlayPct": 20.0, "penaltyKillPct": 80.0, "faceoffWinPct": 51.0},
+        ]
+        attach_team_summary(teams, rows, {"10": "TOR", "26": "LAK"})
+        self.assertTrue(teams["TOR"]["team_summary_available"])
+        self.assertTrue(teams["LAK"]["team_summary_available"])
+        self.assertEqual(teams["TOR"]["sf"], 31.0)
+        self.assertEqual(teams["LAK"]["sa"], 28.0)
+
     def test_missing_team_summary_features_remain_explicitly_missing(self):
         teams = {"BOS": {"team": "BOS", "games": 20, "gf": 3.2, "ga": 2.7}}
         attach_team_summary(teams, [])
