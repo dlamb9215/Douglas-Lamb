@@ -95,7 +95,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Run offline unit tests
-        run: python -m unittest -v nhl.test_elite
+        run: python -m unittest -v nhl.test_elite nhl.test_readiness
       - name: Run NHL matchup model
         env:
           HOME_GOALIE_ID: ${{ inputs.home_goalie_id }}
