@@ -1,6 +1,11 @@
 name: Run Doug's Elite NHL Simulator
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "nhl/**"
+      - ".github/workflows/run_nhl_elite.yml"
   workflow_dispatch:
     inputs:
       home:
@@ -54,6 +59,10 @@ jobs:
         run: python -m unittest -v nhl.test_elite
       - name: Run NHL matchup model
         shell: bash
+        env:
+          HOME_TEAM: ${{ inputs.home || 'TOR' }}
+          AWAY_TEAM: ${{ inputs.away || 'LAK' }}
+          TRIALS: ${{ inputs.trials || '100000' }}
         run: |
           CONFIG=nhl-game-config.json
           TOTAL="$(jq -r '.total // 6.0' "$CONFIG")"
@@ -71,7 +80,7 @@ jobs:
           if [ -n "$HOME_GOALIE_ID" ]; then ARGS+=(--home-goalie-id "$HOME_GOALIE_ID"); fi
           if [ -n "$AWAY_GOALIE_ID" ]; then ARGS+=(--away-goalie-id "$AWAY_GOALIE_ID"); fi
           if [ -n "$EXCLUDED_PLAYER_IDS" ]; then ARGS+=(--exclude-player-ids "$EXCLUDED_PLAYER_IDS"); fi
-          python -m nhl.elite --home "${{ inputs.home }}" --away "${{ inputs.away }}" --trials "${{ inputs.trials }}" --total "$TOTAL" --seed "$SEED" --home-ml "$HOME_ML" --away-ml "$AWAY_ML" --over-odds "$OVER_ODDS" --under-odds "$UNDER_ODDS" --home-puck-odds "$HOME_PUCK_ODDS" --away-puck-odds "$AWAY_PUCK_ODDS" "${ARGS[@]}" | tee nhl-elite-results.txt
+          python -m nhl.elite --home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --total "$TOTAL" --seed "$SEED" --home-ml "$HOME_ML" --away-ml "$AWAY_ML" --over-odds "$OVER_ODDS" --under-odds "$UNDER_ODDS" --home-puck-odds "$HOME_PUCK_ODDS" --away-puck-odds "$AWAY_PUCK_ODDS" "${ARGS[@]}" | tee nhl-elite-results.txt
           test -s nhl-elite-results.json
           test -s nhl-elite-results.txt
       - name: Upload simulation results
