@@ -126,13 +126,19 @@ def load_data(home, away, season):
         roster_data[code] = get_json(f"{WEB}/roster/{code}/current")
     return team_stats, skaters, goalies, roster_data
 
-def build_player_pool(code, roster, skater_rows, goalie_rows, excluded_ids=None):
+def build_player_pool(code, roster, skater_rows, goalie_rows, excluded_ids=None, confirmed_active_ids=None):
     excluded_ids = {str(x) for x in (excluded_ids or [])}
+    confirmed_active_ids = None if confirmed_active_ids is None else {str(x) for x in confirmed_active_ids}
     active = {}
     for group in ("forwards","defensemen"):
         for p in roster.get(group, []) or []:
             pid = player_id(p)
             if pid and str(pid) not in excluded_ids: active[str(pid)] = {"id":pid,"name":player_name(p),"position":"F" if group == "forwards" else "D"}
+    if confirmed_active_ids is not None:
+        unknown = confirmed_active_ids - set(active)
+        if unknown:
+            raise ValueError(f"Confirmed active {code} skaters are missing from the current roster: {sorted(unknown)}")
+        active = {pid: meta for pid, meta in active.items() if pid in confirmed_active_ids}
     # API may expose roster group as goalies; goalie props are handled separately.
     skaters = []
     for row in skater_rows:
@@ -184,13 +190,15 @@ def matchup_means(h, a):
     return max(.5,home), max(.5,away), league_gf
 
 def simulate(home_code, away_code, team_stats, skaters, goalies, rosters, trials=100000,
-             total=6.0, puck_line=1.5, seed=20261115, home_goalie_id=None, away_goalie_id=None, excluded_ids=None):
+             total=6.0, puck_line=1.5, seed=20261115, home_goalie_id=None, away_goalie_id=None, excluded_ids=None, confirmed_active_ids=None):
     if trials < 1000:
         raise ValueError("Use at least 1,000 trials.")
     h, a = team_stats[home_code], team_stats[away_code]
     hm, am, _ = matchup_means(h, a)
-    hp, hg = build_player_pool(home_code, rosters[home_code], skaters, goalies, excluded_ids)
-    ap, ag = build_player_pool(away_code, rosters[away_code], skaters, goalies, excluded_ids)
+    hp, hg = build_player_pool(home_code, rosters[home_code], skaters, goalies, excluded_ids,
+                               (confirmed_active_ids or {}).get(home_code) if confirmed_active_ids is not None else None)
+    ap, ag = build_player_pool(away_code, rosters[away_code], skaters, goalies, excluded_ids,
+                               (confirmed_active_ids or {}).get(away_code) if confirmed_active_ids is not None else None)
     selected = {}
     for code, pool, chosen in ((home_code, hg, home_goalie_id), (away_code, ag, away_goalie_id)):
         found = next((g for g in pool if str(g["id"]) == str(chosen)), None) if chosen else None
@@ -407,11 +415,16 @@ def main():
         goalie_check = validate_confirmed_goalies(goalie_payload, args.home, args.away)
         args.home_goalie_id = str(goalie_check["goalies"]["home"]["player_id"])
         args.away_goalie_id = str(goalie_check["goalies"]["away"]["player_id"])
-    result=simulate(args.home,args.away,team,skaters,goalies,rosters,args.trials,args.total,args.puck_line,args.seed,args.home_goalie_id,args.away_goalie_id,excluded)
     lineup_check = None
+    confirmed_active_ids = None
     if args.lineup_confirmations:
         with open(args.lineup_confirmations, encoding="utf-8") as handle:
             lineup_check = validate_confirmed_skater_lineups(json.load(handle), args.home, args.away)
+        confirmed_active_ids = {
+            args.home: lineup_check["lineups"]["home"]["player_ids"],
+            args.away: lineup_check["lineups"]["away"]["player_ids"],
+        }
+    result=simulate(args.home,args.away,team,skaters,goalies,rosters,args.trials,args.total,args.puck_line,args.seed,args.home_goalie_id,args.away_goalie_id,excluded,confirmed_active_ids)
     result["goalie_confirmation"] = goalie_check or {"status":"NOT_PROVIDED","availability_confirmed":False}
     result["skater_lineup_confirmation"] = lineup_check or {"status":"NOT_PROVIDED","availability_confirmed":False}
     result["betting_gate"] = {
