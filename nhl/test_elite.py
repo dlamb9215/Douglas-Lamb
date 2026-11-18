@@ -91,6 +91,30 @@ class EliteNHLTests(unittest.TestCase):
         self.assertEqual(teams["TOR"]["sf"], 31.0)
         self.assertEqual(teams["LAK"]["sa"], 28.0)
 
+    def test_team_summary_matches_official_stats_rest_snake_case_by_team_id(self):
+        teams = {
+            "BOS": {"team": "BOS", "team_id": 6, "team_full_name": "Boston Bruins"},
+            "FLA": {"team": "FLA", "team_id": 13, "team_full_name": "Florida Panthers"},
+        }
+        rows = [
+            {"teamId": 6, "teamFullName": "Boston Bruins", "games_played": 20,
+             "shots_for_per_game": "31.4", "shots_against_per_game": "27.2",
+             "power_play_pct": "0.235", "penalty_kill_pct": "0.812", "faceoff_win_pct": "0.518"},
+            {"teamId": 13, "teamFullName": "Florida Panthers", "games_played": 20,
+             "shots_for_per_game": 32.1, "shots_against_per_game": 28.4,
+             "power_play_pct": 0.225, "penalty_kill_pct": 0.801, "faceoff_win_pct": 0.512},
+        ]
+        attach_team_summary(teams, rows, {6: "BOS", 13: "FLA"})
+        self.assertEqual(teams["BOS"]["sf"], 31.4)
+        self.assertEqual(teams["BOS"]["sa"], 27.2)
+        self.assertAlmostEqual(teams["BOS"]["pp"], 23.5)
+        self.assertAlmostEqual(teams["BOS"]["pk"], 81.2)
+        self.assertAlmostEqual(teams["BOS"]["fo"], 51.8)
+        self.assertEqual(teams["FLA"]["sf"], 32.1)
+        self.assertTrue(teams["BOS"]["team_summary_available"])
+        self.assertTrue(teams["FLA"]["team_summary_available"])
+        self.assertEqual(teams["BOS"]["team_summary_team_id"], 6)
+
     def test_missing_team_summary_features_remain_explicitly_missing(self):
         teams = {"BOS": {"team": "BOS", "games": 20, "gf": 3.2, "ga": 2.7}}
         attach_team_summary(teams, [])
