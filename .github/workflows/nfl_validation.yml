@@ -47,12 +47,12 @@ on:
       home:
         description: Home team abbreviation
         required: true
-        default: ATL
+        default: HOU
         type: string
       away:
         description: Away team abbreviation
         required: true
-        default: CIN
+        default: IND
         type: string
       trials:
         description: Monte Carlo trials
@@ -123,8 +123,8 @@ jobs:
         if: github.event_name != 'pull_request'
         continue-on-error: true
         env:
-          HOME_TEAM: ${{ github.event.inputs.home || 'ATL' }}
-          AWAY_TEAM: ${{ github.event.inputs.away || 'CIN' }}
+          HOME_TEAM: ${{ github.event.inputs.home || 'HOU' }}
+          AWAY_TEAM: ${{ github.event.inputs.away || 'IND' }}
         run: python nfl_weather.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --output kickoff-weather.json
 
       - name: Build fresh matchup pregame gate
