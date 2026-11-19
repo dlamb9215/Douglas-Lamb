@@ -371,9 +371,14 @@ def fetch_official_injuries(game_date: date, home: str, away: str, season: int =
         # linear text extraction can scramble row associations.
         import pdfplumber
         extracted_tables = []
-        with pdfplumber.open(io.BytesIO(pdf)) as document:
-            for page in document.pages:
-                extracted_tables.extend(page.extract_tables() or [])
+        try:
+            with pdfplumber.open(io.BytesIO(pdf)) as document:
+                for page in document.pages:
+                    extracted_tables.extend(page.extract_tables() or [])
+        except Exception:
+            # Some legacy unit fixtures and malformed downloads are not PDFs;
+            # preserve the independent pypdf text fallback for those cases.
+            extracted_tables = []
         parsed = parse_report_tables(extracted_tables, target_teams, game_date)
         extraction_mode = "pdfplumber_tables"
         if not parsed.get("target_game_found"):
