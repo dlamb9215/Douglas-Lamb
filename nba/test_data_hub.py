@@ -157,8 +157,8 @@ class TestNBADataHub(unittest.TestCase):
                     "warnings": []
                 }),
                 patch("nba.data_hub.fetch_roster", side_effect=[
-                    [{"name": "Jimmy Butler"}],
                     [{"name": "Ja Morant"}],
+                    [{"name": "Jimmy Butler"}],
                 ]),
                 patch("nba.data_hub.fetch_espn_bet_odds", side_effect=RuntimeError("not posted")),
                 patch.dict(os.environ, {"ODDS_API_KEY": ""}),
