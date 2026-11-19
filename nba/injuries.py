@@ -116,6 +116,7 @@ def parse_report_text(
     target_teams = {TEAM_CODE_ALIASES.get(code.upper(), code.upper()) for code in teams} if teams is not None else None
     current_game_matches = game_date is None
     current_report_day: date | None = None
+    target_game_found = False
 
     for raw in text.splitlines():
         line = re.sub(r"\s+", " ", raw).strip()
@@ -144,6 +145,8 @@ def parse_report_text(
             ) and (
                 target_teams is None or set(matchup_codes) == target_teams
             )
+            if current_game_matches and target_teams is not None:
+                target_game_found = True
             current_team = None
             if not remainder:
                 continue
@@ -245,10 +248,10 @@ def parse_report_text(
     # In compact NBA PDFs, a matchup section is evidence that both teams'
     # rows were included. Teams with no reportable injuries have no player row;
     # explicit NOT YET SUBMITTED markers remain authoritative.
-    if game_date is not None and target_teams is not None:
+    if target_game_found and target_teams is not None:
         for code in target_teams:
             team_submission.setdefault(code, "SUBMITTED")
-    return {"players": rows, "team_submission": team_submission}
+    return {"players": rows, "team_submission": team_submission, "target_game_found": target_game_found}
 
 def parse_report_tables(tables: list[list[list[Any]]], teams: set[str], game_date: date) -> dict[str, Any]:
     """Parse official NBA PDF table cells without relying on fragile text order."""
@@ -418,7 +421,9 @@ def fetch_official_injuries(game_date: date, home: str, away: str, season: int =
             # cannot handle the NBA report's multi-column layout.
             parsed = {"players": [], "team_submission": {}, "target_game_found": False}
             extraction_mode = "pdfplumber_unavailable"
-        if not parsed.get("target_game_found") or len(parsed.get("team_submission", {})) != len(target_teams):
+        if (not parsed.get("target_game_found")
+                or len(parsed.get("team_submission", {})) != len(target_teams)
+                or not parsed.get("players")):
             reader = PdfReader(io.BytesIO(pdf))
             candidates = []
             for mode in ("layout", "plain"):
@@ -437,7 +442,9 @@ def fetch_official_injuries(game_date: date, home: str, away: str, season: int =
                 score = (len(parsed_candidate["team_submission"]), len(parsed_candidate["players"]))
                 candidates.append((score, parsed_candidate, mode))
             _, text_parsed, text_mode = max(candidates, key=lambda item: item[0])
-            if len(text_parsed["team_submission"]) > len(parsed.get("team_submission", {})):
+            table_score = (len(parsed.get("team_submission", {})), len(parsed.get("players", [])))
+            text_score = (len(text_parsed["team_submission"]), len(text_parsed["players"]))
+            if text_score > table_score:
                 parsed, extraction_mode = text_parsed, text_mode
             # pdfplumber's layout-preserving text extraction often retains the
             # official report's table rows when pypdf's layout/plain modes do not.
