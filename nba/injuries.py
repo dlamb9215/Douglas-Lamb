@@ -252,6 +252,13 @@ def fetch_official_injuries(game_date: date, home: str, away: str, season: int =
                     extracted = page.extract_text()
                 pages.append(extracted or "")
             parsed_candidate = parse_report_text("\n".join(pages), target_teams, game_date)
+            # A team marked NOT YET SUBMITTED (or lacking a target-game
+            # submission marker) cannot have valid player rows for this game.
+            # Drop those rows so a prior game's column cannot leak through.
+            parsed_candidate["players"] = [
+                row for row in parsed_candidate["players"]
+                if parsed_candidate["team_submission"].get(row["team"]) == "SUBMITTED"
+            ]
             score = (len(parsed_candidate["team_submission"]), len(parsed_candidate["players"]))
             candidates.append((score, parsed_candidate, mode))
         _, parsed, extraction_mode = max(candidates, key=lambda item: item[0])
