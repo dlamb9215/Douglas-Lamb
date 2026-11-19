@@ -403,17 +403,24 @@ def fetch_official_injuries(game_date: date, home: str, away: str, season: int =
         ]
         try:
             with pdfplumber.open(io.BytesIO(pdf)) as document:
+                best_table_score = (-1, -1)
+                parsed = {"players": [], "team_submission": {}, "target_game_found": False}
+                extraction_mode = "pdfplumber_no_matching_table"
                 for mode_name, settings in table_modes:
                     candidate_tables = []
                     for page in document.pages:
                         candidate_tables.extend(page.extract_tables(table_settings=settings) or [])
                     extracted_tables.extend(candidate_tables)
                     candidate = parse_report_tables(candidate_tables, target_teams, game_date)
-                    if candidate.get("target_game_found") and len(candidate.get("team_submission", {})) == len(target_teams):
+                    score = (
+                        len(candidate.get("team_submission", {})),
+                        len(candidate.get("players", [])),
+                    )
+                    if candidate.get("target_game_found") and score > best_table_score:
                         parsed = candidate
                         extraction_mode = "pdfplumber_" + mode_name
-                        break
-                else:
+                        best_table_score = score
+                if best_table_score == (-1, -1):
                     parsed = parse_report_tables(extracted_tables, target_teams, game_date)
                     extraction_mode = "pdfplumber_multi_settings"
         except Exception:
