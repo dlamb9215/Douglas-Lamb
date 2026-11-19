@@ -450,7 +450,7 @@
     "classification_completed_games": 590,
     "fbs_completed_games": 0,
     "teams_with_box_scores": 128,
-    "retrieved_at": "2026-11-18T11:28:37.593538+00:00",
+    "retrieved_at": "2026-11-19T11:26:47.994671+00:00",
     "note": "Ranks are among teams returned with usable game box scores; incomplete-season ranks change weekly.",
     "provider_warnings": []
   },
@@ -590,7 +590,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 46,
       "scoring_defense_rank": 49,
       "passing_offense_rank": 61,
@@ -744,7 +744,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 20,
       "scoring_defense_rank": 35,
       "passing_offense_rank": 25,
@@ -898,7 +898,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 55,
       "scoring_defense_rank": 20,
       "passing_offense_rank": 122,
@@ -1052,7 +1052,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 5,
       "scoring_defense_rank": 123,
       "passing_offense_rank": 2,
@@ -1206,7 +1206,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 18,
       "scoring_defense_rank": 66,
       "passing_offense_rank": 105,
@@ -1360,7 +1360,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 8,
       "scoring_defense_rank": 17,
       "passing_offense_rank": 31,
@@ -1514,7 +1514,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 66,
       "scoring_defense_rank": 106,
       "passing_offense_rank": 124,
@@ -1668,7 +1668,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 82,
       "scoring_defense_rank": 8,
       "passing_offense_rank": 26,
@@ -1822,7 +1822,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 67,
       "scoring_defense_rank": 11,
       "passing_offense_rank": 91,
@@ -1976,7 +1976,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 124,
       "scoring_defense_rank": 72,
       "passing_offense_rank": 85,
@@ -2130,7 +2130,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 30,
       "scoring_defense_rank": 14,
       "passing_offense_rank": 118,
@@ -2284,7 +2284,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 60,
       "scoring_defense_rank": 120,
       "passing_offense_rank": 49,
@@ -2438,7 +2438,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 14,
       "scoring_defense_rank": 68,
       "passing_offense_rank": 1,
@@ -2592,7 +2592,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 64,
       "scoring_defense_rank": 92,
       "passing_offense_rank": 87,
@@ -2746,7 +2746,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 21,
       "scoring_defense_rank": 75,
       "passing_offense_rank": 95,
@@ -2900,7 +2900,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 74,
       "scoring_defense_rank": 64,
       "passing_offense_rank": 119,
@@ -3054,7 +3054,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 97,
       "scoring_defense_rank": 1,
       "passing_offense_rank": 127,
@@ -3208,7 +3208,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 122,
       "scoring_defense_rank": 127,
       "passing_offense_rank": 64,
@@ -3362,7 +3362,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 96,
       "scoring_defense_rank": 5,
       "passing_offense_rank": 82,
@@ -3516,7 +3516,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 104,
       "scoring_defense_rank": 98,
       "passing_offense_rank": 27,
@@ -3670,7 +3670,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 53,
       "scoring_defense_rank": 57,
       "passing_offense_rank": 62,
@@ -3824,7 +3824,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 99,
       "scoring_defense_rank": 21,
       "passing_offense_rank": 98,
@@ -3978,7 +3978,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 108,
       "scoring_defense_rank": 116,
       "passing_offense_rank": 60,
@@ -4132,7 +4132,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 27,
       "scoring_defense_rank": 24,
       "passing_offense_rank": 40,
@@ -4286,7 +4286,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 69,
       "scoring_defense_rank": 88,
       "passing_offense_rank": 100,
@@ -4440,7 +4440,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 57,
       "scoring_defense_rank": 117,
       "passing_offense_rank": 8,
@@ -4594,7 +4594,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 72,
       "scoring_defense_rank": 30,
       "passing_offense_rank": 96,
@@ -4748,7 +4748,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 28,
       "scoring_defense_rank": 42,
       "passing_offense_rank": 63,
@@ -4902,7 +4902,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 93,
       "scoring_defense_rank": 91,
       "passing_offense_rank": 53,
@@ -5056,7 +5056,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 98,
       "scoring_defense_rank": 80,
       "passing_offense_rank": 114,
@@ -5210,7 +5210,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 75,
       "scoring_defense_rank": 99,
       "passing_offense_rank": 71,
@@ -5364,7 +5364,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 38,
       "scoring_defense_rank": 124,
       "passing_offense_rank": 12,
@@ -5518,7 +5518,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 85,
       "scoring_defense_rank": 9,
       "passing_offense_rank": 90,
@@ -5672,7 +5672,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 103,
       "scoring_defense_rank": 104,
       "passing_offense_rank": 39,
@@ -5826,7 +5826,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 70,
       "scoring_defense_rank": 60,
       "passing_offense_rank": 120,
@@ -5980,7 +5980,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 118,
       "scoring_defense_rank": 12,
       "passing_offense_rank": 92,
@@ -6134,7 +6134,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 113,
       "scoring_defense_rank": 44,
       "passing_offense_rank": 44,
@@ -6288,7 +6288,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 105,
       "scoring_defense_rank": 86,
       "passing_offense_rank": 109,
@@ -6442,7 +6442,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 23,
       "scoring_defense_rank": 118,
       "passing_offense_rank": 57,
@@ -6596,7 +6596,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 125,
       "scoring_defense_rank": 121,
       "passing_offense_rank": 89,
@@ -6750,7 +6750,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 42,
       "scoring_defense_rank": 2,
       "passing_offense_rank": 35,
@@ -6904,7 +6904,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 58,
       "scoring_defense_rank": 58,
       "passing_offense_rank": 94,
@@ -7058,7 +7058,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 106,
       "scoring_defense_rank": 45,
       "passing_offense_rank": 66,
@@ -7212,7 +7212,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 80,
       "scoring_defense_rank": 61,
       "passing_offense_rank": 108,
@@ -7366,7 +7366,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 19,
       "scoring_defense_rank": 105,
       "passing_offense_rank": 5,
@@ -7520,7 +7520,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 26,
       "scoring_defense_rank": 53,
       "passing_offense_rank": 4,
@@ -7674,7 +7674,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 37,
       "scoring_defense_rank": 39,
       "passing_offense_rank": 55,
@@ -7828,7 +7828,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 11,
       "scoring_defense_rank": 40,
       "passing_offense_rank": 3,
@@ -7982,7 +7982,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 63,
       "scoring_defense_rank": 113,
       "passing_offense_rank": 32,
@@ -8136,7 +8136,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 44,
       "scoring_defense_rank": 43,
       "passing_offense_rank": 72,
@@ -8290,7 +8290,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 77,
       "scoring_defense_rank": 62,
       "passing_offense_rank": 101,
@@ -8444,7 +8444,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 9,
       "scoring_defense_rank": 32,
       "passing_offense_rank": 54,
@@ -8598,7 +8598,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 34,
       "scoring_defense_rank": 10,
       "passing_offense_rank": 123,
@@ -8752,7 +8752,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 39,
       "scoring_defense_rank": 27,
       "passing_offense_rank": 59,
@@ -8906,7 +8906,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 119,
       "scoring_defense_rank": 26,
       "passing_offense_rank": 125,
@@ -9060,7 +9060,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 126,
       "scoring_defense_rank": 77,
       "passing_offense_rank": 115,
@@ -9214,7 +9214,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 86,
       "scoring_defense_rank": 46,
       "passing_offense_rank": 77,
@@ -9368,7 +9368,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 114,
       "scoring_defense_rank": 36,
       "passing_offense_rank": 106,
@@ -9522,7 +9522,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 31,
       "scoring_defense_rank": 4,
       "passing_offense_rank": 102,
@@ -9676,7 +9676,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 87,
       "scoring_defense_rank": 107,
       "passing_offense_rank": 13,
@@ -9830,7 +9830,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 102,
       "scoring_defense_rank": 69,
       "passing_offense_rank": 83,
@@ -9984,7 +9984,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 115,
       "scoring_defense_rank": 112,
       "passing_offense_rank": 121,
@@ -10138,7 +10138,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 29,
       "scoring_defense_rank": 59,
       "passing_offense_rank": 51,
@@ -10292,7 +10292,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 2,
       "scoring_defense_rank": 71,
       "passing_offense_rank": 6,
@@ -10446,7 +10446,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 3,
       "scoring_defense_rank": 22,
       "passing_offense_rank": 34,
@@ -10600,7 +10600,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 100,
       "scoring_defense_rank": 125,
       "passing_offense_rank": 46,
@@ -10754,7 +10754,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 83,
       "scoring_defense_rank": 63,
       "passing_offense_rank": 75,
@@ -10908,7 +10908,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 89,
       "scoring_defense_rank": 122,
       "passing_offense_rank": 56,
@@ -11062,7 +11062,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 91,
       "scoring_defense_rank": 84,
       "passing_offense_rank": 36,
@@ -11216,7 +11216,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 123,
       "scoring_defense_rank": 83,
       "passing_offense_rank": 88,
@@ -11370,7 +11370,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 101,
       "scoring_defense_rank": 101,
       "passing_offense_rank": 110,
@@ -11524,7 +11524,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 49,
       "scoring_defense_rank": 67,
       "passing_offense_rank": 24,
@@ -11678,7 +11678,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 61,
       "scoring_defense_rank": 13,
       "passing_offense_rank": 76,
@@ -11832,7 +11832,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 84,
       "scoring_defense_rank": 37,
       "passing_offense_rank": 67,
@@ -11986,7 +11986,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 51,
       "scoring_defense_rank": 81,
       "passing_offense_rank": 104,
@@ -12140,7 +12140,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 7,
       "scoring_defense_rank": 54,
       "passing_offense_rank": 30,
@@ -12294,7 +12294,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 22,
       "scoring_defense_rank": 82,
       "passing_offense_rank": 29,
@@ -12448,7 +12448,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 81,
       "scoring_defense_rank": 95,
       "passing_offense_rank": 78,
@@ -12602,7 +12602,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 41,
       "scoring_defense_rank": 87,
       "passing_offense_rank": 45,
@@ -12756,7 +12756,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 116,
       "scoring_defense_rank": 126,
       "passing_offense_rank": 47,
@@ -12910,7 +12910,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 110,
       "scoring_defense_rank": 31,
       "passing_offense_rank": 42,
@@ -13064,7 +13064,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 68,
       "scoring_defense_rank": 115,
       "passing_offense_rank": 69,
@@ -13218,7 +13218,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 52,
       "scoring_defense_rank": 51,
       "passing_offense_rank": 68,
@@ -13372,7 +13372,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 78,
       "scoring_defense_rank": 114,
       "passing_offense_rank": 70,
@@ -13526,7 +13526,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 111,
       "scoring_defense_rank": 7,
       "passing_offense_rank": 86,
@@ -13680,7 +13680,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 73,
       "scoring_defense_rank": 38,
       "passing_offense_rank": 107,
@@ -13834,7 +13834,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 107,
       "scoring_defense_rank": 19,
       "passing_offense_rank": 97,
@@ -13988,7 +13988,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 92,
       "scoring_defense_rank": 23,
       "passing_offense_rank": 16,
@@ -14142,7 +14142,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 65,
       "scoring_defense_rank": 70,
       "passing_offense_rank": 111,
@@ -14296,7 +14296,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 59,
       "scoring_defense_rank": 78,
       "passing_offense_rank": 65,
@@ -14450,7 +14450,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 109,
       "scoring_defense_rank": 25,
       "passing_offense_rank": 48,
@@ -14604,7 +14604,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 32,
       "scoring_defense_rank": 110,
       "passing_offense_rank": 18,
@@ -14758,7 +14758,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 24,
       "scoring_defense_rank": 41,
       "passing_offense_rank": 37,
@@ -14912,7 +14912,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 12,
       "scoring_defense_rank": 52,
       "passing_offense_rank": 43,
@@ -15066,7 +15066,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 6,
       "scoring_defense_rank": 3,
       "passing_offense_rank": 50,
@@ -15220,7 +15220,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 50,
       "scoring_defense_rank": 29,
       "passing_offense_rank": 93,
@@ -15374,7 +15374,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 48,
       "scoring_defense_rank": 65,
       "passing_offense_rank": 116,
@@ -15528,7 +15528,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 62,
       "scoring_defense_rank": 74,
       "passing_offense_rank": 73,
@@ -15682,7 +15682,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 35,
       "scoring_defense_rank": 93,
       "passing_offense_rank": 103,
@@ -15836,7 +15836,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 16,
       "scoring_defense_rank": 103,
       "passing_offense_rank": 33,
@@ -15990,7 +15990,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 10,
       "scoring_defense_rank": 6,
       "passing_offense_rank": 22,
@@ -16144,7 +16144,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 88,
       "scoring_defense_rank": 128,
       "passing_offense_rank": 9,
@@ -16298,7 +16298,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 117,
       "scoring_defense_rank": 15,
       "passing_offense_rank": 84,
@@ -16452,7 +16452,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 25,
       "scoring_defense_rank": 100,
       "passing_offense_rank": 11,
@@ -16606,7 +16606,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 4,
       "scoring_defense_rank": 47,
       "passing_offense_rank": 7,
@@ -16760,7 +16760,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 120,
       "scoring_defense_rank": 73,
       "passing_offense_rank": 38,
@@ -16914,7 +16914,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 17,
       "scoring_defense_rank": 34,
       "passing_offense_rank": 15,
@@ -17068,7 +17068,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 54,
       "scoring_defense_rank": 108,
       "passing_offense_rank": 117,
@@ -17222,7 +17222,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 112,
       "scoring_defense_rank": 96,
       "passing_offense_rank": 126,
@@ -17376,7 +17376,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 40,
       "scoring_defense_rank": 94,
       "passing_offense_rank": 17,
@@ -17530,7 +17530,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 45,
       "scoring_defense_rank": 16,
       "passing_offense_rank": 99,
@@ -17684,7 +17684,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 33,
       "scoring_defense_rank": 85,
       "passing_offense_rank": 14,
@@ -17838,7 +17838,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 56,
       "scoring_defense_rank": 90,
       "passing_offense_rank": 113,
@@ -17992,7 +17992,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 79,
       "scoring_defense_rank": 79,
       "passing_offense_rank": 74,
@@ -18146,7 +18146,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 95,
       "scoring_defense_rank": 109,
       "passing_offense_rank": 21,
@@ -18300,7 +18300,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 128,
       "scoring_defense_rank": 119,
       "passing_offense_rank": 128,
@@ -18454,7 +18454,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 71,
       "scoring_defense_rank": 55,
       "passing_offense_rank": 58,
@@ -18608,7 +18608,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 43,
       "scoring_defense_rank": 33,
       "passing_offense_rank": 23,
@@ -18762,7 +18762,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 121,
       "scoring_defense_rank": 89,
       "passing_offense_rank": 80,
@@ -18916,7 +18916,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 15,
       "scoring_defense_rank": 97,
       "passing_offense_rank": 28,
@@ -19070,7 +19070,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 94,
       "scoring_defense_rank": 76,
       "passing_offense_rank": 81,
@@ -19224,7 +19224,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 127,
       "scoring_defense_rank": 111,
       "passing_offense_rank": 52,
@@ -19378,7 +19378,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 36,
       "scoring_defense_rank": 56,
       "passing_offense_rank": 19,
@@ -19532,7 +19532,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 13,
       "scoring_defense_rank": 50,
       "passing_offense_rank": 20,
@@ -19686,7 +19686,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 90,
       "scoring_defense_rank": 102,
       "passing_offense_rank": 112,
@@ -19840,7 +19840,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 76,
       "scoring_defense_rank": 18,
       "passing_offense_rank": 79,
@@ -19994,7 +19994,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 47,
       "scoring_defense_rank": 28,
       "passing_offense_rank": 41,
@@ -20148,7 +20148,7 @@
         }
       },
       "source": "CollegeFootballData API",
-      "as_of": "2026-11-18",
+      "as_of": "2026-11-19",
       "scoring_offense_rank": 1,
       "scoring_defense_rank": 48,
       "passing_offense_rank": 10,
