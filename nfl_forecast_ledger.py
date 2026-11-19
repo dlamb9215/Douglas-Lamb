@@ -13,9 +13,9 @@ from pathlib import Path
 
 FIELDS = [
     "run_id", "recorded_at_utc", "season", "week", "home_team", "away_team",
-    "kickoff", "trials", "seed", "home_win_probability", "away_win_probability",
-    "home_spread", "home_cover_probability", "away_cover_probability",
-    "total_line", "over_probability", "under_probability",
+    "kickoff", "trials", "seed", "home_win_probability", "away_win_probability", "tie_probability",
+    "home_spread", "home_cover_probability", "away_cover_probability", "spread_push_probability",
+    "total_line", "over_probability", "under_probability", "total_push_probability",
     "home_moneyline_odds", "away_moneyline_odds", "over_odds", "under_odds",
     "weather_available", "weather_wind_mph", "weather_precipitation_mm_per_hour",
     "pregame_verified", "sportsbook_source", "odds_checked_at_utc",
@@ -31,8 +31,8 @@ def append_forecast(record, path="nfl_forecast_ledger.csv"):
     if not home or not away or home == away:
         raise ValueError("Home and away teams must be distinct non-empty abbreviations.")
     probability_fields = ("home_win_probability", "away_win_probability",
-                          "home_cover_probability", "away_cover_probability",
-                          "over_probability", "under_probability")
+                          "home_cover_probability", "away_cover_probability", "spread_push_probability",
+                          "over_probability", "under_probability", "total_push_probability", "tie_probability")
     probs = {}
     for key in probability_fields:
         raw = record.get(key)
@@ -46,16 +46,19 @@ def append_forecast(record, path="nfl_forecast_ledger.csv"):
             raise ValueError(f"{key} must be a finite percentage from 0 to 100.")
         probs[key] = value
     moneyline_total = probs["home_win_probability"] + probs["away_win_probability"]
-    if moneyline_total <= 0 or moneyline_total > 101:
-        raise ValueError("Moneyline probabilities must sum to a positive value no greater than 100% after allowing for ties.")
+    tie = probs.get("tie_probability", 100 - moneyline_total)
+    if tie < 0 or abs(moneyline_total + tie - 100) > 1:
+        raise ValueError("Moneyline probabilities plus tie probability must sum to approximately 100%.")
     if "home_cover_probability" in probs and "away_cover_probability" in probs:
         spread_total = probs["home_cover_probability"] + probs["away_cover_probability"]
-        if spread_total <= 0 or spread_total > 101:
-            raise ValueError("Spread probabilities must sum to a positive value no greater than 100% after allowing for pushes.")
+        push = probs.get("spread_push_probability", 100 - spread_total)
+        if push < 0 or abs(spread_total + push - 100) > 1:
+            raise ValueError("Spread probabilities plus push probability must sum to approximately 100%.")
     if "over_probability" in probs and "under_probability" in probs:
         total_market = probs["over_probability"] + probs["under_probability"]
-        if total_market <= 0 or total_market > 101:
-            raise ValueError("Over/under probabilities must sum to a positive value no greater than 100% after allowing for pushes.")
+        push = probs.get("total_push_probability", 100 - total_market)
+        if push < 0 or abs(total_market + push - 100) > 1:
+            raise ValueError("Over/under probabilities plus push probability must sum to approximately 100%.")
     odds_fields = ("home_moneyline_odds", "away_moneyline_odds", "over_odds", "under_odds")
     if any(record.get(key) not in (None, "") for key in odds_fields):
         source = str(record.get("sportsbook_source") or "").strip()
