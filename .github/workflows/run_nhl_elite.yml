@@ -14,17 +14,17 @@ on:
   workflow_dispatch:
     inputs:
       home:
-        description: Home team (CGY for Wild at Flames)
+        description: Home team (VGK for Stars at Golden Knights)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: SEA
+        default: VGK
       away:
-        description: Away team (MIN for Wild at Flames)
+        description: Away team (DAL for Stars at Golden Knights)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: VAN
+        default: DAL
       trials:
         description: Monte Carlo trials
         required: true
@@ -39,7 +39,7 @@ on:
       game_config_json:
         description: Optional JSON for total, seed, confirmed goalie IDs, scratched player IDs, and sportsbook prices with source/timestamp
         required: false
-        default: '{"total":6.0,"seed":20261119}'
+        default: '{"total":5.5,"seed":20261119}'
         type: string
 
 permissions:
@@ -84,8 +84,8 @@ jobs:
         id: run_matchup
         shell: bash
         env:
-          HOME_TEAM: ${{ inputs.home || 'COL' }}
-          AWAY_TEAM: ${{ inputs.away || 'ANA' }}
+          HOME_TEAM: ${{ inputs.home || 'VGK' }}
+          AWAY_TEAM: ${{ inputs.away || 'DAL' }}
           TRIALS: ${{ inputs.trials || '1000000' }}
           GAME_DATE: ${{ inputs.game_date || '2026-11-19' }}
         run: |
