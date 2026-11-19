@@ -128,4 +128,7 @@ class TestNBAEngine(unittest.TestCase):
         self.assertEqual([row["player"] for row in result["untrusted_player_statuses"]], ["Jayden Quaintance"])
         self.assertEqual(result["status"], "incomplete")
         self.assertEqual(result["roster_validation"]["status"], "failed")
-\nif __name__=="__main__": unittest.main()
+
+
+if __name__ == "__main__":
+    unittest.main()
