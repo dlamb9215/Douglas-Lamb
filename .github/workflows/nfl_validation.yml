@@ -120,7 +120,6 @@ jobs:
         run: python -m unittest -v
 
       - name: Fetch matchup kickoff weather context
-        if: github.event_name != 'pull_request'
         continue-on-error: true
         env:
           HOME_TEAM: ${{ github.event.inputs.home || 'HOU' }}
@@ -128,7 +127,6 @@ jobs:
         run: python nfl_weather.py --home "$HOME_TEAM" --away "$AWAY_TEAM" --output kickoff-weather.json
 
       - name: Build fresh matchup pregame gate
-        if: github.event_name != 'pull_request'
         env:
           HOME_TEAM: ${{ github.event.inputs.home || 'HOU' }}
           AWAY_TEAM: ${{ github.event.inputs.away || 'IND' }}
@@ -140,10 +138,9 @@ jobs:
           fi
 
       - name: Run reproducible 100,000-trial matchup
-        if: github.event_name != 'pull_request'
         env:
-          HOME_TEAM: ${{ github.event.inputs.home || 'ATL' }}
-          AWAY_TEAM: ${{ github.event.inputs.away || 'CIN' }}
+          HOME_TEAM: ${{ github.event.inputs.home || 'HOU' }}
+          AWAY_TEAM: ${{ github.event.inputs.away || 'IND' }}
           TRIALS: ${{ github.event.inputs.trials || '100000' }}
           SPREAD: ${{ github.event.inputs.spread || '' }}
           TOTAL: ${{ github.event.inputs.total || '' }}
@@ -153,6 +150,7 @@ jobs:
           UNDER_ODDS: ${{ github.event.inputs.under_odds || '' }}
           ODDS_CONTEXT_JSON: ${{ github.event.inputs.odds_context_json || '' }}
         run: |
+          set -euo pipefail
           python - <<'PY'
           import json, os
           raw = os.environ.get("ODDS_CONTEXT_JSON", "").strip()
