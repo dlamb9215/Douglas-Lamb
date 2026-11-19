@@ -481,6 +481,7 @@ def main():
         "home_team": home_code,
         "away_team": away_code,
         "kickoff": weather.get("kickoff", ""),
+        "recorded_at_utc": datetime.now(timezone.utc).isoformat(),
         "trials": args.trials,
         "seed": args.seed,
         "home_win_probability": result["home_win"],
