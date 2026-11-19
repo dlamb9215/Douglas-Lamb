@@ -46,7 +46,7 @@ GAME_HEADER = re.compile(
 )
 # Later game sections in the NBA's compact PDF omit the repeated date/time.
 MATCHUP_ONLY_HEADER = re.compile(
-    r"^(?P<matchup>[A-Z]{2,4}@[A-Z]{2,4})\\s+(?P<rest>.*)$"
+    r"^(?P<matchup>[A-Z]{2,4}@[A-Z]{2,4})\s+(?P<rest>.*)$"
 )
 TEAM_CODE_ALIASES = {"GSW": "GS", "NOP": "NO", "NYK": "NY", "SAS": "SA", "UTA": "UTAH", "WAS": "WSH"}
 
