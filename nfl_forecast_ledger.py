@@ -7,6 +7,7 @@ calibration or betting readiness.
 import csv
 import json
 import os
+import math
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -26,12 +27,62 @@ def append_forecast(record, path="nfl_forecast_ledger.csv"):
     required = ("run_id", "home_team", "away_team", "home_win_probability", "away_win_probability")
     if any(record.get(key) in (None, "") for key in required):
         raise ValueError("Forecast record is missing required identifiers or win probabilities.")
-    if record["home_team"] == record["away_team"]:
-        raise ValueError("Home and away teams must differ.")
-    for key in ("home_win_probability", "away_win_probability"):
-        value = float(record[key])
-        if not 0 <= value <= 100:
-            raise ValueError(f"{key} must be between 0 and 100.")
+    home, away = str(record["home_team"]).strip().upper(), str(record["away_team"]).strip().upper()
+    if not home or not away or home == away:
+        raise ValueError("Home and away teams must be distinct non-empty abbreviations.")
+    probability_fields = ("home_win_probability", "away_win_probability",
+                          "home_cover_probability", "away_cover_probability",
+                          "over_probability", "under_probability")
+    probs = {}
+    for key in probability_fields:
+        raw = record.get(key)
+        if raw in (None, ""):
+            continue
+        try:
+            value = float(raw)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"{key} must be a finite percentage from 0 to 100.") from exc
+        if not math.isfinite(value) or not 0 <= value <= 100:
+            raise ValueError(f"{key} must be a finite percentage from 0 to 100.")
+        probs[key] = value
+    if abs(probs["home_win_probability"] + probs["away_win_probability"] - 100) > 1:
+        raise ValueError("Moneyline probabilities must sum to approximately 100%.")
+    if "home_cover_probability" in probs and "away_cover_probability" in probs:
+        if abs(probs["home_cover_probability"] + probs["away_cover_probability"] - 100) > 1:
+            raise ValueError("Spread probabilities must sum to approximately 100%.")
+    if "over_probability" in probs and "under_probability" in probs:
+        push = float(record.get("push_probability") or 0)
+        if not math.isfinite(push) or not 0 <= push <= 100 or abs(probs["over_probability"] + probs["under_probability"] + push - 100) > 1:
+            raise ValueError("Over, under, and push probabilities must sum to approximately 100%.")
+    odds_fields = ("home_moneyline_odds", "away_moneyline_odds", "over_odds", "under_odds")
+    if any(record.get(key) not in (None, "") for key in odds_fields):
+        source = str(record.get("sportsbook_source") or "").strip()
+        checked = str(record.get("odds_checked_at_utc") or "").strip()
+        if not source or not checked:
+            raise ValueError("Sportsbook prices require a source and timezone-aware quote timestamp.")
+        try:
+            stamp = datetime.fromisoformat(checked.replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise ValueError("odds_checked_at_utc must be a valid timezone-aware timestamp.") from exc
+        if stamp.tzinfo is None:
+            raise ValueError("odds_checked_at_utc must include a timezone.")
+    record = dict(record)
+    record["home_team"], record["away_team"] = home, away
+    record.update(probs)
+    kickoff = str(record.get("kickoff") or "").strip()
+    recorded = str(record.get("recorded_at_utc") or "").strip()
+    if kickoff:
+        if not recorded:
+            raise ValueError("A timezone-aware recorded_at_utc is required when kickoff is supplied.")
+        try:
+            kickoff_dt = datetime.fromisoformat(kickoff.replace("Z", "+00:00"))
+            recorded_dt = datetime.fromisoformat(recorded.replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise ValueError("kickoff and recorded_at_utc must be valid timezone-aware timestamps.") from exc
+        if kickoff_dt.tzinfo is None or recorded_dt.tzinfo is None:
+            raise ValueError("kickoff and recorded_at_utc must include timezones.")
+        if recorded_dt >= kickoff_dt:
+            raise ValueError("Forecast must be recorded before scheduled kickoff.")
     target = Path(path)
     rows = []
     if target.exists():
@@ -92,63 +143,74 @@ def reconcile_results(schedule_rows, path="nfl_forecast_ledger.csv"):
     return {"settled": settled, "unsettled": sum(not row.get("settled_at_utc") for row in rows)}
 
 
+def _market_probability_metrics(probabilities, outcomes):
+    if not probabilities:
+        return {"sample_size": 0, "brier_score": None, "log_loss": None,
+                "expected_calibration_error": None, "bins": []}
+    clipped = [min(1 - 1e-9, max(1e-9, p)) for p in probabilities]
+    brier = sum((p-y)**2 for p, y in zip(probabilities, outcomes)) / len(outcomes)
+    log_loss = -sum(y*math.log(p) + (1-y)*math.log(1-p)
+                    for p, y in zip(clipped, outcomes)) / len(outcomes)
+    bins, ece = [], 0.0
+    for low in range(0, 100, 10):
+        members = [(p, y) for p, y in zip(probabilities, outcomes)
+                   if low/100 <= p < (low+10)/100 or (low == 90 and p == 1.0)]
+        if not members:
+            continue
+        predicted = sum(p for p, _ in members) / len(members)
+        observed = sum(y for _, y in members) / len(members)
+        ece += len(members) / len(probabilities) * abs(predicted-observed)
+        bins.append({"range": f"{low}-{low+10}%", "count": len(members),
+                     "mean_probability": round(predicted, 4),
+                     "observed_rate": round(observed, 4)})
+    return {"sample_size": len(probabilities), "brier_score": round(brier, 6),
+            "log_loss": round(log_loss, 6), "expected_calibration_error": round(ece, 6),
+            "bins": bins}
+
+
 def calibration_summary(path="nfl_forecast_ledger.csv"):
     target = Path(path)
     if not target.exists():
-        return {"settled_games": 0, "status": "NO_LEDGER"}
+        return {"settled_games": 0, "status": "NO_LEDGER", "calibrated": False}
     with target.open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))
-    settled = [r for r in rows if r.get("settled_at_utc") and r.get("actual_home_score") not in ("", None)]
+    settled = [r for r in rows if r.get("settled_at_utc")
+               and r.get("actual_home_score") not in ("", None)
+               and r.get("actual_away_score") not in ("", None)]
     if not settled:
-        return {"settled_games": 0, "status": "NO_SETTLED_GAMES"}
-    outcomes = [1 if float(r["actual_home_score"]) > float(r["actual_away_score"]) else 0
-                for r in settled]
-    probabilities = [float(r["home_win_probability"]) / 100 for r in settled]
-    brier = sum((p-y)**2 for p, y in zip(probabilities, outcomes)) / len(settled)
-    spread_rows = [
-        r for r in settled
-        if r.get("home_spread") not in ("", None)
-        and r.get("home_cover_probability") not in ("", None)
-        and float(r["actual_home_score"]) - float(r["actual_away_score"]) + float(r["home_spread"]) != 0
-    ]
-    spread_brier = None
-    spread_accuracy = None
-    if spread_rows:
-        spread_outcomes = [
-            1 if float(r["actual_home_score"]) - float(r["actual_away_score"]) + float(r["home_spread"]) > 0 else 0
-            for r in spread_rows
-        ]
-        spread_probs = [float(r["home_cover_probability"]) / 100 for r in spread_rows]
-        spread_brier = sum((p-y)**2 for p, y in zip(spread_probs, spread_outcomes)) / len(spread_rows)
-        spread_accuracy = sum((p >= 0.5) == bool(y) for p, y in zip(spread_probs, spread_outcomes)) / len(spread_rows)
-    total_rows = [
-        r for r in settled
-        if r.get("total_line") not in ("", None)
-        and r.get("over_probability") not in ("", None)
-        and float(r["actual_home_score"]) + float(r["actual_away_score"]) != float(r["total_line"])
-    ]
-    total_brier = None
-    total_accuracy = None
-    if total_rows:
-        total_outcomes = [
-            1 if float(r["actual_home_score"]) + float(r["actual_away_score"]) > float(r["total_line"]) else 0
-            for r in total_rows
-        ]
-        total_probs = [float(r["over_probability"]) / 100 for r in total_rows]
-        total_brier = sum((p-y)**2 for p, y in zip(total_probs, total_outcomes)) / len(total_rows)
-        total_accuracy = sum((p >= 0.5) == bool(y) for p, y in zip(total_probs, total_outcomes)) / len(total_rows)
+        return {"settled_games": 0, "status": "NO_SETTLED_GAMES", "calibrated": False}
+    ml_p, ml_y, spread_p, spread_y, total_p, total_y = [], [], [], [], [], []
+    for row in settled:
+        home, away = float(row["actual_home_score"]), float(row["actual_away_score"])
+        if row.get("home_win_probability") not in ("", None) and home != away:
+            ml_p.append(float(row["home_win_probability"])/100)
+            ml_y.append(1 if home > away else 0)
+        if row.get("home_spread") not in ("", None) and row.get("home_cover_probability") not in ("", None):
+            cover_margin = home - away + float(row["home_spread"])
+            if cover_margin != 0:
+                spread_p.append(float(row["home_cover_probability"])/100)
+                spread_y.append(1 if cover_margin > 0 else 0)
+        if row.get("total_line") not in ("", None) and row.get("over_probability") not in ("", None):
+            line = float(row["total_line"])
+            if home + away != line:
+                total_p.append(float(row["over_probability"])/100)
+                total_y.append(1 if home + away > line else 0)
+    markets = {
+        "moneyline_home": _market_probability_metrics(ml_p, ml_y),
+        "spread_home": _market_probability_metrics(spread_p, spread_y),
+        "total_over": _market_probability_metrics(total_p, total_y),
+    }
     return {
         "settled_games": len(settled),
-        "home_win_brier_score": round(brier, 6),
-        "spread_brier_score": round(spread_brier, 6) if spread_brier is not None else None,
-        "spread_decision_accuracy": round(spread_accuracy, 4) if spread_accuracy is not None else None,
-        "spread_sample_size": len(spread_rows),
-        "total_brier_score": round(total_brier, 6) if total_brier is not None else None,
-        "total_decision_accuracy": round(total_accuracy, 4) if total_accuracy is not None else None,
-        "total_sample_size": len(total_rows),
+        "home_win_brier_score": markets["moneyline_home"]["brier_score"],
+        "spread_brier_score": markets["spread_home"]["brier_score"],
+        "total_brier_score": markets["total_over"]["brier_score"],
+        "spread_sample_size": markets["spread_home"]["sample_size"],
+        "total_sample_size": markets["total_over"]["sample_size"],
+        "markets": markets,
         "status": "INSUFFICIENT_SAMPLE" if len(settled) < 100 else "REVIEW_REQUIRED",
         "calibrated": False,
-        "note": "Use time-ordered out-of-sample seasons and market-specific calibration before enabling betting thresholds.",
+        "note": "Market-specific descriptive metrics only; require chronological holdout, market comparison, sufficient samples and manual review before betting approval.",
     }
 
 
