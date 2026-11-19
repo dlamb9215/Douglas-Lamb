@@ -6,6 +6,11 @@ on:
     paths:
       - "nhl/**"
       - ".github/workflows/run_nhl_elite.yml"
+  pull_request:
+    paths:
+      - "nhl/**"
+      - ".github/workflows/run_nhl_elite.yml"
+      - "test_nhl_simulator.py"
   workflow_dispatch:
     inputs:
       home:
@@ -84,6 +89,7 @@ jobs:
           TRIALS: ${{ inputs.trials || '100000' }}
           GAME_DATE: ${{ inputs.game_date || '2026-11-19' }}
         run: |
+          set -euo pipefail
           CONFIG=nhl-game-config.json
           TOTAL="$(jq -r '.total // 6.0' "$CONFIG")"
           SEED="$(jq -r '.seed // 20261119' "$CONFIG")"
