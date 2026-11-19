@@ -14,17 +14,17 @@ on:
   workflow_dispatch:
     inputs:
       home:
-        description: Home team (PIT for Blues at Penguins)
+        description: Home team (WSH for Sabres at Capitals)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: PIT
+        default: WSH
       away:
-        description: Away team (STL for Blues at Penguins)
+        description: Away team (BUF for Sabres at Capitals)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: STL
+        default: BUF
       trials:
         description: Monte Carlo trials
         required: true
