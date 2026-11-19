@@ -93,6 +93,37 @@ Memphis Grizzlies Morant, Ja Out Injury/Illness - Left Hamstring Strain
         self.assertEqual(result["team_submission"], {"PHI": "SUBMITTED", "TOR": "SUBMITTED"})
         self.assertEqual(len(result["player_statuses"]), 2)
 
+    def test_drops_player_rows_for_teams_not_submitted_for_target_game(self):
+        from nba.injuries import fetch_official_injuries
+        class FakePage:
+            def extract_text(self, extraction_mode=None):
+                return "target game report"
+        class FakeReader:
+            def __init__(self, stream):
+                self.pages = [FakePage()]
+        parsed = {
+            "players": [
+                {"team": "GS", "player": "Austin Reaves", "status": "Out", "reason": ""},
+                {"team": "MEM", "player": "Ja Morant", "status": "Out", "reason": ""},
+            ],
+            "team_submission": {
+                "GS": "NOT YET SUBMITTED",
+                "MEM": "SUBMITTED",
+            },
+        }
+        with (
+            patch("nba.injuries.latest_report_url", return_value="https://example.test/report.pdf"),
+            patch("nba.injuries._get", return_value=b"%PDF-test"),
+            patch("nba.injuries.PdfReader", FakeReader),
+            patch("nba.injuries.parse_report_text", return_value=parsed),
+        ):
+            result = fetch_official_injuries(date(2026, 11, 19), "GSW", "MEM", 2027)
+        self.assertEqual(
+            [(row["team"], row["player"]) for row in result["player_statuses"]],
+            [("MEM", "Ja Morant")]
+        )
+        self.assertEqual(result["team_submission"]["GS"], "NOT YET SUBMITTED")
+
     def test_uses_labeled_espn_fallback_when_official_site_is_blocked(self):
         import json
         payload = {"injuries": [{
