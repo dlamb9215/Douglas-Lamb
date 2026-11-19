@@ -191,6 +191,28 @@ def build_report(home: str, away: str, game_date: date, team_stats_path: str = "
                 roster_check = {"status": "unavailable", "error": str(roster_error),
                                 "checked_injury_rows": 0, "mismatches": []}
         report["sources"]["injury_roster_validation"] = roster_check
+        # Quarantine every player/team row that failed the live-roster check.
+        # Keep it in a separate audit field, never in the trusted injury list
+        # consumed by downstream reporting or player-level workflows.
+        mismatch_keys = {
+            (str(row.get("team", "")).upper(), _person_key(row.get("player", "")))
+            for row in roster_check.get("mismatches", [])
+        }
+        raw_statuses = injuries.get("player_statuses", [])
+        trusted_statuses = [
+            row for row in raw_statuses
+            if (str(row.get("team", "")).upper(), _person_key(row.get("player", ""))) not in mismatch_keys
+        ]
+        quarantined_statuses = [
+            row for row in raw_statuses
+            if (str(row.get("team", "")).upper(), _person_key(row.get("player", ""))) in mismatch_keys
+        ]
+        report["sources"]["injuries"]["player_statuses"] = trusted_statuses
+        if quarantined_statuses:
+            report["sources"]["injuries"]["untrusted_player_statuses"] = quarantined_statuses
+            report["sources"]["injuries"]["status"] = "incomplete"
+        if not submissions_complete:
+            report["sources"]["injuries"]["status"] = "incomplete"
         report["readiness"]["injury_roster_consistent"] = roster_check.get("status") in {"passed", "not_run"}
         report["readiness"]["official_injuries"] = official and submissions_complete and report["readiness"]["injury_roster_consistent"]
         report["warnings"].extend(injuries.get("warnings", []))
