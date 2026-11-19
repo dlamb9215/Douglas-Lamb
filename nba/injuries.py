@@ -124,14 +124,19 @@ def parse_report_text(
             continue
 
         header = GAME_HEADER.match(line)
-        compact_header = MATCHUP_ONLY_HEADER.match(line) if not header else None
+        # PDF text extraction may prefix a compact matchup with a time or page
+        # layout whitespace, so detect matchup tokens anywhere in the line.
+        matchup_token = re.search(r"(?<![A-Z])([A-Z]{2,4}@[A-Z]{2,4})(?![A-Z])", line)
         if header:
             current_report_day = datetime.strptime(header.group("date"), "%m/%d/%Y").date()
             matchup_value = header.group("matchup")
             remainder = header.group("rest").strip()
-        elif compact_header:
-            matchup_value = compact_header.group("matchup")
-            remainder = compact_header.group("rest").strip()
+        elif matchup_token:
+            date_token = re.search(r"\b(\d{1,2}/\d{1,2}/\d{4})\b", line)
+            if date_token:
+                current_report_day = datetime.strptime(date_token.group(1), "%m/%d/%Y").date()
+            matchup_value = matchup_token.group(1)
+            remainder = (line[:matchup_token.start()] + " " + line[matchup_token.end():]).strip()
         else:
             matchup_value = None
             remainder = ""
