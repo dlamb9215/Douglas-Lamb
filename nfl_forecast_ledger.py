@@ -47,15 +47,15 @@ def append_forecast(record, path="nfl_forecast_ledger.csv"):
         probs[key] = value
     moneyline_total = probs["home_win_probability"] + probs["away_win_probability"]
     if moneyline_total <= 0 or moneyline_total > 101:
-        raise ValueError("Moneyline win probabilities must be positive and cannot exceed 100% after allowing for ties.")
+        raise ValueError("Moneyline probabilities must sum to a positive value no greater than 100% after allowing for ties.")
     if "home_cover_probability" in probs and "away_cover_probability" in probs:
         spread_total = probs["home_cover_probability"] + probs["away_cover_probability"]
         if spread_total <= 0 or spread_total > 101:
-            raise ValueError("Spread probabilities must be positive and cannot exceed 100% after allowing for pushes.")
+            raise ValueError("Spread probabilities must sum to a positive value no greater than 100% after allowing for pushes.")
     if "over_probability" in probs and "under_probability" in probs:
         total_market = probs["over_probability"] + probs["under_probability"]
         if total_market <= 0 or total_market > 101:
-            raise ValueError("Over/under probabilities must be positive and cannot exceed 100% after allowing for pushes.")
+            raise ValueError("Over/under probabilities must sum to a positive value no greater than 100% after allowing for pushes.")
     odds_fields = ("home_moneyline_odds", "away_moneyline_odds", "over_odds", "under_odds")
     if any(record.get(key) not in (None, "") for key in odds_fields):
         source = str(record.get("sportsbook_source") or "").strip()
