@@ -5,7 +5,7 @@ import unittest
 from datetime import date
 from pathlib import Path
 
-from nhl.ledger import append_forecast, reconcile, calibration_summary
+from nhl.ledger import FIELDS, append_forecast, reconcile, calibration_summary
 
 
 def payload():
@@ -73,6 +73,30 @@ class NHLForecastLedgerTests(unittest.TestCase):
             self.assertEqual(summary["settled_games"], 1)
             self.assertEqual(summary["calibration_status"], "INSUFFICIENT_SAMPLE")
             self.assertGreaterEqual(summary["home_moneyline_brier"], 0)
+
+    def test_calibration_reports_separate_market_metrics_and_excludes_total_pushes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "predictions.csv"
+            p = payload()
+            p["sportsbook_prices"] = {}
+            append_forecast(p, path, "1", "2026-11-17")
+            p2 = payload()
+            p2["sportsbook_prices"] = {}
+            append_forecast(p2, path, "2", "2026-11-17")
+            rows = list(csv.DictReader(path.open()))
+            rows[0]["actual_home_goals"], rows[0]["actual_away_goals"] = "4", "2"
+            rows[1]["actual_home_goals"], rows[1]["actual_away_goals"] = "3", "3"
+            for row in rows:
+                row["settled_at_utc"] = "2026-11-18T00:00:00+00:00"
+            with path.open("w", newline="", encoding="utf-8") as handle:
+                writer = csv.DictWriter(handle, fieldnames=FIELDS)
+                writer.writeheader()
+                writer.writerows(rows)
+            report = calibration_summary(path)
+        self.assertEqual(report["markets"]["moneyline_home"]["sample_size"], 1)
+        self.assertEqual(report["markets"]["home_puck_line_minus_1_5"]["sample_size"], 2)
+        self.assertEqual(report["markets"]["total_over"]["sample_size"], 0)
+        self.assertFalse(report["calibrated"])
 
     def test_live_or_unfinished_game_is_not_settled(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -137,22 +137,75 @@ def reconcile(path: str | Path, fetcher: Callable[[str], dict[str, Any]] = fetch
     return changed
 
 
+def _probability_metrics(probabilities: list[float], outcomes: list[int]) -> dict[str, Any]:
+    if not probabilities:
+        return {"sample_size": 0, "brier_score": None, "log_loss": None, "expected_calibration_error": None, "bins": []}
+    import math
+    clipped = [min(1 - 1e-9, max(1e-9, p)) for p in probabilities]
+    brier = sum((p - y) ** 2 for p, y in zip(probabilities, outcomes)) / len(outcomes)
+    log_loss = -sum(y * math.log(p) + (1 - y) * math.log(1 - p)
+                    for p, y in zip(clipped, outcomes)) / len(outcomes)
+    bins = []
+    ece = 0.0
+    for lower in range(0, 100, 10):
+        members = [(p, y) for p, y in zip(probabilities, outcomes)
+                   if lower / 100 <= p < (lower + 10) / 100
+                   or (lower == 90 and p == 1.0)]
+        if not members:
+            continue
+        predicted = sum(p for p, _ in members) / len(members)
+        observed = sum(y for _, y in members) / len(members)
+        ece += len(members) / len(probabilities) * abs(predicted - observed)
+        bins.append({"range": f"{lower}-{lower + 10}%", "count": len(members),
+                     "mean_probability": round(predicted, 4),
+                     "observed_rate": round(observed, 4)})
+    return {"sample_size": len(probabilities), "brier_score": round(brier, 6),
+            "log_loss": round(log_loss, 6), "expected_calibration_error": round(ece, 6),
+            "bins": bins}
+
+
 def calibration_summary(path: str | Path) -> dict[str, Any]:
     target = Path(path)
     if not target.exists():
-        return {"settled_games": 0, "calibration_status": "INSUFFICIENT_SAMPLE"}
+        return {"settled_games": 0, "calibration_status": "INSUFFICIENT_SAMPLE",
+                "markets": {}, "calibrated": False}
     with target.open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))
-    settled = [r for r in rows if r.get("settled_at_utc") and r.get("actual_home_goals") != "" and r.get("actual_away_goals") != ""]
+    settled = [r for r in rows if r.get("settled_at_utc")
+               and r.get("actual_home_goals") not in ("", None)
+               and r.get("actual_away_goals") not in ("", None)]
     if not settled:
-        return {"settled_games": 0, "calibration_status": "INSUFFICIENT_SAMPLE"}
-    brier = sum((float(r["home_win_probability"]) / 100 -
-                 (1.0 if int(r["actual_home_goals"]) > int(r["actual_away_goals"]) else 0.0)) ** 2
-                for r in settled) / len(settled)
+        return {"settled_games": 0, "calibration_status": "INSUFFICIENT_SAMPLE",
+                "markets": {}, "calibrated": False}
+    home_ml_p, home_ml_y = [], []
+    puck_p, puck_y = [], []
+    total_p, total_y = [], []
+    for row in settled:
+        hg, ag = int(row["actual_home_goals"]), int(row["actual_away_goals"])
+        margin, goals = hg - ag, hg + ag
+        if row.get("home_win_probability") not in ("", None) and hg != ag:
+            home_ml_p.append(float(row["home_win_probability"]) / 100)
+            home_ml_y.append(1 if hg > ag else 0)
+        if row.get("home_puck_line_probability") not in ("", None):
+            puck_p.append(float(row["home_puck_line_probability"]) / 100)
+            puck_y.append(1 if margin > 1.5 else 0)
+        if row.get("over_probability") not in ("", None) and row.get("total_line") not in ("", None):
+            line = float(row["total_line"])
+            if goals != line:
+                total_p.append(float(row["over_probability"]) / 100)
+                total_y.append(1 if goals > line else 0)
+    markets = {
+        "moneyline_home": _probability_metrics(home_ml_p, home_ml_y),
+        "home_puck_line_minus_1_5": _probability_metrics(puck_p, puck_y),
+        "total_over": _probability_metrics(total_p, total_y),
+    }
     return {
-        "settled_games": len(settled), "home_moneyline_brier": round(brier, 5),
+        "settled_games": len(settled),
+        "home_moneyline_brier": markets["moneyline_home"]["brier_score"],
+        "markets": markets,
         "calibration_status": "INSUFFICIENT_SAMPLE" if len(settled) < 100 else "REVIEW_REQUIRED",
-        "note": "Descriptive ledger statistic only; this does not certify calibration or profitability.",
+        "calibrated": False,
+        "note": "Descriptive market-specific metrics only. Require chronological holdout, market comparison, sufficient samples and manual review before betting approval.",
     }
 
 
