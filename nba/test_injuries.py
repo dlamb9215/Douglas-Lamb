@@ -5,6 +5,35 @@ from datetime import date
 from unittest.mock import patch
 
 class TestNBAOfficialInjuries(unittest.TestCase):
+    def test_parses_official_pdf_table_rows_and_empty_injury_team(self):
+        from nba.injuries import parse_report_tables
+        tables = [[
+            ["Date", "Time", "Matchup", "Team", "Player", "Status", "Reason"],
+            ["11/19/2026", "08:00 (ET)", "NYK@MIN", "Minnesota Timberwolves", "Clark, Jaylen", "Out", "Hamstring"],
+            ["11/19/2026", "08:00 (ET)", "NYK@MIN", "Minnesota Timberwolves", "DiVincenzo, Donte", "Out", "Achilles"],
+            ["11/19/2026", "08:00 (ET)", "NYK@MIN", "Minnesota Timberwolves", "Edwards, Anthony", "Out", "Knee"],
+            ["", "", "", "", "Kuminga, Jonathan", "Questionable", "Shoulder"],
+        ]]
+        result = parse_report_tables(tables, {"NYK", "MIN"}, date(2026, 11, 19))
+        self.assertTrue(result["target_game_found"])
+        self.assertEqual(result["team_submission"], {"NY": "SUBMITTED", "MIN": "SUBMITTED"})
+        self.assertEqual(
+            {(row["team"], row["player"], row["status"]) for row in result["players"]},
+            {("MIN", "Jaylen Clark", "Out"), ("MIN", "Donte DiVincenzo", "Out"),
+             ("MIN", "Anthony Edwards", "Out"), ("MIN", "Jonathan Kuminga", "Questionable")}
+        )
+
+    def test_official_table_unsubmitted_marker_is_not_promoted(self):
+        from nba.injuries import parse_report_tables
+        tables = [[
+            ["Date", "Time", "Matchup", "Team", "Player", "Status", "Reason"],
+            ["11/19/2026", "08:00 (ET)", "NYK@MIN", "Minnesota Timberwolves", "Clark, Jaylen", "Out", "Hamstring"],
+            ["11/19/2026", "08:00 (ET)", "NYK@MIN", "New York Knicks", "—", "—", "NOT YET SUBMITTED"],
+        ]]
+        result = parse_report_tables(tables, {"NYK", "MIN"}, date(2026, 11, 19))
+        self.assertEqual(result["team_submission"]["NY"], "NOT YET SUBMITTED")
+        self.assertEqual(result["team_submission"]["MIN"], "SUBMITTED")
+
     def test_parses_official_report_player_statuses_and_teams(self):
         sample = """Injury Report: 11/07/26 11:15 PM
 Page 1 of 8
