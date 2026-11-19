@@ -135,6 +135,53 @@ class TestNBAPlayerProps(unittest.TestCase):
         self.assertEqual(result["teams"], {"BOS": [], "NY": []})
         self.assertIn("withheld", result["warnings"][0].lower())
 
+    def test_player_props_fail_closed_when_either_official_team_report_is_unsubmitted(self):
+        from unittest.mock import patch
+        injury = {
+            "source": "NBA official injury report",
+            "team_submission": {"GS": "SUBMITTED", "MEM": "NOT YET SUBMITTED"},
+            "player_statuses": [],
+            "warnings": [],
+        }
+        with (
+            patch("nba.player_props.validate_lineup_context", return_value=(True, "ok")),
+            patch("nba.player_props.fetch_official_injuries", return_value=injury),
+            patch("nba.player_props.fetch_roster") as roster_fetch,
+        ):
+            result = build_matchup_player_projections(
+                "MEM", "GSW", date(2026, 11, 19),
+                confirmed_lineups={"source": "test", "confirmed_at": datetime.now(timezone.utc).isoformat(),
+                                   "teams": {"MEM": {}, "GS": {}}}
+            )
+        self.assertEqual(result["teams"], {"MEM": [], "GS": []})
+        self.assertTrue(any("submission missing or incomplete" in warning for warning in result["warnings"]))
+        roster_fetch.assert_not_called()
+
+    def test_player_props_fail_closed_when_injury_row_does_not_match_team_roster(self):
+        from unittest.mock import patch
+        injury = {
+            "source": "NBA official injury report",
+            "team_submission": {"GS": "SUBMITTED", "MEM": "SUBMITTED"},
+            "player_statuses": [{"team": "GS", "player": "Not A Warrior", "status": "Out", "reason": "test"}],
+            "warnings": [],
+        }
+        rosters = {
+            "GS": [{"id": "1", "name": "Actual Warrior", "active": True}],
+            "MEM": [{"id": "2", "name": "Actual Grizzly", "active": True}],
+        }
+        with (
+            patch("nba.player_props.validate_lineup_context", return_value=(True, "ok")),
+            patch("nba.player_props.fetch_official_injuries", return_value=injury),
+            patch("nba.player_props.fetch_roster", side_effect=lambda team: rosters[team]),
+        ):
+            result = build_matchup_player_projections(
+                "MEM", "GSW", date(2026, 11, 19),
+                confirmed_lineups={"source": "test", "confirmed_at": datetime.now(timezone.utc).isoformat(),
+                                   "teams": {"MEM": {}, "GS": {}}}
+            )
+        self.assertEqual(result["teams"], {"MEM": [], "GS": []})
+        self.assertTrue(any("roster mismatches" in warning for warning in result["warnings"]))
+
     def test_confirmed_minutes_override_historical_minutes(self):
         player = {"id": "1", "name": "Test Player", "position": "G"}
         games = [{"minutes": 20, "points": 12, "rebounds": 3, "assists": 4} for _ in range(8)]
