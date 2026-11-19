@@ -14,17 +14,17 @@ on:
   workflow_dispatch:
     inputs:
       home:
-        description: Home team (OTT for Flyers at Senators)
+        description: Home team (PIT for Blues at Penguins)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: OTT
+        default: PIT
       away:
-        description: Away team (PHI for Flyers at Senators)
+        description: Away team (STL for Blues at Penguins)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: PHI
+        default: STL
       trials:
         description: Monte Carlo trials
         required: true
@@ -84,8 +84,8 @@ jobs:
         id: run_matchup
         shell: bash
         env:
-          HOME_TEAM: ${{ inputs.home || 'OTT' }}
-          AWAY_TEAM: ${{ inputs.away || 'PHI' }}
+          HOME_TEAM: ${{ inputs.home || 'PIT' }}
+          AWAY_TEAM: ${{ inputs.away || 'STL' }}
           TRIALS: ${{ inputs.trials || '1000000' }}
           GAME_DATE: ${{ inputs.game_date || '2026-11-19' }}
         run: |
