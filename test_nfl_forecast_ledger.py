@@ -31,6 +31,41 @@ class NFLForecastLedgerTests(unittest.TestCase):
             self.assertEqual(summary["spread_brier_score"], 0.2025)
             self.assertEqual(summary["total_brier_score"], 0.2601)
 
+    def test_rejects_nonfinite_and_noncomplementary_probabilities(self):
+        base = {"run_id":"bad","season":2026,"week":10,"home_team":"BUF","away_team":"MIA",
+                "home_win_probability":62,"away_win_probability":38}
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "ledger.csv"
+            with self.assertRaisesRegex(ValueError, "finite"):
+                append_forecast(dict(base, home_win_probability=float("nan")), path)
+            with self.assertRaisesRegex(ValueError, "sum"):
+                append_forecast(dict(base, away_win_probability=42), path)
+            with self.assertRaisesRegex(ValueError, "Spread probabilities"):
+                append_forecast(dict(base, home_cover_probability=55, away_cover_probability=47), path)
+
+    def test_market_prices_require_timestamped_source(self):
+        record = {"run_id":"market","season":2026,"week":10,"home_team":"BUF","away_team":"MIA",
+                  "home_win_probability":62,"away_win_probability":38,"home_moneyline_odds":-130}
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, "source and timezone-aware"):
+                append_forecast(record, Path(directory) / "ledger.csv")
+
+    def test_accepts_tie_and_push_probability_residuals(self):
+        base = {"run_id":"pushes","season":2026,"week":10,"home_team":"BUF","away_team":"MIA",
+                "home_win_probability":49,"away_win_probability":49,"tie_probability":2,
+                "home_cover_probability":48,"away_cover_probability":48,"spread_push_probability":4,
+                "over_probability":45,"under_probability":45,"total_push_probability":10}
+        with tempfile.TemporaryDirectory() as directory:
+            self.assertTrue(append_forecast(base, Path(directory) / "ledger.csv"))
+
+    def test_rejects_forecast_recorded_at_or_after_kickoff(self):
+        base = {"run_id":"late","season":2026,"week":10,"home_team":"BUF","away_team":"MIA",
+                "home_win_probability":62,"away_win_probability":38,
+                "kickoff":"2026-11-20T01:00:00Z","recorded_at_utc":"2026-11-20T01:00:00Z"}
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, "before scheduled kickoff"):
+                append_forecast(base, Path(directory) / "ledger.csv")
+
     def test_rejects_invalid_probabilities(self):
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaises(ValueError):
