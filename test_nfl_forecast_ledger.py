@@ -31,6 +31,25 @@ class NFLForecastLedgerTests(unittest.TestCase):
             self.assertEqual(summary["spread_brier_score"], 0.2025)
             self.assertEqual(summary["total_brier_score"], 0.2601)
 
+    def test_rejects_nonfinite_and_noncomplementary_probabilities(self):
+        base = {"run_id":"bad","season":2026,"week":10,"home_team":"BUF","away_team":"MIA",
+                "home_win_probability":62,"away_win_probability":38}
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "ledger.csv"
+            with self.assertRaisesRegex(ValueError, "finite"):
+                append_forecast(dict(base, home_win_probability=float("nan")), path)
+            with self.assertRaisesRegex(ValueError, "sum"):
+                append_forecast(dict(base, away_win_probability=35), path)
+            with self.assertRaisesRegex(ValueError, "Spread probabilities"):
+                append_forecast(dict(base, home_cover_probability=55, away_cover_probability=40), path)
+
+    def test_market_prices_require_timestamped_source(self):
+        record = {"run_id":"market","season":2026,"week":10,"home_team":"BUF","away_team":"MIA",
+                  "home_win_probability":62,"away_win_probability":38,"home_moneyline_odds":-130}
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, "source and timezone-aware"):
+                append_forecast(record, Path(directory) / "ledger.csv")
+
     def test_rejects_invalid_probabilities(self):
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaises(ValueError):
