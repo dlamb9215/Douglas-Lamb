@@ -44,6 +44,10 @@ GAME_HEADER = re.compile(
     r"^(?P<date>\d{1,2}/\d{1,2}/\d{4})\s+\d{1,2}:\d{2}\s+\(ET\)\s+"
     r"(?P<matchup>[A-Z]{2,4}@[A-Z]{2,4})\s*(?P<rest>.*)$"
 )
+# Later game sections in the NBA's compact PDF omit the repeated date/time.
+MATCHUP_ONLY_HEADER = re.compile(
+    r"^(?P<matchup>[A-Z]{2,4}@[A-Z]{2,4})\\s+(?P<rest>.*)$"
+)
 TEAM_CODE_ALIASES = {"GSW": "GS", "NOP": "NO", "NYK": "NY", "SAS": "SA", "UTA": "UTAH", "WAS": "WSH"}
 
 class _Links(HTMLParser):
@@ -111,6 +115,7 @@ def parse_report_text(
     current_team = None
     target_teams = {TEAM_CODE_ALIASES.get(code.upper(), code.upper()) for code in teams} if teams is not None else None
     current_game_matches = game_date is None
+    current_report_day: date | None = None
 
     for raw in text.splitlines():
         line = re.sub(r"\s+", " ", raw).strip()
@@ -118,21 +123,31 @@ def parse_report_text(
             continue
 
         header = GAME_HEADER.match(line)
+        compact_header = MATCHUP_ONLY_HEADER.match(line) if not header else None
         if header:
-            report_day = datetime.strptime(header.group("date"), "%m/%d/%Y").date()
+            current_report_day = datetime.strptime(header.group("date"), "%m/%d/%Y").date()
+            matchup_value = header.group("matchup")
+            remainder = header.group("rest").strip()
+        elif compact_header:
+            matchup_value = compact_header.group("matchup")
+            remainder = compact_header.group("rest").strip()
+        else:
+            matchup_value = None
+            remainder = ""
+        if matchup_value:
             matchup_codes = [
                 TEAM_CODE_ALIASES.get(code.upper(), code.upper())
-                for code in header.group("matchup").split("@")
+                for code in matchup_value.split("@")
             ]
             current_game_matches = (
-                game_date is None or report_day == game_date
+                game_date is None or current_report_day == game_date
             ) and (
                 target_teams is None or set(matchup_codes) == target_teams
             )
             current_team = None
-            line = header.group("rest").strip()
-            if not line:
+            if not remainder:
                 continue
+            line = remainder
 
         if not current_game_matches:
             continue
@@ -227,6 +242,12 @@ def parse_report_text(
         row for row in rows
         if team_submission.get(row["team"]) == "SUBMITTED"
     ]
+    # In compact NBA PDFs, a matchup section is evidence that both teams'
+    # rows were included. Teams with no reportable injuries have no player row;
+    # explicit NOT YET SUBMITTED markers remain authoritative.
+    if game_date is not None and target_teams is not None:
+        for code in target_teams:
+            team_submission.setdefault(code, "SUBMITTED")
     return {"players": rows, "team_submission": team_submission}
 
 def parse_report_tables(tables: list[list[list[Any]]], teams: set[str], game_date: date) -> dict[str, Any]:
