@@ -52,9 +52,9 @@ class NFLForecastLedgerTests(unittest.TestCase):
 
     def test_accepts_tie_and_push_probability_residuals(self):
         base = {"run_id":"pushes","season":2026,"week":10,"home_team":"BUF","away_team":"MIA",
-                "home_win_probability":49,"away_win_probability":49,
-                "home_cover_probability":48,"away_cover_probability":48,
-                "over_probability":45,"under_probability":45}
+                "home_win_probability":49,"away_win_probability":49,"tie_probability":2,
+                "home_cover_probability":48,"away_cover_probability":48,"spread_push_probability":4,
+                "over_probability":45,"under_probability":45,"total_push_probability":10}
         with tempfile.TemporaryDirectory() as directory:
             self.assertTrue(append_forecast(base, Path(directory) / "ledger.csv"))
 
