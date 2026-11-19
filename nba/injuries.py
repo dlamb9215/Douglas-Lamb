@@ -40,6 +40,11 @@ PLAYER_ROW = re.compile(
     r"(?:\s+(?P<reason>.*))?$", re.IGNORECASE
 )
 REPORT_LINK = re.compile(r"Injury-Report_(\d{4}-\d{2}-\d{2})_(\d{1,2})_(\d{2})(AM|PM)\.pdf", re.I)
+GAME_HEADER = re.compile(
+    r"^(?P<date>\d{1,2}/\d{1,2}/\d{4})\s+\d{1,2}:\d{2}\s+\(ET\)\s+"
+    r"(?P<matchup>[A-Z]{2,4}@[A-Z]{2,4})\s*(?P<rest>.*)$"
+)
+TEAM_CODE_ALIASES = {"GSW": "GS", "NOP": "NO", "NYK": "NY", "SAS": "SA", "UTA": "UTAH", "WAS": "WSH"}
 
 class _Links(HTMLParser):
     def __init__(self):
@@ -91,30 +96,67 @@ def latest_report_url(game_date: date, season: int = 2027) -> str:
         )
     return max(choices, key=lambda item: item[0])[1]
 
-def parse_report_text(text: str, teams: set[str] | None = None) -> dict[str, Any]:
+def parse_report_text(
+    text: str, teams: set[str] | None = None, game_date: date | None = None
+) -> dict[str, Any]:
+    """Parse only the requested matchup's section of the league-wide PDF.
+
+    The official PDF contains many games on one report. Filtering only by team
+    abbreviation can accidentally import that team's previous-game injuries
+    into tomorrow's matchup. Track each date/matchup header and ignore every
+    other game's team sections.
+    """
     rows: list[dict[str, str]] = []
     team_submission: dict[str, str] = {}
     current_team = None
+    target_teams = {TEAM_CODE_ALIASES.get(code.upper(), code.upper()) for code in teams} if teams is not None else None
+    current_game_matches = game_date is None
+
     for raw in text.splitlines():
         line = re.sub(r"\s+", " ", raw).strip()
         if not line or line.startswith(("Injury Report:", "Page ")):
             continue
+
+        header = GAME_HEADER.match(line)
+        if header:
+            report_day = datetime.strptime(header.group("date"), "%m/%d/%Y").date()
+            matchup_codes = [
+                TEAM_CODE_ALIASES.get(code.upper(), code.upper())
+                for code in header.group("matchup").split("@")
+            ]
+            current_game_matches = (
+                game_date is None or report_day == game_date
+            ) and (
+                target_teams is None or set(matchup_codes) == target_teams
+            )
+            current_team = None
+            line = header.group("rest").strip()
+            if not line:
+                continue
+
+        if not current_game_matches:
+            continue
+
         # Team names may share a PDF text line with the first player row.
         found_team = None
         remainder = line
-        for team_name in TEAM_NAMES_SORTED:
-            pos = line.find(team_name)
-            if pos >= 0:
-                found_team = TEAM_NAMES[team_name]
-                remainder = line[pos + len(team_name):].strip()
-                break
+        matches = [
+            (line.find(team_name), team_name)
+            for team_name in TEAM_NAMES_SORTED
+            if line.find(team_name) >= 0
+        ]
+        if matches:
+            pos, team_name = min(matches, key=lambda item: (item[0], -len(item[1])))
+            found_team = TEAM_NAMES[team_name]
+            remainder = line[pos + len(team_name):].strip()
+
         if found_team:
             current_team = found_team
-            if teams is not None and current_team not in teams:
+            if target_teams is not None and current_team not in target_teams:
                 current_team = None
                 continue
-            # A team heading in the official PDF is evidence that its report
-            # section was submitted; the explicit not-submitted marker overrides it.
+            # A team heading in the requested game is evidence of a submission;
+            # the explicit not-submitted marker overrides it.
             team_submission.setdefault(found_team, "SUBMITTED")
             if remainder.upper() == "NOT YET SUBMITTED":
                 team_submission[found_team] = "NOT YET SUBMITTED"
@@ -135,9 +177,6 @@ def parse_report_text(text: str, teams: set[str] | None = None) -> dict[str, Any
                 "status": match.group("status").title(),
                 "reason": (match.group("reason") or "").strip(),
             })
-    if teams is not None:
-        rows = [row for row in rows if row["team"] in teams]
-        team_submission = {key: value for key, value in team_submission.items() if key in teams}
     return {"players": rows, "team_submission": team_submission}
 
 def _espn_injury_fallback(game_date: date, target_teams: set[str]) -> dict[str, Any]:
@@ -212,7 +251,7 @@ def fetch_official_injuries(game_date: date, home: str, away: str, season: int =
                 except TypeError:
                     extracted = page.extract_text()
                 pages.append(extracted or "")
-            parsed_candidate = parse_report_text("\n".join(pages), target_teams)
+            parsed_candidate = parse_report_text("\n".join(pages), target_teams, game_date)
             score = (len(parsed_candidate["team_submission"]), len(parsed_candidate["players"]))
             candidates.append((score, parsed_candidate, mode))
         _, parsed, extraction_mode = max(candidates, key=lambda item: item[0])

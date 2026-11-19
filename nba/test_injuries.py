@@ -24,6 +24,37 @@ Cleveland Cavaliers Allen, Jarrett Out Injury/Illness - Right Knee Contusion
         self.assertEqual(result["players"][1]["status"], "Out")
         self.assertEqual({row["team"] for row in result["players"]}, {"DEN", "IND"})
 
+    def test_filters_injuries_to_exact_game_date_and_matchup(self):
+        sample = """Injury Report: 11/18/26 06:45 PM
+11/18/2026 07:00 (ET) HOU@IND Houston Rockets Capela, Clint Out Injury/Illness - Right Ankle Sprain
+Indiana Pacers Haliburton, Tyrese Out Injury/Illness - Left Hamstring Strain
+11/18/2026 08:00 (ET) MEM@CLE Memphis Grizzlies Jackson, GG Out Injury/Illness - Left Foot Fracture
+Cleveland Cavaliers Mobley, Evan Out Injury/Illness - Left Great Toe Sprain
+11/18/2026 08:00 (ET) GSW@DAL Golden State Warriors Butler III, Jimmy Out Injury/Illness - Right ACL Repair
+Dallas Mavericks Lively II, Dereck Out Injury/Illness - Right Foot Surgery
+11/19/2026 08:00 (ET) GSW@MEM Golden State Warriors NOT YET SUBMITTED
+Memphis Grizzlies NOT YET SUBMITTED
+"""
+        result = parse_report_text(
+            sample, {"GS", "MEM"}, date(2026, 11, 19)
+        )
+        self.assertEqual(result["players"], [])
+        self.assertEqual(result["team_submission"], {
+            "GS": "NOT YET SUBMITTED", "MEM": "NOT YET SUBMITTED"
+        })
+
+    def test_exact_matchup_injury_rows_are_kept(self):
+        sample = """11/18/2026 08:00 (ET) GSW@DAL Golden State Warriors Butler III, Jimmy Out Injury/Illness - Right ACL Repair
+Dallas Mavericks Lively II, Dereck Out Injury/Illness - Right Foot Surgery
+11/19/2026 08:00 (ET) GSW@MEM Golden State Warriors Curry, Stephen Out Injury/Illness - Right Oblique Tear
+Memphis Grizzlies Morant, Ja Out Injury/Illness - Left Hamstring Strain
+"""
+        result = parse_report_text(sample, {"GS", "MEM"}, date(2026, 11, 19))
+        self.assertEqual(
+            {(row["team"], row["player"]) for row in result["players"]},
+            {("GS", "Stephen Curry"), ("MEM", "Ja Morant")}
+        )
+
     def test_flags_team_not_yet_submitted(self):
         result = parse_report_text("Brooklyn Nets NOT YET SUBMITTED", {"BKN"})
         self.assertEqual(result["team_submission"]["BKN"], "NOT YET SUBMITTED")
@@ -46,7 +77,7 @@ Cleveland Cavaliers Allen, Jarrett Out Injury/Illness - Right Knee Contusion
         class FakePage:
             def extract_text(self, extraction_mode=None):
                 if extraction_mode == "layout":
-                    return "Philadelphia 76ers\nEmbiid, Joel Available\nToronto Raptors\nBarnes, Scottie Out"
+                    return "11/12/2026 08:00 (ET) PHI@TOR Philadelphia 76ers\nEmbiid, Joel Available\nToronto Raptors\nBarnes, Scottie Out"
                 return "garbled columns"
         class FakeReader:
             def __init__(self, stream):
