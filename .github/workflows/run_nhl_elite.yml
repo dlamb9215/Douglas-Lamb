@@ -14,17 +14,17 @@ on:
   workflow_dispatch:
     inputs:
       home:
-        description: Home team (CAR for Hurricanes vs Canadiens)
+        description: Home team (WPG for Islanders at Jets)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: CAR
+        default: WPG
       away:
-        description: Away team (MTL for Hurricanes vs Canadiens)
+        description: Away team (NYI for Islanders at Jets)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, NJD, MTL, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: MTL
+        default: NYI
       trials:
         description: Monte Carlo trials
         required: true
@@ -39,7 +39,7 @@ on:
       game_config_json:
         description: Optional JSON for total, seed, confirmed goalie IDs, scratched player IDs, and sportsbook prices with source/timestamp
         required: false
-        default: '{"total":6.5,"seed":20261119}'
+        default: '{"seed":20261119}'
         type: string
 
 permissions:
@@ -84,8 +84,8 @@ jobs:
         id: run_matchup
         shell: bash
         env:
-          HOME_TEAM: ${{ inputs.home || 'CAR' }}
-          AWAY_TEAM: ${{ inputs.away || 'MTL' }}
+          HOME_TEAM: ${{ inputs.home || 'WPG' }}
+          AWAY_TEAM: ${{ inputs.away || 'NYI' }}
           TRIALS: ${{ inputs.trials || '1000000' }}
           GAME_DATE: ${{ inputs.game_date || '2026-11-19' }}
         run: |
