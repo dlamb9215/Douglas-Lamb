@@ -108,8 +108,8 @@ jobs:
         id: run_matchup
         if: github.event_name != 'pull_request'
         env:
-          HOME_TEAM: ${{ inputs.home || 'MEM' }}
-          AWAY_TEAM: ${{ inputs.away || 'GSW' }}
+          HOME_TEAM: ${{ inputs.home || 'MIN' }}
+          AWAY_TEAM: ${{ inputs.away || 'NYK' }}
           SPREAD: ${{ inputs.spread || '' }}
           TOTAL: ${{ inputs.total || '' }}
           TRIALS: ${{ inputs.trials || '1000000' }}
