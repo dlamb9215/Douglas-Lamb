@@ -6,6 +6,11 @@ on:
     paths:
       - "nhl/**"
       - ".github/workflows/run_nhl_elite.yml"
+  pull_request:
+    paths:
+      - "nhl/**"
+      - ".github/workflows/run_nhl_elite.yml"
+      - "test_nhl_simulator.py"
   workflow_dispatch:
     inputs:
       home:
@@ -63,9 +68,14 @@ jobs:
           config = json.loads(raw) if raw else {}
           if not isinstance(config, dict): raise SystemExit("game_config_json must be a JSON object")
           with open("nhl-game-config.json", "w", encoding="utf-8") as handle: json.dump(config, handle, indent=2)
+          for key, filename in (("goalie_confirmations_json", "goalie-confirmations.json"),
+                                ("lineup_confirmations_json", "lineup-confirmations.json")):
+              if config.get(key) is not None:
+                  with open(filename, "w", encoding="utf-8") as handle:
+                      json.dump(config[key], handle)
           PY
       - name: Run offline unit tests
-        run: python -m unittest -v nhl.test_elite nhl.test_ledger
+        run: python -m unittest -v nhl.test_elite nhl.test_ledger nhl.test_readiness
       - name: Reconcile prior NHL forecasts
         if: github.event_name == 'workflow_dispatch'
         continue-on-error: true
@@ -79,6 +89,7 @@ jobs:
           TRIALS: ${{ inputs.trials || '100000' }}
           GAME_DATE: ${{ inputs.game_date || '2026-11-19' }}
         run: |
+          set -euo pipefail
           CONFIG=nhl-game-config.json
           TOTAL="$(jq -r '.total // 6.0' "$CONFIG")"
           SEED="$(jq -r '.seed // 20261119' "$CONFIG")"
@@ -99,6 +110,8 @@ jobs:
           if [ -n "$HOME_GOALIE_ID" ]; then ARGS+=(--home-goalie-id "$HOME_GOALIE_ID"); fi
           if [ -n "$AWAY_GOALIE_ID" ]; then ARGS+=(--away-goalie-id "$AWAY_GOALIE_ID"); fi
           if [ -n "$EXCLUDED_PLAYER_IDS" ]; then ARGS+=(--exclude-player-ids "$EXCLUDED_PLAYER_IDS"); fi
+          if [ -s goalie-confirmations.json ]; then ARGS+=(--goalie-confirmations goalie-confirmations.json); fi
+          if [ -s lineup-confirmations.json ]; then ARGS+=(--lineup-confirmations lineup-confirmations.json); fi
           python -m nhl.elite --home "$HOME_TEAM" --away "$AWAY_TEAM" --trials "$TRIALS" --total "$TOTAL" --seed "$SEED" --home-ml "$HOME_ML" --away-ml "$AWAY_ML" --over-odds "$OVER_ODDS" --under-odds "$UNDER_ODDS" --home-puck-odds "$HOME_PUCK_ODDS" --away-puck-odds "$AWAY_PUCK_ODDS" "${ARGS[@]}" | tee nhl-elite-results.txt
           test -s nhl-elite-results.json
           test -s nhl-elite-results.txt
