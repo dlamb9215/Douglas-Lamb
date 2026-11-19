@@ -1,5 +1,5 @@
 import unittest
-from nba.simulator import TeamStats, matchup_projection, simulate, implied_probability, no_vig_probabilities, expected_value_per_100, _decision
+from nba.simulator import TeamStats, matchup_projection, simulate, implied_probability, no_vig_probabilities, expected_value_per_100, _decision, quarantine_untrusted_injury_rows
 
 def team(code, **updates):
     d={"name":code,"games_played":10,"pace":99,"off_rating":115,"def_rating":112,
@@ -106,4 +106,26 @@ class TestNBAEngine(unittest.TestCase):
         self.assertEqual(_decision(58,2),"LEAN")
         self.assertEqual(_decision(54,4),"PASS")
         self.assertEqual(_decision(60,.5),"PASS")
-if __name__=="__main__": unittest.main()
+
+    def test_quarantines_players_assigned_to_the_wrong_team(self):
+        from unittest.mock import patch
+        context = {
+            "player_statuses": [
+                {"team": "MIN", "player": "Joan Beringer", "status": "Available"},
+                {"team": "MIN", "player": "Jayden Quaintance", "status": "Out"},
+            ],
+            "team_submission": {"MIN": "SUBMITTED", "NY": "SUBMITTED"},
+            "report_url": "https://example.test/report.pdf",
+            "warnings": [],
+        }
+        validation = {
+            "status": "failed",
+            "mismatches": [{"team": "MIN", "player": "Jayden Quaintance"}],
+        }
+        with patch("nba.data_hub.validate_injury_roster_consistency", return_value=validation):
+            result = quarantine_untrusted_injury_rows(context, "MIN", "NYK")
+        self.assertEqual([row["player"] for row in result["player_statuses"]], ["Joan Beringer"])
+        self.assertEqual([row["player"] for row in result["untrusted_player_statuses"]], ["Jayden Quaintance"])
+        self.assertEqual(result["status"], "incomplete")
+        self.assertEqual(result["roster_validation"]["status"], "failed")
+\nif __name__=="__main__": unittest.main()
