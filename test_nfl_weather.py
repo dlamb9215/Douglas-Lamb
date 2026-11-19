@@ -57,6 +57,28 @@ class NFLWeatherTests(unittest.TestCase):
         self.assertAlmostEqual(result["latitude"],40.45)
         self.assertAlmostEqual(result["longitude"],-3.69)
 
+    @patch("nfl_weather._get_json")
+    @patch("nfl_weather._get_rows")
+    def test_generic_home_location_uses_home_team_city_not_literal_home(self, rows, get_json):
+        rows.return_value = [{
+            "home_team":"HOU","away_team":"IND","season":"2026","week":"11",
+            "game_type":"REG","gameday":"2026-11-19","gametime":"20:15",
+            "stadium":"Reliant Stadium","location":"Home","roof":"outdoors","surface":"turf"
+        }]
+        get_json.side_effect = [
+            {"results":[{"country_code":"US","name":"Houston","admin1":"Texas",
+                         "country":"United States","latitude":29.6847,"longitude":-95.4107}]},
+            {"hourly":{
+                "time":["2026-11-20T01:00","2026-11-20T02:00"],
+                "temperature_2m":[15,14],"precipitation":[0,0],
+                "wind_speed_10m":[10,11],"wind_gusts_10m":[15,16]
+            }}
+        ]
+        result = fetch_matchup_weather("HOU","IND",2026,11)
+        self.assertEqual(result["venue_city"],"Houston, Texas, United States")
+        self.assertAlmostEqual(result["latitude"],29.6847)
+        self.assertNotEqual(result["latitude"],39.84167)
+
     @patch("nfl_weather._get_json", return_value={"results":[
         {"country_code":"US","name":"Joplin","admin1":"Missouri",
          "country":"United States","latitude":37.10,"longitude":-94.79}
