@@ -177,6 +177,50 @@ def parse_report_text(
                 "status": match.group("status").title(),
                 "reason": (match.group("reason") or "").strip(),
             })
+    # The official PDF uses two side-by-side game columns. Text extraction can
+    # interleave the second team's heading with another game's header, which
+    # resets the linear parser state. Recover target-game submission markers
+    # from the final occurrence of each requested team name after its exact
+    # matchup header; this never promotes an unsubmitted team to available.
+    if game_date is not None and target_teams is not None:
+        lines = [re.sub(r"\s+", " ", raw).strip() for raw in text.splitlines()]
+        target_header_index = None
+        for index, candidate in enumerate(lines):
+            header = GAME_HEADER.match(candidate)
+            if not header:
+                continue
+            report_day = datetime.strptime(header.group("date"), "%m/%d/%Y").date()
+            codes = {
+                TEAM_CODE_ALIASES.get(code.upper(), code.upper())
+                for code in header.group("matchup").split("@")
+            }
+            if report_day == game_date and codes == target_teams:
+                target_header_index = index
+                break
+        if target_header_index is not None:
+            for team_name in TEAM_NAMES_SORTED:
+                code = TEAM_NAMES[team_name]
+                if code not in target_teams:
+                    continue
+                occurrences = [
+                    index for index in range(target_header_index, len(lines))
+                    if team_name in lines[index]
+                ]
+                if not occurrences:
+                    continue
+                index = occurrences[-1]
+                context = " ".join(lines[index:index + 3])
+                if "NOT YET SUBMITTED" in context.upper():
+                    team_submission[code] = "NOT YET SUBMITTED"
+                elif code not in team_submission:
+                    team_submission[code] = "SUBMITTED"
+
+    # Never retain player rows for a target team without an explicit
+    # SUBMITTED marker for this exact game.
+    rows = [
+        row for row in rows
+        if team_submission.get(row["team"]) == "SUBMITTED"
+    ]
     return {"players": rows, "team_submission": team_submission}
 
 def _espn_injury_fallback(game_date: date, target_teams: set[str]) -> dict[str, Any]:
