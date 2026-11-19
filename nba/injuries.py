@@ -371,17 +371,33 @@ def fetch_official_injuries(game_date: date, home: str, away: str, season: int =
         # linear text extraction can scramble row associations.
         import pdfplumber
         extracted_tables = []
+        table_modes = [
+            ("default", {}),
+            ("text_grid", {"vertical_strategy": "text", "horizontal_strategy": "text"}),
+            ("lines_grid", {"vertical_strategy": "lines", "horizontal_strategy": "lines"}),
+            ("text_lines", {"vertical_strategy": "text", "horizontal_strategy": "lines"}),
+        ]
         try:
             with pdfplumber.open(io.BytesIO(pdf)) as document:
-                for page in document.pages:
-                    extracted_tables.extend(page.extract_tables() or [])
+                for mode_name, settings in table_modes:
+                    candidate_tables = []
+                    for page in document.pages:
+                        candidate_tables.extend(page.extract_tables(table_settings=settings) or [])
+                    extracted_tables.extend(candidate_tables)
+                    candidate = parse_report_tables(candidate_tables, target_teams, game_date)
+                    if candidate.get("target_game_found") and len(candidate.get("team_submission", {})) == len(target_teams):
+                        parsed = candidate
+                        extraction_mode = "pdfplumber_" + mode_name
+                        break
+                else:
+                    parsed = parse_report_tables(extracted_tables, target_teams, game_date)
+                    extraction_mode = "pdfplumber_multi_settings"
         except Exception:
-            # Some legacy unit fixtures and malformed downloads are not PDFs;
-            # preserve the independent pypdf text fallback for those cases.
-            extracted_tables = []
-        parsed = parse_report_tables(extracted_tables, target_teams, game_date)
-        extraction_mode = "pdfplumber_tables"
-        if not parsed.get("target_game_found"):
+            # Preserve independent text extraction if the PDF table detector
+            # cannot handle the NBA report's multi-column layout.
+            parsed = {"players": [], "team_submission": {}, "target_game_found": False}
+            extraction_mode = "pdfplumber_unavailable"
+        if not parsed.get("target_game_found") or len(parsed.get("team_submission", {})) != len(target_teams):
             reader = PdfReader(io.BytesIO(pdf))
             candidates = []
             for mode in ("layout", "plain"):
@@ -399,7 +415,9 @@ def fetch_official_injuries(game_date: date, home: str, away: str, season: int =
                 ]
                 score = (len(parsed_candidate["team_submission"]), len(parsed_candidate["players"]))
                 candidates.append((score, parsed_candidate, mode))
-            _, parsed, extraction_mode = max(candidates, key=lambda item: item[0])
+            _, text_parsed, text_mode = max(candidates, key=lambda item: item[0])
+            if len(text_parsed["team_submission"]) > len(parsed.get("team_submission", {})):
+                parsed, extraction_mode = text_parsed, text_mode
         if not parsed.get("target_game_found") and not parsed["players"] and len(parsed["team_submission"]) != len(target_teams):
             raise RuntimeError(
                 "Official injury report downloaded but table and text extraction could not "
