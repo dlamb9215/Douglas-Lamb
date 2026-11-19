@@ -134,6 +134,49 @@ class TestNBADataHub(unittest.TestCase):
         self.assertEqual(result["status"], "failed")
         self.assertEqual(result["mismatches"][0]["player"], "Wrong Team Player")
 
+    def test_quarantines_player_team_mismatches_from_trusted_injury_rows(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            stats = Path(tmp) / "stats.json"
+            stats.write_text(json.dumps({"league": "NBA"}), encoding="utf-8")
+            with (
+                patch("nba.data_hub.validate_payload", return_value={"ready": True, "warnings": []}),
+                patch("nba.data_hub.build_context", return_value={
+                    "event": {"event_id": "123"}, "source": "ESPN",
+                    "retrieved_at": "2026-11-19T12:00:00Z",
+                    "home_rest_days": 2, "away_rest_days": 1, "warnings": []
+                }),
+                patch("nba.data_hub.fetch_official_injuries", return_value={
+                    "source": "NBA official injury report",
+                    "retrieved_at": "2026-11-19T12:00:00Z",
+                    "report_url": "https://official.nba.com/report.pdf",
+                    "player_statuses": [
+                        {"team": "GS", "player": "Jimmy Butler III", "status": "Out"},
+                        {"team": "GS", "player": "Anthony Edwards", "status": "Out"},
+                    ],
+                    "team_submission": {"GS": "SUBMITTED", "MEM": "SUBMITTED"},
+                    "warnings": []
+                }),
+                patch("nba.data_hub.fetch_roster", side_effect=[
+                    [{"name": "Jimmy Butler"}],
+                    [{"name": "Ja Morant"}],
+                ]),
+                patch("nba.data_hub.fetch_espn_bet_odds", side_effect=RuntimeError("not posted")),
+                patch.dict(os.environ, {"ODDS_API_KEY": ""}),
+            ):
+                report = build_report("MEM", "GSW", date(2026, 11, 19), str(stats))
+        injuries = report["sources"]["injuries"]
+        self.assertEqual(
+            [(row["team"], row["player"]) for row in injuries["player_statuses"]],
+            [("GS", "Jimmy Butler III")]
+        )
+        self.assertEqual(
+            [(row["team"], row["player"]) for row in injuries["untrusted_player_statuses"]],
+            [("GS", "Anthony Edwards")]
+        )
+        self.assertEqual(injuries["status"], "incomplete")
+        self.assertFalse(report["readiness"]["injury_roster_consistent"])
+        self.assertFalse(report["readiness"]["official_injuries"])
+
     def test_bad_team_codes_rejected(self):
         with self.assertRaisesRegex(ValueError, "recognized NBA"):
             build_report("XXX", "DET", date(2026, 11, 12))
