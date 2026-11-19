@@ -7,6 +7,7 @@ calibration or betting readiness.
 import csv
 import json
 import os
+import math
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -26,12 +27,48 @@ def append_forecast(record, path="nfl_forecast_ledger.csv"):
     required = ("run_id", "home_team", "away_team", "home_win_probability", "away_win_probability")
     if any(record.get(key) in (None, "") for key in required):
         raise ValueError("Forecast record is missing required identifiers or win probabilities.")
-    if record["home_team"] == record["away_team"]:
-        raise ValueError("Home and away teams must differ.")
-    for key in ("home_win_probability", "away_win_probability"):
-        value = float(record[key])
-        if not 0 <= value <= 100:
-            raise ValueError(f"{key} must be between 0 and 100.")
+    home, away = str(record["home_team"]).strip().upper(), str(record["away_team"]).strip().upper()
+    if not home or not away or home == away:
+        raise ValueError("Home and away teams must be distinct non-empty abbreviations.")
+    probability_fields = ("home_win_probability", "away_win_probability",
+                          "home_cover_probability", "away_cover_probability",
+                          "over_probability", "under_probability")
+    probs = {}
+    for key in probability_fields:
+        raw = record.get(key)
+        if raw in (None, ""):
+            continue
+        try:
+            value = float(raw)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"{key} must be a finite percentage from 0 to 100.") from exc
+        if not math.isfinite(value) or not 0 <= value <= 100:
+            raise ValueError(f"{key} must be a finite percentage from 0 to 100.")
+        probs[key] = value
+    if abs(probs["home_win_probability"] + probs["away_win_probability"] - 100) > 1:
+        raise ValueError("Moneyline probabilities must sum to approximately 100%.")
+    if "home_cover_probability" in probs and "away_cover_probability" in probs:
+        if abs(probs["home_cover_probability"] + probs["away_cover_probability"] - 100) > 1:
+            raise ValueError("Spread probabilities must sum to approximately 100%.")
+    if "over_probability" in probs and "under_probability" in probs:
+        push = float(record.get("push_probability") or 0)
+        if not math.isfinite(push) or not 0 <= push <= 100 or abs(probs["over_probability"] + probs["under_probability"] + push - 100) > 1:
+            raise ValueError("Over, under, and push probabilities must sum to approximately 100%.")
+    odds_fields = ("home_moneyline_odds", "away_moneyline_odds", "over_odds", "under_odds")
+    if any(record.get(key) not in (None, "") for key in odds_fields):
+        source = str(record.get("sportsbook_source") or "").strip()
+        checked = str(record.get("odds_checked_at_utc") or "").strip()
+        if not source or not checked:
+            raise ValueError("Sportsbook prices require a source and timezone-aware quote timestamp.")
+        try:
+            stamp = datetime.fromisoformat(checked.replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise ValueError("odds_checked_at_utc must be a valid timezone-aware timestamp.") from exc
+        if stamp.tzinfo is None:
+            raise ValueError("odds_checked_at_utc must include a timezone.")
+    record = dict(record)
+    record["home_team"], record["away_team"] = home, away
+    record.update(probs)
     target = Path(path)
     rows = []
     if target.exists():
