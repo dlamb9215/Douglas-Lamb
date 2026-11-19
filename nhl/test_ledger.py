@@ -5,7 +5,7 @@ import unittest
 from datetime import date
 from pathlib import Path
 
-from nhl.ledger import append_forecast, reconcile, calibration_summary
+from nhl.ledger import FIELDS, append_forecast, reconcile, calibration_summary
 
 
 def payload():
