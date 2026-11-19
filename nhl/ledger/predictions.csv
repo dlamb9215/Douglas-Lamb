@@ -1,3 +1,4 @@
 run_id,forecasted_at_utc,game_date,season,home,away,trials,seed,home_win_probability,away_win_probability,home_puck_line_probability,away_puck_line_probability,total_line,over_probability,under_probability,push_probability,home_ml_odds,away_ml_odds,over_odds,under_odds,home_puck_odds,away_puck_odds,sportsbook_source,odds_checked_at_utc,home_goalie_id,away_goalie_id,team_summary_available,actual_home_goals,actual_away_goals,settled_at_utc
 44435110229,2026-11-19T01:12:44.815728+00:00,2026-11-19,20262027,TOR,LAK,1000000,20261119,51.72,48.28,29.38,70.62,6.0,60.2,29.62,10.18,,,,,,,,,8475683,8475311,True,,,
 44436498828,2026-11-19T01:23:26.032947+00:00,2026-11-19,20262027,OTT,PHI,1000000,20261119,70.46,29.54,45.95,54.05,6.0,41.03,47.24,11.73,,,,,,,,,8476999,8478435,True,,,
+44437077464,2026-11-19T01:28:15.573303+00:00,2026-11-19,20262027,PIT,STL,1000000,20261119,39.84,60.16,18.7,81.3,6.0,49.17,39.72,11.11,,,,,,,,,8481668,8480981,True,,,
