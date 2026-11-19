@@ -54,6 +54,23 @@ Memphis Grizzlies NOT YET SUBMITTED
         })
         self.assertEqual(result["players"], [])
 
+    def test_explicit_unsubmitted_markers_override_interleaved_pdf_rows(self):
+        sample = """11/19/2026 08:00 (ET) GSW@MEM Golden State Warriors
+NOT YET SUBMITTED
+Memphis Grizzlies
+NOT YET SUBMITTED
+11/19/2026 08:00 (ET) LAC@SAS LA Clippers Beal, Bradley Out
+11/19/2026 08:00 (ET) NYK@MIN Minnesota Timberwolves
+Clark, Jaylen Out
+DiVincenzo, Donte Out
+Edwards, Anthony Out
+"""
+        result = parse_report_text(sample, {"GS", "MEM"}, date(2026, 11, 19))
+        self.assertEqual(result["team_submission"], {
+            "GS": "NOT YET SUBMITTED", "MEM": "NOT YET SUBMITTED"
+        })
+        self.assertEqual(result["players"], [])
+
     def test_exact_matchup_injury_rows_are_kept(self):
         sample = """11/18/2026 08:00 (ET) GSW@DAL Golden State Warriors Butler III, Jimmy Out Injury/Illness - Right ACL Repair
 Dallas Mavericks Lively II, Dereck Out Injury/Illness - Right Foot Surgery
