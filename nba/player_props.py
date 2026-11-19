@@ -26,6 +26,14 @@ EXCLUDED_STATUSES = {"Out", "Doubtful", "Questionable"}
 MIN_GAMES = 5
 MIN_AVERAGE_MINUTES = 10.0
 
+def _player_name_key(value: str) -> str:
+    """Normalize names for official-report/current-roster cross-checks."""
+    tokens = re.findall(r"[a-z0-9]+", str(value).casefold())
+    while tokens and tokens[-1] in {"jr", "sr", "ii", "iii", "iv"}:
+        tokens.pop()
+    return " ".join(tokens)
+MIN_AVERAGE_MINUTES = 10.0
+
 def confirmed_minutes(entry: dict[str, Any] | None) -> tuple[float | None, float | None, str | None]:
     """Validate explicit game-specific availability and minutes confirmation."""
     if not isinstance(entry, dict):
@@ -442,15 +450,55 @@ def build_matchup_player_projections(home: str, away: str, game_date: date, seas
                 "This experimental model does not confirm starters, rotations, or expected minutes.",
             ],
         }
-    status_map = {(row["team"], row["player"].casefold()): row["status"] for row in injury["player_statuses"]}
+    warnings = list(injury.get("warnings", []))
+    empty_teams = {team: [] for team in team_codes}
+    # Fail closed: a missing team submission, third-party fallback, or player
+    # assigned to the wrong current roster means we cannot safely know which
+    # players are OUT. Do not generate any player props for either team.
+    if injury.get("source") != "NBA official injury report":
+        return {
+            "game_date": game_date.isoformat(), "home": team_codes[0], "away": team_codes[1],
+            "season": season, "trials_per_player": trials, "teams": empty_teams,
+            "source": injury.get("source", "unknown injury source"),
+            "warnings": warnings + ["Player props withheld: official NBA injury report is not verified."],
+            "limitations": ["No player projections are produced unless both official team submissions and every parsed player/team assignment are validated."],
+        }
+    submissions = injury.get("team_submission", {})
+    missing_submissions = [team for team in team_codes if submissions.get(team) != "SUBMITTED"]
+    if missing_submissions:
+        return {
+            "game_date": game_date.isoformat(), "home": team_codes[0], "away": team_codes[1],
+            "season": season, "trials_per_player": trials, "teams": empty_teams,
+            "source": "NBA official injury report",
+            "warnings": warnings + ["Player props withheld: official injury submission missing or incomplete for " + ", ".join(missing_submissions) + "."],
+            "limitations": ["Unknown or unsubmitted injury status is never treated as Available."],
+        }
+    rosters = {team: fetch_roster(team) for team in team_codes}
+    roster_names = {
+        team: {_player_name_key(player.get("name", "")) for player in roster if player.get("name")}
+        for team, roster in rosters.items()
+    }
+    mismatches = [
+        f"{row.get('player', 'Unknown')} ({row.get('team', 'unknown team')})"
+        for row in injury.get("player_statuses", [])
+        if row.get("team") not in roster_names
+        or _player_name_key(row.get("player", "")) not in roster_names.get(row.get("team"), set())
+    ]
+    if mismatches:
+        return {
+            "game_date": game_date.isoformat(), "home": team_codes[0], "away": team_codes[1],
+            "season": season, "trials_per_player": trials, "teams": empty_teams,
+            "source": "NBA official injury report; roster cross-check failed",
+            "warnings": warnings + ["Player props withheld: injury report contains player/team roster mismatches: " + "; ".join(mismatches) + "."],
+            "limitations": ["No player props are released when any official injury row cannot be matched to that team's current roster."],
+        }
+    status_map = {
+        (row["team"], _player_name_key(row["player"])): row["status"]
+        for row in injury.get("player_statuses", [])
+    }
     teams = {}
-    warnings = list(injury["warnings"])
     for team_code in team_codes:
-        if injury["team_submission"].get(team_code) == "NOT YET SUBMITTED":
-            warnings.append(f"{team_code} injury report not submitted; player props withheld for this team.")
-            teams[team_code] = []
-            continue
-        roster = fetch_roster(team_code)
+        roster = rosters[team_code]
         projections = []
         lineup = confirmed_lineups["teams"].get(team_code, {})
         roster_ok, roster_reason = validate_lineup_roster_membership(lineup, roster)
@@ -461,7 +509,7 @@ def build_matchup_player_projections(home: str, away: str, game_date: date, seas
         for player in roster:
             if not player["active"]:
                 continue
-            status = status_map.get((team_code, player["name"].casefold()))
+            status = status_map.get((team_code, _player_name_key(player["name"])))
             if status in EXCLUDED_STATUSES:
                 continue
             lineup_entry = next((value for name, value in lineup.items()
