@@ -14,17 +14,17 @@ on:
   workflow_dispatch:
     inputs:
       home:
-        description: Home team (TOR for Thursday's first game)
+        description: Home team (OTT for Flyers at Senators)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: TOR
+        default: OTT
       away:
-        description: Away team (LAK for Thursday's first game)
+        description: Away team (PHI for Flyers at Senators)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: LAK
+        default: PHI
       trials:
         description: Monte Carlo trials
         required: true
