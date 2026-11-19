@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - ".github/workflows/run-simulator.yml"
       - "main.py"
       - "nfl_data.py"
       - "drive_simulator.py"
@@ -70,7 +71,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install test dependencies
-        run: python -m pip install --upgrade pip numpy pypdf
+        run: python -m pip install --upgrade pip numpy pypdf pdfplumber
 
       - name: Parse matchup configuration
         if: github.event_name == 'workflow_dispatch'
