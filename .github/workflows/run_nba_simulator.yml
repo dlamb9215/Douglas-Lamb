@@ -61,7 +61,7 @@ on:
       game_config_json:
         description: Optional JSON object for sportsbook prices, source/timestamp, confirmed lineups, player-prop lines, rest/travel and other settings; see BETTING_ENGINE_UPGRADE.md
         required: false
-        default: '{"auto_injuries":true,"auto_odds":true,"espn_bet_odds":false,"player_props":true,"prop_trials":50000,"seed":42,"home_rest":0,"away_rest":0}'
+        default: '{"auto_injuries":true,"auto_odds":false,"espn_bet_odds":false,"player_props":true,"prop_trials":50000,"seed":42,"home_rest":0,"away_rest":0}'
         type: string
 
 jobs:
@@ -86,7 +86,7 @@ jobs:
           HOME_TEAM: ${{ inputs.home || 'SAS' }}
           AWAY_TEAM: ${{ inputs.away || 'LAC' }}
           GAME_DATE: ${{ inputs.game_date || '2026-11-19' }}
-          GAME_CONFIG_JSON: ${{ inputs.game_config_json || '{"auto_injuries":true,"auto_odds":true,"espn_bet_odds":false,"player_props":true,"prop_trials":50000,"seed":42,"home_rest":0,"away_rest":0}' }}
+          GAME_CONFIG_JSON: ${{ inputs.game_config_json || '{"auto_injuries":true,"auto_odds":false,"espn_bet_odds":false,"player_props":true,"prop_trials":50000,"seed":42,"home_rest":0,"away_rest":0}' }}
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
           SPORTRADAR_API_KEY: ${{ secrets.SPORTRADAR_API_KEY }}
         run: |
@@ -115,7 +115,7 @@ jobs:
           TRIALS: ${{ inputs.trials || '1000000' }}
           MAX_TRIALS: ${{ inputs.max_trials || '5000000' }}
           GAME_DATE: ${{ inputs.game_date || '2026-11-19' }}
-          GAME_CONFIG_JSON: ${{ inputs.game_config_json || '{"auto_injuries":true,"auto_odds":true,"espn_bet_odds":false,"player_props":true,"prop_trials":50000,"seed":42,"home_rest":0,"away_rest":0}' }}
+          GAME_CONFIG_JSON: ${{ inputs.game_config_json || '{"auto_injuries":true,"auto_odds":false,"espn_bet_odds":false,"player_props":true,"prop_trials":50000,"seed":42,"home_rest":0,"away_rest":0}' }}
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: |
           set -euo pipefail
