@@ -260,7 +260,7 @@ def parse_report_tables(tables: list[list[list[Any]]], teams: set[str], game_dat
             if any("matchup" in cell for cell in folded) and any("team" in cell for cell in folded) and any("player" in cell for cell in folded) and any("status" in cell for cell in folded):
                 header = {}
                 for idx, cell in enumerate(folded):
-                    if "date" in cell and "game" in cell: header["date"] = idx
+                    if cell in {"date", "game date"}: header["date"] = idx
                     elif "matchup" in cell or cell == "game": header["matchup"] = idx
                     elif cell == "team": header["team"] = idx
                     elif "player" in cell: header["player"] = idx
