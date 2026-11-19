@@ -429,6 +429,8 @@ def fetch_official_injuries(game_date: date, home: str, away: str, season: int =
                     layout_parsed = parse_report_text(layout_text, target_teams, game_date)
                     if len(layout_parsed.get("team_submission", {})) > len(parsed.get("team_submission", {})):
                         parsed, extraction_mode = layout_parsed, "pdfplumber_layout_text"
+                except Exception:
+                    pass
         if not parsed.get("target_game_found") and not parsed["players"] and len(parsed["team_submission"]) != len(target_teams):
             raise RuntimeError(
                 "Official injury report downloaded but table and text extraction could not "
