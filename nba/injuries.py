@@ -418,6 +418,17 @@ def fetch_official_injuries(game_date: date, home: str, away: str, season: int =
             _, text_parsed, text_mode = max(candidates, key=lambda item: item[0])
             if len(text_parsed["team_submission"]) > len(parsed.get("team_submission", {})):
                 parsed, extraction_mode = text_parsed, text_mode
+            # pdfplumber's layout-preserving text extraction often retains the
+            # official report's table rows when pypdf's layout/plain modes do not.
+            if len(parsed.get("team_submission", {})) != len(target_teams):
+                try:
+                    with pdfplumber.open(io.BytesIO(pdf)) as document:
+                        layout_text = "\\n".join(
+                            page.extract_text(layout=True) or "" for page in document.pages
+                        )
+                    layout_parsed = parse_report_text(layout_text, target_teams, game_date)
+                    if len(layout_parsed.get("team_submission", {})) > len(parsed.get("team_submission", {})):
+                        parsed, extraction_mode = layout_parsed, "pdfplumber_layout_text"
         if not parsed.get("target_game_found") and not parsed["players"] and len(parsed["team_submission"]) != len(target_teams):
             raise RuntimeError(
                 "Official injury report downloaded but table and text extraction could not "
