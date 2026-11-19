@@ -209,6 +209,14 @@ jobs:
           set -euo pipefail
           CONFIG=nba-game-config.json
           if [ ! -s "$CONFIG" ]; then echo "No matchup config was generated; skipping props."; exit 0; fi
+          if [ ! -s nba-data-readiness.json ]; then
+            echo "PLAYER PROPS BLOCKED: data-readiness report is missing." | tee player-prop-readiness.txt
+            exit 0
+          fi
+          if ! jq -e '.readiness.official_injuries == true and .readiness.injury_roster_consistent == true and .readiness.confirmed_lineups == true' nba-data-readiness.json >/dev/null; then
+            echo "PLAYER PROPS BLOCKED: official injury submissions, roster validation, and confirmed game-specific lineups are all required." | tee player-prop-readiness.txt
+            exit 0
+          fi
           PLAYER_PROPS="$(jq -r '.player_props // true' "$CONFIG")"
           if [ "$PLAYER_PROPS" != "true" ]; then echo "Player props disabled by game_config_json."; exit 0; fi
           if [ -z "$GAME_DATE" ]; then GAME_DATE="$(TZ=America/New_York date +%F)"; fi
@@ -231,3 +239,4 @@ jobs:
             nba-simulation-results.txt
             nba-simulation-results.json
             nba-player-projections.json
+            player-prop-readiness.txt
