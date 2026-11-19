@@ -77,7 +77,7 @@ Memphis Grizzlies Morant, Ja Out Injury/Illness - Left Hamstring Strain
         class FakePage:
             def extract_text(self, extraction_mode=None):
                 if extraction_mode == "layout":
-                    return "Philadelphia 76ers\nEmbiid, Joel Available\nToronto Raptors\nBarnes, Scottie Out"
+                    return "11/12/2026 08:00 (ET) PHI@TOR Philadelphia 76ers\nEmbiid, Joel Available\nToronto Raptors\nBarnes, Scottie Out"
                 return "garbled columns"
         class FakeReader:
             def __init__(self, stream):
