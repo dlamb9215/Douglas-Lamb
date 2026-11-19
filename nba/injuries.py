@@ -208,9 +208,15 @@ def parse_report_text(
                 ]
                 if not occurrences:
                     continue
-                index = occurrences[-1]
-                context = " ".join(lines[index:index + 3])
-                if "NOT YET SUBMITTED" in context.upper():
+                # PDF text extraction can interleave the two visual columns and
+                # attach unrelated players to the wrong team. An explicit
+                # NOT YET SUBMITTED marker near the requested team's heading is
+                # authoritative and must override any stray inferred rows.
+                explicit_not_submitted = any(
+                    "NOT YET SUBMITTED" in " ".join(lines[index:index + 5]).upper()
+                    for index in occurrences
+                )
+                if explicit_not_submitted:
                     team_submission[code] = "NOT YET SUBMITTED"
                 elif code not in team_submission:
                     team_submission[code] = "SUBMITTED"
