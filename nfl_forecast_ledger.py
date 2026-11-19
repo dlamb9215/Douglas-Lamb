@@ -45,15 +45,17 @@ def append_forecast(record, path="nfl_forecast_ledger.csv"):
         if not math.isfinite(value) or not 0 <= value <= 100:
             raise ValueError(f"{key} must be a finite percentage from 0 to 100.")
         probs[key] = value
-    if abs(probs["home_win_probability"] + probs["away_win_probability"] - 100) > 1:
-        raise ValueError("Moneyline probabilities must sum to approximately 100%.")
+    moneyline_total = probs["home_win_probability"] + probs["away_win_probability"]
+    if moneyline_total <= 0 or moneyline_total > 101:
+        raise ValueError("Moneyline win probabilities must be positive and cannot exceed 100% after allowing for ties.")
     if "home_cover_probability" in probs and "away_cover_probability" in probs:
-        if abs(probs["home_cover_probability"] + probs["away_cover_probability"] - 100) > 1:
-            raise ValueError("Spread probabilities must sum to approximately 100%.")
+        spread_total = probs["home_cover_probability"] + probs["away_cover_probability"]
+        if spread_total <= 0 or spread_total > 101:
+            raise ValueError("Spread probabilities must be positive and cannot exceed 100% after allowing for pushes.")
     if "over_probability" in probs and "under_probability" in probs:
-        push = float(record.get("push_probability") or 0)
-        if not math.isfinite(push) or not 0 <= push <= 100 or abs(probs["over_probability"] + probs["under_probability"] + push - 100) > 1:
-            raise ValueError("Over, under, and push probabilities must sum to approximately 100%.")
+        total_market = probs["over_probability"] + probs["under_probability"]
+        if total_market <= 0 or total_market > 101:
+            raise ValueError("Over/under probabilities must be positive and cannot exceed 100% after allowing for pushes.")
     odds_fields = ("home_moneyline_odds", "away_moneyline_odds", "over_odds", "under_odds")
     if any(record.get(key) not in (None, "") for key in odds_fields):
         source = str(record.get("sportsbook_source") or "").strip()
