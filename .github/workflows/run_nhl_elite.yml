@@ -30,7 +30,7 @@ on:
         required: true
         type: choice
         options: ["100000", "250000", "500000", "1000000", "5000000"]
-        default: "100000"
+        default: "1000000"
       game_date:
         description: Game date in YYYY-MM-DD
         required: true
