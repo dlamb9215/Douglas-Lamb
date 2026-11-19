@@ -224,6 +224,45 @@ def _decision(prob,edge,threshold=55.,min_edge=1.5):
     if prob>=threshold and edge>=min_edge: return "LEAN"
     return "PASS"
 
+def quarantine_untrusted_injury_rows(injury_context: dict[str, Any], home: str, away: str) -> dict[str, Any]:
+    """Remove PDF rows that do not belong to the stated team's live roster.
+
+    The NBA PDF is multi-column; a text extractor can attach a neighboring
+    game's players to the wrong team. Such rows must never flow into the
+    simulator or satisfy its official-injury readiness gate.
+    """
+    if not isinstance(injury_context, dict):
+        return injury_context
+    from nba.data_hub import validate_injury_roster_consistency, _person_key
+    aliases = {"GSW": "GS", "NOP": "NO", "NYK": "NY", "SAS": "SA", "UTA": "UTAH", "WAS": "WSH"}
+    team_codes = (aliases.get(home.upper(), home.upper()), aliases.get(away.upper(), away.upper()))
+    rows = list(injury_context.get("player_statuses", []))
+    try:
+        validation = validate_injury_roster_consistency(rows, team_codes)
+    except Exception as exc:
+        validation = {"status": "unavailable", "mismatches": [], "error": str(exc)}
+    mismatch_keys = {
+        (str(row.get("team", "")).upper(), _person_key(row.get("player", "")))
+        for row in validation.get("mismatches", [])
+    }
+    trusted = [
+        row for row in rows
+        if (str(row.get("team", "")).upper(), _person_key(row.get("player", ""))) not in mismatch_keys
+        and str(row.get("team", "")).upper() in team_codes
+    ]
+    quarantined = [row for row in rows if row not in trusted]
+    result = dict(injury_context)
+    result["player_statuses"] = trusted
+    result["roster_validation"] = validation
+    if quarantined:
+        result["untrusted_player_statuses"] = quarantined
+        result["status"] = "incomplete"
+        result.setdefault("warnings", []).append(
+            "Rows failing current-team roster validation were quarantined; official injury readiness is false."
+        )
+    return result
+
+
 def main():
     ap=argparse.ArgumentParser(description="Doug's Elite NBA Simulator")
     ap.add_argument("--home",required=True); ap.add_argument("--away",required=True); ap.add_argument("--data",default="nba/team_stats.json")
@@ -303,7 +342,9 @@ def main():
         if not a.game_date: ap.error("--auto-injuries requires --game-date")
         from datetime import date
         from nba.injuries import fetch_official_injuries
-        try: injury_context=fetch_official_injuries(date.fromisoformat(a.game_date),a.home,a.away,meta.get("season",2027))
+        try:
+            injury_context=fetch_official_injuries(date.fromisoformat(a.game_date),a.home,a.away,meta.get("season",2027))
+            injury_context=quarantine_untrusted_injury_rows(injury_context,a.home,a.away)
         except (RuntimeError,OSError,ValueError) as exc:
             injury_context={"source":"NBA official injury report","status":"unavailable","error":str(exc),"warnings":["Official injury data could not be retrieved; no automatic player availability or injury-point adjustment was applied. Verify injuries independently before betting."]}
             print(f"INJURY DATA WARNING: official report unavailable: {exc}")
@@ -326,8 +367,10 @@ def main():
     injury_team_codes=[{"GSW":"GS","NOP":"NO","NYK":"NY","SAS":"SA","UTA":"UTAH","WAS":"WSH"}.get(code.upper(),code.upper()) for code in (a.home,a.away)]
     official_injury_ready=bool(
         injury_context and injury_context.get("report_url")
-        and all(injury_context.get("team_submission",{}).get(code) not in (None,"NOT YET SUBMITTED","UNAVAILABLE")
+        and all(injury_context.get("team_submission",{}).get(code) == "SUBMITTED"
                 for code in injury_team_codes)
+        and injury_context.get("roster_validation",{}).get("status") == "passed"
+        and not injury_context.get("untrusted_player_statuses")
     )
     availability_confirmed=bool(availability_confirmed and official_injury_ready)
     if not official_injury_ready:
