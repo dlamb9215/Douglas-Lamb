@@ -229,6 +229,86 @@ def parse_report_text(
     ]
     return {"players": rows, "team_submission": team_submission}
 
+def parse_report_tables(tables: list[list[list[Any]]], teams: set[str], game_date: date) -> dict[str, Any]:
+    """Parse official NBA PDF table cells without relying on fragile text order."""
+    target = {TEAM_CODE_ALIASES.get(code.upper(), code.upper()) for code in teams}
+    rows: list[dict[str, str]] = []
+    submissions: dict[str, str] = {}
+    current_date: date | None = None
+    current_matchup: set[str] | None = None
+    current_team: str | None = None
+    target_game_found = False
+
+    def clean(value: Any) -> str:
+        return re.sub(r"\s+", " ", str(value or "")).strip()
+
+    def parse_day(value: str) -> date | None:
+        for fmt in ("%m/%d/%Y", "%Y-%m-%d"):
+            try:
+                return datetime.strptime(value, fmt).date()
+            except ValueError:
+                pass
+        return None
+
+    for table in tables:
+        header: dict[str, int] | None = None
+        for raw_row in table or []:
+            cells = [clean(cell) for cell in (raw_row or [])]
+            folded = [cell.casefold() for cell in cells]
+            if not any(cells):
+                continue
+            if any("matchup" in cell for cell in folded) and any("team" in cell for cell in folded) and any("player" in cell for cell in folded) and any("status" in cell for cell in folded):
+                header = {}
+                for idx, cell in enumerate(folded):
+                    if "date" in cell and "game" in cell: header["date"] = idx
+                    elif "matchup" in cell or cell == "game": header["matchup"] = idx
+                    elif cell == "team": header["team"] = idx
+                    elif "player" in cell: header["player"] = idx
+                    elif "status" in cell: header["status"] = idx
+                    elif "reason" in cell or "injury" in cell: header["reason"] = idx
+                continue
+            if header is None:
+                continue
+            def cell(key: str) -> str:
+                idx = header.get(key, -1)
+                return cells[idx] if 0 <= idx < len(cells) else ""
+
+            day_value = parse_day(cell("date"))
+            if day_value:
+                current_date = day_value
+            matchup_value = cell("matchup").upper().replace(" ", "")
+            if re.fullmatch(r"[A-Z]{2,4}@[A-Z]{2,4}", matchup_value):
+                codes = {TEAM_CODE_ALIASES.get(code, code) for code in matchup_value.split("@")}
+                current_matchup = codes
+                current_team = None
+                if current_date == game_date and codes == target:
+                    target_game_found = True
+            team_value = cell("team")
+            if team_value and team_value not in {"—", "-"}:
+                current_team = next((TEAM_NAMES[name] for name in TEAM_NAMES_SORTED if name.casefold() == team_value.casefold()), None)
+            if current_date != game_date or current_matchup != target:
+                continue
+            if "NOT YET SUBMITTED" in " ".join(cells).upper():
+                if current_team in target:
+                    submissions[current_team] = "NOT YET SUBMITTED"
+                continue
+            player_value, status_value, reason_value = cell("player"), cell("status"), cell("reason")
+            if not player_value or player_value in {"—", "-"} or not status_value:
+                continue
+            status_match = re.match(r"^(Available|Out|Questionable|Doubtful|Probable)\b", status_value, re.I)
+            if not status_match or current_team not in target:
+                continue
+            name_parts = player_value.split(",", 1)
+            player = (name_parts[1].strip() + " " + name_parts[0].strip()) if len(name_parts) == 2 else player_value
+            rows.append({"team": current_team, "player": player, "status": status_match.group(1).title(), "reason": reason_value})
+
+    if target_game_found:
+        for code in target:
+            submissions.setdefault(code, "SUBMITTED")
+    rows = [row for row in rows if submissions.get(row["team"]) == "SUBMITTED"]
+    return {"players": rows, "team_submission": submissions, "target_game_found": target_game_found}
+
+
 def _espn_injury_fallback(game_date: date, target_teams: set[str]) -> dict[str, Any]:
     """Third-party fallback used only when the NBA-hosted report is inaccessible."""
     url = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/injuries"
@@ -287,35 +367,38 @@ def fetch_official_injuries(game_date: date, home: str, away: str, season: int =
     try:
         report_url = latest_report_url(game_date, season)
         pdf = _get(report_url)
-        reader = PdfReader(io.BytesIO(pdf))
-        # NBA PDFs are laid out in columns. Plain extraction can interleave
-        # columns and detach team headings from player rows; try both reading
-        # orders and keep the parse that identifies the most requested teams
-        # and player rows. This remains a parser only, not a status inference.
-        candidates = []
-        for mode in ("layout", "plain"):
-            pages = []
-            for page in reader.pages:
-                try:
-                    extracted = page.extract_text(extraction_mode=mode) if mode == "layout" else page.extract_text()
-                except TypeError:
-                    extracted = page.extract_text()
-                pages.append(extracted or "")
-            parsed_candidate = parse_report_text("\n".join(pages), target_teams, game_date)
-            # A team marked NOT YET SUBMITTED (or lacking a target-game
-            # submission marker) cannot have valid player rows for this game.
-            # Drop those rows so a prior game's column cannot leak through.
-            parsed_candidate["players"] = [
-                row for row in parsed_candidate["players"]
-                if parsed_candidate["team_submission"].get(row["team"]) == "SUBMITTED"
-            ]
-            score = (len(parsed_candidate["team_submission"]), len(parsed_candidate["players"]))
-            candidates.append((score, parsed_candidate, mode))
-        _, parsed, extraction_mode = max(candidates, key=lambda item: item[0])
-        if not parsed["players"] and len(parsed["team_submission"]) != len(target_teams):
+        # Prefer structured table extraction; the NBA PDF is multi-column and
+        # linear text extraction can scramble row associations.
+        import pdfplumber
+        extracted_tables = []
+        with pdfplumber.open(io.BytesIO(pdf)) as document:
+            for page in document.pages:
+                extracted_tables.extend(page.extract_tables() or [])
+        parsed = parse_report_tables(extracted_tables, target_teams, game_date)
+        extraction_mode = "pdfplumber_tables"
+        if not parsed.get("target_game_found"):
+            reader = PdfReader(io.BytesIO(pdf))
+            candidates = []
+            for mode in ("layout", "plain"):
+                pages = []
+                for page in reader.pages:
+                    try:
+                        extracted = page.extract_text(extraction_mode=mode) if mode == "layout" else page.extract_text()
+                    except TypeError:
+                        extracted = page.extract_text()
+                    pages.append(extracted or "")
+                parsed_candidate = parse_report_text("\n".join(pages), target_teams, game_date)
+                parsed_candidate["players"] = [
+                    row for row in parsed_candidate["players"]
+                    if parsed_candidate["team_submission"].get(row["team"]) == "SUBMITTED"
+                ]
+                score = (len(parsed_candidate["team_submission"]), len(parsed_candidate["players"]))
+                candidates.append((score, parsed_candidate, mode))
+            _, parsed, extraction_mode = max(candidates, key=lambda item: item[0])
+        if not parsed.get("target_game_found") and not parsed["players"] and len(parsed["team_submission"]) != len(target_teams):
             raise RuntimeError(
-                "Official injury report downloaded but both PDF text layouts failed "
-                f"to identify both requested team sections (found {sorted(parsed['team_submission'])})"
+                "Official injury report downloaded but table and text extraction could not "
+                f"identify the requested matchup {sorted(target_teams)} on {game_date.isoformat()}"
             )
         return {
             "game_date": game_date.isoformat(), "teams": sorted(target_teams),
