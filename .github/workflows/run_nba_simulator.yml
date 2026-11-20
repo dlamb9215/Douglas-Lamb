@@ -55,7 +55,7 @@ on:
         type: string
       game_date:
         description: Matchup date YYYY-MM-DD (Thursday default)
-        required: false
+        required: true
         default: ""
         type: string
       game_config_json:
@@ -81,7 +81,7 @@ jobs:
           test -s nba/team_stats.json
           python -m nba.data_quality --data nba/team_stats.json --max-age-hours 72
       - name: Build multi-source NBA data readiness report
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'workflow_dispatch'
         env:
           HOME_TEAM: ${{ inputs.home || 'SAS' }}
           AWAY_TEAM: ${{ inputs.away || 'LAC' }}
@@ -106,7 +106,7 @@ jobs:
           python -m nba.data_hub --home "$HOME_TEAM" --away "$AWAY_TEAM" --date "$GAME_DATE" --output nba-data-readiness.json "${lineup_args[@]}" | tee nba-data-readiness.txt
       - name: Run matchup
         id: run_matchup
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'workflow_dispatch'
         env:
           HOME_TEAM: ${{ inputs.home || 'SAS' }}
           AWAY_TEAM: ${{ inputs.away || 'LAC' }}
