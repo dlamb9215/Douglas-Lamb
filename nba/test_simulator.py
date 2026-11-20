@@ -1,5 +1,5 @@
 import unittest
-from nba.simulator import TeamStats, matchup_projection, simulate, implied_probability, no_vig_probabilities, expected_value_per_100, _decision, quarantine_untrusted_injury_rows
+from nba.simulator import TeamStats, matchup_projection, simulate, implied_probability, no_vig_probabilities, expected_value_per_100, _decision, quarantine_untrusted_injury_rows, _optional_matchup_odds
 
 def team(code, **updates):
     d={"name":code,"games_played":10,"pace":99,"off_rating":115,"def_rating":112,
@@ -9,6 +9,14 @@ def team(code, **updates):
     return TeamStats.from_dict(code,d)
 
 class TestNBAEngine(unittest.TestCase):
+    def test_missing_odds_event_does_not_abort_matchup(self):
+        from unittest.mock import patch
+        with patch("nba.odds.matchup_odds", side_effect=RuntimeError("event not posted")):
+            result = _optional_matchup_odds("San Antonio Spurs", "LA Clippers")
+        self.assertEqual(result["status"], "unavailable")
+        self.assertIn("event not posted", result["error"])
+        self.assertIn("simulation-only", result["warning"])
+
     def test_projection(self):
         r=matchup_projection(team("BOS"),team("NYK"))
         self.assertGreater(r["home_points"],0)
