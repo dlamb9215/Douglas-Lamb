@@ -176,7 +176,7 @@ jobs:
           if [ -n "$SPREAD$TOTAL$HOME_ODDS$AWAY_ODDS$OVER_ODDS$UNDER_ODDS" ]; then
             args+=(--odds-source "$ODDS_SOURCE" --odds-checked-at "$ODDS_CHECKED_AT")
           fi
-          python main.py "${args[@]}" | tee nfl-simulation-report.txt
+          python main.py "${args[@]}" --no-ledger | tee nfl-simulation-report.txt
 
       - name: Upload validation and simulation reports
         if: always()
