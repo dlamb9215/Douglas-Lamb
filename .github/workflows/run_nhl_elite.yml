@@ -34,7 +34,7 @@ on:
       game_date:
         description: Game date in YYYY-MM-DD
         required: true
-        default: "2026-11-19"
+        default: ""
         type: string
       game_config_json:
         description: Optional JSON for total, seed, confirmed goalie IDs, scratched player IDs, and sportsbook prices with source/timestamp
@@ -87,9 +87,10 @@ jobs:
           HOME_TEAM: ${{ inputs.home || 'CHI' }}
           AWAY_TEAM: ${{ inputs.away || 'CBJ' }}
           TRIALS: ${{ inputs.trials || '1000000' }}
-          GAME_DATE: ${{ inputs.game_date || '2026-11-19' }}
+          GAME_DATE: ${{ inputs.game_date || '' }}
         run: |
           set -euo pipefail
+          if [[ -z "$GAME_DATE" ]]; then GAME_DATE="$(TZ=America/New_York date +%F)"; fi
           CONFIG=nhl-game-config.json
           TOTAL="$(jq -r '.total // 6.0' "$CONFIG")"
           SEED="$(jq -r '.seed // 20261119' "$CONFIG")"
@@ -119,9 +120,10 @@ jobs:
         if: github.event_name == 'workflow_dispatch' && steps.run_matchup.outcome == 'success'
         env:
           RUN_ID: ${{ github.run_id }}
-          GAME_DATE: ${{ inputs.game_date }}
+          GAME_DATE: ${{ inputs.game_date || '' }}
         run: |
           set -euo pipefail
+          if [[ -z "$GAME_DATE" ]]; then GAME_DATE="$(TZ=America/New_York date +%F)"; fi
           CONFIG=nhl-game-config.json
           ODDS_SOURCE="$(jq -r '.odds_source // empty' "$CONFIG")"
           ODDS_CHECKED_AT="$(jq -r '.odds_checked_at // empty' "$CONFIG")"
