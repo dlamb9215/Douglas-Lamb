@@ -134,6 +134,8 @@ def main():
     parser.add_argument("--seed", type=int, default=42,
                         help="Random seed for reproducible simulations")
 
+    parser.add_argument("--no-ledger", action="store_true", help="Run without archiving a forecast (validation/smoke tests only)")
+
     args = parser.parse_args()
     try:
         market_snapshot = validate_market_snapshot({
@@ -508,8 +510,14 @@ def main():
         "sportsbook_source": market_snapshot.get("source") or "",
         "odds_checked_at_utc": market_snapshot.get("checked_at_utc") or "",
     }
-    added = append_forecast(ledger_record)
-    summary = calibration_summary()
+    if args.no_ledger:
+        added = False
+        summary = calibration_summary()
+        ledger_status = "SKIPPED (validation/smoke run)"
+    else:
+        added = append_forecast(ledger_record)
+        summary = calibration_summary()
+        ledger_status = "APPENDED" if added else "DUPLICATE RUN SKIPPED"
 
     # Shared decision layer: actual two-way prices only; never assume -110.
     quote_source = market_snapshot.get("source") or ""
@@ -551,7 +559,7 @@ def main():
     print(json.dumps(shared_decisions, indent=2))
     print("\nNFL FORECAST TRACKING")
     print("=====================")
-    print(f"Forecast ledger: {'APPENDED' if added else 'DUPLICATE RUN SKIPPED'}")
+    print(f"Forecast ledger: {ledger_status}")
     print(f"Settled games available for calibration review: {summary.get('settled_games', 0)}")
     print(f"Historical calibration status: {summary.get('status')} (calibrated={summary.get('calibrated', False)})")
 
