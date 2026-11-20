@@ -263,6 +263,20 @@ def quarantine_untrusted_injury_rows(injury_context: dict[str, Any], home: str, 
     return result
 
 
+def _optional_matchup_odds(home_name: str, away_name: str) -> dict[str, Any]:
+    """Return a no-odds status instead of aborting a valid matchup when a book has not posted it."""
+    from nba.odds import matchup_odds
+    try:
+        return matchup_odds(home_name, away_name)
+    except (RuntimeError, OSError, ValueError) as exc:
+        return {
+            "source": "The Odds API v4",
+            "status": "unavailable",
+            "error": str(exc),
+            "warning": "No verified sportsbook market was available; model probabilities remain simulation-only.",
+        }
+
+
 def main():
     ap=argparse.ArgumentParser(description="Doug's Elite NBA Simulator")
     ap.add_argument("--home",required=True); ap.add_argument("--away",required=True); ap.add_argument("--data",default="nba/team_stats.json")
@@ -294,8 +308,10 @@ def main():
     if a.home.upper() not in teams or a.away.upper() not in teams: ap.error("Team abbreviation missing from NBA data")
     h,w=teams[a.home.upper()],teams[a.away.upper()]; odds_context=None
     if a.auto_odds:
-        from nba.odds import matchup_odds
-        odds_context=matchup_odds(h.name,w.name); fetched_spread=odds_context.get("home_spread"); fetched_total=odds_context.get("total")
+        odds_context=_optional_matchup_odds(h.name,w.name)
+        if odds_context.get("status") == "unavailable":
+            print("WARNING: sportsbook odds unavailable; continuing with the team model and no market-edge claims: " + odds_context.get("error", "unknown provider error"), file=sys.stderr)
+        fetched_spread=odds_context.get("home_spread"); fetched_total=odds_context.get("total")
         spread_line_matches=a.spread is None or (fetched_spread is not None and abs(a.spread-fetched_spread)<.001)
         total_line_matches=a.total is None or (fetched_total is not None and abs(a.total-fetched_total)<.001)
         if a.spread is None: a.spread=fetched_spread
