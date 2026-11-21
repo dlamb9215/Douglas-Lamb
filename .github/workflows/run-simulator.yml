@@ -38,12 +38,12 @@ on:
       home:
         description: Home team abbreviation (HOU for Thursday)
         required: true
-        default: "HOU"
+        default: "KC"
         type: string
       away:
         description: Away team abbreviation (IND for Thursday)
         required: true
-        default: "IND"
+        default: "ARI"
         type: string
       trials:
         description: Simulation trials
@@ -106,8 +106,8 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         shell: bash
         env:
-          HOME_TEAM: ${{ inputs.home || 'HOU' }}
-          AWAY_TEAM: ${{ inputs.away || 'IND' }}
+          HOME_TEAM: ${{ inputs.home || 'KC' }}
+          AWAY_TEAM: ${{ inputs.away || 'ARI' }}
         run: |
           NEUTRAL_SITE="$(jq -r '.neutral_site // false' game-config.json)"
           if [[ "$NEUTRAL_SITE" == "true" ]]; then
