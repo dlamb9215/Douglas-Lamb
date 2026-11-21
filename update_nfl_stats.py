@@ -46,18 +46,47 @@ def download_csv(filename):
         ))
 
 def download_schedule():
-    url = (
-        "https://github.com/nflverse/nflverse-data/"
-        "releases/download/schedules/games.csv"
+    # Resolve the release asset through GitHub's API instead of relying on
+    # the browser_download_url, which returned HTTP 404 in Actions.
+    headers = {
+        "User-Agent": "Doug-Elite-Game-Simulator",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    token = os.environ.get("GITHUB_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    release_url = (
+        "https://api.github.com/repos/nflverse/nflverse-data/"
+        "releases/tags/schedules"
     )
-    request = urllib.request.Request(
-        url,
-        headers={"User-Agent": "Doug-Elite-Game-Simulator"}
+    request = urllib.request.Request(release_url, headers=headers)
+    with urllib.request.urlopen(request, timeout=30) as response:
+        release = json.loads(response.read().decode("utf-8"))
+
+    asset = next(
+        (a for a in release.get("assets", []) if a.get("name") == "games.csv"),
+        None,
     )
+    if asset is None:
+        raise RuntimeError("nflverse schedules release is missing games.csv")
+
+    asset_headers = dict(headers)
+    asset_headers["Accept"] = "application/octet-stream"
+    request = urllib.request.Request(asset["url"], headers=asset_headers)
     with urllib.request.urlopen(request, timeout=90) as response:
-        return list(csv.DictReader(
-            response.read().decode("utf-8-sig").splitlines()
-        ))
+        payload = response.read()
+
+    # GitHub may return JSON metadata rather than the binary asset if the
+    # requested media type is not honored; fail clearly instead of parsing it.
+    if payload.lstrip().startswith(b"{"):
+        raise RuntimeError(
+            "GitHub returned JSON instead of the nflverse games.csv asset"
+        )
+    return list(csv.DictReader(
+        payload.decode("utf-8-sig").splitlines()
+    ))
 def num(row, field):
     try:
         value = row.get(field, "")
