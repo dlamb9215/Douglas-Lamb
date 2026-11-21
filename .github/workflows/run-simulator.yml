@@ -164,7 +164,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         shell: bash
         run: |
-          ARGS=(--home "${{ inputs.home || 'HOU' }}" --away "${{ inputs.away || 'IND' }}" --trials "${{ inputs.trials || '100000' }}" --pregame-report pregame-context.json --game-day-confirmations game_day_confirmations.json)
+          ARGS=(--home "${{ inputs.home || 'NYG' }}" --away "${{ inputs.away || 'JAX' }}" --trials "${{ inputs.trials || '100000' }}" --pregame-report pregame-context.json --game-day-confirmations game_day_confirmations.json)
           SPREAD="$(jq -r '.spread // empty' game-config.json)"
           TOTAL="$(jq -r '.total // empty' game-config.json)"
           HOME_ODDS="$(jq -r '.home_odds // empty' game-config.json)"
@@ -200,8 +200,8 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         shell: bash
         env:
-          HOME_TEAM: ${{ inputs.home || 'HOU' }}
-          AWAY_TEAM: ${{ inputs.away || 'IND' }}
+          HOME_TEAM: ${{ inputs.home || 'NYG' }}
+          AWAY_TEAM: ${{ inputs.away || 'JAX' }}
         run: |
           if [[ ! -f game_day_confirmations.json ]]; then
             python -c 'import json,os,datetime; json.dump({"source":"No official confirmation file supplied; placeholder only","checked_at_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"players":[]},open("game_day_confirmations.json","w"),indent=2)'
@@ -219,7 +219,7 @@ jobs:
           {
             echo "# Doug's Elite Game Simulator"
             echo ""
-            echo "- Matchup: ${{ inputs.away || 'IND' }} at ${{ inputs.home || 'HOU' }}"
+            echo "- Matchup: ${{ inputs.away || 'JAX' }} at ${{ inputs.home || 'NYG' }}"
             echo "- Trials requested: ${{ inputs.trials || '100000' }}"
             echo "- Workflow run: ${{ github.run_id }}"
             echo ""
