@@ -36,14 +36,14 @@ on:
   workflow_dispatch:
     inputs:
       home:
-        DETcription: Home team abbreviation
+        description: Home team abbreviation
         required: true
-        default: "LAR"
+        default: "DET"
         type: string
       away:
-        CHIcription: Away team abbreviation
+        description: Away team abbreviation
         required: true
-        default: "GB"
+        default: "CHI"
         type: string
       trials:
         description: Simulation trials
