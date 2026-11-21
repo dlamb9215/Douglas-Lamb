@@ -53,7 +53,7 @@ on:
       game_config_json:
         description: Optional JSON for confirmed QBs and official source URLs, official game-day confirmation payload, player-prop lines, sportsbook lines/prices/source/timestamp, and neutral_site
         required: false
-        default: '{"neutral_site":true}'
+        default: '{"neutral_site":true,"home_qb_confirmed":"Brock Purdy","home_qb_source":"https://www.49ers.com/team/depth-chart","away_qb_confirmed":"Kirk Cousins","away_qb_source":"https://www.vikings.com/news/kirk-cousins-starting-packers-week-10-game"}'
         type: string
 permissions:
   contents: write
