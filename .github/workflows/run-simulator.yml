@@ -36,14 +36,14 @@ on:
   workflow_dispatch:
     inputs:
       home:
-        description: Home team abbreviation (HOU for Thursday)
+        description: Home team abbreviation
         required: true
-        default: "KC"
+        default: "NYG"
         type: string
       away:
-        description: Away team abbreviation (IND for Thursday)
+        description: Away team abbreviation
         required: true
-        default: "ARI"
+        default: "JAX"
         type: string
       trials:
         description: Simulation trials
@@ -106,8 +106,8 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         shell: bash
         env:
-          HOME_TEAM: ${{ inputs.home || 'KC' }}
-          AWAY_TEAM: ${{ inputs.away || 'ARI' }}
+          HOME_TEAM: ${{ inputs.home || 'NYG' }}
+          AWAY_TEAM: ${{ inputs.away || 'JAX' }}
         run: |
           NEUTRAL_SITE="$(jq -r '.neutral_site // false' game-config.json)"
           if [[ "$NEUTRAL_SITE" == "true" ]]; then
@@ -124,11 +124,11 @@ jobs:
           AWAY_QB="$(jq -r '.away_qb_confirmed // empty' game-config.json)"
           HOME_SOURCE="$(jq -r '.home_qb_source // empty' game-config.json)"
           AWAY_SOURCE="$(jq -r '.away_qb_source // empty' game-config.json)"
-          python pregame_context.py --home "${{ inputs.home || 'HOU' }}" --away "${{ inputs.away || 'IND' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "$HOME_QB" --away-qb-confirmed "$AWAY_QB" --home-qb-source "$HOME_SOURCE" --away-qb-source "$AWAY_SOURCE" --output pregame-context.json
+          python pregame_context.py --home "${{ inputs.home || 'NYG' }}" --away "${{ inputs.away || 'JAX' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "$HOME_QB" --away-qb-confirmed "$AWAY_QB" --home-qb-source "$HOME_SOURCE" --away-qb-source "$AWAY_SOURCE" --output pregame-context.json
 
       - name: Validate fresh pregame context
         if: github.event_name != 'workflow_dispatch'
-        run: python pregame_context.py --home WAS --away LAR --input player_pool.json --output pregame-context.json
+        run: python pregame_context.py --home NYG --away JAX --input player_pool.json --output pregame-context.json
 
       - name: Reconcile prior NFL forecasts and report calibration
         shell: bash
