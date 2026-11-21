@@ -26,7 +26,7 @@ on:
       home:
         description: Home team abbreviation
         required: true
-        default: "TOR"
+        default: "PHI"
         type: string
       away:
         description: Away team abbreviation
@@ -56,7 +56,7 @@ on:
       game_date:
         description: Matchup date YYYY-MM-DD
         required: true
-        default: "2026-11-23"
+        default: "2026-11-21"
         type: string
       game_config_json:
         description: Optional JSON object for sportsbook prices, source/timestamp, confirmed lineups, player-prop lines, rest/travel and other settings; see BETTING_ENGINE_UPGRADE.md
