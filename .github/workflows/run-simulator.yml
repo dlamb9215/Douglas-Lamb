@@ -38,12 +38,12 @@ on:
       home:
         description: Home team abbreviation
         required: true
-        default: "NYG"
+        default: "SF"
         type: string
       away:
         description: Away team abbreviation
         required: true
-        default: "JAX"
+        default: "MIN"
         type: string
       trials:
         description: Simulation trials
@@ -53,7 +53,7 @@ on:
       game_config_json:
         description: Optional JSON for confirmed QBs and official source URLs, official game-day confirmation payload, player-prop lines, sportsbook lines/prices/source/timestamp, and neutral_site
         required: false
-        default: '{"neutral_site":false}'
+        default: '{"neutral_site":true}'
         type: string
 permissions:
   contents: write
@@ -106,8 +106,8 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         shell: bash
         env:
-          HOME_TEAM: ${{ inputs.home || 'NYG' }}
-          AWAY_TEAM: ${{ inputs.away || 'JAX' }}
+          HOME_TEAM: ${{ inputs.home || 'SF' }}
+          AWAY_TEAM: ${{ inputs.away || 'MIN' }}
         run: |
           NEUTRAL_SITE="$(jq -r '.neutral_site // false' game-config.json)"
           if [[ "$NEUTRAL_SITE" == "true" ]]; then
@@ -124,7 +124,7 @@ jobs:
           AWAY_QB="$(jq -r '.away_qb_confirmed // empty' game-config.json)"
           HOME_SOURCE="$(jq -r '.home_qb_source // empty' game-config.json)"
           AWAY_SOURCE="$(jq -r '.away_qb_source // empty' game-config.json)"
-          python pregame_context.py --home "${{ inputs.home || 'NYG' }}" --away "${{ inputs.away || 'JAX' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "$HOME_QB" --away-qb-confirmed "$AWAY_QB" --home-qb-source "$HOME_SOURCE" --away-qb-source "$AWAY_SOURCE" --output pregame-context.json
+          python pregame_context.py --home "${{ inputs.home || 'SF' }}" --away "${{ inputs.away || 'MIN' }}" --input player_pool.json --weather-input nfl-weather.json --home-qb-confirmed "$HOME_QB" --away-qb-confirmed "$AWAY_QB" --home-qb-source "$HOME_SOURCE" --away-qb-source "$AWAY_SOURCE" --output pregame-context.json
 
       - name: Validate fresh pregame context
         if: github.event_name != 'workflow_dispatch'
@@ -164,7 +164,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         shell: bash
         run: |
-          ARGS=(--home "${{ inputs.home || 'NYG' }}" --away "${{ inputs.away || 'JAX' }}" --trials "${{ inputs.trials || '100000' }}" --pregame-report pregame-context.json --game-day-confirmations game_day_confirmations.json)
+          ARGS=(--home "${{ inputs.home || 'SF' }}" --away "${{ inputs.away || 'MIN' }}" --trials "${{ inputs.trials || '100000' }}" --pregame-report pregame-context.json --game-day-confirmations game_day_confirmations.json)
           SPREAD="$(jq -r '.spread // empty' game-config.json)"
           TOTAL="$(jq -r '.total // empty' game-config.json)"
           HOME_ODDS="$(jq -r '.home_odds // empty' game-config.json)"
@@ -200,8 +200,8 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         shell: bash
         env:
-          HOME_TEAM: ${{ inputs.home || 'NYG' }}
-          AWAY_TEAM: ${{ inputs.away || 'JAX' }}
+          HOME_TEAM: ${{ inputs.home || 'SF' }}
+          AWAY_TEAM: ${{ inputs.away || 'MIN' }}
         run: |
           if [[ ! -f game_day_confirmations.json ]]; then
             python -c 'import json,os,datetime; json.dump({"source":"No official confirmation file supplied; placeholder only","checked_at_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"players":[]},open("game_day_confirmations.json","w"),indent=2)'
@@ -219,7 +219,7 @@ jobs:
           {
             echo "# Doug's Elite Game Simulator"
             echo ""
-            echo "- Matchup: ${{ inputs.away || 'JAX' }} at ${{ inputs.home || 'NYG' }}"
+            echo "- Matchup: ${{ inputs.away || 'MIN' }} at ${{ inputs.home || 'SF' }}"
             echo "- Trials requested: ${{ inputs.trials || '100000' }}"
             echo "- Workflow run: ${{ github.run_id }}"
             echo ""
