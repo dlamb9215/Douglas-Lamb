@@ -38,7 +38,7 @@ on:
       home:
         description: Home team abbreviation
         required: true
-        default: "BUF"
+        default: "ARI"
         type: string
       away:
         description: Away team abbreviation
@@ -109,6 +109,8 @@ jobs:
           HOME_TEAM: ${{ inputs.home || 'BUF' }}
           AWAY_TEAM: ${{ inputs.away || 'KC' }}
         run: |
+          HOME_TEAM="${HOME_TEAM^^}"
+          AWAY_TEAM="${AWAY_TEAM^^}"
           NEUTRAL_SITE="$(jq -r '.neutral_site // false' game-config.json)"
           if [[ "$NEUTRAL_SITE" == "true" ]]; then
             python -c 'import json,os; json.dump({"available":False,"neutral_site":True,"home_team":os.environ["HOME_TEAM"],"away_team":os.environ["AWAY_TEAM"],"warning":"Neutral-site game; no outdoor weather adjustment applied."},open("nfl-weather.json","w"),indent=2)'
