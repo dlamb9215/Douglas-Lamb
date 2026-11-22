@@ -1,0 +1,1954 @@
+[
+  {
+    "team": "ARI",
+    "data_updated_at": "2026-11-22T12:47:13.713634+00:00",
+    "season": 2026,
+    "games_played": 10,
+    "points_for_per_game": 18.4,
+    "points_allowed_per_game": 28.9,
+    "offense": {
+      "passing": {
+        "yards_per_game": 218.8,
+        "attempts_per_game": 37.7,
+        "completions_per_game": 24.3,
+        "completion_pct": 64.46,
+        "yards_per_attempt": 5.804,
+        "touchdowns": 1.3,
+        "interceptions": 0.9,
+        "first_downs_per_game": 11.4
+      },
+      "rushing": {
+        "yards_per_game": 95.8,
+        "attempts_per_game": 23.7,
+        "yards_per_carry": 4.042,
+        "touchdowns": 0.4,
+        "first_downs_per_game": 5.1
+      },
+      "total": {
+        "yards_per_game": 314.6,
+        "plays_per_game": 64.2,
+        "yards_per_play": 4.9
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 232.5,
+        "attempts_per_game": 28.4,
+        "completions_per_game": 18.4,
+        "completion_pct": 64.79,
+        "yards_per_attempt": 8.187,
+        "touchdowns": 2.2,
+        "interceptions": 0.4,
+        "first_downs_per_game": 10.3
+      },
+      "rushing": {
+        "yards_per_game": 129.9,
+        "attempts_per_game": 30.8,
+        "yards_per_carry": 4.218,
+        "touchdowns": 1.1,
+        "first_downs_per_game": 8.2
+      },
+      "total": {
+        "yards_per_game": 362.4,
+        "plays_per_game": 61.3,
+        "yards_per_play": 5.912
+      }
+    },
+    "turnovers": {
+      "takeaways": 9.0,
+      "giveaways": 10.0,
+      "differential": -1.0
+    }
+  },
+  {
+    "team": "ATL",
+    "data_updated_at": "2026-11-22T12:47:13.713691+00:00",
+    "season": 2026,
+    "games_played": 10,
+    "points_for_per_game": 20.1,
+    "points_allowed_per_game": 25.8,
+    "offense": {
+      "passing": {
+        "yards_per_game": 205.2,
+        "attempts_per_game": 29.9,
+        "completions_per_game": 17.9,
+        "completion_pct": 59.87,
+        "yards_per_attempt": 6.863,
+        "touchdowns": 1.1,
+        "interceptions": 1.3,
+        "first_downs_per_game": 8.3
+      },
+      "rushing": {
+        "yards_per_game": 133.5,
+        "attempts_per_game": 27.8,
+        "yards_per_carry": 4.802,
+        "touchdowns": 1.0,
+        "first_downs_per_game": 7.6
+      },
+      "total": {
+        "yards_per_game": 338.7,
+        "plays_per_game": 59.6,
+        "yards_per_play": 5.683
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 251.9,
+        "attempts_per_game": 35.3,
+        "completions_per_game": 23.2,
+        "completion_pct": 65.72,
+        "yards_per_attempt": 7.136,
+        "touchdowns": 1.9,
+        "interceptions": 0.3,
+        "first_downs_per_game": 12.0
+      },
+      "rushing": {
+        "yards_per_game": 119.1,
+        "attempts_per_game": 26.9,
+        "yards_per_carry": 4.428,
+        "touchdowns": 1.0,
+        "first_downs_per_game": 6.7
+      },
+      "total": {
+        "yards_per_game": 371.0,
+        "plays_per_game": 64.3,
+        "yards_per_play": 5.77
+      }
+    },
+    "turnovers": {
+      "takeaways": 9.0,
+      "giveaways": 17.0,
+      "differential": -8.0
+    }
+  },
+  {
+    "team": "BAL",
+    "data_updated_at": "2026-11-22T12:47:13.713712+00:00",
+    "season": 2026,
+    "games_played": 10,
+    "points_for_per_game": 20.9,
+    "points_allowed_per_game": 25.9,
+    "offense": {
+      "passing": {
+        "yards_per_game": 218.2,
+        "attempts_per_game": 29.6,
+        "completions_per_game": 19.8,
+        "completion_pct": 66.89,
+        "yards_per_attempt": 7.372,
+        "touchdowns": 1.0,
+        "interceptions": 0.6,
+        "first_downs_per_game": 10.6
+      },
+      "rushing": {
+        "yards_per_game": 125.6,
+        "attempts_per_game": 28.0,
+        "yards_per_carry": 4.486,
+        "touchdowns": 1.3,
+        "first_downs_per_game": 6.4
+      },
+      "total": {
+        "yards_per_game": 343.8,
+        "plays_per_game": 60.1,
+        "yards_per_play": 5.72
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 230.6,
+        "attempts_per_game": 30.5,
+        "completions_per_game": 19.9,
+        "completion_pct": 65.25,
+        "yards_per_attempt": 7.561,
+        "touchdowns": 1.2,
+        "interceptions": 0.4,
+        "first_downs_per_game": 10.7
+      },
+      "rushing": {
+        "yards_per_game": 105.9,
+        "attempts_per_game": 28.3,
+        "yards_per_carry": 3.742,
+        "touchdowns": 1.4,
+        "first_downs_per_game": 6.4
+      },
+      "total": {
+        "yards_per_game": 336.5,
+        "plays_per_game": 60.7,
+        "yards_per_play": 5.544
+      }
+    },
+    "turnovers": {
+      "takeaways": 9.0,
+      "giveaways": 12.0,
+      "differential": -3.0
+    }
+  },
+  {
+    "team": "BUF",
+    "data_updated_at": "2026-11-22T12:47:13.713728+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 31.89,
+    "points_allowed_per_game": 22.11,
+    "offense": {
+      "passing": {
+        "yards_per_game": 247.0,
+        "attempts_per_game": 28.56,
+        "completions_per_game": 18.56,
+        "completion_pct": 64.98,
+        "yards_per_attempt": 8.65,
+        "touchdowns": 1.44,
+        "interceptions": 0.78,
+        "first_downs_per_game": 11.0
+      },
+      "rushing": {
+        "yards_per_game": 152.67,
+        "attempts_per_game": 32.56,
+        "yards_per_carry": 4.689,
+        "touchdowns": 2.22,
+        "first_downs_per_game": 9.67
+      },
+      "total": {
+        "yards_per_game": 399.67,
+        "plays_per_game": 63.11,
+        "yards_per_play": 6.333
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 256.33,
+        "attempts_per_game": 37.89,
+        "completions_per_game": 23.0,
+        "completion_pct": 60.7,
+        "yards_per_attempt": 6.765,
+        "touchdowns": 1.67,
+        "interceptions": 0.78,
+        "first_downs_per_game": 13.0
+      },
+      "rushing": {
+        "yards_per_game": 93.56,
+        "attempts_per_game": 23.56,
+        "yards_per_carry": 3.972,
+        "touchdowns": 0.78,
+        "first_downs_per_game": 5.56
+      },
+      "total": {
+        "yards_per_game": 349.89,
+        "plays_per_game": 63.78,
+        "yards_per_play": 5.486
+      }
+    },
+    "turnovers": {
+      "takeaways": 14.0,
+      "giveaways": 13.0,
+      "differential": 1.0
+    }
+  },
+  {
+    "team": "CAR",
+    "data_updated_at": "2026-11-22T12:47:13.713743+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 24.33,
+    "points_allowed_per_game": 26.22,
+    "offense": {
+      "passing": {
+        "yards_per_game": 271.56,
+        "attempts_per_game": 38.11,
+        "completions_per_game": 22.89,
+        "completion_pct": 60.06,
+        "yards_per_attempt": 7.125,
+        "touchdowns": 1.78,
+        "interceptions": 0.67,
+        "first_downs_per_game": 13.22
+      },
+      "rushing": {
+        "yards_per_game": 100.78,
+        "attempts_per_game": 24.56,
+        "yards_per_carry": 4.104,
+        "touchdowns": 1.0,
+        "first_downs_per_game": 6.11
+      },
+      "total": {
+        "yards_per_game": 372.33,
+        "plays_per_game": 65.89,
+        "yards_per_play": 5.651
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 217.89,
+        "attempts_per_game": 34.78,
+        "completions_per_game": 22.33,
+        "completion_pct": 64.22,
+        "yards_per_attempt": 6.265,
+        "touchdowns": 1.44,
+        "interceptions": 0.67,
+        "first_downs_per_game": 11.44
+      },
+      "rushing": {
+        "yards_per_game": 124.0,
+        "attempts_per_game": 28.22,
+        "yards_per_carry": 4.394,
+        "touchdowns": 1.56,
+        "first_downs_per_game": 6.89
+      },
+      "total": {
+        "yards_per_game": 341.89,
+        "plays_per_game": 64.67,
+        "yards_per_play": 5.287
+      }
+    },
+    "turnovers": {
+      "takeaways": 13.0,
+      "giveaways": 9.0,
+      "differential": 4.0
+    }
+  },
+  {
+    "team": "CHI",
+    "data_updated_at": "2026-11-22T12:47:13.713758+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 26.78,
+    "points_allowed_per_game": 20.44,
+    "offense": {
+      "passing": {
+        "yards_per_game": 256.67,
+        "attempts_per_game": 34.67,
+        "completions_per_game": 23.44,
+        "completion_pct": 67.63,
+        "yards_per_attempt": 7.404,
+        "touchdowns": 1.11,
+        "interceptions": 1.0,
+        "first_downs_per_game": 12.0
+      },
+      "rushing": {
+        "yards_per_game": 142.0,
+        "attempts_per_game": 33.67,
+        "yards_per_carry": 4.218,
+        "touchdowns": 1.89,
+        "first_downs_per_game": 7.44
+      },
+      "total": {
+        "yards_per_game": 398.67,
+        "plays_per_game": 70.56,
+        "yards_per_play": 5.65
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 235.56,
+        "attempts_per_game": 28.89,
+        "completions_per_game": 17.89,
+        "completion_pct": 61.92,
+        "yards_per_attempt": 8.154,
+        "touchdowns": 1.44,
+        "interceptions": 0.78,
+        "first_downs_per_game": 9.78
+      },
+      "rushing": {
+        "yards_per_game": 91.11,
+        "attempts_per_game": 20.56,
+        "yards_per_carry": 4.432,
+        "touchdowns": 0.89,
+        "first_downs_per_game": 4.22
+      },
+      "total": {
+        "yards_per_game": 326.67,
+        "plays_per_game": 52.33,
+        "yards_per_play": 6.242
+      }
+    },
+    "turnovers": {
+      "takeaways": 13.0,
+      "giveaways": 17.0,
+      "differential": -4.0
+    }
+  },
+  {
+    "team": "CIN",
+    "data_updated_at": "2026-11-22T12:47:13.713771+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 30.89,
+    "points_allowed_per_game": 21.44,
+    "offense": {
+      "passing": {
+        "yards_per_game": 310.56,
+        "attempts_per_game": 37.78,
+        "completions_per_game": 28.22,
+        "completion_pct": 74.71,
+        "yards_per_attempt": 8.221,
+        "touchdowns": 3.0,
+        "interceptions": 0.67,
+        "first_downs_per_game": 15.78
+      },
+      "rushing": {
+        "yards_per_game": 84.78,
+        "attempts_per_game": 21.89,
+        "yards_per_carry": 3.873,
+        "touchdowns": 0.67,
+        "first_downs_per_game": 6.0
+      },
+      "total": {
+        "yards_per_game": 395.33,
+        "plays_per_game": 61.44,
+        "yards_per_play": 6.434
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 237.11,
+        "attempts_per_game": 33.89,
+        "completions_per_game": 21.11,
+        "completion_pct": 62.3,
+        "yards_per_attempt": 6.997,
+        "touchdowns": 1.22,
+        "interceptions": 0.56,
+        "first_downs_per_game": 11.11
+      },
+      "rushing": {
+        "yards_per_game": 123.89,
+        "attempts_per_game": 24.89,
+        "yards_per_carry": 4.978,
+        "touchdowns": 0.89,
+        "first_downs_per_game": 6.67
+      },
+      "total": {
+        "yards_per_game": 361.0,
+        "plays_per_game": 61.67,
+        "yards_per_play": 5.854
+      }
+    },
+    "turnovers": {
+      "takeaways": 12.0,
+      "giveaways": 9.0,
+      "differential": 3.0
+    }
+  },
+  {
+    "team": "CLE",
+    "data_updated_at": "2026-11-22T12:47:13.713789+00:00",
+    "season": 2026,
+    "games_played": 10,
+    "points_for_per_game": 18.8,
+    "points_allowed_per_game": 22.0,
+    "offense": {
+      "passing": {
+        "yards_per_game": 241.7,
+        "attempts_per_game": 32.3,
+        "completions_per_game": 21.0,
+        "completion_pct": 65.02,
+        "yards_per_attempt": 7.483,
+        "touchdowns": 0.9,
+        "interceptions": 0.4,
+        "first_downs_per_game": 10.5
+      },
+      "rushing": {
+        "yards_per_game": 97.5,
+        "attempts_per_game": 25.6,
+        "yards_per_carry": 3.809,
+        "touchdowns": 0.9,
+        "first_downs_per_game": 5.0
+      },
+      "total": {
+        "yards_per_game": 339.2,
+        "plays_per_game": 62.1,
+        "yards_per_play": 5.462
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 219.3,
+        "attempts_per_game": 33.5,
+        "completions_per_game": 19.7,
+        "completion_pct": 58.81,
+        "yards_per_attempt": 6.546,
+        "touchdowns": 1.5,
+        "interceptions": 0.7,
+        "first_downs_per_game": 10.2
+      },
+      "rushing": {
+        "yards_per_game": 126.3,
+        "attempts_per_game": 27.3,
+        "yards_per_carry": 4.626,
+        "touchdowns": 0.8,
+        "first_downs_per_game": 7.5
+      },
+      "total": {
+        "yards_per_game": 345.6,
+        "plays_per_game": 63.5,
+        "yards_per_play": 5.443
+      }
+    },
+    "turnovers": {
+      "takeaways": 13.0,
+      "giveaways": 11.0,
+      "differential": 2.0
+    }
+  },
+  {
+    "team": "DAL",
+    "data_updated_at": "2026-11-22T12:47:13.713804+00:00",
+    "season": 2026,
+    "games_played": 10,
+    "points_for_per_game": 28.6,
+    "points_allowed_per_game": 28.2,
+    "offense": {
+      "passing": {
+        "yards_per_game": 272.4,
+        "attempts_per_game": 38.7,
+        "completions_per_game": 24.8,
+        "completion_pct": 64.08,
+        "yards_per_attempt": 7.039,
+        "touchdowns": 2.1,
+        "interceptions": 0.6,
+        "first_downs_per_game": 13.6
+      },
+      "rushing": {
+        "yards_per_game": 102.8,
+        "attempts_per_game": 25.7,
+        "yards_per_carry": 4.0,
+        "touchdowns": 1.1,
+        "first_downs_per_game": 6.5
+      },
+      "total": {
+        "yards_per_game": 375.2,
+        "plays_per_game": 65.9,
+        "yards_per_play": 5.693
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 252.2,
+        "attempts_per_game": 32.4,
+        "completions_per_game": 21.6,
+        "completion_pct": 66.67,
+        "yards_per_attempt": 7.784,
+        "touchdowns": 1.9,
+        "interceptions": 0.4,
+        "first_downs_per_game": 12.3
+      },
+      "rushing": {
+        "yards_per_game": 154.1,
+        "attempts_per_game": 29.5,
+        "yards_per_carry": 5.224,
+        "touchdowns": 1.4,
+        "first_downs_per_game": 7.5
+      },
+      "total": {
+        "yards_per_game": 406.3,
+        "plays_per_game": 64.1,
+        "yards_per_play": 6.339
+      }
+    },
+    "turnovers": {
+      "takeaways": 8.0,
+      "giveaways": 9.0,
+      "differential": -1.0
+    }
+  },
+  {
+    "team": "DEN",
+    "data_updated_at": "2026-11-22T12:47:13.713819+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 22.0,
+    "points_allowed_per_game": 20.67,
+    "offense": {
+      "passing": {
+        "yards_per_game": 192.22,
+        "attempts_per_game": 31.89,
+        "completions_per_game": 19.33,
+        "completion_pct": 60.63,
+        "yards_per_attempt": 6.028,
+        "touchdowns": 1.22,
+        "interceptions": 0.44,
+        "first_downs_per_game": 9.44
+      },
+      "rushing": {
+        "yards_per_game": 91.44,
+        "attempts_per_game": 24.78,
+        "yards_per_carry": 3.691,
+        "touchdowns": 1.0,
+        "first_downs_per_game": 5.67
+      },
+      "total": {
+        "yards_per_game": 283.67,
+        "plays_per_game": 57.89,
+        "yards_per_play": 4.9
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 249.89,
+        "attempts_per_game": 38.22,
+        "completions_per_game": 23.0,
+        "completion_pct": 60.17,
+        "yards_per_attempt": 6.538,
+        "touchdowns": 1.56,
+        "interceptions": 0.89,
+        "first_downs_per_game": 11.78
+      },
+      "rushing": {
+        "yards_per_game": 124.33,
+        "attempts_per_game": 27.56,
+        "yards_per_carry": 4.512,
+        "touchdowns": 0.67,
+        "first_downs_per_game": 7.56
+      },
+      "total": {
+        "yards_per_game": 374.22,
+        "plays_per_game": 68.67,
+        "yards_per_play": 5.45
+      }
+    },
+    "turnovers": {
+      "takeaways": 12.0,
+      "giveaways": 6.0,
+      "differential": 6.0
+    }
+  },
+  {
+    "team": "DET",
+    "data_updated_at": "2026-11-22T12:47:13.713834+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 28.56,
+    "points_allowed_per_game": 22.11,
+    "offense": {
+      "passing": {
+        "yards_per_game": 272.78,
+        "attempts_per_game": 34.0,
+        "completions_per_game": 23.0,
+        "completion_pct": 67.65,
+        "yards_per_attempt": 8.023,
+        "touchdowns": 2.0,
+        "interceptions": 0.44,
+        "first_downs_per_game": 12.67
+      },
+      "rushing": {
+        "yards_per_game": 134.78,
+        "attempts_per_game": 29.33,
+        "yards_per_carry": 4.595,
+        "touchdowns": 1.33,
+        "first_downs_per_game": 8.67
+      },
+      "total": {
+        "yards_per_game": 407.56,
+        "plays_per_game": 65.67,
+        "yards_per_play": 6.206
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 266.0,
+        "attempts_per_game": 37.89,
+        "completions_per_game": 24.22,
+        "completion_pct": 63.93,
+        "yards_per_attempt": 7.021,
+        "touchdowns": 2.11,
+        "interceptions": 0.78,
+        "first_downs_per_game": 13.22
+      },
+      "rushing": {
+        "yards_per_game": 90.44,
+        "attempts_per_game": 22.89,
+        "yards_per_carry": 3.951,
+        "touchdowns": 0.67,
+        "first_downs_per_game": 6.0
+      },
+      "total": {
+        "yards_per_game": 356.44,
+        "plays_per_game": 64.33,
+        "yards_per_play": 5.541
+      }
+    },
+    "turnovers": {
+      "takeaways": 9.0,
+      "giveaways": 7.0,
+      "differential": 2.0
+    }
+  },
+  {
+    "team": "GB",
+    "data_updated_at": "2026-11-22T12:47:13.713848+00:00",
+    "season": 2026,
+    "games_played": 10,
+    "points_for_per_game": 22.6,
+    "points_allowed_per_game": 22.1,
+    "offense": {
+      "passing": {
+        "yards_per_game": 284.1,
+        "attempts_per_game": 37.0,
+        "completions_per_game": 23.3,
+        "completion_pct": 62.97,
+        "yards_per_attempt": 7.678,
+        "touchdowns": 2.0,
+        "interceptions": 0.7,
+        "first_downs_per_game": 12.1
+      },
+      "rushing": {
+        "yards_per_game": 67.0,
+        "attempts_per_game": 21.9,
+        "yards_per_carry": 3.059,
+        "touchdowns": 0.6,
+        "first_downs_per_game": 4.2
+      },
+      "total": {
+        "yards_per_game": 351.1,
+        "plays_per_game": 61.4,
+        "yards_per_play": 5.718
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 229.4,
+        "attempts_per_game": 35.6,
+        "completions_per_game": 22.4,
+        "completion_pct": 62.92,
+        "yards_per_attempt": 6.444,
+        "touchdowns": 1.5,
+        "interceptions": 1.4,
+        "first_downs_per_game": 11.2
+      },
+      "rushing": {
+        "yards_per_game": 111.0,
+        "attempts_per_game": 27.5,
+        "yards_per_carry": 4.036,
+        "touchdowns": 1.2,
+        "first_downs_per_game": 7.0
+      },
+      "total": {
+        "yards_per_game": 340.4,
+        "plays_per_game": 66.0,
+        "yards_per_play": 5.158
+      }
+    },
+    "turnovers": {
+      "takeaways": 20.0,
+      "giveaways": 12.0,
+      "differential": 8.0
+    }
+  },
+  {
+    "team": "HOU",
+    "data_updated_at": "2026-11-22T12:47:13.713871+00:00",
+    "season": 2026,
+    "games_played": 10,
+    "points_for_per_game": 25.9,
+    "points_allowed_per_game": 22.2,
+    "offense": {
+      "passing": {
+        "yards_per_game": 266.3,
+        "attempts_per_game": 35.0,
+        "completions_per_game": 22.3,
+        "completion_pct": 63.71,
+        "yards_per_attempt": 7.609,
+        "touchdowns": 2.2,
+        "interceptions": 0.4,
+        "first_downs_per_game": 12.4
+      },
+      "rushing": {
+        "yards_per_game": 95.2,
+        "attempts_per_game": 25.6,
+        "yards_per_carry": 3.719,
+        "touchdowns": 0.6,
+        "first_downs_per_game": 5.4
+      },
+      "total": {
+        "yards_per_game": 361.5,
+        "plays_per_game": 62.4,
+        "yards_per_play": 5.793
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 251.2,
+        "attempts_per_game": 34.5,
+        "completions_per_game": 21.5,
+        "completion_pct": 62.32,
+        "yards_per_attempt": 7.281,
+        "touchdowns": 1.2,
+        "interceptions": 0.6,
+        "first_downs_per_game": 10.9
+      },
+      "rushing": {
+        "yards_per_game": 96.1,
+        "attempts_per_game": 24.9,
+        "yards_per_carry": 3.859,
+        "touchdowns": 1.2,
+        "first_downs_per_game": 5.8
+      },
+      "total": {
+        "yards_per_game": 347.3,
+        "plays_per_game": 62.9,
+        "yards_per_play": 5.521
+      }
+    },
+    "turnovers": {
+      "takeaways": 10.0,
+      "giveaways": 6.0,
+      "differential": 4.0
+    }
+  },
+  {
+    "team": "IND",
+    "data_updated_at": "2026-11-22T12:47:13.713886+00:00",
+    "season": 2026,
+    "games_played": 11,
+    "points_for_per_game": 19.18,
+    "points_allowed_per_game": 27.0,
+    "offense": {
+      "passing": {
+        "yards_per_game": 180.18,
+        "attempts_per_game": 32.27,
+        "completions_per_game": 18.82,
+        "completion_pct": 58.31,
+        "yards_per_attempt": 5.583,
+        "touchdowns": 0.64,
+        "interceptions": 1.18,
+        "first_downs_per_game": 8.82
+      },
+      "rushing": {
+        "yards_per_game": 113.36,
+        "attempts_per_game": 27.27,
+        "yards_per_carry": 4.157,
+        "touchdowns": 1.09,
+        "first_downs_per_game": 7.36
+      },
+      "total": {
+        "yards_per_game": 293.55,
+        "plays_per_game": 62.09,
+        "yards_per_play": 4.728
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 234.73,
+        "attempts_per_game": 29.45,
+        "completions_per_game": 18.27,
+        "completion_pct": 62.04,
+        "yards_per_attempt": 7.969,
+        "touchdowns": 1.82,
+        "interceptions": 0.27,
+        "first_downs_per_game": 10.09
+      },
+      "rushing": {
+        "yards_per_game": 134.36,
+        "attempts_per_game": 28.45,
+        "yards_per_carry": 4.722,
+        "touchdowns": 0.91,
+        "first_downs_per_game": 6.82
+      },
+      "total": {
+        "yards_per_game": 369.09,
+        "plays_per_game": 60.0,
+        "yards_per_play": 6.152
+      }
+    },
+    "turnovers": {
+      "takeaways": 8.0,
+      "giveaways": 20.0,
+      "differential": -12.0
+    }
+  },
+  {
+    "team": "JAX",
+    "data_updated_at": "2026-11-22T12:47:13.713900+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 29.89,
+    "points_allowed_per_game": 16.0,
+    "offense": {
+      "passing": {
+        "yards_per_game": 254.67,
+        "attempts_per_game": 29.11,
+        "completions_per_game": 19.11,
+        "completion_pct": 65.65,
+        "yards_per_attempt": 8.748,
+        "touchdowns": 2.33,
+        "interceptions": 0.56,
+        "first_downs_per_game": 12.22
+      },
+      "rushing": {
+        "yards_per_game": 117.78,
+        "attempts_per_game": 29.56,
+        "yards_per_carry": 3.985,
+        "touchdowns": 1.0,
+        "first_downs_per_game": 6.89
+      },
+      "total": {
+        "yards_per_game": 372.44,
+        "plays_per_game": 60.22,
+        "yards_per_play": 6.185
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 237.56,
+        "attempts_per_game": 33.33,
+        "completions_per_game": 22.22,
+        "completion_pct": 66.67,
+        "yards_per_attempt": 7.127,
+        "touchdowns": 1.11,
+        "interceptions": 1.33,
+        "first_downs_per_game": 11.0
+      },
+      "rushing": {
+        "yards_per_game": 91.0,
+        "attempts_per_game": 23.44,
+        "yards_per_carry": 3.882,
+        "touchdowns": 0.56,
+        "first_downs_per_game": 4.89
+      },
+      "total": {
+        "yards_per_game": 328.56,
+        "plays_per_game": 58.67,
+        "yards_per_play": 5.6
+      }
+    },
+    "turnovers": {
+      "takeaways": 16.0,
+      "giveaways": 7.0,
+      "differential": 9.0
+    }
+  },
+  {
+    "team": "KC",
+    "data_updated_at": "2026-11-22T12:47:13.713913+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 26.33,
+    "points_allowed_per_game": 17.33,
+    "offense": {
+      "passing": {
+        "yards_per_game": 265.0,
+        "attempts_per_game": 33.11,
+        "completions_per_game": 22.11,
+        "completion_pct": 66.78,
+        "yards_per_attempt": 8.003,
+        "touchdowns": 2.11,
+        "interceptions": 0.44,
+        "first_downs_per_game": 11.78
+      },
+      "rushing": {
+        "yards_per_game": 136.0,
+        "attempts_per_game": 27.11,
+        "yards_per_carry": 5.016,
+        "touchdowns": 1.11,
+        "first_downs_per_game": 7.56
+      },
+      "total": {
+        "yards_per_game": 401.0,
+        "plays_per_game": 61.56,
+        "yards_per_play": 6.514
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 227.78,
+        "attempts_per_game": 35.44,
+        "completions_per_game": 21.44,
+        "completion_pct": 60.5,
+        "yards_per_attempt": 6.426,
+        "touchdowns": 0.78,
+        "interceptions": 0.78,
+        "first_downs_per_game": 10.78
+      },
+      "rushing": {
+        "yards_per_game": 97.78,
+        "attempts_per_game": 26.11,
+        "yards_per_carry": 3.745,
+        "touchdowns": 0.67,
+        "first_downs_per_game": 6.0
+      },
+      "total": {
+        "yards_per_game": 325.56,
+        "plays_per_game": 63.44,
+        "yards_per_play": 5.131
+      }
+    },
+    "turnovers": {
+      "takeaways": 13.0,
+      "giveaways": 6.0,
+      "differential": 7.0
+    }
+  },
+  {
+    "team": "LAC",
+    "data_updated_at": "2026-11-22T12:47:13.713942+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 16.0,
+    "points_allowed_per_game": 26.56,
+    "offense": {
+      "passing": {
+        "yards_per_game": 193.78,
+        "attempts_per_game": 29.0,
+        "completions_per_game": 17.56,
+        "completion_pct": 60.54,
+        "yards_per_attempt": 6.682,
+        "touchdowns": 0.78,
+        "interceptions": 1.22,
+        "first_downs_per_game": 8.44
+      },
+      "rushing": {
+        "yards_per_game": 119.56,
+        "attempts_per_game": 28.67,
+        "yards_per_carry": 4.171,
+        "touchdowns": 0.67,
+        "first_downs_per_game": 5.22
+      },
+      "total": {
+        "yards_per_game": 313.33,
+        "plays_per_game": 61.33,
+        "yards_per_play": 5.109
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 242.78,
+        "attempts_per_game": 31.33,
+        "completions_per_game": 20.67,
+        "completion_pct": 65.96,
+        "yards_per_attempt": 7.748,
+        "touchdowns": 1.44,
+        "interceptions": 0.89,
+        "first_downs_per_game": 11.22
+      },
+      "rushing": {
+        "yards_per_game": 110.22,
+        "attempts_per_game": 28.33,
+        "yards_per_carry": 3.89,
+        "touchdowns": 1.44,
+        "first_downs_per_game": 6.22
+      },
+      "total": {
+        "yards_per_game": 353.0,
+        "plays_per_game": 61.33,
+        "yards_per_play": 5.755
+      }
+    },
+    "turnovers": {
+      "takeaways": 14.0,
+      "giveaways": 18.0,
+      "differential": -4.0
+    }
+  },
+  {
+    "team": "LAR",
+    "data_updated_at": "2026-11-22T12:47:13.713927+00:00",
+    "season": 2026,
+    "games_played": 10,
+    "points_for_per_game": 24.8,
+    "points_allowed_per_game": 18.7,
+    "offense": {
+      "passing": {
+        "yards_per_game": 263.6,
+        "attempts_per_game": 37.5,
+        "completions_per_game": 25.0,
+        "completion_pct": 66.67,
+        "yards_per_attempt": 7.029,
+        "touchdowns": 1.9,
+        "interceptions": 1.0,
+        "first_downs_per_game": 13.3
+      },
+      "rushing": {
+        "yards_per_game": 133.0,
+        "attempts_per_game": 28.8,
+        "yards_per_carry": 4.618,
+        "touchdowns": 1.2,
+        "first_downs_per_game": 8.1
+      },
+      "total": {
+        "yards_per_game": 396.6,
+        "plays_per_game": 67.8,
+        "yards_per_play": 5.85
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 199.0,
+        "attempts_per_game": 31.1,
+        "completions_per_game": 19.0,
+        "completion_pct": 61.09,
+        "yards_per_attempt": 6.399,
+        "touchdowns": 1.1,
+        "interceptions": 0.9,
+        "first_downs_per_game": 9.7
+      },
+      "rushing": {
+        "yards_per_game": 96.8,
+        "attempts_per_game": 24.7,
+        "yards_per_carry": 3.919,
+        "touchdowns": 0.4,
+        "first_downs_per_game": 4.9
+      },
+      "total": {
+        "yards_per_game": 295.8,
+        "plays_per_game": 57.9,
+        "yards_per_play": 5.109
+      }
+    },
+    "turnovers": {
+      "takeaways": 12.0,
+      "giveaways": 15.0,
+      "differential": -3.0
+    }
+  },
+  {
+    "team": "LV",
+    "data_updated_at": "2026-11-22T12:47:13.713956+00:00",
+    "season": 2026,
+    "games_played": 10,
+    "points_for_per_game": 25.1,
+    "points_allowed_per_game": 28.9,
+    "offense": {
+      "passing": {
+        "yards_per_game": 254.4,
+        "attempts_per_game": 35.3,
+        "completions_per_game": 22.6,
+        "completion_pct": 64.02,
+        "yards_per_attempt": 7.207,
+        "touchdowns": 2.0,
+        "interceptions": 0.8,
+        "first_downs_per_game": 12.8
+      },
+      "rushing": {
+        "yards_per_game": 70.7,
+        "attempts_per_game": 24.6,
+        "yards_per_carry": 2.874,
+        "touchdowns": 0.6,
+        "first_downs_per_game": 4.3
+      },
+      "total": {
+        "yards_per_game": 325.1,
+        "plays_per_game": 61.6,
+        "yards_per_play": 5.278
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 247.8,
+        "attempts_per_game": 29.6,
+        "completions_per_game": 19.7,
+        "completion_pct": 66.55,
+        "yards_per_attempt": 8.372,
+        "touchdowns": 2.2,
+        "interceptions": 0.7,
+        "first_downs_per_game": 12.2
+      },
+      "rushing": {
+        "yards_per_game": 151.1,
+        "attempts_per_game": 30.7,
+        "yards_per_carry": 4.922,
+        "touchdowns": 1.3,
+        "first_downs_per_game": 8.1
+      },
+      "total": {
+        "yards_per_game": 398.9,
+        "plays_per_game": 62.5,
+        "yards_per_play": 6.382
+      }
+    },
+    "turnovers": {
+      "takeaways": 16.0,
+      "giveaways": 11.0,
+      "differential": 5.0
+    }
+  },
+  {
+    "team": "MIA",
+    "data_updated_at": "2026-11-22T12:47:13.713969+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 16.44,
+    "points_allowed_per_game": 24.89,
+    "offense": {
+      "passing": {
+        "yards_per_game": 187.22,
+        "attempts_per_game": 26.89,
+        "completions_per_game": 15.56,
+        "completion_pct": 57.85,
+        "yards_per_attempt": 6.963,
+        "touchdowns": 0.78,
+        "interceptions": 0.67,
+        "first_downs_per_game": 8.22
+      },
+      "rushing": {
+        "yards_per_game": 113.11,
+        "attempts_per_game": 26.78,
+        "yards_per_carry": 4.224,
+        "touchdowns": 0.89,
+        "first_downs_per_game": 6.22
+      },
+      "total": {
+        "yards_per_game": 300.33,
+        "plays_per_game": 56.67,
+        "yards_per_play": 5.3
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 211.67,
+        "attempts_per_game": 27.0,
+        "completions_per_game": 19.89,
+        "completion_pct": 73.66,
+        "yards_per_attempt": 7.84,
+        "touchdowns": 1.89,
+        "interceptions": 0.78,
+        "first_downs_per_game": 10.22
+      },
+      "rushing": {
+        "yards_per_game": 118.44,
+        "attempts_per_game": 30.0,
+        "yards_per_carry": 3.948,
+        "touchdowns": 0.78,
+        "first_downs_per_game": 7.33
+      },
+      "total": {
+        "yards_per_game": 330.11,
+        "plays_per_game": 58.44,
+        "yards_per_play": 5.648
+      }
+    },
+    "turnovers": {
+      "takeaways": 9.0,
+      "giveaways": 11.0,
+      "differential": -2.0
+    }
+  },
+  {
+    "team": "MIN",
+    "data_updated_at": "2026-11-22T12:47:13.713983+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 19.56,
+    "points_allowed_per_game": 14.0,
+    "offense": {
+      "passing": {
+        "yards_per_game": 182.67,
+        "attempts_per_game": 28.44,
+        "completions_per_game": 17.56,
+        "completion_pct": 61.72,
+        "yards_per_attempt": 6.422,
+        "touchdowns": 1.11,
+        "interceptions": 0.67,
+        "first_downs_per_game": 8.78
+      },
+      "rushing": {
+        "yards_per_game": 108.56,
+        "attempts_per_game": 26.89,
+        "yards_per_carry": 4.037,
+        "touchdowns": 0.44,
+        "first_downs_per_game": 5.0
+      },
+      "total": {
+        "yards_per_game": 291.22,
+        "plays_per_game": 58.22,
+        "yards_per_play": 5.002
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 190.89,
+        "attempts_per_game": 29.22,
+        "completions_per_game": 17.0,
+        "completion_pct": 58.17,
+        "yards_per_attempt": 6.532,
+        "touchdowns": 0.67,
+        "interceptions": 1.11,
+        "first_downs_per_game": 8.78
+      },
+      "rushing": {
+        "yards_per_game": 111.89,
+        "attempts_per_game": 26.78,
+        "yards_per_carry": 4.178,
+        "touchdowns": 0.56,
+        "first_downs_per_game": 6.0
+      },
+      "total": {
+        "yards_per_game": 302.78,
+        "plays_per_game": 60.11,
+        "yards_per_play": 5.037
+      }
+    },
+    "turnovers": {
+      "takeaways": 17.0,
+      "giveaways": 9.0,
+      "differential": 8.0
+    }
+  },
+  {
+    "team": "NE",
+    "data_updated_at": "2026-11-22T12:47:13.713996+00:00",
+    "season": 2026,
+    "games_played": 10,
+    "points_for_per_game": 22.1,
+    "points_allowed_per_game": 24.2,
+    "offense": {
+      "passing": {
+        "yards_per_game": 247.8,
+        "attempts_per_game": 30.9,
+        "completions_per_game": 19.8,
+        "completion_pct": 64.08,
+        "yards_per_attempt": 8.019,
+        "touchdowns": 1.9,
+        "interceptions": 1.2,
+        "first_downs_per_game": 10.7
+      },
+      "rushing": {
+        "yards_per_game": 114.0,
+        "attempts_per_game": 27.8,
+        "yards_per_carry": 4.101,
+        "touchdowns": 0.7,
+        "first_downs_per_game": 7.1
+      },
+      "total": {
+        "yards_per_game": 361.8,
+        "plays_per_game": 61.2,
+        "yards_per_play": 5.912
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 256.6,
+        "attempts_per_game": 31.8,
+        "completions_per_game": 21.4,
+        "completion_pct": 67.3,
+        "yards_per_attempt": 8.069,
+        "touchdowns": 1.7,
+        "interceptions": 0.7,
+        "first_downs_per_game": 10.9
+      },
+      "rushing": {
+        "yards_per_game": 106.1,
+        "attempts_per_game": 25.9,
+        "yards_per_carry": 4.097,
+        "touchdowns": 1.0,
+        "first_downs_per_game": 6.2
+      },
+      "total": {
+        "yards_per_game": 362.7,
+        "plays_per_game": 60.4,
+        "yards_per_play": 6.005
+      }
+    },
+    "turnovers": {
+      "takeaways": 10.0,
+      "giveaways": 20.0,
+      "differential": -10.0
+    }
+  },
+  {
+    "team": "NO",
+    "data_updated_at": "2026-11-22T12:47:13.714011+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 22.44,
+    "points_allowed_per_game": 26.22,
+    "offense": {
+      "passing": {
+        "yards_per_game": 241.44,
+        "attempts_per_game": 38.11,
+        "completions_per_game": 25.44,
+        "completion_pct": 66.76,
+        "yards_per_attempt": 6.335,
+        "touchdowns": 1.67,
+        "interceptions": 0.78,
+        "first_downs_per_game": 12.22
+      },
+      "rushing": {
+        "yards_per_game": 90.11,
+        "attempts_per_game": 25.11,
+        "yards_per_carry": 3.588,
+        "touchdowns": 0.89,
+        "first_downs_per_game": 6.0
+      },
+      "total": {
+        "yards_per_game": 331.56,
+        "plays_per_game": 65.78,
+        "yards_per_play": 5.041
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 249.44,
+        "attempts_per_game": 32.33,
+        "completions_per_game": 20.89,
+        "completion_pct": 64.6,
+        "yards_per_attempt": 7.715,
+        "touchdowns": 1.44,
+        "interceptions": 0.44,
+        "first_downs_per_game": 11.0
+      },
+      "rushing": {
+        "yards_per_game": 129.78,
+        "attempts_per_game": 29.89,
+        "yards_per_carry": 4.342,
+        "touchdowns": 1.44,
+        "first_downs_per_game": 8.11
+      },
+      "total": {
+        "yards_per_game": 379.22,
+        "plays_per_game": 65.11,
+        "yards_per_play": 5.824
+      }
+    },
+    "turnovers": {
+      "takeaways": 9.0,
+      "giveaways": 15.0,
+      "differential": -6.0
+    }
+  },
+  {
+    "team": "NYG",
+    "data_updated_at": "2026-11-22T12:47:13.714024+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 22.56,
+    "points_allowed_per_game": 21.78,
+    "offense": {
+      "passing": {
+        "yards_per_game": 243.67,
+        "attempts_per_game": 33.78,
+        "completions_per_game": 20.89,
+        "completion_pct": 61.84,
+        "yards_per_attempt": 7.214,
+        "touchdowns": 1.44,
+        "interceptions": 0.78,
+        "first_downs_per_game": 11.22
+      },
+      "rushing": {
+        "yards_per_game": 112.56,
+        "attempts_per_game": 28.78,
+        "yards_per_carry": 3.911,
+        "touchdowns": 0.89,
+        "first_downs_per_game": 7.0
+      },
+      "total": {
+        "yards_per_game": 356.22,
+        "plays_per_game": 65.67,
+        "yards_per_play": 5.425
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 195.89,
+        "attempts_per_game": 31.78,
+        "completions_per_game": 19.89,
+        "completion_pct": 62.59,
+        "yards_per_attempt": 6.164,
+        "touchdowns": 1.89,
+        "interceptions": 0.89,
+        "first_downs_per_game": 9.89
+      },
+      "rushing": {
+        "yards_per_game": 121.56,
+        "attempts_per_game": 27.11,
+        "yards_per_carry": 4.484,
+        "touchdowns": 0.78,
+        "first_downs_per_game": 6.44
+      },
+      "total": {
+        "yards_per_game": 317.44,
+        "plays_per_game": 60.78,
+        "yards_per_play": 5.223
+      }
+    },
+    "turnovers": {
+      "takeaways": 12.0,
+      "giveaways": 12.0,
+      "differential": 0.0
+    }
+  },
+  {
+    "team": "NYJ",
+    "data_updated_at": "2026-11-22T12:47:13.714037+00:00",
+    "season": 2026,
+    "games_played": 10,
+    "points_for_per_game": 19.4,
+    "points_allowed_per_game": 25.4,
+    "offense": {
+      "passing": {
+        "yards_per_game": 236.3,
+        "attempts_per_game": 31.2,
+        "completions_per_game": 20.7,
+        "completion_pct": 66.35,
+        "yards_per_attempt": 7.574,
+        "touchdowns": 1.2,
+        "interceptions": 0.4,
+        "first_downs_per_game": 9.9
+      },
+      "rushing": {
+        "yards_per_game": 105.6,
+        "attempts_per_game": 25.4,
+        "yards_per_carry": 4.157,
+        "touchdowns": 0.5,
+        "first_downs_per_game": 7.0
+      },
+      "total": {
+        "yards_per_game": 341.9,
+        "plays_per_game": 59.8,
+        "yards_per_play": 5.717
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 210.5,
+        "attempts_per_game": 29.1,
+        "completions_per_game": 18.5,
+        "completion_pct": 63.57,
+        "yards_per_attempt": 7.234,
+        "touchdowns": 1.7,
+        "interceptions": 0.2,
+        "first_downs_per_game": 10.4
+      },
+      "rushing": {
+        "yards_per_game": 135.3,
+        "attempts_per_game": 31.4,
+        "yards_per_carry": 4.309,
+        "touchdowns": 1.3,
+        "first_downs_per_game": 8.2
+      },
+      "total": {
+        "yards_per_game": 345.8,
+        "plays_per_game": 62.8,
+        "yards_per_play": 5.506
+      }
+    },
+    "turnovers": {
+      "takeaways": 12.0,
+      "giveaways": 9.0,
+      "differential": 3.0
+    }
+  },
+  {
+    "team": "PHI",
+    "data_updated_at": "2026-11-22T12:47:13.714050+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 16.44,
+    "points_allowed_per_game": 24.56,
+    "offense": {
+      "passing": {
+        "yards_per_game": 193.33,
+        "attempts_per_game": 33.67,
+        "completions_per_game": 19.89,
+        "completion_pct": 59.08,
+        "yards_per_attempt": 5.743,
+        "touchdowns": 1.11,
+        "interceptions": 0.67,
+        "first_downs_per_game": 9.0
+      },
+      "rushing": {
+        "yards_per_game": 88.56,
+        "attempts_per_game": 23.67,
+        "yards_per_carry": 3.742,
+        "touchdowns": 0.89,
+        "first_downs_per_game": 4.78
+      },
+      "total": {
+        "yards_per_game": 281.89,
+        "plays_per_game": 60.67,
+        "yards_per_play": 4.647
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 238.89,
+        "attempts_per_game": 33.33,
+        "completions_per_game": 20.0,
+        "completion_pct": 60.0,
+        "yards_per_attempt": 7.167,
+        "touchdowns": 1.44,
+        "interceptions": 0.33,
+        "first_downs_per_game": 11.33
+      },
+      "rushing": {
+        "yards_per_game": 126.11,
+        "attempts_per_game": 30.67,
+        "yards_per_carry": 4.112,
+        "touchdowns": 1.11,
+        "first_downs_per_game": 7.22
+      },
+      "total": {
+        "yards_per_game": 365.0,
+        "plays_per_game": 65.78,
+        "yards_per_play": 5.549
+      }
+    },
+    "turnovers": {
+      "takeaways": 5.0,
+      "giveaways": 9.0,
+      "differential": -4.0
+    }
+  },
+  {
+    "team": "PIT",
+    "data_updated_at": "2026-11-22T12:47:13.714063+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 22.0,
+    "points_allowed_per_game": 20.22,
+    "offense": {
+      "passing": {
+        "yards_per_game": 224.0,
+        "attempts_per_game": 35.78,
+        "completions_per_game": 21.22,
+        "completion_pct": 59.32,
+        "yards_per_attempt": 6.261,
+        "touchdowns": 1.67,
+        "interceptions": 0.67,
+        "first_downs_per_game": 9.89
+      },
+      "rushing": {
+        "yards_per_game": 116.11,
+        "attempts_per_game": 24.0,
+        "yards_per_carry": 4.838,
+        "touchdowns": 0.44,
+        "first_downs_per_game": 7.22
+      },
+      "total": {
+        "yards_per_game": 340.11,
+        "plays_per_game": 62.67,
+        "yards_per_play": 5.427
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 260.56,
+        "attempts_per_game": 36.0,
+        "completions_per_game": 24.22,
+        "completion_pct": 67.28,
+        "yards_per_attempt": 7.238,
+        "touchdowns": 1.22,
+        "interceptions": 0.78,
+        "first_downs_per_game": 12.33
+      },
+      "rushing": {
+        "yards_per_game": 83.22,
+        "attempts_per_game": 22.78,
+        "yards_per_carry": 3.654,
+        "touchdowns": 0.56,
+        "first_downs_per_game": 5.67
+      },
+      "total": {
+        "yards_per_game": 343.78,
+        "plays_per_game": 61.78,
+        "yards_per_play": 5.565
+      }
+    },
+    "turnovers": {
+      "takeaways": 13.0,
+      "giveaways": 8.0,
+      "differential": 5.0
+    }
+  },
+  {
+    "team": "SEA",
+    "data_updated_at": "2026-11-22T12:47:13.714077+00:00",
+    "season": 2026,
+    "games_played": 10,
+    "points_for_per_game": 22.3,
+    "points_allowed_per_game": 17.5,
+    "offense": {
+      "passing": {
+        "yards_per_game": 232.9,
+        "attempts_per_game": 30.5,
+        "completions_per_game": 19.6,
+        "completion_pct": 64.26,
+        "yards_per_attempt": 7.636,
+        "touchdowns": 1.7,
+        "interceptions": 0.9,
+        "first_downs_per_game": 11.9
+      },
+      "rushing": {
+        "yards_per_game": 114.7,
+        "attempts_per_game": 29.3,
+        "yards_per_carry": 3.915,
+        "touchdowns": 0.8,
+        "first_downs_per_game": 6.1
+      },
+      "total": {
+        "yards_per_game": 347.6,
+        "plays_per_game": 62.0,
+        "yards_per_play": 5.606
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 166.2,
+        "attempts_per_game": 30.6,
+        "completions_per_game": 19.5,
+        "completion_pct": 63.73,
+        "yards_per_attempt": 5.431,
+        "touchdowns": 0.9,
+        "interceptions": 0.8,
+        "first_downs_per_game": 8.0
+      },
+      "rushing": {
+        "yards_per_game": 86.7,
+        "attempts_per_game": 25.7,
+        "yards_per_carry": 3.374,
+        "touchdowns": 0.8,
+        "first_downs_per_game": 5.3
+      },
+      "total": {
+        "yards_per_game": 252.9,
+        "plays_per_game": 59.0,
+        "yards_per_play": 4.286
+      }
+    },
+    "turnovers": {
+      "takeaways": 13.0,
+      "giveaways": 16.0,
+      "differential": -3.0
+    }
+  },
+  {
+    "team": "SF",
+    "data_updated_at": "2026-11-22T12:47:13.714090+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 31.22,
+    "points_allowed_per_game": 21.78,
+    "offense": {
+      "passing": {
+        "yards_per_game": 263.22,
+        "attempts_per_game": 29.33,
+        "completions_per_game": 20.56,
+        "completion_pct": 70.08,
+        "yards_per_attempt": 8.973,
+        "touchdowns": 2.22,
+        "interceptions": 0.56,
+        "first_downs_per_game": 12.67
+      },
+      "rushing": {
+        "yards_per_game": 144.0,
+        "attempts_per_game": 29.22,
+        "yards_per_carry": 4.928,
+        "touchdowns": 1.67,
+        "first_downs_per_game": 8.56
+      },
+      "total": {
+        "yards_per_game": 407.22,
+        "plays_per_game": 60.0,
+        "yards_per_play": 6.787
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 236.22,
+        "attempts_per_game": 36.78,
+        "completions_per_game": 24.22,
+        "completion_pct": 65.86,
+        "yards_per_attempt": 6.423,
+        "touchdowns": 1.78,
+        "interceptions": 0.78,
+        "first_downs_per_game": 11.44
+      },
+      "rushing": {
+        "yards_per_game": 82.56,
+        "attempts_per_game": 24.22,
+        "yards_per_carry": 3.408,
+        "touchdowns": 0.44,
+        "first_downs_per_game": 4.78
+      },
+      "total": {
+        "yards_per_game": 318.78,
+        "plays_per_game": 62.78,
+        "yards_per_play": 5.078
+      }
+    },
+    "turnovers": {
+      "takeaways": 14.0,
+      "giveaways": 9.0,
+      "differential": 5.0
+    }
+  },
+  {
+    "team": "TB",
+    "data_updated_at": "2026-11-22T12:47:13.714103+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 22.44,
+    "points_allowed_per_game": 19.78,
+    "offense": {
+      "passing": {
+        "yards_per_game": 158.11,
+        "attempts_per_game": 26.67,
+        "completions_per_game": 16.22,
+        "completion_pct": 60.83,
+        "yards_per_attempt": 5.929,
+        "touchdowns": 0.67,
+        "interceptions": 1.0,
+        "first_downs_per_game": 7.44
+      },
+      "rushing": {
+        "yards_per_game": 163.89,
+        "attempts_per_game": 32.67,
+        "yards_per_carry": 5.017,
+        "touchdowns": 1.22,
+        "first_downs_per_game": 8.89
+      },
+      "total": {
+        "yards_per_game": 322.0,
+        "plays_per_game": 62.33,
+        "yards_per_play": 5.166
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 226.67,
+        "attempts_per_game": 34.11,
+        "completions_per_game": 21.11,
+        "completion_pct": 61.89,
+        "yards_per_attempt": 6.645,
+        "touchdowns": 1.33,
+        "interceptions": 1.78,
+        "first_downs_per_game": 9.56
+      },
+      "rushing": {
+        "yards_per_game": 79.11,
+        "attempts_per_game": 22.33,
+        "yards_per_carry": 3.542,
+        "touchdowns": 0.33,
+        "first_downs_per_game": 5.22
+      },
+      "total": {
+        "yards_per_game": 305.78,
+        "plays_per_game": 58.33,
+        "yards_per_play": 5.242
+      }
+    },
+    "turnovers": {
+      "takeaways": 21.0,
+      "giveaways": 14.0,
+      "differential": 7.0
+    }
+  },
+  {
+    "team": "TEN",
+    "data_updated_at": "2026-11-22T12:47:13.714115+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 18.56,
+    "points_allowed_per_game": 26.56,
+    "offense": {
+      "passing": {
+        "yards_per_game": 190.44,
+        "attempts_per_game": 31.89,
+        "completions_per_game": 20.33,
+        "completion_pct": 63.76,
+        "yards_per_attempt": 5.972,
+        "touchdowns": 0.89,
+        "interceptions": 0.67,
+        "first_downs_per_game": 9.22
+      },
+      "rushing": {
+        "yards_per_game": 100.11,
+        "attempts_per_game": 22.89,
+        "yards_per_carry": 4.374,
+        "touchdowns": 0.89,
+        "first_downs_per_game": 5.44
+      },
+      "total": {
+        "yards_per_game": 290.56,
+        "plays_per_game": 56.33,
+        "yards_per_play": 5.158
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 281.56,
+        "attempts_per_game": 34.11,
+        "completions_per_game": 24.22,
+        "completion_pct": 71.01,
+        "yards_per_attempt": 8.254,
+        "touchdowns": 1.56,
+        "interceptions": 1.0,
+        "first_downs_per_game": 13.78
+      },
+      "rushing": {
+        "yards_per_game": 124.0,
+        "attempts_per_game": 30.56,
+        "yards_per_carry": 4.058,
+        "touchdowns": 1.22,
+        "first_downs_per_game": 7.56
+      },
+      "total": {
+        "yards_per_game": 405.56,
+        "plays_per_game": 67.0,
+        "yards_per_play": 6.053
+      }
+    },
+    "turnovers": {
+      "takeaways": 12.0,
+      "giveaways": 11.0,
+      "differential": 1.0
+    }
+  },
+  {
+    "team": "WAS",
+    "data_updated_at": "2026-11-22T12:47:13.714127+00:00",
+    "season": 2026,
+    "games_played": 9,
+    "points_for_per_game": 21.78,
+    "points_allowed_per_game": 24.78,
+    "offense": {
+      "passing": {
+        "yards_per_game": 225.0,
+        "attempts_per_game": 33.22,
+        "completions_per_game": 20.78,
+        "completion_pct": 62.54,
+        "yards_per_attempt": 6.773,
+        "touchdowns": 1.67,
+        "interceptions": 0.33,
+        "first_downs_per_game": 10.56
+      },
+      "rushing": {
+        "yards_per_game": 116.78,
+        "attempts_per_game": 27.0,
+        "yards_per_carry": 4.325,
+        "touchdowns": 0.56,
+        "first_downs_per_game": 6.0
+      },
+      "total": {
+        "yards_per_game": 341.78,
+        "plays_per_game": 62.56,
+        "yards_per_play": 5.464
+      }
+    },
+    "defense": {
+      "passing": {
+        "yards_per_game": 260.11,
+        "attempts_per_game": 36.89,
+        "completions_per_game": 24.11,
+        "completion_pct": 65.36,
+        "yards_per_attempt": 7.051,
+        "touchdowns": 1.89,
+        "interceptions": 0.67,
+        "first_downs_per_game": 12.22
+      },
+      "rushing": {
+        "yards_per_game": 103.78,
+        "attempts_per_game": 26.22,
+        "yards_per_carry": 3.958,
+        "touchdowns": 1.0,
+        "first_downs_per_game": 6.67
+      },
+      "total": {
+        "yards_per_game": 363.89,
+        "plays_per_game": 65.11,
+        "yards_per_play": 5.589
+      }
+    },
+    "turnovers": {
+      "takeaways": 14.0,
+      "giveaways": 6.0,
+      "differential": 8.0
+    }
+  }
+]
