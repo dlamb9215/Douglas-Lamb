@@ -33,16 +33,25 @@ class PregameContextTests(unittest.TestCase):
         self.assertFalse(report["teams"]["BAL"]["official_starting_quarterback_confirmed"])
         self.assertEqual(report["teams"]["BAL"]["reported_injuries"][0]["status"], "questionable")
 
-    def test_missing_active_qb1_blocks_team_simulation(self):
-        self.pool["players"][0]["depth_order"] = 99
+    def test_active_backup_fallback_allows_provisional_team_simulation(self):
+        self.pool["players"][0]["injury_status"] = "questionable"
+        self.pool["players"].append({
+            "team": "BAL", "name": "QB Backup", "position": "QB",
+            "depth_order": 2, "roster_status": "active",
+            "injury_status": "active",
+        })
         report = build_pregame_report(self.pool, "BAL", "JAX", now=self.now)
-        self.assertFalse(report["team_simulation_ready"])
-        self.assertTrue(report["team_simulation_blockers"])
+        self.assertTrue(report["team_simulation_ready"])
+        self.assertEqual(report["teams"]["BAL"]["projected_qb1"], "QB Backup")
+        self.assertEqual(report["teams"]["BAL"]["qb_selection_reason"], "active_backup_fallback")
+        self.assertFalse(report["teams"]["BAL"]["official_starting_quarterback_confirmed"])
+        self.assertTrue(report["teams"]["BAL"]["starting_quarterback_uncertainty"])
 
-    def test_out_qb1_blocks_team_simulation(self):
+    def test_no_available_qb_blocks_team_simulation(self):
         self.pool["players"][0]["injury_status"] = "out"
         report = build_pregame_report(self.pool, "BAL", "JAX", now=self.now)
         self.assertFalse(report["team_simulation_ready"])
+        self.assertTrue(report["team_simulation_blockers"])
 
     def test_official_qb_override_accepts_active_backup_and_records_source(self):
         self.pool["players"].append({"team":"BAL","name":"QB Backup","position":"QB","depth_order":2,"roster_status":"active","injury_status":"active"})
