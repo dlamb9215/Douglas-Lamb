@@ -108,8 +108,22 @@ def build_pregame_report(pool, home, away, max_age_hours=36, now=None, confirmed
             raise ValueError(f"Confirmed starting QB for {team} is not an available active roster QB in the fresh feed.")
         if requested_name and not source_url.startswith("https://"):
             raise ValueError(f"Confirmed starting QB for {team} requires an HTTPS source.")
-        qb1 = confirmed_qb or next((p for p in qbs if p.get("depth_order") == 1), None)
+        listed_qb1 = next((p for p in qbs if p.get("depth_order") == 1), None)
+        # The top-listed QB may be questionable/out while a rostered backup is
+        # active. Use the first available QB for provisional team-level modeling,
+        # but do not treat that fallback as official starter confirmation.
+        available_qbs = [p for p in qbs if available(p)]
+        qb1 = confirmed_qb or (
+            listed_qb1 if available(listed_qb1)
+            else (available_qbs[0] if available_qbs else listed_qb1)
+        )
         qb1_ready = available(qb1)
+        qb_selection_reason = (
+            "official_source_override" if confirmed_qb
+            else "listed_qb1_available" if qb1 is listed_qb1 and qb1_ready
+            else "active_backup_fallback" if qb1_ready
+            else "no_available_qb"
+        )
         teams[team] = {
             "player_records": len(rows),
             "quarterback_depth_chart": [
@@ -128,12 +142,14 @@ def build_pregame_report(pool, home, away, max_age_hours=36, now=None, confirmed
             ],
             "projected_qb1": qb1.get("name") if qb1 else None,
             "projected_qb1_available_in_feed": qb1_ready,
+            "qb_selection_reason": qb_selection_reason,
             "quarterback_confirmation_method": "official_source_override" if confirmed_qb else "depth_chart_feed",
             "quarterback_confirmation_source": source_url if confirmed_qb else None,
             "quarterback_confirmation_feed_team": confirmation_feed_team if confirmed_qb else None,
             "reported_injuries": injury_rows,
             "official_game_day_inactives_confirmed": False,
             "official_starting_quarterback_confirmed": bool(confirmed_qb),
+            "starting_quarterback_uncertainty": not bool(confirmed_qb),
         }
 
     team_simulation_ready = all(
