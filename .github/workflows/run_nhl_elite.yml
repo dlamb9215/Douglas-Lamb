@@ -14,17 +14,17 @@ on:
   workflow_dispatch:
     inputs:
       home:
-        description: Home team (MTL for Kings at Canadiens)
+        description: Home team (OTT for Flames at Senators)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: MTL
+        default: OTT
       away:
-        description: Away team (LAK for Kings at Canadiens)
+        description: Away team (CGY for Flames at Senators)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, NJD, MTL, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: LAK
+        default: CGY
       trials:
         description: Monte Carlo trials
         required: true
@@ -84,8 +84,8 @@ jobs:
         id: run_matchup
         shell: bash
         env:
-          HOME_TEAM: ${{ inputs.home || 'MTL' }}
-          AWAY_TEAM: ${{ inputs.away || 'LAK' }}
+          HOME_TEAM: ${{ inputs.home || 'OTT' }}
+          AWAY_TEAM: ${{ inputs.away || 'CGY' }}
           TRIALS: ${{ inputs.trials || '1000000' }}
           GAME_DATE: ${{ inputs.game_date || '' }}
         run: |
