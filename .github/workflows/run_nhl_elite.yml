@@ -34,7 +34,7 @@ on:
       game_date:
         description: Game date in YYYY-MM-DD
         required: true
-        default: ""
+        default: "2026-11-24"
         type: string
       game_config_json:
         description: Optional JSON for total, seed, confirmed goalie IDs, scratched player IDs, and sportsbook prices with source/timestamp
