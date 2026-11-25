@@ -83,8 +83,8 @@ jobs:
       - name: Build multi-source NBA data readiness report
         if: github.event_name == 'workflow_dispatch'
         env:
-          HOME_TEAM: ${{ inputs.home || 'NYK' }}
-          AWAY_TEAM: ${{ inputs.away || 'CLE' }}
+          HOME_TEAM: ${{ inputs.home || 'OKC' }}
+          AWAY_TEAM: ${{ inputs.away || 'MIN' }}
           GAME_DATE: ${{ inputs.game_date || '' }}
           GAME_CONFIG_JSON: ${{ inputs.game_config_json || '{"auto_injuries":true,"auto_odds":false,"espn_bet_odds":false,"player_props":true,"prop_trials":50000,"seed":42,"home_rest":0,"away_rest":0}' }}
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
@@ -108,8 +108,8 @@ jobs:
         id: run_matchup
         if: github.event_name == 'workflow_dispatch'
         env:
-          HOME_TEAM: ${{ inputs.home || 'NYK' }}
-          AWAY_TEAM: ${{ inputs.away || 'CLE' }}
+          HOME_TEAM: ${{ inputs.home || 'OKC' }}
+          AWAY_TEAM: ${{ inputs.away || 'MIN' }}
           SPREAD: ${{ inputs.spread || '' }}
           TOTAL: ${{ inputs.total || '' }}
           TRIALS: ${{ inputs.trials || '1000000' }}
