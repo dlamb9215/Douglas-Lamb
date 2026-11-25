@@ -26,12 +26,12 @@ on:
       home:
         description: Home team abbreviation
         required: true
-        default: "CHA"
+        default: "PHI"
         type: string
       away:
         description: Away team abbreviation
         required: true
-        default: "CHI"
+        default: "MIA"
         type: string
       spread:
         description: Home spread, e.g. -3.5; blank to skip
@@ -68,8 +68,8 @@ jobs:
   simulate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Install dependencies
@@ -83,8 +83,8 @@ jobs:
       - name: Build multi-source NBA data readiness report
         if: github.event_name == 'workflow_dispatch'
         env:
-          HOME_TEAM: ${{ inputs.home || 'SAC' }}
-          AWAY_TEAM: ${{ inputs.away || 'SAS' }}
+          HOME_TEAM: ${{ inputs.home || 'PHI' }}
+          AWAY_TEAM: ${{ inputs.away || 'MIA' }}
           GAME_DATE: ${{ inputs.game_date || '' }}
           GAME_CONFIG_JSON: ${{ inputs.game_config_json || '{"auto_injuries":true,"auto_odds":false,"espn_bet_odds":false,"player_props":true,"prop_trials":50000,"seed":42,"home_rest":0,"away_rest":0}' }}
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
@@ -228,10 +228,13 @@ jobs:
             args+=(--lines-json player-prop-lines.json)
           fi
           python -m nba.player_props "${args[@]}"
-      - uses: actions/upload-artifact@v4
+      - name: Upload NBA results artifact
+        id: upload_results
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: nba-matchup-results
+          retention-days: 14
           if-no-files-found: warn
           path: |
             nba-data-readiness.json
@@ -240,3 +243,16 @@ jobs:
             nba-simulation-results.json
             nba-player-projections.json
             player-prop-readiness.txt
+
+      - name: Publish artifact retrieval details
+        if: always()
+        env:
+          ARTIFACT_ID: ${{ steps.upload_results.outputs.artifact-id }}
+          ARTIFACT_URL: ${{ steps.upload_results.outputs.artifact-url }}
+        run: |
+          {
+            echo "### NBA Simulator artifact"
+            echo "- Workflow run: ${GITHUB_RUN_ID}"
+            echo "- Artifact ID: ${ARTIFACT_ID:-not produced}"
+            if [ -n "${ARTIFACT_URL:-}" ]; then echo "- Artifact URL: ${ARTIFACT_URL}"; fi
+          } >> "$GITHUB_STEP_SUMMARY"
