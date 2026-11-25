@@ -108,8 +108,8 @@ jobs:
         id: run_matchup
         if: github.event_name == 'workflow_dispatch'
         env:
-          HOME_TEAM: ${{ inputs.home || 'SAC' }}
-          AWAY_TEAM: ${{ inputs.away || 'SAS' }}
+          HOME_TEAM: ${{ inputs.home || 'PHI' }}
+          AWAY_TEAM: ${{ inputs.away || 'MIA' }}
           SPREAD: ${{ inputs.spread || '' }}
           TOTAL: ${{ inputs.total || '' }}
           TRIALS: ${{ inputs.trials || '1000000' }}
