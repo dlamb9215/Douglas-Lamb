@@ -148,6 +148,29 @@ class SimulatorTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "home team"):
                 load_pregame_checks(path, "Home U", "Away U")
 
+    def test_model_reports_sample_shrinkage_and_monte_carlo_precision(self):
+        result = simulate_game(self.home, self.away, 4000, seed=101)
+        self.assertEqual(result["model_methodology"]["calibration_status"],
+                         "not empirically calibrated; evaluate against timestamped pregame ledger")
+        self.assertAlmostEqual(
+            result["simulation_precision"]["home_efficiency_sample_weight"],
+            self.home.games_sampled / (self.home.games_sampled + 4.0),
+        )
+        self.assertGreaterEqual(result["simulation_precision"]["home_win_standard_error"], 0)
+        self.assertGreaterEqual(result["simulation_precision"]["home_win_95pct_margin"], 0)
+
+    def test_profile_rejects_impossible_completion_rate(self):
+        bad = TeamProfile("Bad Completion U", completion_pct=1.2)
+        with self.assertRaisesRegex(ValueError, "completion_pct"):
+            bad.validate()
+
+    def test_turnover_risk_changes_drive_scoring_frequency(self):
+        from random import Random
+        from ncaa.engine import _drive_points
+        low_turnover = sum(_drive_points(3.0, 0.05, Random(i)) > 0 for i in range(2000))
+        high_turnover = sum(_drive_points(3.0, 0.22, Random(i)) > 0 for i in range(2000))
+        self.assertGreater(low_turnover, high_turnover)
+
     def test_invalid_trial_count_rejected(self):
         with self.assertRaises(ValueError):
             simulate_game(self.home, self.away, 0)
