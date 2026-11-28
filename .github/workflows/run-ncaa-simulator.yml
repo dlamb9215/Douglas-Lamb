@@ -28,14 +28,14 @@ on:
         type: choice
         options: [regular, postseason, both]
       home:
-        description: Home college team (Kentucky)
+        description: Home college team (Miami)
         required: true
-        default: Kentucky
+        default: Miami
         type: string
       away:
-        description: Away college team (Louisville)
+        description: Away college team (Boston College)
         required: true
-        default: Louisville
+        default: Boston College
         type: string
       trials:
         description: Monte Carlo trials
