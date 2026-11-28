@@ -145,6 +145,7 @@ jobs:
           print("The simulator may proceed using refreshed data or this verified recent cache.")
           PY
       - name: Fetch venue weather context for kickoff (optional)
+        timeout-minutes: 3
         continue-on-error: true
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
@@ -159,6 +160,7 @@ jobs:
           if [[ -n "$GAME_KICKOFF" ]]; then args+=(--kickoff "$GAME_KICKOFF"); fi
           python -m ncaa.weather "${args[@]}"
       - name: Refresh player season statistics and usage (optional provider entitlement)
+        timeout-minutes: 4
         continue-on-error: true
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
@@ -167,6 +169,7 @@ jobs:
           CLASSIFICATION: ${{ inputs.classification }}
         run: python -m ncaa.data.player_refresh --year "$SEASON_YEAR" --season-type "$SEASON_TYPE" --classification "$CLASSIFICATION"
       - name: Reconcile previous forecast ledger with completed scores (optional)
+        timeout-minutes: 2
         continue-on-error: true
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
