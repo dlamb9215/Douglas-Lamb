@@ -26,7 +26,7 @@ on:
       home:
         description: Home team abbreviation
         required: true
-        default: "CHA"
+        default: "CHI"
         type: string
       away:
         description: Away team abbreviation
