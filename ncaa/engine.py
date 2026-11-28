@@ -165,6 +165,7 @@ def _simulate_overtime(home_ppd: float, away_ppd: float,
     play-by-play implementation. After two possession rounds, teams alternate
     modeled two-point attempts to avoid the old arbitrary seven-point tiebreak.
     """
+    home_total = away_total = 0
     for round_number in range(1, 13):
         if round_number <= 2:
             home_td = _clamp(0.48 + (home_ppd - 2.5) * 0.055, 0.28, 0.68)
@@ -187,10 +188,12 @@ def _simulate_overtime(home_ppd: float, away_ppd: float,
             away_two = _clamp(0.43 + (away_ppd - 2.5) * 0.045, 0.28, 0.62)
             home_points = 2 if rng.random() < home_two else 0
             away_points = 2 if rng.random() < away_two else 0
+        home_total += home_points
+        away_total += away_points
         if home_points != away_points:
-            return home_points, away_points, round_number
+            return home_total, away_total, round_number
     # Extremely unlikely pathological tie after conversion rounds.
-    return (2, 0, 12) if rng.random() < 0.5 else (0, 2, 12)
+    return (home_total + 2, away_total, 12) if rng.random() < 0.5 else (home_total, away_total + 2, 12)
 
 
 def _simulate_first_half(home_ppd: float, away_ppd: float,
