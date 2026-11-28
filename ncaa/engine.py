@@ -119,9 +119,8 @@ def _points_per_drive(offense: TeamProfile, defense: TeamProfile) -> float:
     success = (offense.success_rate - 0.42) * 1.7
     explosive = (offense.explosive_play_rate - 0.12) * 2.0
     strength = (offense.strength_rating - defense.strength_rating) / 30.0
-    turnover_edge = (defense.takeaways_per_game - offense.turnovers_per_game) * 0.11
     return _clamp(base + (efficiency - 1.0) * 1.15 + pass_edge * 0.45 + rush_edge * 0.35 + success + explosive
-                  + strength + turnover_edge, 0.65, 5.2)
+                  + strength, 0.65, 5.2)
 
 
 def _drive_turnover_probability(offense: TeamProfile, defense: TeamProfile) -> float:
@@ -139,8 +138,13 @@ def _drive_points(ppd: float, turnover_probability: float,
     td_prob = _clamp(ppd * 0.10, 0.06, 0.48)
     fg_prob = _clamp((ppd - 7.0 * td_prob) / 3.0, 0.04, 0.42)
     to_prob = _clamp(turnover_probability, 0.035, 0.24)
-    # Preserve a valid mutually exclusive probability distribution at the
-    # high-scoring edge of the model's supported range.
+    # Turnovers replace productive possessions. Scale scoring frequency around
+    # a neutral 12% per-drive turnover baseline; this coefficient is a model
+    # assumption to be evaluated and recalibrated against the forecast ledger.
+    scoring_scale = _clamp(1.0 - (to_prob - 0.12) * 1.5, 0.75, 1.12)
+    td_prob *= scoring_scale
+    fg_prob *= scoring_scale
+    # Preserve a valid mutually exclusive probability distribution.
     scoring_total = td_prob + fg_prob
     scoring_cap = 1.0 - to_prob
     if scoring_total > scoring_cap:
