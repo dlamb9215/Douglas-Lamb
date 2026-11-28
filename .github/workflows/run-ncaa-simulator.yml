@@ -28,14 +28,14 @@ on:
         type: choice
         options: [regular, postseason, both]
       home:
-        description: Home college team (UCLA)
+        description: Home college team (BYU)
         required: true
-        default: UCLA
+        default: BYU
         type: string
       away:
-        description: Away college team (USC)
+        description: Away college team (Cincinnati)
         required: true
-        default: USC
+        default: Cincinnati
         type: string
       trials:
         description: Monte Carlo trials
