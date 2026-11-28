@@ -28,14 +28,14 @@ on:
         type: choice
         options: [regular, postseason, both]
       home:
-        description: Home college team (Georgia)
+        description: Home college team (Wake Forest)
         required: true
-        default: Georgia
+        default: Wake Forest
         type: string
       away:
-        description: Away college team (Georgia Tech)
+        description: Away college team (Duke)
         required: true
-        default: Georgia Tech
+        default: Duke
         type: string
       trials:
         description: Monte Carlo trials
