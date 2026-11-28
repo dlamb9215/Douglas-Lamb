@@ -14,17 +14,17 @@ on:
   workflow_dispatch:
     inputs:
       home:
-        description: Home team (LAK for Anaheim at Los Angeles)
+        description: Home team (CHI for Minnesota at Chicago)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: LAK
+        default: CHI
       away:
-        description: Away team (ANA for Anaheim at Los Angeles)
+        description: Away team (MIN for Minnesota at Chicago)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, NJD, MTL, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: ANA
+        default: MIN
       trials:
         description: Monte Carlo trials
         required: true
@@ -34,12 +34,12 @@ on:
       game_date:
         description: Game date in YYYY-MM-DD
         required: true
-        default: "2026-11-28"
+        default: "2026-11-29"
         type: string
       game_config_json:
         description: Optional JSON for total, seed, confirmed goalie IDs, scratched player IDs, and sportsbook prices with source/timestamp
         required: false
-        default: '{"seed":20261128}'
+        default: '{"seed":20261129}'
         type: string
 
 permissions:
