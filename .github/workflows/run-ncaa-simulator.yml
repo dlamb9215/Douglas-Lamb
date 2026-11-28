@@ -28,14 +28,14 @@ on:
         type: choice
         options: [regular, postseason, both]
       home:
-        description: Home college team (Temple for Thursday FBS game)
+        description: Home college team (Kentucky)
         required: true
-        default: Temple
+        default: Kentucky
         type: string
       away:
-        description: Away college team (Rice for Thursday FBS game)
+        description: Away college team (Louisville)
         required: true
-        default: Rice
+        default: Louisville
         type: string
       trials:
         description: Monte Carlo trials
@@ -45,7 +45,7 @@ on:
       game_config_json:
         description: Optional JSON for kickoff, lines/odds, neutral site, sourced pregame checks and player inputs
         required: false
-        default: '{"neutral_site":false,"require_verified_pregame":false,"kickoff":"2026-11-19T18:30:00-06:00"}'
+        default: '{"neutral_site":false,"require_verified_pregame":false,"kickoff":"2026-11-28T11:00:00-06:00"}'
         type: string
 jobs:
   simulate:
