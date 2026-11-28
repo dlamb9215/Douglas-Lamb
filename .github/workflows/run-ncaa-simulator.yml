@@ -73,14 +73,39 @@ jobs:
                   if not isinstance(payload, expected): raise SystemExit(f"{key} has the wrong JSON type")
                   with open(filename, "w", encoding="utf-8") as handle: json.dump(payload, handle, indent=2)
           PY
-      - name: Refresh current-season NCAA team statistics
+      - name: Refresh current-season NCAA team statistics only when cache is stale
+        timeout-minutes: 2
         continue-on-error: true
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
           SEASON_YEAR: ${{ inputs.season_year }}
           SEASON_TYPE: ${{ inputs.season_type }}
           CLASSIFICATION: ${{ inputs.classification }}
-        run: python -m ncaa.data.refresh --year "$SEASON_YEAR" --season-type "$SEASON_TYPE" --classification "$CLASSIFICATION"
+        run: |
+          python - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          classification = os.environ["CLASSIFICATION"].lower()
+          suffix = "" if classification == "fbs" else "_fcs"
+          path = Path(f"ncaa/data/team_rankings{suffix}.json")
+          try:
+              meta = json.loads(path.read_text(encoding="utf-8")).get("metadata", {})
+              stamp = datetime.fromisoformat((meta.get("retrieved_at") or "").replace("Z", "+00:00"))
+              if stamp.tzinfo is None: stamp = stamp.replace(tzinfo=timezone.utc)
+              age = (datetime.now(timezone.utc) - stamp.astimezone(timezone.utc)).total_seconds() / 86400
+              fresh = (str(meta.get("year")) == os.environ["SEASON_YEAR"]
+                       and meta.get("season_type") == os.environ["SEASON_TYPE"]
+                       and meta.get("classification") == classification and 0 <= age <= 10)
+          except (OSError, ValueError, TypeError):
+              fresh = False
+          if fresh:
+              print(f"Using verified {classification.upper()} team cache ({age:.1f} days old); skipping slow provider refresh.")
+          else:
+              print("Team cache missing/stale; attempting bounded provider refresh.")
+              os.execvp("python", ["python", "-m", "ncaa.data.refresh", "--year", os.environ["SEASON_YEAR"],
+                                   "--season-type", os.environ["SEASON_TYPE"], "--classification", classification])
+          PY
       - name: Validate refreshed data or recent cached team statistics
         env:
           SEASON_YEAR: ${{ inputs.season_year }}
@@ -145,7 +170,7 @@ jobs:
           print("The simulator may proceed using refreshed data or this verified recent cache.")
           PY
       - name: Fetch venue weather context for kickoff (optional)
-        timeout-minutes: 3
+        timeout-minutes: 2
         continue-on-error: true
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
@@ -159,15 +184,38 @@ jobs:
           args=(--year "$SEASON_YEAR" --season-type "$SEASON_TYPE" --classification "$CLASSIFICATION" --home "$HOME_TEAM" --away "$AWAY_TEAM" --output weather.json)
           if [[ -n "$GAME_KICKOFF" ]]; then args+=(--kickoff "$GAME_KICKOFF"); fi
           python -m ncaa.weather "${args[@]}"
-      - name: Refresh player season statistics and usage (optional provider entitlement)
-        timeout-minutes: 4
+      - name: Refresh player season statistics only when cache is stale
+        timeout-minutes: 2
         continue-on-error: true
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
           SEASON_YEAR: ${{ inputs.season_year }}
           SEASON_TYPE: ${{ inputs.season_type }}
           CLASSIFICATION: ${{ inputs.classification }}
-        run: python -m ncaa.data.player_refresh --year "$SEASON_YEAR" --season-type "$SEASON_TYPE" --classification "$CLASSIFICATION"
+        run: |
+          python - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          path = Path("ncaa/data/player_data_status.json")
+          try:
+              meta = json.loads(path.read_text(encoding="utf-8"))
+              stamp = datetime.fromisoformat((meta.get("retrieved_at") or "").replace("Z", "+00:00"))
+              if stamp.tzinfo is None: stamp = stamp.replace(tzinfo=timezone.utc)
+              age = (datetime.now(timezone.utc) - stamp.astimezone(timezone.utc)).total_seconds() / 86400
+              fresh = (str(meta.get("year")) == os.environ["SEASON_YEAR"]
+                       and meta.get("season_type") == os.environ["SEASON_TYPE"]
+                       and meta.get("classification") == os.environ["CLASSIFICATION"].lower()
+                       and meta.get("stats_available") and 0 <= age <= 10)
+          except (OSError, ValueError, TypeError):
+              fresh = False
+          if fresh:
+              print(f"Using verified player cache ({age:.1f} days old); skipping optional provider refresh.")
+          else:
+              print("Player cache missing/stale; attempting bounded optional refresh.")
+              os.execvp("python", ["python", "-m", "ncaa.data.player_refresh", "--year", os.environ["SEASON_YEAR"],
+                                   "--season-type", os.environ["SEASON_TYPE"], "--classification", os.environ["CLASSIFICATION"]])
+          PY
       # Historical forecast reconciliation is deliberately excluded from the
       # game path. It is maintenance work and must never delay live simulations.
       - name: Run NCAA simulator tests
