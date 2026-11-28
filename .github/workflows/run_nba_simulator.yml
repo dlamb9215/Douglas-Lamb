@@ -31,7 +31,7 @@ on:
       away:
         description: Away team abbreviation
         required: true
-        default: "BKN"
+        default: "IND"
         type: string
       spread:
         description: Home spread, e.g. -3.5; blank to skip
