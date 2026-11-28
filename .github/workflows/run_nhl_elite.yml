@@ -14,17 +14,17 @@ on:
   workflow_dispatch:
     inputs:
       home:
-        description: Home team (NYR for Flames at Rangers)
+        description: Home team (PIT for Maple Leafs at Penguins)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: NYR
+        default: PIT
       away:
-        description: Away team (CGY for Flames at Rangers)
+        description: Away team (TOR for Maple Leafs at Penguins)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, NJD, MTL, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: CGY
+        default: TOR
       trials:
         description: Monte Carlo trials
         required: true
@@ -39,7 +39,7 @@ on:
       game_config_json:
         description: Optional JSON for total, seed, confirmed goalie IDs, scratched player IDs, and sportsbook prices with source/timestamp
         required: false
-        default: '{"seed":20261129}'
+        default: '{"seed":20261130}'
         type: string
 
 permissions:
