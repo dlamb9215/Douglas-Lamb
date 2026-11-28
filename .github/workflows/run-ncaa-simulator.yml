@@ -74,12 +74,67 @@ jobs:
                   with open(filename, "w", encoding="utf-8") as handle: json.dump(payload, handle, indent=2)
           PY
       - name: Refresh current-season NCAA team statistics
+        continue-on-error: true
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
           SEASON_YEAR: ${{ inputs.season_year }}
           SEASON_TYPE: ${{ inputs.season_type }}
           CLASSIFICATION: ${{ inputs.classification }}
         run: python -m ncaa.data.refresh --year "$SEASON_YEAR" --season-type "$SEASON_TYPE" --classification "$CLASSIFICATION"
+      - name: Validate refreshed data or recent cached team statistics
+        env:
+          SEASON_YEAR: ${{ inputs.season_year }}
+          SEASON_TYPE: ${{ inputs.season_type }}
+          CLASSIFICATION: ${{ inputs.classification }}
+          HOME_TEAM: ${{ inputs.home }}
+          AWAY_TEAM: ${{ inputs.away }}
+        run: |
+          python - <<'PY'
+          import csv, json, os, sys
+          from datetime import date, datetime, timezone
+          from pathlib import Path
+
+          classification = os.environ["CLASSIFICATION"].lower()
+          suffix = "" if classification == "fbs" else "_fcs"
+          profiles_path = Path(f"ncaa/data/team_profiles{suffix}.csv")
+          rankings_path = Path(f"ncaa/data/team_rankings{suffix}.json")
+          if not profiles_path.exists() or not rankings_path.exists():
+              raise SystemExit("No usable team-statistics cache exists; refusing to run on missing data.")
+          meta = json.loads(rankings_path.read_text(encoding="utf-8")).get("metadata", {})
+          if str(meta.get("year")) != os.environ["SEASON_YEAR"] or meta.get("classification") != classification or meta.get("season_type") != os.environ["SEASON_TYPE"]:
+              raise SystemExit("Cached team statistics do not match the requested season, segment, and division.")
+          as_of = meta.get("retrieved_at") or meta.get("as_of")
+          if not as_of:
+              raise SystemExit("Cached team statistics have no verifiable refresh date.")
+          try:
+              stamp = datetime.fromisoformat(as_of.replace("Z", "+00:00"))
+              if stamp.tzinfo is None:
+                  stamp = stamp.replace(tzinfo=timezone.utc)
+              age_days = (datetime.now(timezone.utc) - stamp.astimezone(timezone.utc)).total_seconds() / 86400
+          except ValueError:
+              stamp = date.fromisoformat(as_of)
+              age_days = (date.today() - stamp).days
+          if age_days < -1 or age_days > 10:
+              raise SystemExit(f"Cached team statistics are {age_days:.1f} days old; maximum permitted age is 10 days.")
+          with profiles_path.open(newline="", encoding="utf-8") as handle:
+              rows = list(csv.DictReader(handle))
+          if len(rows) < 50:
+              raise SystemExit(f"Only {len(rows)} team profiles are available; at least 50 are required.")
+          aliases = meta.get("team_aliases", {})
+          def resolve(name):
+              key = "".join(ch.lower() for ch in name if ch.isalnum())
+              for alias, canonical in aliases.items():
+                  if "".join(ch.lower() for ch in alias if ch.isalnum()) == key:
+                      return canonical
+              return name
+          available = {row.get("team", "").casefold() for row in rows}
+          for requested in (os.environ["HOME_TEAM"], os.environ["AWAY_TEAM"]):
+              canonical = resolve(requested)
+              if canonical.casefold() not in available:
+                  raise SystemExit(f"Cached statistics do not contain matchup team: {requested} ({canonical}).")
+          print(f"Validated {len(rows)} {classification.upper()} team profiles from {meta.get('as_of') or as_of}; age {age_days:.1f} days.")
+          print("The simulator may proceed using refreshed data or this verified recent cache.")
+          PY
       - name: Fetch venue weather context for kickoff (optional)
         continue-on-error: true
         env:
