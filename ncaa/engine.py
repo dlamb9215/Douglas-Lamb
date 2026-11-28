@@ -5,7 +5,7 @@ Missing profiles use conservative league-average priors and are flagged in outpu
 """
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields as dataclass_fields
 import math
 import random
 from typing import Optional
@@ -64,15 +64,28 @@ class TeamProfile:
             value = getattr(self, key)
             if not math.isfinite(value) or value <= 0:
                 raise ValueError(f"{key} must be a positive finite number")
-        for key in ("turnovers_per_game", "takeaways_per_game",
-                    "explosive_play_rate", "success_rate"):
+        nonnegative = {
+            field.name for field in dataclass_fields(self)
+            if field.name not in {"name", "source", "as_of", "points_per_drive",
+                                  "points_for", "points_against", "yards_per_play",
+                                  "yards_per_play_allowed", "plays_per_game"}
+        }
+        for key in nonnegative:
             value = getattr(self, key)
             if not math.isfinite(value) or value < 0:
                 raise ValueError(f"{key} must be finite and non-negative")
-        if self.explosive_play_rate > 1 or self.success_rate > 1:
-            raise ValueError("Rates must be between 0 and 1")
+        for key in ("completion_pct", "explosive_play_rate", "success_rate"):
+            value = getattr(self, key)
+            if value > 1:
+                raise ValueError(f"{key} must be between 0 and 1")
+        if self.points_per_drive is not None and (
+            not math.isfinite(self.points_per_drive) or self.points_per_drive <= 0
+        ):
+            raise ValueError("points_per_drive must be positive and finite when supplied")
         if self.games_sampled < 0:
             raise ValueError("games_sampled cannot be negative")
+        if self.completions_per_game > self.pass_attempts_per_game and self.pass_attempts_per_game > 0:
+            raise ValueError("completions_per_game cannot exceed pass_attempts_per_game")
 
 
 @dataclass(frozen=True)
@@ -111,22 +124,73 @@ def _points_per_drive(offense: TeamProfile, defense: TeamProfile) -> float:
                   + strength + turnover_edge, 0.65, 5.2)
 
 
-def _drive_points(ppd: float, turnover_rate: float, rng: random.Random) -> int:
-    # Calibrated drive outcome buckets: TD, FG, turnover, punt/other.
+def _drive_turnover_probability(offense: TeamProfile, defense: TeamProfile) -> float:
+    """Blend observed giveaways and opponent takeaways into a per-drive risk."""
+    drives = max(_expected_drives(offense), 1.0)
+    events_per_game = 0.5 * (
+        offense.turnovers_per_game + defense.takeaways_per_game
+    )
+    return _clamp(events_per_game / drives, 0.035, 0.24)
+
+
+def _drive_points(ppd: float, turnover_probability: float,
+                  rng: random.Random) -> int:
+    """Sample a drive result from TD, field-goal, turnover and empty-drive outcomes."""
     td_prob = _clamp(ppd * 0.10, 0.06, 0.48)
     fg_prob = _clamp((ppd - 7.0 * td_prob) / 3.0, 0.04, 0.42)
-    to_prob = _clamp(0.12 + (turnover_rate - 1.4) * 0.025, 0.06, 0.22)
-    punt_prob = max(0.0, 1.0 - td_prob - fg_prob - to_prob)
+    to_prob = _clamp(turnover_probability, 0.035, 0.24)
+    # Preserve a valid mutually exclusive probability distribution at the
+    # high-scoring edge of the model's supported range.
+    scoring_total = td_prob + fg_prob
+    scoring_cap = 1.0 - to_prob
+    if scoring_total > scoring_cap:
+        scale = scoring_cap / scoring_total
+        td_prob *= scale
+        fg_prob *= scale
     draw = rng.random()
     if draw < td_prob:
         return 7
     if draw < td_prob + fg_prob:
         return 3
-    if draw < td_prob + fg_prob + to_prob:
-        return 0
-    # A small fraction of otherwise empty drives end in a safety/defensive score.
     return 0
 
+
+def _simulate_overtime(home_ppd: float, away_ppd: float,
+                       home_to_probability: float,
+                       away_to_probability: float,
+                       rng: random.Random) -> tuple[int, int, int]:
+    """Resolve ties with alternating college-style possessions, then conversion rounds.
+
+    This is a transparent overtime approximation rather than a rules-exact
+    play-by-play implementation. After two possession rounds, teams alternate
+    modeled two-point attempts to avoid the old arbitrary seven-point tiebreak.
+    """
+    for round_number in range(1, 13):
+        if round_number <= 2:
+            home_td = _clamp(0.48 + (home_ppd - 2.5) * 0.055, 0.28, 0.68)
+            away_td = _clamp(0.48 + (away_ppd - 2.5) * 0.055, 0.28, 0.68)
+            home_fg = _clamp(0.22 + (home_ppd - 2.5) * 0.015, 0.10, 0.32)
+            away_fg = _clamp(0.22 + (away_ppd - 2.5) * 0.015, 0.10, 0.32)
+            def ot_score(td, fg, to):
+                draw = rng.random()
+                if draw < td:
+                    return 7
+                if draw < td + fg:
+                    return 3
+                if draw < td + fg + to * 0.65:
+                    return 0
+                return 0
+            home_points = ot_score(home_td, home_fg, home_to_probability)
+            away_points = ot_score(away_td, away_fg, away_to_probability)
+        else:
+            home_two = _clamp(0.43 + (home_ppd - 2.5) * 0.045, 0.28, 0.62)
+            away_two = _clamp(0.43 + (away_ppd - 2.5) * 0.045, 0.28, 0.62)
+            home_points = 2 if rng.random() < home_two else 0
+            away_points = 2 if rng.random() < away_two else 0
+        if home_points != away_points:
+            return home_points, away_points, round_number
+    # Extremely unlikely pathological tie after conversion rounds.
+    return (2, 0, 12) if rng.random() < 0.5 else (0, 2, 12)
 
 
 def _simulate_first_half(home_ppd: float, away_ppd: float,
@@ -170,10 +234,18 @@ def simulate_game(
     lines = lines or MarketLines()
     rng = random.Random(seed)
 
-    home_ppd = _points_per_drive(home, away)
-    away_ppd = _points_per_drive(away, home)
+    raw_home_ppd = _points_per_drive(home, away)
+    raw_away_ppd = _points_per_drive(away, home)
+    home_sample_weight = home.games_sampled / (home.games_sampled + 4.0) if home.games_sampled else 0.0
+    away_sample_weight = away.games_sampled / (away.games_sampled + 4.0) if away.games_sampled else 0.0
+    # Empirical-Bayes-style shrinkage toward a conservative FBS/FCS scoring prior.
+    # The prior is deliberately disclosed; weights rise with completed-game sample.
+    home_ppd = 2.50 + (raw_home_ppd - 2.50) * home_sample_weight
+    away_ppd = 2.50 + (raw_away_ppd - 2.50) * away_sample_weight
     home_drives = _expected_drives(home)
     away_drives = _expected_drives(away)
+    home_to_probability = _drive_turnover_probability(home, away)
+    away_to_probability = _drive_turnover_probability(away, home)
     home_edge = 0.0 if neutral_site else 2.2
     home_ppd = _clamp(home_ppd + home_edge / home_drives, 0.65, 5.2)
 
@@ -188,14 +260,17 @@ def simulate_game(
     for _ in range(trials):
         # Small shared game-environment shock creates correlated pace/scoring variance.
         game_shock = rng.gauss(0.0, 0.12)
-        h_count = max(6, round(rng.gauss(home_drives, 0.85)))
-        a_count = max(6, round(rng.gauss(away_drives, 0.85)))
-        h_outcomes = [_drive_points(_clamp(home_ppd + game_shock, 0.65, 5.2),
-                                    home.turnovers_per_game, rng) for _ in range(h_count)]
-        a_outcomes = [_drive_points(_clamp(away_ppd + game_shock, 0.65, 5.2),
-                                    away.turnovers_per_game, rng) for _ in range(a_count)]
+        home_uncertainty = 0.10 + 0.42 / math.sqrt(max(home.games_sampled, 1))
+        away_uncertainty = 0.10 + 0.42 / math.sqrt(max(away.games_sampled, 1))
+        home_game_ppd = _clamp(home_ppd + game_shock + rng.gauss(0.0, home_uncertainty), 0.65, 5.2)
+        away_game_ppd = _clamp(away_ppd + game_shock + rng.gauss(0.0, away_uncertainty), 0.65, 5.2)
+        pace_shock = rng.gauss(0.0, 0.45)
+        h_count = max(6, round(rng.gauss(home_drives + pace_shock, 0.85)))
+        a_count = max(6, round(rng.gauss(away_drives + pace_shock, 0.85)))
+        h_outcomes = [_drive_points(home_game_ppd, home_to_probability, rng) for _ in range(h_count)]
+        a_outcomes = [_drive_points(away_game_ppd, away_to_probability, rng) for _ in range(a_count)]
         h1, a1, h1_drives, a1_drives = _simulate_first_half(
-            home_ppd, away_ppd, home.turnovers_per_game, away.turnovers_per_game, rng
+            home_ppd, away_ppd, home_to_probability, away_to_probability, rng
         )
         first_half_home_drives += h1_drives
         first_half_away_drives += a1_drives
@@ -204,12 +279,12 @@ def simulate_game(
         away_first_scores.append(a1)
         first_home_sum += h1
         first_away_sum += a1
-        # Overtime is represented as a modest one-possession resolution, not a full OT ruleset.
         if hs == as_:
-            if rng.random() < 0.5:
-                hs += 7
-            else:
-                as_ += 7
+            ot_home, ot_away, _ot_rounds = _simulate_overtime(
+                home_ppd, away_ppd, home_to_probability, away_to_probability, rng
+            )
+            hs += ot_home
+            as_ += ot_away
         home_scores.append(hs)
         away_scores.append(as_)
         margin = hs - as_
@@ -258,6 +333,19 @@ def simulate_game(
         "home_win_probability": round(home_wins / trials, 4),
         "away_win_probability": round((trials - home_wins) / trials, 4),
         "expected_points_per_drive": {home.name: round(home_ppd, 3), away.name: round(away_ppd, 3)},
+        "model_methodology": {
+            "engine": "drive-level Monte Carlo with team-specific game efficiency and pace shocks",
+            "sample_shrinkage": "team scoring efficiency shrunk toward 2.50 points/drive with weight games/(games+4)",
+            "overtime": "college-style alternating possession approximation; conversion rounds after two rounds",
+            "overtime_note": "not a rules-exact play-by-play overtime model",
+            "calibration_status": "not empirically calibrated; evaluate against timestamped pregame ledger",
+        },
+        "simulation_precision": {
+            "home_win_standard_error": round(math.sqrt((home_wins / trials) * (1 - home_wins / trials) / trials), 6),
+            "home_win_95pct_margin": round(1.96 * math.sqrt((home_wins / trials) * (1 - home_wins / trials) / trials), 6),
+            "home_efficiency_sample_weight": round(home_sample_weight, 4),
+            "away_efficiency_sample_weight": round(away_sample_weight, 4),
+        },
         "team_comparison": {home.name: _team_metrics(home), away.name: _team_metrics(away)},
         "expected_drives": {home.name: round(home_drives, 2), away.name: round(away_drives, 2)},
         "market": {},
