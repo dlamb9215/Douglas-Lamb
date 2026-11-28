@@ -68,7 +68,7 @@ class TeamProfile:
             field.name for field in dataclass_fields(self)
             if field.name not in {"name", "source", "as_of", "points_per_drive",
                                   "points_for", "points_against", "yards_per_play",
-                                  "yards_per_play_allowed", "plays_per_game"}
+                                  "yards_per_play_allowed", "plays_per_game", "strength_rating"}
         }
         for key in nonnegative:
             value = getattr(self, key)
