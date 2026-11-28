@@ -388,6 +388,17 @@ def _warnings(home: TeamProfile, away: TeamProfile) -> list[str]:
             warnings.append(f"{team.name}: limited sample ({team.games_sampled} games)")
         if team.source == "league-average prior":
             warnings.append(f"{team.name}: replace prior with current-season data before betting use")
+        if team.source == "CollegeFootballData API" and team.as_of:
+            try:
+                from datetime import date
+                age_days = (date.today() - date.fromisoformat(team.as_of)).days
+                if age_days > 2:
+                    warnings.append(
+                        f"{team.name}: team statistics are {age_days} days old; "
+                        "refresh was rate-limited and projections carry elevated data risk"
+                    )
+            except ValueError:
+                warnings.append(f"{team.name}: team-statistics date could not be validated")
     return warnings
 
 
