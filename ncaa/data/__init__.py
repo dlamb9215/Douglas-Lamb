@@ -1,6 +1,7 @@
 """CSV profile loading and validation for FBS/FCS team inputs."""
 from __future__ import annotations
 import csv
+import os
 from pathlib import Path
 from ..engine import TeamProfile
 
@@ -67,9 +68,16 @@ def get_profile(name: str, profiles: dict[str, TeamProfile]) -> TeamProfile:
                     f"{name}: invalid NCAA profile date; refresh team statistics."
                 ) from exc
             age_days = (date.today() - data_date).days
-            if age_days < 0 or age_days > 2:
+            try:
+                max_age_days = int(os.environ.get("NCAA_MAX_DATA_AGE_DAYS", "2"))
+            except ValueError as exc:
+                raise ValueError("NCAA_MAX_DATA_AGE_DAYS must be a non-negative integer") from exc
+            if max_age_days < 0:
+                raise ValueError("NCAA_MAX_DATA_AGE_DAYS must be a non-negative integer")
+            if age_days < 0 or age_days > max_age_days:
                 raise ValueError(
-                    f"{name}: NCAA profile is {age_days} days old; refresh team statistics before simulating."
+                    f"{name}: NCAA profile is {age_days} days old; maximum permitted age is "
+                    f"{max_age_days} days. Refresh team statistics before simulating."
                 )
             if not 40.0 <= found.plays_per_game <= 100.0:
                 raise ValueError(
