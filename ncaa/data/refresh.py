@@ -10,6 +10,8 @@ import csv
 import json
 import os
 from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
+import time
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
@@ -35,19 +37,51 @@ def api_get(path: str, params: dict, api_key: str) -> list | dict:
         "Accept": "application/json",
         "User-Agent": "DougsEliteNCAASimulator/1.0",
     })
-    try:
-        with urlopen(request, timeout=40) as response:
-            payload = json.loads(response.read().decode("utf-8"))
-    except HTTPError as exc:
-        if exc.code == 401:
-            raise RuntimeError("CFBD returned 401: check the CFBD_API_KEY GitHub secret.") from exc
-        if exc.code == 403:
-            raise RuntimeError("CFBD returned 403: the API key may not include this endpoint/tier.") from exc
-        if exc.code == 429:
-            raise RuntimeError("CFBD rate limit reached. Retry after the provider's reset window.") from exc
-        raise RuntimeError(f"CFBD API error {exc.code} for {path}") from exc
-    except (URLError, TimeoutError) as exc:
-        raise RuntimeError(f"Could not reach CFBD endpoint {path}: {exc}") from exc
+    # CFBD applies rolling request limits. Honor Retry-After when supplied and
+    # use bounded exponential backoff when it is not. Retry transient gateway
+    # errors as well; never turn a failed response into an empty dataset.
+    max_attempts = 6
+    for attempt in range(max_attempts):
+        try:
+            with urlopen(request, timeout=40) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+            break
+        except HTTPError as exc:
+            if exc.code == 401:
+                raise RuntimeError("CFBD returned 401: check the CFBD_API_KEY GitHub secret.") from exc
+            if exc.code == 403:
+                raise RuntimeError("CFBD returned 403: the API key may not include this endpoint/tier.") from exc
+            retryable = exc.code == 429 or exc.code in {500, 502, 503, 504}
+            if not retryable or attempt == max_attempts - 1:
+                if exc.code == 429:
+                    raise RuntimeError(
+                        f"CFBD rate limit persisted after {max_attempts} attempts. "
+                        "Wait for the provider reset window, then rerun."
+                    ) from exc
+                raise RuntimeError(f"CFBD API error {exc.code} for {path}") from exc
+            retry_after = exc.headers.get("Retry-After")
+            delay = min(300, 30 * (2 ** attempt))
+            if retry_after:
+                try:
+                    delay = min(300, max(1, int(retry_after)))
+                except ValueError:
+                    try:
+                        reset_at = parsedate_to_datetime(retry_after)
+                        delay = min(300, max(1, int((reset_at - datetime.now(timezone.utc)).total_seconds())))
+                    except (TypeError, ValueError, OverflowError):
+                        pass
+            print(
+                f"CFBD returned HTTP {exc.code} for {path}; "
+                f"retry {attempt + 1}/{max_attempts - 1} in {delay}s.",
+                flush=True,
+            )
+            time.sleep(delay)
+        except (URLError, TimeoutError) as exc:
+            if attempt == max_attempts - 1:
+                raise RuntimeError(f"Could not reach CFBD endpoint {path} after {max_attempts} attempts: {exc}") from exc
+            delay = min(120, 10 * (2 ** attempt))
+            print(f"CFBD connection issue for {path}; retry in {delay}s: {exc}", flush=True)
+            time.sleep(delay)
     if not isinstance(payload, (list, dict)):
         raise RuntimeError(f"Unexpected response type from {path}")
     return payload
