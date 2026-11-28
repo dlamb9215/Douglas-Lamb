@@ -14,17 +14,17 @@ on:
   workflow_dispatch:
     inputs:
       home:
-        description: Home team (EDM for Golden Knights at Oilers)
+        description: Home team (VGK for Canadiens at Golden Knights)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: EDM
+        default: VGK
       away:
-        description: Away team (VGK for Golden Knights at Oilers)
+        description: Away team (MTL for Canadiens at Golden Knights)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, NJD, MTL, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: VGK
+        default: MTL
       trials:
         description: Monte Carlo trials
         required: true
@@ -34,12 +34,12 @@ on:
       game_date:
         description: Game date in YYYY-MM-DD
         required: true
-        default: "2026-11-24"
+        default: "2026-11-28"
         type: string
       game_config_json:
         description: Optional JSON for total, seed, confirmed goalie IDs, scratched player IDs, and sportsbook prices with source/timestamp
         required: false
-        default: '{"seed":20261119}'
+        default: '{"seed":20261128}'
         type: string
 
 permissions:
