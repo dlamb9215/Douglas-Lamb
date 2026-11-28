@@ -245,7 +245,7 @@ def simulate_game(
     raw_away_ppd = _points_per_drive(away, home)
     home_sample_weight = home.games_sampled / (home.games_sampled + 4.0) if home.games_sampled else 0.0
     away_sample_weight = away.games_sampled / (away.games_sampled + 4.0) if away.games_sampled else 0.0
-    # Empirical-Bayes-style shrinkage toward a conservative FBS/FCS scoring prior.
+    # Transparent sample-size shrinkage toward a conservative scoring prior.
     # The prior is deliberately disclosed; weights rise with completed-game sample.
     home_ppd = 2.50 + (raw_home_ppd - 2.50) * home_sample_weight
     away_ppd = 2.50 + (raw_away_ppd - 2.50) * away_sample_weight
@@ -342,7 +342,7 @@ def simulate_game(
         "expected_points_per_drive": {home.name: round(home_ppd, 3), away.name: round(away_ppd, 3)},
         "model_methodology": {
             "engine": "drive-level Monte Carlo with team-specific game efficiency and pace shocks",
-            "sample_shrinkage": "team scoring efficiency shrunk toward 2.50 points/drive with weight games/(games+4)",
+            "sample_shrinkage": "team scoring efficiency shrunk toward a disclosed 2.50 points/drive prior with weight games/(games+4)",
             "overtime": "college-style alternating possession approximation; conversion rounds after two rounds",
             "overtime_note": "not a rules-exact play-by-play overtime model",
             "calibration_status": "not empirically calibrated; evaluate against timestamped pregame ledger",
@@ -370,11 +370,19 @@ def simulate_game(
         result["market"]["home_cover_probability"] = round(home_covers / trials, 4)
         result["market"]["away_cover_probability"] = round((trials - home_covers - home_cover_pushes) / trials, 4)
         result["market"]["spread_push_probability"] = round(home_cover_pushes / trials, 4)
+        cover_p = home_covers / trials
+        result["simulation_precision"]["home_cover_standard_error"] = round(
+            math.sqrt(cover_p * (1 - cover_p) / trials), 6
+        )
     if lines.total is not None:
         result["market"]["total_line"] = lines.total
         result["market"]["over_probability"] = round(overs / trials, 4)
         result["market"]["under_probability"] = round((trials - overs - total_pushes) / trials, 4)
         result["market"]["total_push_probability"] = round(total_pushes / trials, 4)
+        over_p = overs / trials
+        result["simulation_precision"]["over_standard_error"] = round(
+            math.sqrt(over_p * (1 - over_p) / trials), 6
+        )
     return result
 
 
