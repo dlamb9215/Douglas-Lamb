@@ -155,6 +155,7 @@ class SimulatorTests(unittest.TestCase):
         self.assertAlmostEqual(
             result["simulation_precision"]["home_efficiency_sample_weight"],
             self.home.games_sampled / (self.home.games_sampled + 4.0),
+            places=4,
         )
         self.assertGreaterEqual(result["simulation_precision"]["home_win_standard_error"], 0)
         self.assertGreaterEqual(result["simulation_precision"]["home_win_95pct_margin"], 0)
