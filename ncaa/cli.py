@@ -16,7 +16,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Doug's Elite NCAA Football Simulator")
     parser.add_argument("--home", required=True, help="Home school name")
     parser.add_argument("--away", required=True, help="Away school name")
-    parser.add_argument("--trials", type=int, default=100_000)
+    parser.add_argument("--trials", type=int, default=500_000)
     parser.add_argument("--season", default="2026")
     parser.add_argument("--classification", choices=("fbs", "fcs"), default="fbs")
     parser.add_argument("--data", default=None)
