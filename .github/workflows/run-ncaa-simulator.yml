@@ -173,6 +173,7 @@ jobs:
           TRIALS: ${{ inputs.trials }}
           SEASON_YEAR: ${{ inputs.season_year }}
           CLASSIFICATION: ${{ inputs.classification }}
+          NCAA_MAX_DATA_AGE_DAYS: "10"
         shell: bash
         run: |
           CONFIG=ncaa-game-config.json
