@@ -182,6 +182,13 @@ def main() -> None:
     print(f"Home win: {result['home_win_probability']:.1%} | "
           f"Away win: {result['away_win_probability']:.1%}")
     print(f"Projected total: {result['projected_total']:.1f}")
+    precision = result.get("simulation_precision", {})
+    print("SIMULATION QUALITY:")
+    print(f"  Home-win Monte Carlo SE: {precision.get('home_win_standard_error', 0):.4%} "
+          f"(approx. 95% +/- {precision.get('home_win_95pct_margin', 0):.4%})")
+    print(f"  Efficiency sample weights: home {precision.get('home_efficiency_sample_weight', 0):.1%}, "
+          f"away {precision.get('away_efficiency_sample_weight', 0):.1%}")
+    print(f"  Calibration: {result.get('model_methodology', {}).get('calibration_status', 'not reported')}")
     h1 = result["projected_first_half_score"]
     print(f"Projected first half: {args.home} {h1[args.home]:.1f} - {args.away} {h1[args.away]:.1f}")
     print(f"First-half home lead: {result['first_half_win_probability_home']:.1%} | "
