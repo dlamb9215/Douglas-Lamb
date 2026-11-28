@@ -127,11 +127,20 @@ jobs:
                   if "".join(ch.lower() for ch in alias if ch.isalnum()) == key:
                       return canonical
               return name
-          available = {row.get("team", "").casefold() for row in rows}
+          by_team = {row.get("team", "").casefold(): row for row in rows}
           for requested in (os.environ["HOME_TEAM"], os.environ["AWAY_TEAM"]):
               canonical = resolve(requested)
-              if canonical.casefold() not in available:
+              row = by_team.get(canonical.casefold())
+              if row is None:
                   raise SystemExit(f"Cached statistics do not contain matchup team: {requested} ({canonical}).")
+              try:
+                  games = int(float(row.get("games_sampled") or 0))
+                  row_date = date.fromisoformat(row.get("as_of") or "")
+              except (TypeError, ValueError):
+                  raise SystemExit(f"Cached statistics for {canonical} have invalid sample/date metadata.")
+              row_age = (date.today() - row_date).days
+              if games < 1 or row_age < 0 or row_age > 10:
+                  raise SystemExit(f"Cached statistics for {canonical} fail sample/freshness checks: games={games}, age={row_age} days.")
           print(f"Validated {len(rows)} {classification.upper()} team profiles from {meta.get('as_of') or as_of}; age {age_days:.1f} days.")
           print("The simulator may proceed using refreshed data or this verified recent cache.")
           PY
