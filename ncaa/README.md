@@ -196,3 +196,19 @@ The CLI now blocks a matchup if either selected team is absent from the chosen F
 
 
 The team directory cache also creates unambiguous aliases from official abbreviations, alternate school names, and school-plus-mascot names. For example, a team may be entered by its school name or full mascot name; ambiguous mascot-only aliases are intentionally not created. The simulator resolves aliases to the canonical CFBD school name before checking profiles and pregame inputs.
+
+
+## Model hardening update (November 28, 2026)
+
+The current drive-level engine now includes:
+- Sample-size shrinkage of team scoring efficiency toward a disclosed 2.50 points/drive prior, weighted by games played: `games / (games + 4)`. This is a transparent stabilizer, not a fitted or proven calibration curve.
+- Team-specific game-level scoring-efficiency shocks plus a shared game-environment shock, with more uncertainty for smaller samples.
+- Per-drive turnover risk blended from the offense's giveaways and opponent defense's takeaways; turnover risk reduces scoring-drive frequency. The coefficient is an explicit assumption that must be tested in out-of-sample backtests.
+- A college-style overtime approximation with alternating possession outcomes and later two-point conversion rounds, replacing the previous arbitrary one-score tiebreak. This is not a rules-exact play-by-play overtime engine.
+- Monte Carlo standard error and approximate 95% simulation-noise interval for moneyline probabilities, plus standard errors for spread and total probabilities when lines are supplied.
+- Expanded validation for non-finite, negative, impossible-rate and internally inconsistent team-profile fields.
+- A configurable data-age gate. Local runs default to a strict 2-day limit; the GitHub matchup workflow allows up to 10 days only after its separate cache validation checks season, division, date, team coverage and national profile count. Any data older than 2 days is flagged in the forecast warnings.
+
+The GitHub workflow uses 500,000 baseline trials by default. It also runs the sensitivity suite, so the full workflow performs additional scenario trials beyond the baseline. Monte Carlo precision measures simulation noise only; it does not measure model accuracy, data error or uncertainty in the assumptions.
+
+**Important limitations remain:** this is still a drive-level model, not a play-by-play simulator. It does not yet fit its coefficients through rolling out-of-sample optimization, use opponent-adjusted play-by-play EPA/success-rate distributions, model exact clock/timeout/game-state decisions, verify current injuries and starting quarterbacks automatically, or apply weather/player availability adjustments to scoring. Player projections remain optional season-workload estimates and are not yet a fully correlated position-specific prop model. A positive model edge is not established until enough timestamped pregame forecasts are evaluated against closing prices and final outcomes. Do not treat any probability as calibrated or as a guaranteed betting edge.
