@@ -14,17 +14,17 @@ on:
   workflow_dispatch:
     inputs:
       home:
-        description: Home team (DAL for Utah at Dallas)
+        description: Home team (COL for San Jose at Colorado)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, MTL, NJD, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: DAL
+        default: COL
       away:
-        description: Away team (UTA for Utah at Dallas)
+        description: Away team (SJS for San Jose at Colorado)
         required: true
         type: choice
         options: [ANA, BOS, BUF, CAR, CBJ, CGY, CHI, COL, DAL, DET, EDM, FLA, LAK, MIN, NJD, MTL, NSH, NYI, NYR, OTT, PHI, PIT, SEA, SJS, STL, TBL, TOR, UTA, VAN, VGK, WPG, WSH]
-        default: UTA
+        default: SJS
       trials:
         description: Monte Carlo trials
         required: true
