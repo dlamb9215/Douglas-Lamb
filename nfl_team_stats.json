@@ -1,7 +1,7 @@
 [
   {
     "team": "ARI",
-    "data_updated_at": "2026-11-27T13:07:03.329482+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462093+00:00",
     "season": 2026,
     "games_played": 11,
     "points_for_per_game": 17.36,
@@ -62,7 +62,7 @@
   },
   {
     "team": "ATL",
-    "data_updated_at": "2026-11-27T13:07:03.329523+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462143+00:00",
     "season": 2026,
     "games_played": 10,
     "points_for_per_game": 20.1,
@@ -123,7 +123,7 @@
   },
   {
     "team": "BAL",
-    "data_updated_at": "2026-11-27T13:07:03.329541+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462160+00:00",
     "season": 2026,
     "games_played": 11,
     "points_for_per_game": 22.0,
@@ -184,7 +184,7 @@
   },
   {
     "team": "BUF",
-    "data_updated_at": "2026-11-27T13:07:03.329554+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462174+00:00",
     "season": 2026,
     "games_played": 11,
     "points_for_per_game": 29.64,
@@ -245,7 +245,7 @@
   },
   {
     "team": "CAR",
-    "data_updated_at": "2026-11-27T13:07:03.329567+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462187+00:00",
     "season": 2026,
     "games_played": 10,
     "points_for_per_game": 25.4,
@@ -306,7 +306,7 @@
   },
   {
     "team": "CHI",
-    "data_updated_at": "2026-11-27T13:07:03.329580+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462200+00:00",
     "season": 2026,
     "games_played": 11,
     "points_for_per_game": 27.36,
@@ -367,7 +367,7 @@
   },
   {
     "team": "CIN",
-    "data_updated_at": "2026-11-27T13:07:03.329592+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462212+00:00",
     "season": 2026,
     "games_played": 10,
     "points_for_per_game": 29.8,
@@ -428,7 +428,7 @@
   },
   {
     "team": "CLE",
-    "data_updated_at": "2026-11-27T13:07:03.329608+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462229+00:00",
     "season": 2026,
     "games_played": 10,
     "points_for_per_game": 18.8,
@@ -489,7 +489,7 @@
   },
   {
     "team": "DAL",
-    "data_updated_at": "2026-11-27T13:07:03.329621+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462241+00:00",
     "season": 2026,
     "games_played": 12,
     "points_for_per_game": 31.25,
@@ -550,68 +550,68 @@
   },
   {
     "team": "DEN",
-    "data_updated_at": "2026-11-27T13:07:03.329632+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462254+00:00",
     "season": 2026,
-    "games_played": 10,
-    "points_for_per_game": 23.6,
-    "points_allowed_per_game": 21.0,
+    "games_played": 11,
+    "points_for_per_game": 21.91,
+    "points_allowed_per_game": 21.55,
     "offense": {
       "passing": {
-        "yards_per_game": 195.5,
-        "attempts_per_game": 32.2,
-        "completions_per_game": 19.3,
-        "completion_pct": 59.94,
-        "yards_per_attempt": 6.071,
-        "touchdowns": 1.2,
-        "interceptions": 0.5,
-        "first_downs_per_game": 9.7
+        "yards_per_game": 193.09,
+        "attempts_per_game": 32.91,
+        "completions_per_game": 19.55,
+        "completion_pct": 59.39,
+        "yards_per_attempt": 5.867,
+        "touchdowns": 1.09,
+        "interceptions": 0.64,
+        "first_downs_per_game": 9.55
       },
       "rushing": {
-        "yards_per_game": 95.6,
-        "attempts_per_game": 25.7,
-        "yards_per_carry": 3.72,
-        "touchdowns": 1.2,
-        "first_downs_per_game": 6.1
+        "yards_per_game": 93.55,
+        "attempts_per_game": 25.73,
+        "yards_per_carry": 3.636,
+        "touchdowns": 1.09,
+        "first_downs_per_game": 6.18
       },
       "total": {
-        "yards_per_game": 291.1,
-        "plays_per_game": 59.1,
-        "yards_per_play": 4.926
+        "yards_per_game": 286.64,
+        "plays_per_game": 60.0,
+        "yards_per_play": 4.777
       }
     },
     "defense": {
       "passing": {
-        "yards_per_game": 251.6,
-        "attempts_per_game": 38.1,
-        "completions_per_game": 22.5,
-        "completion_pct": 59.06,
-        "yards_per_attempt": 6.604,
-        "touchdowns": 1.7,
-        "interceptions": 0.9,
-        "first_downs_per_game": 11.6
+        "yards_per_game": 241.64,
+        "attempts_per_game": 36.0,
+        "completions_per_game": 21.27,
+        "completion_pct": 59.09,
+        "yards_per_attempt": 6.712,
+        "touchdowns": 1.64,
+        "interceptions": 0.82,
+        "first_downs_per_game": 10.91
       },
       "rushing": {
-        "yards_per_game": 126.2,
-        "attempts_per_game": 27.2,
-        "yards_per_carry": 4.64,
-        "touchdowns": 0.6,
-        "first_downs_per_game": 7.2
+        "yards_per_game": 125.36,
+        "attempts_per_game": 27.55,
+        "yards_per_carry": 4.551,
+        "touchdowns": 0.55,
+        "first_downs_per_game": 7.09
       },
       "total": {
-        "yards_per_game": 377.8,
-        "plays_per_game": 68.4,
+        "yards_per_game": 367.0,
+        "plays_per_game": 66.45,
         "yards_per_play": 5.523
       }
     },
     "turnovers": {
-      "takeaways": 13.0,
-      "giveaways": 7.0,
-      "differential": 6.0
+      "takeaways": 14.0,
+      "giveaways": 10.0,
+      "differential": 4.0
     }
   },
   {
     "team": "DET",
-    "data_updated_at": "2026-11-27T13:07:03.329644+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462266+00:00",
     "season": 2026,
     "games_played": 11,
     "points_for_per_game": 29.36,
@@ -672,7 +672,7 @@
   },
   {
     "team": "GB",
-    "data_updated_at": "2026-11-27T13:07:03.329656+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462277+00:00",
     "season": 2026,
     "games_played": 11,
     "points_for_per_game": 21.73,
@@ -733,7 +733,7 @@
   },
   {
     "team": "HOU",
-    "data_updated_at": "2026-11-27T13:07:03.329668+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462288+00:00",
     "season": 2026,
     "games_played": 10,
     "points_for_per_game": 25.9,
@@ -794,7 +794,7 @@
   },
   {
     "team": "IND",
-    "data_updated_at": "2026-11-27T13:07:03.329680+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462300+00:00",
     "season": 2026,
     "games_played": 11,
     "points_for_per_game": 19.18,
@@ -855,7 +855,7 @@
   },
   {
     "team": "JAX",
-    "data_updated_at": "2026-11-27T13:07:03.329691+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462312+00:00",
     "season": 2026,
     "games_played": 10,
     "points_for_per_game": 28.7,
@@ -916,7 +916,7 @@
   },
   {
     "team": "KC",
-    "data_updated_at": "2026-11-27T13:07:03.329702+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462324+00:00",
     "season": 2026,
     "games_played": 11,
     "points_for_per_game": 25.55,
@@ -977,7 +977,7 @@
   },
   {
     "team": "LAC",
-    "data_updated_at": "2026-11-27T13:07:03.329727+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462348+00:00",
     "season": 2026,
     "games_played": 10,
     "points_for_per_game": 16.8,
@@ -1038,7 +1038,7 @@
   },
   {
     "team": "LAR",
-    "data_updated_at": "2026-11-27T13:07:03.329715+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462337+00:00",
     "season": 2026,
     "games_played": 11,
     "points_for_per_game": 24.91,
@@ -1099,7 +1099,7 @@
   },
   {
     "team": "LV",
-    "data_updated_at": "2026-11-27T13:07:03.329738+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462359+00:00",
     "season": 2026,
     "games_played": 11,
     "points_for_per_game": 25.0,
@@ -1160,7 +1160,7 @@
   },
   {
     "team": "MIA",
-    "data_updated_at": "2026-11-27T13:07:03.329749+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462371+00:00",
     "season": 2026,
     "games_played": 10,
     "points_for_per_game": 15.7,
@@ -1221,7 +1221,7 @@
   },
   {
     "team": "MIN",
-    "data_updated_at": "2026-11-27T13:07:03.329760+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462383+00:00",
     "season": 2026,
     "games_played": 10,
     "points_for_per_game": 18.6,
@@ -1282,7 +1282,7 @@
   },
   {
     "team": "NE",
-    "data_updated_at": "2026-11-27T13:07:03.329772+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462394+00:00",
     "season": 2026,
     "games_played": 10,
     "points_for_per_game": 22.1,
@@ -1343,7 +1343,7 @@
   },
   {
     "team": "NO",
-    "data_updated_at": "2026-11-27T13:07:03.329784+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462406+00:00",
     "season": 2026,
     "games_played": 10,
     "points_for_per_game": 21.5,
@@ -1404,7 +1404,7 @@
   },
   {
     "team": "NYG",
-    "data_updated_at": "2026-11-27T13:07:03.329795+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462417+00:00",
     "season": 2026,
     "games_played": 10,
     "points_for_per_game": 22.6,
@@ -1465,7 +1465,7 @@
   },
   {
     "team": "NYJ",
-    "data_updated_at": "2026-11-27T13:07:03.329806+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462429+00:00",
     "season": 2026,
     "games_played": 11,
     "points_for_per_game": 20.09,
@@ -1526,7 +1526,7 @@
   },
   {
     "team": "PHI",
-    "data_updated_at": "2026-11-27T13:07:03.329817+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462441+00:00",
     "season": 2026,
     "games_played": 11,
     "points_for_per_game": 18.73,
@@ -1587,68 +1587,68 @@
   },
   {
     "team": "PIT",
-    "data_updated_at": "2026-11-27T13:07:03.329829+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462454+00:00",
     "season": 2026,
-    "games_played": 10,
-    "points_for_per_game": 21.4,
-    "points_allowed_per_game": 20.1,
+    "games_played": 11,
+    "points_for_per_game": 21.91,
+    "points_allowed_per_game": 18.73,
     "offense": {
       "passing": {
-        "yards_per_game": 224.3,
-        "attempts_per_game": 36.6,
-        "completions_per_game": 22.1,
-        "completion_pct": 60.38,
-        "yards_per_attempt": 6.128,
-        "touchdowns": 1.6,
-        "interceptions": 0.6,
-        "first_downs_per_game": 9.9
+        "yards_per_game": 216.82,
+        "attempts_per_game": 34.64,
+        "completions_per_game": 20.91,
+        "completion_pct": 60.37,
+        "yards_per_attempt": 6.26,
+        "touchdowns": 1.55,
+        "interceptions": 0.55,
+        "first_downs_per_game": 9.36
       },
       "rushing": {
-        "yards_per_game": 111.8,
-        "attempts_per_game": 23.6,
-        "yards_per_carry": 4.737,
-        "touchdowns": 0.4,
-        "first_downs_per_game": 7.1
+        "yards_per_game": 112.27,
+        "attempts_per_game": 24.27,
+        "yards_per_carry": 4.625,
+        "touchdowns": 0.36,
+        "first_downs_per_game": 7.0
       },
       "total": {
-        "yards_per_game": 336.1,
-        "plays_per_game": 63.3,
-        "yards_per_play": 5.31
+        "yards_per_game": 329.09,
+        "plays_per_game": 61.82,
+        "yards_per_play": 5.324
       }
     },
     "defense": {
       "passing": {
-        "yards_per_game": 248.6,
-        "attempts_per_game": 34.5,
-        "completions_per_game": 22.9,
-        "completion_pct": 66.38,
-        "yards_per_attempt": 7.206,
-        "touchdowns": 1.1,
-        "interceptions": 0.7,
-        "first_downs_per_game": 11.8
+        "yards_per_game": 241.36,
+        "attempts_per_game": 35.0,
+        "completions_per_game": 22.82,
+        "completion_pct": 65.19,
+        "yards_per_attempt": 6.896,
+        "touchdowns": 1.0,
+        "interceptions": 0.82,
+        "first_downs_per_game": 11.45
       },
       "rushing": {
-        "yards_per_game": 84.0,
-        "attempts_per_game": 23.1,
-        "yards_per_carry": 3.636,
-        "touchdowns": 0.6,
-        "first_downs_per_game": 5.4
+        "yards_per_game": 83.0,
+        "attempts_per_game": 23.36,
+        "yards_per_carry": 3.553,
+        "touchdowns": 0.55,
+        "first_downs_per_game": 5.55
       },
       "total": {
-        "yards_per_game": 332.6,
-        "plays_per_game": 60.6,
-        "yards_per_play": 5.488
+        "yards_per_game": 324.36,
+        "plays_per_game": 61.36,
+        "yards_per_play": 5.286
       }
     },
     "turnovers": {
-      "takeaways": 14.0,
-      "giveaways": 8.0,
-      "differential": 6.0
+      "takeaways": 17.0,
+      "giveaways": 9.0,
+      "differential": 8.0
     }
   },
   {
     "team": "SEA",
-    "data_updated_at": "2026-11-27T13:07:03.329840+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462465+00:00",
     "season": 2026,
     "games_played": 10,
     "points_for_per_game": 22.3,
@@ -1709,7 +1709,7 @@
   },
   {
     "team": "SF",
-    "data_updated_at": "2026-11-27T13:07:03.329851+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462477+00:00",
     "season": 2026,
     "games_played": 10,
     "points_for_per_game": 31.6,
@@ -1770,7 +1770,7 @@
   },
   {
     "team": "TB",
-    "data_updated_at": "2026-11-27T13:07:03.329862+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462489+00:00",
     "season": 2026,
     "games_played": 10,
     "points_for_per_game": 22.3,
@@ -1831,7 +1831,7 @@
   },
   {
     "team": "TEN",
-    "data_updated_at": "2026-11-27T13:07:03.329873+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462500+00:00",
     "season": 2026,
     "games_played": 10,
     "points_for_per_game": 19.7,
@@ -1892,7 +1892,7 @@
   },
   {
     "team": "WAS",
-    "data_updated_at": "2026-11-27T13:07:03.329884+00:00",
+    "data_updated_at": "2026-11-28T12:53:56.462511+00:00",
     "season": 2026,
     "games_played": 10,
     "points_for_per_game": 21.8,
